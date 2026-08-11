@@ -629,6 +629,53 @@ ul {
   line-height: 1.6;
 }
 
+.contact-detail-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  margin-top: 0.8rem;
+}
+
+.detail-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  width: 100%;
+}
+
+.detail-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(60, 175, 138, 0.12);
+  color: var(--teal-green);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.detail-text {
+  flex: 1;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+.detail-text strong {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--navy);
+  margin-bottom: 0.2rem;
+}
+
+.detail-text span,
+.detail-text a {
+  font-size: 0.88rem;
+  color: #475569;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
 /* Carousel Dots */
 .hero-carousel-dots {
   display: flex;
@@ -2326,16 +2373,15 @@ ul {
   }
 
   .form-row-grid {
-    grid-template-columns: 1fr;
-    gap: 1rem;
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+    margin-bottom: 1rem !important;
   }
 
-  .custom-form {
-    padding: 1.8rem 1.2rem;
-  }
-
+  .custom-form,
   .contact-info-card {
-    padding: 1.8rem 1.2rem !important;
+    padding: 1.5rem 1.15rem !important;
+    border-radius: 12px !important;
   }
 
   .footer-content {
