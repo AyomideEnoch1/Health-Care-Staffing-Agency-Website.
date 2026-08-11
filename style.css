@@ -1547,11 +1547,23 @@ ul {
   background-color: var(--white);
 }
 
-.gallery-grid {
+.gallery-news-section .container,
+.why-choose-section .container {
+  max-width: 1400px;
+}
+
+.gallery-grid,
+.why-choose-grid {
   display: grid;
-  grid-template-columns: 1.2fr 1fr;
-  gap: clamp(4rem, 6vw, 6.2rem);
+  grid-template-columns: 1fr 1.18fr;
+  gap: clamp(3.5rem, 5vw, 5.5rem);
   align-items: center;
+}
+
+.gallery-info-col,
+.why-choose-info {
+  width: 100%;
+  max-width: 100%;
 }
 
 /* Right-Hand Text Column Typography Sizing for Desktop */
@@ -1606,13 +1618,6 @@ ul {
 /* Why Choose Us Split */
 .why-choose-section {
   background-color: var(--bg-light);
-}
-
-.why-choose-grid {
-  display: grid;
-  grid-template-columns: 1.2fr 1fr;
-  gap: clamp(4rem, 6vw, 6.2rem);
-  align-items: center;
 }
 
 .why-choose-list {
@@ -1911,6 +1916,16 @@ ul {
     grid-template-columns: 1fr 1fr;
     gap: 2rem;
   }
+
+  .gallery-grid,
+  .why-choose-grid {
+    grid-template-columns: 1fr 1.1fr;
+    gap: 2.8rem;
+  }
+
+  .layered-collage-3 {
+    height: 500px;
+  }
 }
 
 /* Tablet Devices (768px to 991px) */
@@ -1996,6 +2011,7 @@ ul {
     gap: 1.8rem;
   }
 
+  .gallery-grid,
   .why-choose-grid {
     grid-template-columns: 1fr;
     gap: 2.5rem;
