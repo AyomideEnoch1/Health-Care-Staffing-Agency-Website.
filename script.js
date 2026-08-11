@@ -233,10 +233,10 @@ document.addEventListener('DOMContentLoaded', () => {
       { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out' }
     );
 
-    // B. Hero Section Elements Reveal
-    gsap.fromTo('.hero-text-block', 
-      { y: 40, opacity: 0 }, 
-      { y: 0, opacity: 1, duration: 1, ease: 'power3.out', delay: 0.1 }
+    // B. Hero & Subpage Hero Entrance Animations
+    gsap.fromTo('.hero-text-block, .subpage-hero .hero-text-block', 
+      { y: 35, opacity: 0 }, 
+      { y: 0, opacity: 1, duration: 1.1, ease: 'power2.out', delay: 0.1 }
     );
 
     gsap.fromTo('.hero-diagonal-shape', 
@@ -244,16 +244,16 @@ document.addEventListener('DOMContentLoaded', () => {
       { scaleX: 1, duration: 1.2, transformOrigin: 'left center', ease: 'power3.inOut' }
     );
 
-    // C. Slide In All Section Headers From Left On Scroll
-    const sectionHeaders = document.querySelectorAll('.welcome-header, .welcome-title, .products-title-wrapper, .gallery-title, .form-title');
+    // C. Slide In All Section Headers & Titles From Left On Scroll (Across All Pages)
+    const sectionHeaders = document.querySelectorAll('.welcome-header, .welcome-title, .products-title-wrapper, .gallery-title, .form-title, .section-title, .page-title, .contact-card-title, .news-subtitle');
     sectionHeaders.forEach(header => {
       gsap.fromTo(header, 
-        { x: -60, opacity: 0 }, 
+        { x: -50, opacity: 0 }, 
         { 
           x: 0, 
           opacity: 1, 
-          duration: 0.95, 
-          ease: 'power3.out',
+          duration: 1.05, 
+          ease: 'power2.out',
           scrollTrigger: {
             trigger: header,
             start: 'top 90%',
@@ -263,7 +263,7 @@ document.addEventListener('DOMContentLoaded', () => {
       );
     });
 
-    // D. Silky Smooth Alternating Left & Right Slide-In Animation for Cards on Scroll
+    // D. Silky Smooth Alternating Left & Right Slide-In Animation for Cards & Items (Across All Pages)
     const animateAlternatingCards = (selector, offsetDist = 45) => {
       const cards = document.querySelectorAll(selector);
       if (cards.length > 0) {
@@ -289,14 +289,10 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     };
 
-    // Apply Smooth Alternating Left/Right Slide-In to Section Cards
-    animateAlternatingCards('.step-card', 45);
-    animateAlternatingCards('.sector-card', 50);
-    animateAlternatingCards('.product-card', 45);
-    animateAlternatingCards('.why-item', 40);
-    animateAlternatingCards('.team-card, .pillar-card, .service-card, .advantage-card, .perk-card, .news-card', 45);
+    // Apply Smooth Alternating Left/Right Slide-In to All Cards & Items Site-Wide
+    animateAlternatingCards('.step-card, .sector-card, .product-card, .why-item, .team-card, .pillar-card, .service-card, .advantage-card, .perk-card, .news-card, .article-card, .leader-card, .value-card, .client-benefit-card, .job-role-card, .apply-step-card', 48);
 
-    // E. 2-Column Split Section Slide-In (Silky Smooth Left & Right Entrance)
+    // E. 2-Column Split Section Slide-In (Silky Smooth Left & Right Entrance Site-Wide)
     const animateSplitSection = (leftSelector, rightSelector, offsetDist = 50) => {
       const leftElements = document.querySelectorAll(leftSelector);
       const rightElements = document.querySelectorAll(rightSelector);
@@ -338,10 +334,37 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     };
 
-    // Apply Left/Right Split Slide-In to Why Choose Us & Contact Section
-    animateSplitSection('.why-choose-grid .gallery-photo-col, .gallery-grid .gallery-photo-col, .contact-info-card', '.why-choose-grid .gallery-info-col, .gallery-grid .gallery-info-col, #home-contact-form', 55);
+    // Apply Left/Right Split Slide-In to Why Choose Us, Gallery, Forms & Contact Cards
+    animateSplitSection(
+      '.why-choose-grid .gallery-photo-col, .gallery-grid .gallery-photo-col, .contact-info-card, .subpage-split-left', 
+      '.why-choose-grid .gallery-info-col, .gallery-grid .gallery-info-col, #home-contact-form, .custom-form, .subpage-split-right', 
+      52
+    );
 
-    // F. Fade-Up for Banners & Containers
+    // F. Tabs, Control Buttons & Pagination Slide-Up
+    const animateInteractiveControls = (selector) => {
+      const controls = document.querySelectorAll(selector);
+      controls.forEach(ctrl => {
+        gsap.fromTo(ctrl, 
+          { y: 25, opacity: 0 }, 
+          { 
+            y: 0, 
+            opacity: 1, 
+            duration: 0.9, 
+            ease: 'power2.out',
+            scrollTrigger: {
+              trigger: ctrl,
+              start: 'top 92%',
+              toggleActions: 'play none none none'
+            }
+          }
+        );
+      });
+    };
+
+    animateInteractiveControls('.tab-btn, .filter-tab, .products-pagination, .social-buttons, .callout-btn-group');
+
+    // G. Fade-Up for Section Containers & Footer
     const animateSectionContainers = (selector, yOffset = 25) => {
       const elements = document.querySelectorAll(selector);
       elements.forEach(el => {
@@ -362,7 +385,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     };
 
-    animateSectionContainers('.strip-section, .welcome-section, .callout-banner-section, .site-footer');
+    animateSectionContainers('.strip-section, .welcome-section, .callout-banner-section, .about-section, .services-section, .clients-section, .jobseekers-section, .blog-section, .contact-section, .site-footer');
 
     // Refresh ScrollTrigger positions after rendering
     setTimeout(() => {
