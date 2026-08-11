@@ -290,7 +290,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // Apply Smooth Alternating Left/Right Slide-In to All Cards & Items Site-Wide
-    animateAlternatingCards('.step-card, .sector-card, .product-card, .why-item, .team-card, .pillar-card, .service-card, .advantage-card, .perk-card, .news-card, .article-card, .leader-card, .value-card, .client-benefit-card, .job-role-card, .apply-step-card', 48);
+    animateAlternatingCards('.step-card, .sector-card, .product-card, .why-item, .team-card, .pillar-card, .service-card, .advantage-card, .perk-card, .news-card, .article-card, .leader-card, .value-card, .client-benefit-card, .job-role-card, .apply-step-card, .leadership-grid > div, .pillars-grid > div, .services-page-grid > div, .advantages-grid > div, .perks-grid > div, .blog-grid > article, .contact-grid-row > div', 48);
 
     // E. 2-Column Split Section Slide-In (Silky Smooth Left & Right Entrance Site-Wide)
     const animateSplitSection = (leftSelector, rightSelector, offsetDist = 50) => {
