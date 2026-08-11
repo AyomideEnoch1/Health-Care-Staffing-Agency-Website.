@@ -445,24 +445,29 @@ ul {
   margin-top: 1.4rem;
 }
 
-/* Button Pill */
+/* Button Pill - Responsive & Fluid */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   font-family: var(--font-heading);
-  font-size: clamp(0.75rem, 1.5vw, 0.8rem);
+  font-size: clamp(0.72rem, 2.5vw, 0.86rem);
   font-weight: 700;
-  letter-spacing: 1px;
+  letter-spacing: 0.8px;
   text-transform: uppercase;
   border-radius: var(--radius-pill);
   cursor: pointer;
   transition: var(--transition-fast);
+  text-align: center;
+  white-space: normal;
+  line-height: 1.35;
+  word-break: normal;
+  overflow-wrap: break-word;
 }
 
 .btn-pill-hero {
-  padding: clamp(0.75rem, 2vw, 0.85rem) clamp(1.5rem, 3.5vw, 2.4rem);
-  font-size: clamp(0.78rem, 1.5vw, 0.86rem);
+  padding: clamp(0.75rem, 2.5vw, 0.92rem) clamp(1.2rem, 3.2vw, 2.4rem);
+  font-size: clamp(0.74rem, 2.5vw, 0.86rem);
   font-weight: 800;
   background: var(--white);
   color: var(--navy) !important;
@@ -504,7 +509,7 @@ ul {
 
 .form-card-container {
   margin: 3rem auto 0 auto;
-  max-width: 1000px;
+  max-width: 1150px;
   width: 100%;
   box-sizing: border-box;
 }
@@ -514,10 +519,104 @@ ul {
   border: 2px solid #CBD5E1;
   border-top: 4px solid var(--teal-green);
   border-radius: 16px;
-  padding: 2.8rem 2.5rem;
+  padding: clamp(1.6rem, 4vw, 3.2rem) clamp(1.2rem, 3.5vw, 2.8rem);
   box-shadow: 0 20px 45px rgba(26, 58, 99, 0.12);
   width: 100%;
   box-sizing: border-box;
+}
+
+/* Responsive Team Cards & Role Badges for About Us Page */
+.team-card {
+  background: var(--white);
+  border: 2px solid #E2E8F0;
+  border-radius: 14px;
+  padding: clamp(1.5rem, 3.5vw, 2.5rem) clamp(1.2rem, 3vw, 2rem);
+  box-shadow: var(--shadow-soft);
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+.team-card-teal {
+  border-top: 4px solid var(--teal-green);
+}
+
+.team-card-sky {
+  border-top: 4px solid var(--sky-blue);
+}
+
+.role-pill-badge {
+  display: inline-block;
+  padding: 0.4rem 0.95rem;
+  font-weight: 800;
+  font-size: clamp(0.68rem, 2.2vw, 0.78rem);
+  border-radius: 50px;
+  margin-bottom: 1rem;
+  max-width: 100%;
+  box-sizing: border-box;
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  line-height: 1.35;
+}
+
+.role-pill-badge.teal-badge {
+  background: rgba(60, 175, 138, 0.15);
+  color: var(--teal-green);
+}
+
+.role-pill-badge.sky-badge {
+  background: rgba(46, 155, 214, 0.15);
+  color: var(--sky-blue);
+}
+
+.team-member-name {
+  font-family: var(--font-heading);
+  font-size: clamp(1.25rem, 3.2vw, 1.5rem);
+  color: var(--navy);
+  margin-bottom: 0.4rem;
+}
+
+.team-member-credentials {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: var(--cyan-turquoise);
+  margin-bottom: 1.2rem;
+}
+
+.team-member-credentials.sky-text {
+  color: var(--sky-blue);
+}
+
+.team-member-bio {
+  font-size: 0.95rem;
+  color: #475569;
+  line-height: 1.65;
+  margin-bottom: 1.2rem;
+}
+
+.team-member-bullets {
+  font-size: 0.88rem;
+  color: var(--navy);
+  line-height: 1.8;
+  margin-bottom: 1.2rem;
+  font-weight: 700;
+  list-style: none;
+}
+
+.team-member-email {
+  font-size: 0.9rem;
+  color: var(--navy);
+  font-weight: 800;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+.sky-link {
+  color: var(--sky-blue);
+  font-weight: 800;
 }
 
 .border-accent-card {
@@ -682,9 +781,12 @@ ul {
 
 .contact-grid-row {
   display: grid;
-  grid-template-columns: 1fr 1.2fr;
-  gap: 3rem;
+  grid-template-columns: 1fr 1.35fr;
+  gap: 3.5rem;
   margin-top: 2.5rem;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .contact-info-card {
