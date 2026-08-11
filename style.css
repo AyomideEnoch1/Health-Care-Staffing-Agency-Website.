@@ -1376,8 +1376,84 @@ ul {
   letter-spacing: 0.5px;
 }
 
-.sector-link:hover {
-  color: var(--deep-blue);
+/* 3-Picture Photo Collage for Why Partner With Section */
+.photo-collage-3 {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+  position: relative;
+}
+
+.collage-item {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-card);
+  box-shadow: 0 12px 32px rgba(26, 58, 99, 0.12);
+  border: 2px solid #CBD5E1;
+  transition: var(--transition-smooth);
+}
+
+.collage-item:hover {
+  transform: translateY(-4px);
+  border-color: var(--cyan-turquoise);
+  box-shadow: 0 18px 40px rgba(27, 174, 207, 0.2);
+}
+
+.collage-item-main {
+  width: 100%;
+  height: 290px;
+}
+
+.collage-item-main .collage-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  transition: transform 0.6s ease;
+}
+
+.collage-item-main:hover .collage-img {
+  transform: scale(1.05);
+}
+
+.collage-badge {
+  position: absolute;
+  bottom: 14px;
+  left: 14px;
+  background: linear-gradient(135deg, #1B4F8C 0%, #1A3A63 100%);
+  color: var(--white);
+  font-family: var(--font-heading);
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 0.35rem 0.85rem;
+  border-radius: 50px;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  z-index: 3;
+}
+
+.collage-row-sub {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  width: 100%;
+}
+
+.collage-item-sub {
+  height: 190px;
+}
+
+.collage-item-sub .collage-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s ease;
+}
+
+.collage-item-sub:hover .collage-img {
+  transform: scale(1.06);
 }
 
 /* Why Choose Us Split */
@@ -2110,6 +2186,14 @@ ul {
   .btn {
     padding: 0.75rem 1.4rem;
     font-size: 0.76rem;
+  }
+
+  .collage-item-main {
+    height: 220px;
+  }
+
+  .collage-item-sub {
+    height: 140px;
   }
 
   .gallery-img {
