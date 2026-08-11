@@ -2128,6 +2128,41 @@ ul {
     gap: 2.5rem;
   }
 
+  /* Mobile Restructure for Blog Layered Collage */
+  .layered-collage-3 {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.85rem !important;
+    height: auto !important;
+    position: static !important;
+    padding: 0 !important;
+    margin-bottom: 1.5rem;
+  }
+
+  .layered-item {
+    position: relative !important;
+    top: auto !important;
+    bottom: auto !important;
+    left: auto !important;
+    right: auto !important;
+    width: 100% !important;
+    height: 185px !important;
+    transform: none !important;
+    border-radius: var(--radius-card) !important;
+    box-shadow: 0 8px 24px rgba(26, 58, 99, 0.12) !important;
+    border: 2px solid #CBD5E1 !important;
+  }
+
+  .layered-item.layer-front {
+    height: 220px !important;
+    box-shadow: 0 12px 30px rgba(26, 58, 99, 0.18) !important;
+    border-color: var(--cyan-turquoise) !important;
+  }
+
+  .layered-item:hover {
+    transform: translateY(-4px) !important;
+  }
+
   .contact-grid-row {
     grid-template-columns: 1fr;
     gap: 2rem;
@@ -2358,26 +2393,6 @@ ul {
 
   .collage-item-sub {
     height: 140px;
-  }
-
-  .layered-collage-3 {
-    height: 330px;
-  }
-
-  .layer-back {
-    width: 74%;
-    height: 165px;
-  }
-
-  .layer-front {
-    top: 55px;
-    width: 76%;
-    height: 175px;
-  }
-
-  .layer-bottom {
-    width: 70%;
-    height: 145px;
   }
 
   .gallery-img {
