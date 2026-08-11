@@ -509,7 +509,7 @@ ul {
 
 .form-card-container {
   margin: 3rem auto 0 auto;
-  max-width: 1150px;
+  max-width: 1200px;
   width: 100%;
   box-sizing: border-box;
 }
@@ -2597,28 +2597,42 @@ ul {
     padding: 2rem 1.5rem;
   }
 
+  /* 95%+ Mobile Screen Width for Forms & Containers */
+  .container {
+    padding-left: 0.7rem !important;
+    padding-right: 0.7rem !important;
+  }
+
   .form-row-grid {
     grid-template-columns: 1fr !important;
     gap: 1rem !important;
     margin-bottom: 1rem !important;
   }
 
-  .form-card-container,
+  .form-card-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 95% !important;
+    margin: 1.8rem auto 0 auto !important;
+    box-sizing: border-box !important;
+  }
+
   .custom-form,
   .contact-info-card,
   .contact-form-card,
   .border-accent-card {
     width: 100% !important;
     max-width: 100% !important;
+    min-width: 95% !important;
     box-sizing: border-box !important;
-    padding: 1.5rem 1.15rem !important;
-    border-radius: 16px !important;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
+    padding: 1.4rem 0.9rem !important;
+    border-radius: 20px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
   }
 
   .contact-manager-box {
-    padding: 1rem 0.85rem !important;
+    padding: 1rem 0.8rem !important;
     width: 100% !important;
     box-sizing: border-box !important;
   }
