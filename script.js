@@ -291,4 +291,38 @@ document.addEventListener('DOMContentLoaded', () => {
 
     animateAlternatingCards('.step-card, .sector-card, .product-card, .why-item, .team-card, .pillar-card, .service-card, .advantage-card, .perk-card, .contact-grid-row > div', 48);
   }
+
+  // 4. Slide-in from Right Animation for Executive Overview
+  const slideRightEls = document.querySelectorAll('.slide-from-right');
+  slideRightEls.forEach((el) => {
+    if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+      gsap.fromTo(
+        el,
+        { x: 120, opacity: 0 },
+        {
+          x: 0,
+          opacity: 1,
+          duration: 1.15,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: el,
+            start: 'top 85%',
+            toggleActions: 'play none none none'
+          }
+        }
+      );
+    } else {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('active-slide');
+            }
+          });
+        },
+        { threshold: 0.15 }
+      );
+      observer.observe(el);
+    }
+  });
 });

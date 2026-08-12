@@ -1705,9 +1705,47 @@ ul {
   transition: transform 0.4s ease;
 }
 
-.sector-card:hover .value-icon-box svg,
-.core-value-card:hover .value-icon-box svg {
-  transform: scale(1.08);
+/* ==========================================================================
+   Slanted Section Borders, Blended Backgrounds & Slide Animations
+   ========================================================================== */
+.slanted-top-right {
+  position: relative;
+  clip-path: polygon(0 50px, 100% 0, 100% 100%, 0 100%);
+  margin-top: -50px;
+  padding-top: 6rem !important;
+}
+
+.slanted-bottom-left {
+  position: relative;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 50px), 0 100%);
+  padding-bottom: 6rem !important;
+}
+
+.slanted-both {
+  position: relative;
+  clip-path: polygon(0 50px, 100% 0, 100% calc(100% - 50px), 0 100%);
+  margin-top: -50px;
+  padding-top: 6rem !important;
+  padding-bottom: 6rem !important;
+}
+
+/* Purpose & Vision Blended Gradient Background */
+.blended-vision-bg {
+  background: linear-gradient(180deg, var(--white) 0%, #EFFBF9 35%, #E0F2FE 75%, var(--white) 100%);
+  position: relative;
+}
+
+/* Slide From Right Scroll Effect */
+.slide-from-right {
+  opacity: 0;
+  transform: translateX(90px);
+  will-change: transform, opacity;
+  transition: transform 1.1s cubic-bezier(0.16, 1, 0.3, 1), opacity 1.1s ease;
+}
+
+.slide-from-right.active-slide {
+  opacity: 1;
+  transform: translateX(0);
 }
 
 .sector-img-box {
