@@ -29,15 +29,15 @@ document.addEventListener('DOMContentLoaded', () => {
   const productData = [
     // Page 1
     [
-      { img: 'assets/images/role_psw_care.jpg', title: 'A. Personal Care Support', highlight: false },
-      { img: 'assets/images/service_nurse.jpg', title: 'B. Travelling Nursing Program', highlight: true },
-      { img: 'assets/images/role_rn_care.jpg', title: 'C. Support & Companionship', highlight: false }
+      { img: 'assets/images/role_psw_care.jpg', title: 'Personal Care Support', highlight: false },
+      { img: 'assets/images/service_nurse.jpg', title: 'Travelling Nursing Program', highlight: true },
+      { img: 'assets/images/role_rn_care.jpg', title: 'Support & Companionship', highlight: false }
     ],
     // Page 2
     [
-      { img: 'assets/images/role_icu_care.jpg', title: 'D. Respite Care Services', highlight: false },
-      { img: 'assets/images/hero_divine.jpg', title: 'E. Light Household Support', highlight: true },
-      { img: 'assets/images/role_psw_care.jpg', title: 'F. Alzheimer’s & Dementia Care', highlight: false }
+      { img: 'assets/images/role_icu_care.jpg', title: 'Respite Care Services', highlight: false },
+      { img: 'assets/images/hero_divine.jpg', title: 'Light Household Support', highlight: true },
+      { img: 'assets/images/role_psw_care.jpg', title: 'Alzheimer’s & Dementia Care', highlight: false }
     ],
     // Page 3
     [
