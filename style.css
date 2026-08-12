@@ -1744,9 +1744,9 @@ ul {
   background-color: #F1F5F9;
 }
 
-/* 5. Cyan/Teal Gradient Geometric Ribbon Background */
+/* 5. Clean Non-Glowing Section Background */
 .geometric-ribbon-cyan {
-  background: linear-gradient(135deg, #F8FAFC 0%, #E0F2FE 40%, #EFFBF9 100%);
+  background-color: var(--white);
 }
 
 /* 6. White Background Sharp Slanted Section */
