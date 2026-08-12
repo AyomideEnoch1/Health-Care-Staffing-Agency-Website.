@@ -356,12 +356,23 @@
                 <input type="text" class="form-field" id="applicant-city" placeholder="CITY &amp; PROVINCE (e.g. Scarborough, ON)" required>
               </div>
 
-              <!-- RESUME UPLOAD FIELD -->
-              <div style="margin-bottom: 1.2rem; text-align: left;">
-                <label for="applicant-resume" style="display: block; font-weight: 700; color: var(--navy); margin-bottom: 0.5rem; font-size: 0.9rem;">
-                  Upload Resume / CV <span style="color: var(--teal-green); font-weight: normal;">(PDF, DOC, DOCX max 10MB)</span> *
+              <!-- CUSTOM RESUME UPLOAD COMPONENT -->
+              <div class="custom-file-upload-box">
+                <input type="file" id="applicant-resume" class="hidden-file-input" accept=".pdf,.doc,.docx" required>
+                <label for="applicant-resume" class="file-upload-label">
+                  <div class="file-upload-icon-circle">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                      <polyline points="17 8 12 3 7 8"></polyline>
+                      <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                  </div>
+                  <div class="file-upload-text-group">
+                    <span class="file-upload-title">UPLOAD YOUR RESUME / CV *</span>
+                    <span class="file-upload-subtitle" id="file-chosen-name">Click to browse or drag &amp; drop file here (PDF, DOC, DOCX - Max 10MB)</span>
+                  </div>
+                  <span class="file-upload-btn-chip">BROWSE FILE</span>
                 </label>
-                <input type="file" class="form-field" id="applicant-resume" accept=".pdf,.doc,.docx" required style="padding: 0.6rem; background: var(--bg-light); border: 2px dashed var(--teal-green); border-radius: 8px; cursor: pointer;">
               </div>
 
               <button type="submit" class="btn btn-pill-hero full-width-btn">SUBMIT APPLICATION WITH RESUME</button>

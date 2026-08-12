@@ -360,7 +360,7 @@ document.addEventListener('DOMContentLoaded', () => {
               }
             });
           },
-          { threshold: 0.12 }
+          { threshold: 0.1 }
         );
         observer.observe(el);
       }
@@ -372,7 +372,7 @@ document.addEventListener('DOMContentLoaded', () => {
   setupSlideAnimation(slideTopEls, 'top');
 
 
-  // 6. Roles Stagger — queues list items one-by-one on scroll
+  // 6. Roles Stagger — queues list items one-by-one on scroll (10% threshold trigger)
   const staggerLists = document.querySelectorAll('.roles-stagger-list');
   if (staggerLists.length > 0) {
     const staggerObserver = new IntersectionObserver(
@@ -384,8 +384,27 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         });
       },
-      { threshold: 0.05, rootMargin: '0px 0px -30px 0px' }
+      { threshold: 0.1 }
     );
     staggerLists.forEach((list) => staggerObserver.observe(list));
   }
+
+  // 7. Custom Resume File Input Indicator
+  const resumeInput = document.getElementById('applicant-resume');
+  const fileChosenLabel = document.getElementById('file-chosen-name');
+  if (resumeInput && fileChosenLabel) {
+    resumeInput.addEventListener('change', function () {
+      if (this.files && this.files.length > 0) {
+        const fileName = this.files[0].name;
+        fileChosenLabel.textContent = `Selected: ${fileName} (Ready to upload)`;
+        fileChosenLabel.style.color = '#00A896';
+        fileChosenLabel.style.fontWeight = '700';
+      } else {
+        fileChosenLabel.textContent = 'Click to browse or drag & drop file here (PDF, DOC, DOCX - Max 10MB)';
+        fileChosenLabel.style.color = '#475569';
+        fileChosenLabel.style.fontWeight = 'normal';
+      }
+    });
+  }
 });
+
