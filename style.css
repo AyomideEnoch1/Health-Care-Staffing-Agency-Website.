@@ -1706,43 +1706,56 @@ ul {
 }
 
 /* ==========================================================================
-   Reference Image Signature Background Architecture
+   Universal Sharp Slanted Section Borders Architecture
    ========================================================================== */
 
-/* 1. Diagonal Geometric Hero Subpage Banner */
+/* 1. Subpage Hero Sharp Slanted Bottom Border */
 .subpage-hero {
   position: relative;
   background: linear-gradient(135deg, #0A192F 0%, #0A2240 45%, #00A896 85%, #1BAECF 100%) !important;
   clip-path: polygon(0 0, 100% 0, 100% calc(100% - 4.5vw), 0 100%);
   margin-bottom: -4vw;
-  padding-bottom: calc(5rem + 4vw) !important;
+  padding-bottom: calc(5.5rem + 4vw) !important;
 }
 
-/* 2. Light Neutral Geometric Ribbon Section (Matches Middle Gray Block in Reference Image) */
-.geometric-ribbon-section {
+/* 2. Light Neutral Geometric Ribbon Section (Sharp Slanted Top & Bottom) */
+.geometric-ribbon-section,
+.sharp-slanted-section {
   position: relative;
   background-color: #F1F5F9;
-  clip-path: polygon(0 4vw, 100% 0, 100% calc(100% - 4vw), 0 100%);
-  margin-top: -3.5vw;
-  margin-bottom: -3.5vw;
-  padding-top: calc(5.5rem + 4vw) !important;
-  padding-bottom: calc(5.5rem + 4vw) !important;
+  clip-path: polygon(0 4.2vw, 100% 0, 100% calc(100% - 4.2vw), 0 100%);
+  margin-top: -3.8vw;
+  margin-bottom: -3.8vw;
+  padding-top: calc(6rem + 4.2vw) !important;
+  padding-bottom: calc(6rem + 4.2vw) !important;
   z-index: 2;
 }
 
-/* 3. Cyan/Teal Gradient Geometric Ribbon Section */
+/* 3. Cyan/Teal Gradient Geometric Ribbon Section (Reverse Sharp Slanted Top & Bottom) */
 .geometric-ribbon-cyan {
   position: relative;
   background: linear-gradient(135deg, #F8FAFC 0%, #E0F2FE 40%, #EFFBF9 100%);
-  clip-path: polygon(0 0, 100% 4vw, 100% 100%, 0 calc(100% - 4vw));
-  margin-top: -3.5vw;
-  margin-bottom: -3.5vw;
-  padding-top: calc(5.5rem + 4vw) !important;
-  padding-bottom: calc(5.5rem + 4vw) !important;
+  clip-path: polygon(0 0, 100% 4.2vw, 100% 100%, 0 calc(100% - 4.2vw));
+  margin-top: -3.8vw;
+  margin-bottom: -3.8vw;
+  padding-top: calc(6rem + 4.2vw) !important;
+  padding-bottom: calc(6rem + 4.2vw) !important;
   z-index: 2;
 }
 
-/* 4. Left Accent Indicator Line for Section Headings (Reference Style) */
+/* 4. White Background Sharp Slanted Section */
+.sharp-slanted-white {
+  position: relative;
+  background-color: var(--white);
+  clip-path: polygon(0 4.2vw, 100% 0, 100% calc(100% - 4.2vw), 0 100%);
+  margin-top: -3.8vw;
+  margin-bottom: -3.8vw;
+  padding-top: calc(6rem + 4.2vw) !important;
+  padding-bottom: calc(6rem + 4.2vw) !important;
+  z-index: 2;
+}
+
+/* 5. Left Accent Indicator Line for Section Headings */
 .accent-heading-wrapper {
   border-left: 4px solid var(--cyan-turquoise);
   padding-left: 1.2rem;
@@ -1752,23 +1765,24 @@ ul {
 /* Slanted & Angled Utility Classes */
 .slanted-top-right {
   position: relative;
-  clip-path: polygon(0 50px, 100% 0, 100% 100%, 0 100%);
-  margin-top: -50px;
-  padding-top: 6rem !important;
+  clip-path: polygon(0 4.2vw, 100% 0, 100% 100%, 0 100%);
+  margin-top: -3.8vw;
+  padding-top: calc(6rem + 4.2vw) !important;
 }
 
 .slanted-bottom-left {
   position: relative;
-  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 50px), 0 100%);
-  padding-bottom: 6rem !important;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 4.2vw), 0 100%);
+  padding-bottom: calc(6rem + 4.2vw) !important;
 }
 
 .slanted-both {
   position: relative;
-  clip-path: polygon(0 50px, 100% 0, 100% calc(100% - 50px), 0 100%);
-  margin-top: -50px;
-  padding-top: 6rem !important;
-  padding-bottom: 6rem !important;
+  clip-path: polygon(0 4.2vw, 100% 0, 100% calc(100% - 4.2vw), 0 100%);
+  margin-top: -3.8vw;
+  margin-bottom: -3.8vw;
+  padding-top: calc(6rem + 4.2vw) !important;
+  padding-bottom: calc(6rem + 4.2vw) !important;
 }
 
 /* Purpose & Vision Blended Gradient Background */
