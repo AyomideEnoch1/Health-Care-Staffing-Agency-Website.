@@ -138,7 +138,7 @@ document.addEventListener('DOMContentLoaded', () => {
       img: "assets/images/service_homecare.jpg"
     },
     {
-      text: "Nurse-Led Excellence<br>under Livina Akadinwa<br>RN, BScN, MPH.",
+      text: "Nurse-Led Excellence<br>&amp; Clinical Quality<br>Assurance 24/7.",
       img: "assets/images/team_divine.jpg"
     }
   ];
@@ -203,8 +203,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 4. Form Feedback Submission Messages
   const forms = [
-    { formId: 'client-request-form', feedbackId: 'client-form-feedback', successMsg: 'Facility shift request submitted successfully! Divine Fingers operations will confirm within 30 minutes.' },
-    { formId: 'candidate-apply-form', feedbackId: 'candidate-form-feedback', successMsg: 'Application received! Divine Fingers recruitment coordinator will reach out shortly.' },
+    { formId: 'client-request-form', feedbackId: 'client-form-feedback', successMsg: 'Facility shift request submitted successfully! Divine Fingers care coordination team will confirm rapidly.' },
+    { formId: 'candidate-apply-form', feedbackId: 'candidate-form-feedback', successMsg: 'Application & resume received! Divine Fingers recruitment coordinator will reach out shortly.' },
     { formId: 'general-contact-form', feedbackId: 'contact-form-feedback', successMsg: 'Message sent! Thank you for reaching out to Divine Fingers Healthcare Services.' },
     { formId: 'home-contact-form', feedbackId: 'home-form-feedback', successMsg: 'Message sent! Thank you for reaching out to Divine Fingers Healthcare Services. Our care coordination team will respond shortly.' }
   ];
