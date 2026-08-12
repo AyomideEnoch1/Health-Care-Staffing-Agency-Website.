@@ -1107,17 +1107,115 @@ ul {
 }
 
 .welcome-text {
-  font-size: 0.95rem;
-  color: var(--text-muted);
-  max-width: 900px;
-  line-height: 1.7;
-  margin-bottom: 1.2rem;
+  font-size: 1.22rem;
+  color: #1E293B;
+  max-width: 960px;
+  line-height: 1.85;
+  margin-bottom: 1.8rem;
+  font-weight: 500;
 }
 
 .link-more {
   display: inline-block;
   font-family: var(--font-heading);
   font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--primary-cyan);
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.link-more:hover {
+  transform: translateX(4px);
+  color: var(--navy);
+}
+
+/* ==========================================================================
+   REDESIGNED EXECUTIVE CORE VALUES CARDS (REDUCED BORDER RADIUS & SLEEK STYLING)
+   ========================================================================== */
+
+.core-value-card {
+  background: var(--white);
+  border: 1px solid #E2E8F0;
+  border-radius: 6px; /* Reduced crisp corporate border radius */
+  padding: 2.2rem 1.8rem;
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.05);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.core-value-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.1);
+}
+
+.core-value-card.value-teal {
+  border-left: 5px solid var(--teal-green);
+}
+.core-value-card.value-sky {
+  border-left: 5px solid var(--sky-blue);
+}
+.core-value-card.value-cyan {
+  border-left: 5px solid var(--cyan-turquoise);
+}
+.core-value-card.value-navy {
+  border-left: 5px solid var(--navy);
+}
+
+.value-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.value-badge-pill {
+  font-family: var(--font-heading);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  padding: 0.35rem 0.75rem;
+  border-radius: 4px;
+  text-transform: uppercase;
+  display: inline-block;
+}
+
+.badge-teal {
+  color: var(--teal-green);
+  background: rgba(0, 168, 150, 0.1);
+}
+.badge-sky {
+  color: var(--sky-blue);
+  background: rgba(27, 174, 207, 0.1);
+}
+.badge-cyan {
+  color: var(--cyan-turquoise);
+  background: rgba(78, 205, 196, 0.12);
+}
+.badge-navy {
+  color: var(--navy);
+  background: rgba(10, 34, 64, 0.08);
+}
+
+.value-icon-circle {
+  font-size: 1.4rem;
+}
+
+.value-card-title {
+  font-family: var(--font-heading);
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--navy);
+  margin-bottom: 0.6rem;
+  line-height: 1.35;
+}
+
+.value-card-desc {
+  font-size: 0.94rem;
+  color: #475569;
+  line-height: 1.7;
+  margin: 0;
+}
   font-weight: 800;
   color: var(--primary-cyan);
   letter-spacing: 0.5px;
