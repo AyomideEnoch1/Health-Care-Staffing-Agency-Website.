@@ -1895,6 +1895,14 @@ ul {
   background-color: #F1F5F9;
 }
 
+/* Apply Now Section containment & bottom padding to contain candidate form */
+#apply-now {
+  padding-bottom: clamp(5.5rem, 10vw, 9rem) !important;
+  position: relative;
+  overflow: hidden;
+}
+
+
 /* 5. Clean Non-Glowing Section Background */
 .geometric-ribbon-cyan {
   background-color: var(--white);
@@ -3231,6 +3239,11 @@ ul {
   #candidate-apply-form .form-title {
     font-size: clamp(1.15rem, 4.5vw, 1.4rem) !important;
   }
+
+  #apply-now {
+    padding-bottom: 4.8rem !important;
+  }
+
 
 
   /* Why Partner With Cards Column Flex-Direction on Mobile */
