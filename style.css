@@ -1708,7 +1708,7 @@ ul {
 /* ==========================================================================
    Universal Sharp Slanted Section Borders Architecture
 /* ==========================================================================
-   Universal Sharp Slanted Section Borders Architecture (ALL PAGES)
+   Homepage Specific Top-Border Sharp Slanted Edge Architecture
    ========================================================================== */
 
 /* 1. Subpage Hero Sharp Slanted Bottom Border */
@@ -1721,34 +1721,22 @@ ul {
   z-index: 1;
 }
 
-/* 2. Universal Sharp Slanted Clip Path for ALL Section Elements Across All Pages */
-section,
-.section-padding,
-.geometric-ribbon-section,
-.geometric-ribbon-cyan,
-.sharp-slanted-section,
-.sharp-slanted-white,
-.why-choose-section,
-.welcome-section,
-.client-section,
-.jobseekers-section,
-.contact-section {
+/* 2. Top Border Slants Down From Left to Right */
+.sharp-top-slant-left {
   position: relative;
-  clip-path: polygon(0 4.2vw, 100% 0, 100% calc(100% - 4.2vw), 0 100%);
-  margin-top: -3.8vw;
-  margin-bottom: -3.8vw;
-  padding-top: calc(6rem + 4.2vw) !important;
-  padding-bottom: calc(6rem + 4.2vw) !important;
+  clip-path: polygon(0 4.2vw, 100% 0, 100% 100%, 0 100%) !important;
+  margin-top: -3.8vw !important;
+  padding-top: calc(5.5rem + 3.8vw) !important;
   z-index: 2;
 }
 
-/* 3. Automatic Alternating Sharp Slanted Cutouts for Odd & Even Sections */
-section:nth-of-type(even) {
-  clip-path: polygon(0 0, 100% 4.2vw, 100% 100%, 0 calc(100% - 4.2vw)) !important;
-}
-
-section:nth-of-type(odd) {
-  clip-path: polygon(0 4.2vw, 100% 0, 100% calc(100% - 4.2vw), 0 100%) !important;
+/* 3. Top Border Slants Down From Right to Left */
+.sharp-top-slant-right {
+  position: relative;
+  clip-path: polygon(0 0, 100% 4.2vw, 100% 100%, 0 100%) !important;
+  margin-top: -3.8vw !important;
+  padding-top: calc(5.5rem + 3.8vw) !important;
+  z-index: 2;
 }
 
 /* 4. Light Neutral Geometric Ribbon Background */
