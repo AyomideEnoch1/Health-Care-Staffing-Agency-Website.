@@ -1675,6 +1675,37 @@ ul {
   box-shadow: var(--shadow-hover);
 }
 
+/* Core Value Card Icon Box Interactive Hover Effects */
+.value-icon-box {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--teal-green) 0%, var(--sky-blue) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.2rem;
+  box-shadow: 0 4px 14px rgba(0, 168, 150, 0.22);
+  flex-shrink: 0;
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease, background 0.4s ease;
+}
+
+.sector-card:hover .value-icon-box,
+.core-value-card:hover .value-icon-box {
+  transform: scale(1.15) translateY(-2px) rotate(-4deg);
+  background: linear-gradient(135deg, var(--sky-blue) 0%, var(--teal-green) 100%);
+  box-shadow: 0 8px 24px rgba(27, 174, 207, 0.45);
+}
+
+.value-icon-box svg {
+  transition: transform 0.4s ease;
+}
+
+.sector-card:hover .value-icon-box svg,
+.core-value-card:hover .value-icon-box svg {
+  transform: scale(1.08);
+}
+
 .sector-img-box {
   width: 100%;
   height: 210px;
