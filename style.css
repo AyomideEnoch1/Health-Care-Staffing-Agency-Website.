@@ -1707,55 +1707,66 @@ ul {
 
 /* ==========================================================================
    Universal Sharp Slanted Section Borders Architecture
+/* ==========================================================================
+   Universal Sharp Slanted Section Borders Architecture (ALL PAGES)
    ========================================================================== */
 
 /* 1. Subpage Hero Sharp Slanted Bottom Border */
 .subpage-hero {
   position: relative;
   background: linear-gradient(135deg, #0A192F 0%, #0A2240 45%, #00A896 85%, #1BAECF 100%) !important;
-  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 4.5vw), 0 100%);
-  margin-bottom: -4vw;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 4.5vw), 0 100%) !important;
+  margin-bottom: -4vw !important;
   padding-bottom: calc(5.5rem + 4vw) !important;
+  z-index: 1;
 }
 
-/* 2. Light Neutral Geometric Ribbon Section (Sharp Slanted Top & Bottom) */
+/* 2. Universal Sharp Slanted Clip Path for ALL Section Elements Across All Pages */
+section,
+.section-padding,
 .geometric-ribbon-section,
-.sharp-slanted-section {
+.geometric-ribbon-cyan,
+.sharp-slanted-section,
+.sharp-slanted-white,
+.why-choose-section,
+.welcome-section,
+.client-section,
+.jobseekers-section,
+.contact-section {
   position: relative;
+  clip-path: polygon(0 4.2vw, 100% 0, 100% calc(100% - 4.2vw), 0 100%);
+  margin-top: -3.8vw;
+  margin-bottom: -3.8vw;
+  padding-top: calc(6rem + 4.2vw) !important;
+  padding-bottom: calc(6rem + 4.2vw) !important;
+  z-index: 2;
+}
+
+/* 3. Automatic Alternating Sharp Slanted Cutouts for Odd & Even Sections */
+section:nth-of-type(even) {
+  clip-path: polygon(0 0, 100% 4.2vw, 100% 100%, 0 calc(100% - 4.2vw)) !important;
+}
+
+section:nth-of-type(odd) {
+  clip-path: polygon(0 4.2vw, 100% 0, 100% calc(100% - 4.2vw), 0 100%) !important;
+}
+
+/* 4. Light Neutral Geometric Ribbon Background */
+.geometric-ribbon-section {
   background-color: #F1F5F9;
-  clip-path: polygon(0 4.2vw, 100% 0, 100% calc(100% - 4.2vw), 0 100%);
-  margin-top: -3.8vw;
-  margin-bottom: -3.8vw;
-  padding-top: calc(6rem + 4.2vw) !important;
-  padding-bottom: calc(6rem + 4.2vw) !important;
-  z-index: 2;
 }
 
-/* 3. Cyan/Teal Gradient Geometric Ribbon Section (Reverse Sharp Slanted Top & Bottom) */
+/* 5. Cyan/Teal Gradient Geometric Ribbon Background */
 .geometric-ribbon-cyan {
-  position: relative;
   background: linear-gradient(135deg, #F8FAFC 0%, #E0F2FE 40%, #EFFBF9 100%);
-  clip-path: polygon(0 0, 100% 4.2vw, 100% 100%, 0 calc(100% - 4.2vw));
-  margin-top: -3.8vw;
-  margin-bottom: -3.8vw;
-  padding-top: calc(6rem + 4.2vw) !important;
-  padding-bottom: calc(6rem + 4.2vw) !important;
-  z-index: 2;
 }
 
-/* 4. White Background Sharp Slanted Section */
+/* 6. White Background Sharp Slanted Section */
 .sharp-slanted-white {
-  position: relative;
   background-color: var(--white);
-  clip-path: polygon(0 4.2vw, 100% 0, 100% calc(100% - 4.2vw), 0 100%);
-  margin-top: -3.8vw;
-  margin-bottom: -3.8vw;
-  padding-top: calc(6rem + 4.2vw) !important;
-  padding-bottom: calc(6rem + 4.2vw) !important;
-  z-index: 2;
 }
 
-/* 5. Left Accent Indicator Line for Section Headings */
+/* 7. Left Accent Indicator Line for Section Headings */
 .accent-heading-wrapper {
   border-left: 4px solid var(--cyan-turquoise);
   padding-left: 1.2rem;
@@ -1765,20 +1776,20 @@ ul {
 /* Slanted & Angled Utility Classes */
 .slanted-top-right {
   position: relative;
-  clip-path: polygon(0 4.2vw, 100% 0, 100% 100%, 0 100%);
+  clip-path: polygon(0 4.2vw, 100% 0, 100% 100%, 0 100%) !important;
   margin-top: -3.8vw;
   padding-top: calc(6rem + 4.2vw) !important;
 }
 
 .slanted-bottom-left {
   position: relative;
-  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 4.2vw), 0 100%);
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 4.2vw), 0 100%) !important;
   padding-bottom: calc(6rem + 4.2vw) !important;
 }
 
 .slanted-both {
   position: relative;
-  clip-path: polygon(0 4.2vw, 100% 0, 100% calc(100% - 4.2vw), 0 100%);
+  clip-path: polygon(0 4.2vw, 100% 0, 100% calc(100% - 4.2vw), 0 100%) !important;
   margin-top: -3.8vw;
   margin-bottom: -3.8vw;
   padding-top: calc(6rem + 4.2vw) !important;
