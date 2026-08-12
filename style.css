@@ -3190,6 +3190,49 @@ ul {
     box-sizing: border-box !important;
   }
 
+  /* Custom File Upload Box & Candidate Form Mobile Responsiveness */
+  .file-upload-label {
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    padding: 1rem 0.8rem !important;
+    gap: 0.75rem !important;
+  }
+
+  .file-upload-text-group {
+    align-items: center !important;
+    text-align: center !important;
+    width: 100% !important;
+  }
+
+  .file-upload-subtitle {
+    white-space: normal !important;
+    word-break: break-word !important;
+    text-align: center !important;
+    font-size: 0.78rem !important;
+  }
+
+  .file-upload-btn-chip {
+    width: 100% !important;
+    text-align: center !important;
+    box-sizing: border-box !important;
+    padding: 0.6rem 0.8rem !important;
+  }
+
+  #candidate-apply-form select.form-field {
+    font-size: 0.8rem !important;
+    padding: 0.95rem 0.75rem !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    max-width: 100% !important;
+  }
+
+  #candidate-apply-form .form-title {
+    font-size: clamp(1.15rem, 4.5vw, 1.4rem) !important;
+  }
+
+
   /* Why Partner With Cards Column Flex-Direction on Mobile */
   .why-item {
     display: flex !important;
