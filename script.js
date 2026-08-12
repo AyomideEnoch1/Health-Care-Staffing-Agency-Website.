@@ -130,15 +130,15 @@ document.addEventListener('DOMContentLoaded', () => {
       img: "assets/images/hero_divine.jpg"
     },
     {
-      text: "Travelling Nursing Program<br>On-Demand Clinical Care<br>across Canada.",
+      text: "Travelling Nursing Program<br>On-Demand Clinical Care Across Canada.",
       img: "assets/images/service_nurse.jpg"
     },
     {
-      text: "Personal Care &amp;<br>Assistive Daily Living<br>Support.",
+      text: "Personal Care Support<br>&amp; Assistive Daily Living.",
       img: "assets/images/service_homecare.jpg"
     },
     {
-      text: "Partnership Not Transactions<br>Quality Over Quantity<br>in Every Care Interaction.",
+      text: "Partnership &amp; Quality<br>in Every Care Interaction.",
       img: "assets/images/team_divine.jpg"
     }
   ];
@@ -166,6 +166,17 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => {
       if (heroTitle) {
         heroTitle.innerHTML = slide.text;
+        
+        // Dynamically scale font size down for longer sentences
+        const cleanText = slide.text.replace(/<[^>]*>/g, '');
+        if (cleanText.length > 38) {
+          heroTitle.style.fontSize = 'clamp(1.5rem, 3.1vw, 2.2rem)';
+        } else if (cleanText.length > 28) {
+          heroTitle.style.fontSize = 'clamp(1.7rem, 3.4vw, 2.45rem)';
+        } else {
+          heroTitle.style.fontSize = '';
+        }
+
         heroTitle.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
         heroTitle.style.opacity = '1';
         heroTitle.style.transform = 'translateY(0)';
