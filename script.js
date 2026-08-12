@@ -292,37 +292,100 @@ document.addEventListener('DOMContentLoaded', () => {
     animateAlternatingCards('.step-card, .sector-card, .product-card, .why-item, .team-card, .pillar-card, .service-card, .advantage-card, .perk-card, .contact-grid-row > div', 48);
   }
 
-  // 4. Slide-in from Right Animation for Executive Overview
+  // 5. Scroll-Triggered Slide-In Animations (Left, Right & Top)
+  // Pre-mark all slide elements as hidden so they start off-screen
+  const slideLeftEls = document.querySelectorAll('.slide-from-left');
   const slideRightEls = document.querySelectorAll('.slide-from-right');
-  slideRightEls.forEach((el) => {
-    if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
-      gsap.fromTo(
-        el,
-        { x: 120, opacity: 0 },
-        {
-          x: 0,
-          opacity: 1,
-          duration: 1.15,
-          ease: 'power3.out',
-          scrollTrigger: {
-            trigger: el,
-            start: 'top 85%',
-            toggleActions: 'play none none none'
-          }
+  const slideTopEls = document.querySelectorAll('.slide-from-top');
+
+  // Add .slide-hidden to start them invisible (JS-gated to avoid no-JS issues)
+  slideLeftEls.forEach(el => el.classList.add('slide-hidden'));
+  slideRightEls.forEach(el => el.classList.add('slide-hidden'));
+  slideTopEls.forEach(el => el.classList.add('slide-hidden'));
+
+  // Responsive offset: smaller on mobile to prevent horizontal/vertical layout jump
+  const getSlideOffset = () => {
+    const w = window.innerWidth;
+    if (w <= 480) return 22;
+    if (w <= 767) return 35;
+    if (w <= 991) return 55;
+    return 80;
+  };
+
+  const setupSlideAnimation = (elements, direction) => {
+    elements.forEach((el) => {
+      if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+        // GSAP handles animation entirely via inline styles
+        const offset = getSlideOffset();
+        let fromState = { opacity: 0 };
+        if (direction === 'left') {
+          fromState.x = -offset;
+        } else if (direction === 'right') {
+          fromState.x = offset;
+        } else if (direction === 'top') {
+          fromState.y = -offset;
         }
-      );
-    } else {
-      const observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              entry.target.classList.add('active-slide');
+
+        gsap.fromTo(
+          el,
+          fromState,
+          {
+            x: 0,
+            y: 0,
+            opacity: 1,
+            duration: 1.1,
+            ease: 'power3.out',
+            clearProps: 'transform,opacity',
+            scrollTrigger: {
+              trigger: el,
+              start: 'top 88%',
+              toggleActions: 'play none none none'
+            },
+            onStart: () => {
+              // Remove the CSS hidden class so GSAP's inline styles take full control
+              el.classList.remove('slide-hidden');
             }
-          });
-        },
-        { threshold: 0.15 }
-      );
-      observer.observe(el);
-    }
-  });
+          }
+        );
+      } else {
+        // IntersectionObserver CSS-transition fallback
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                // Transition: hidden → active-slide (CSS handles smooth animation)
+                el.classList.remove('slide-hidden');
+                el.classList.add('active-slide');
+                observer.unobserve(el);
+              }
+            });
+          },
+          { threshold: 0.12 }
+        );
+        observer.observe(el);
+      }
+    });
+  };
+
+  setupSlideAnimation(slideLeftEls, 'left');
+  setupSlideAnimation(slideRightEls, 'right');
+  setupSlideAnimation(slideTopEls, 'top');
+
+
+  // 6. Roles Stagger — queues list items one-by-one on scroll
+  const staggerLists = document.querySelectorAll('.roles-stagger-list');
+  if (staggerLists.length > 0) {
+    const staggerObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('stagger-revealed');
+            staggerObserver.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.05, rootMargin: '0px 0px -30px 0px' }
+    );
+    staggerLists.forEach((list) => staggerObserver.observe(list));
+  }
 });
