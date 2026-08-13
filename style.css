@@ -3124,9 +3124,26 @@ ul {
 
   /* OUR TEAM section text font size increase on mobile */
   .why-choose-info .news-description {
-    font-size: 1.02rem !important;
-    line-height: 1.72 !important;
+    font-size: 1.15rem !important;
+    line-height: 1.75 !important;
     color: #1E293B !important;
+  }
+
+  /* Remove card background/container on mobile for Why Work With Us overview card */
+  .why-work-card {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin-top: 0 !important;
+    margin-bottom: 1.2rem !important;
+  }
+
+  .why-work-card p {
+    font-size: 1.15rem !important;
+    line-height: 1.75 !important;
+    color: #1E293B !important;
+    margin-top: 0 !important;
   }
 
   /* Narrative cards font size on mobile */
@@ -3333,9 +3350,10 @@ ul {
     line-height: 1.7 !important;
   }
 
-  .why-choose-info .news-description {
-    font-size: 0.98rem !important;
-    line-height: 1.68 !important;
+  .why-choose-info .news-description,
+  .why-work-card p {
+    font-size: 1.08rem !important;
+    line-height: 1.7 !important;
   }
 
   .narrative-card p {
@@ -3465,9 +3483,15 @@ ul {
   /* ─ Services Row 1: Header ─ */
   /* Already stacked by 991px rule; now tighten further */
   .service-section-header-row {
-    gap: 0.6rem !important;
-    margin-bottom: 1.6rem !important;
-    padding-bottom: 1rem !important;
+    gap: 0.5rem !important;
+    margin-bottom: 0.8rem !important;
+    padding-bottom: 0.5rem !important;
+  }
+
+  /* Section slant padding reduction on mobile */
+  .sharp-top-slant-left,
+  .sharp-top-slant-right {
+    padding-top: calc(2.2rem + 2vw) !important;
   }
 
   /* Section badge chips: shrink font & padding on mobile */
