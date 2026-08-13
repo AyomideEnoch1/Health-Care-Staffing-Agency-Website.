@@ -3129,21 +3129,27 @@ ul {
     color: #1E293B !important;
   }
 
-  /* Remove card background/container on mobile for Why Work With Us overview card */
-  .why-work-card {
+  /* Remove card background/container & increase width on mobile for Why Work With Us & Who We Partner With */
+  .why-work-card,
+  .who-partner-card {
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;
     padding: 0 !important;
     margin-top: 0 !important;
     margin-bottom: 1.2rem !important;
+    width: 100% !important;
+    max-width: 100% !important;
   }
 
-  .why-work-card p {
+  .why-work-card p,
+  .who-partner-card p {
     font-size: 1.15rem !important;
     line-height: 1.75 !important;
     color: #1E293B !important;
     margin-top: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
   }
 
   /* Narrative cards font size on mobile */
@@ -3351,9 +3357,12 @@ ul {
   }
 
   .why-choose-info .news-description,
-  .why-work-card p {
+  .why-work-card p,
+  .who-partner-card p {
     font-size: 1.08rem !important;
     line-height: 1.7 !important;
+    width: 100% !important;
+    max-width: 100% !important;
   }
 
   .narrative-card p {
