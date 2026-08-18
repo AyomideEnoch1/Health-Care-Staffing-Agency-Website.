@@ -4135,13 +4135,17 @@ ul {
   box-sizing: border-box;
 }
 
+.admin-view-tab,
 .admin-tab-panel {
-  display: none;
-  animation: fadeInPanel 0.3s ease;
+  display: none !important;
+  opacity: 0;
 }
 
+.admin-view-tab.active-tab,
 .admin-tab-panel.active {
-  display: block;
+  display: block !important;
+  opacity: 1;
+  animation: fadeInPanel 0.3s ease;
 }
 
 @keyframes fadeInPanel {

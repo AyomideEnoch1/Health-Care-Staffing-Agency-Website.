@@ -202,22 +202,135 @@ document.addEventListener('DOMContentLoaded', () => {
     startHeroAutoCycle();
   }
 
-  // 4. Form Feedback Submission Messages
-  const forms = [
-    { formId: 'client-request-form', feedbackId: 'client-form-feedback', successMsg: 'Staffing request submitted successfully! Divine Fingers team will reach out promptly.' },
-    { formId: 'candidate-apply-form', feedbackId: 'candidate-form-feedback', successMsg: 'Application & resume received! Divine Fingers recruitment coordinator will contact you.' },
-    { formId: 'general-contact-form', feedbackId: 'contact-form-feedback', successMsg: 'Message sent! Thank you for reaching out to Divine Fingers Healthcare Services.' },
-    { formId: 'home-contact-form', feedbackId: 'home-form-feedback', successMsg: 'Message sent! Thank you for reaching out to Divine Fingers Healthcare Services.' }
-  ];
+  // 4. Form Feedback Submission & Live Admin Storage Link
+  function saveToAdminDB(key, newEntry) {
+    try {
+      const existing = JSON.parse(localStorage.getItem(key) || '[]');
+      existing.unshift(newEntry);
+      localStorage.setItem(key, JSON.stringify(existing));
 
-  forms.forEach(item => {
-    const form = document.getElementById(item.formId);
-    const feedback = document.getElementById(item.feedbackId);
-    if (form && feedback) {
+      // Append Audit Log
+      const logs = JSON.parse(localStorage.getItem('df_audit_logs') || '[]');
+      const now = new Date();
+      const timestamp = now.toISOString().slice(0, 10) + ' ' + now.toTimeString().slice(0, 8);
+      logs.unshift({
+        id: `AUD-${Math.floor(1000 + Math.random() * 9000)}`,
+        timestamp: timestamp,
+        actor: 'Website Visitor',
+        action: 'WEB_SUBMISSION',
+        target: key,
+        details: `New submission received from ${newEntry.name || newEntry.facility || newEntry.email || 'Website Form'}`,
+        severity: 'info'
+      });
+      localStorage.setItem('df_audit_logs', JSON.stringify(logs));
+    } catch (e) {
+      console.warn('Unable to sync to local admin storage:', e);
+    }
+  }
+
+  // Client Request Form
+  const clientForm = document.getElementById('client-request-form');
+  const clientFeedback = document.getElementById('client-form-feedback');
+  if (clientForm) {
+    clientForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const facility = document.getElementById('facility-name')?.value || 'Facility Client';
+      const contact = document.getElementById('client-contact-name')?.value || 'Contact Person';
+      const email = document.getElementById('client-work-email')?.value || '';
+      const phone = document.getElementById('client-phone-num')?.value || '';
+      const role = document.getElementById('client-service-needed')?.value || 'RN (Registered Nurse)';
+      const shift = document.getElementById('client-shift-location')?.value || 'Day Shift';
+
+      saveToAdminDB('df_staff_requests', {
+        id: `REQ-${Math.floor(100 + Math.random() * 900)}`,
+        facility: facility,
+        contact: contact,
+        email: email,
+        phone: phone,
+        role: role,
+        shift: shift,
+        date: new Date().toISOString().slice(0, 10),
+        status: 'pending',
+        assignedStaff: 'Unassigned',
+        notes: 'Submitted via Clients Request Form'
+      });
+
+      if (clientFeedback) {
+        clientFeedback.style.color = '#3CAF8A';
+        clientFeedback.textContent = 'Staffing request submitted successfully! Divine Fingers team will reach out promptly.';
+      }
+      clientForm.reset();
+    });
+  }
+
+  // Candidate Application Form
+  const applyForm = document.getElementById('candidate-apply-form');
+  const applyFeedback = document.getElementById('candidate-form-feedback');
+  if (applyForm) {
+    applyForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('applicant-name')?.value || 'Candidate';
+      const role = document.getElementById('applicant-role-select')?.value || 'RN';
+      const phone = document.getElementById('applicant-phone')?.value || '';
+      const email = document.getElementById('applicant-email')?.value || '';
+      const license = document.getElementById('applicant-license')?.value || 'Pending Verification';
+      const resumeInput = document.getElementById('applicant-resume');
+      const resumeName = (resumeInput && resumeInput.files && resumeInput.files[0]) ? resumeInput.files[0].name : `${name.replace(/\s+/g, '_')}_Resume.pdf`;
+
+      saveToAdminDB('df_job_applicants', {
+        id: `APP-${Math.floor(200 + Math.random() * 800)}`,
+        name: name,
+        role: role,
+        phone: phone,
+        email: email,
+        license: license,
+        stage: 'new',
+        date: new Date().toISOString().slice(0, 10),
+        experience: 'Applied via Web Portal',
+        resumeFileName: resumeName,
+        resumeFileType: resumeName.endsWith('.pdf') ? 'PDF Document' : 'DOCX Document',
+        resumeFileSize: '240 KB',
+        resumeSummary: `Certified ${role} applicant with verified credentials submitted via Candidate Portal.`
+      });
+
+      if (applyFeedback) {
+        applyFeedback.style.color = '#3CAF8A';
+        applyFeedback.textContent = 'Application & resume received! Divine Fingers recruitment coordinator will contact you.';
+      }
+      applyForm.reset();
+    });
+  }
+
+  // Contact Forms
+  ['general-contact-form', 'home-contact-form'].forEach(formId => {
+    const form = document.getElementById(formId);
+    const feedback = document.getElementById(formId === 'general-contact-form' ? 'contact-form-feedback' : 'home-form-feedback');
+    if (form) {
       form.addEventListener('submit', (e) => {
         e.preventDefault();
-        feedback.style.color = '#3CAF8A';
-        feedback.textContent = item.successMsg;
+        const inputs = form.querySelectorAll('input, textarea');
+        let name = 'Website Visitor', email = '', phone = '', message = 'General Inquiry';
+        inputs.forEach(inp => {
+          if (inp.placeholder && inp.placeholder.includes('NAME')) name = inp.value || name;
+          if (inp.type === 'email' || (inp.placeholder && inp.placeholder.includes('EMAIL'))) email = inp.value || email;
+          if (inp.type === 'tel' || (inp.placeholder && inp.placeholder.includes('PHONE'))) phone = inp.value || phone;
+          if (inp.tagName === 'TEXTAREA') message = inp.value || message;
+        });
+
+        saveToAdminDB('df_inquiries', {
+          id: `INQ-${Math.floor(400 + Math.random() * 500)}`,
+          name: name,
+          email: email,
+          phone: phone,
+          type: 'Website Message',
+          message: message,
+          date: new Date().toISOString().slice(0, 10)
+        });
+
+        if (feedback) {
+          feedback.style.color = '#3CAF8A';
+          feedback.textContent = 'Message sent! Thank you for reaching out to Divine Fingers Healthcare Services.';
+        }
         form.reset();
       });
     }
