@@ -3724,3 +3724,13 @@ ul {
     font-size: 0.82rem !important;
   }
 }
+
+.admin-footer-link {
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.admin-footer-link:hover {
+  color: var(--cyan-turquoise) !important;
+  text-decoration: underline !important;
+  transform: translateY(-1px);
+}

@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Operations & Analytics Dashboard | Divine Fingers Healthcare Services Inc.</title>
+  <meta name="description" content="Administrative Ops Portal & Futuristic Analytics Dashboard for Divine Fingers Healthcare Services Inc.">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Open+Sans:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- CSS Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Chart.js CDN for Futuristic Data Visualizations -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body style="background-color: #0F172A; margin: 0; padding: 0;">
+
+  <!-- 1. ADMIN AUTHENTICATION GATE OVERLAY -->
+  <div class="admin-auth-overlay" id="admin-auth-overlay">
+    <div class="admin-auth-card">
+      <img src="assets/images/logo.png" alt="Divine Fingers Logo" class="admin-auth-logo">
+      <h2 class="admin-auth-title">DIVINE FINGERS ADMIN</h2>
+      <p class="admin-auth-subtitle">Healthcare Care Coordination & Operations Portal</p>
+      
+      <form class="admin-auth-form" id="admin-login-form">
+        <select class="form-field" id="admin-role-select" style="letter-spacing: 0; font-size: 0.95rem; margin-bottom: 0.8rem; cursor: pointer;">
+          <option value="super-admin">Super Admin (Full System & Audit Access)</option>
+          <option value="care-admin">Care Coordinator Admin (Operations Access)</option>
+        </select>
+        <input type="password" class="form-field" id="admin-passcode" placeholder="ENTER ACCESS PIN" required autofocus>
+        <button type="submit" class="btn btn-pill-hero full-width-btn" style="padding: 0.85rem; font-size: 0.95rem;">LOGIN TO DASHBOARD</button>
+        <div class="admin-auth-error" id="auth-error-msg">Super Admin PIN: 7777 | Admin PIN: 1234</div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 2. MAIN ADMIN DASHBOARD WRAPPER -->
+  <div class="admin-wrapper" id="admin-app" style="display: flex;">
+
+    <!-- Mobile Backdrop -->
+    <div class="admin-sidebar-backdrop" id="admin-sidebar-backdrop"></div>
+
+    <!-- SIDEBAR NAVIGATION -->
+    <aside class="admin-sidebar" id="admin-sidebar">
+      <div class="admin-sidebar-header">
+        <img src="assets/images/logo.png" alt="Divine Fingers Healthcare Logo" class="admin-sidebar-logo">
+        <div style="display: flex; flex-direction: column;">
+          <span class="admin-sidebar-brand-name">Divine Fingers</span>
+          <span class="admin-sidebar-brand-sub">HEALTHCARE ADMIN</span>
+        </div>
+      </div>
+
+      <nav class="admin-nav">
+        <ul class="admin-nav-list">
+          <li class="admin-nav-item">
+            <a href="#overview" class="admin-nav-link active" data-tab="overview-tab">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="7" height="9"/>
+                <rect x="14" y="3" width="7" height="5"/>
+                <rect x="14" y="12" width="7" height="9"/>
+                <rect x="3" y="16" width="7" height="5"/>
+              </svg>
+              <span>Overview Analytics</span>
+            </a>
+          </li>
+
+          <li class="admin-nav-item">
+            <a href="#requests" class="admin-nav-link" data-tab="requests-tab">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/>
+                <line x1="16" y1="17" x2="8" y2="17"/>
+                <polyline points="10 9 9 9 8 9"/>
+              </svg>
+              <span>Staffing Requests</span>
+              <span class="admin-nav-badge" id="requests-count-badge">0</span>
+            </a>
+          </li>
+
+          <li class="admin-nav-item">
+            <a href="#applicants" class="admin-nav-link" data-tab="applicants-tab">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+              <span>Job Applicants (ATS)</span>
+              <span class="admin-nav-badge" id="applicants-count-badge">0</span>
+            </a>
+          </li>
+
+          <li class="admin-nav-item">
+            <a href="#roster" class="admin-nav-link" data-tab="roster-tab">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+              </svg>
+              <span>Caregiver Roster Pool</span>
+            </a>
+          </li>
+
+          <li class="admin-nav-item">
+            <a href="#inquiries" class="admin-nav-link" data-tab="inquiries-tab">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                <polyline points="22,6 12,13 2,6"/>
+              </svg>
+              <span>Inquiries & Alerts</span>
+            </a>
+          </li>
+
+          <li class="admin-nav-item">
+            <a href="#audit" class="admin-nav-link" data-tab="audit-tab">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                <path d="m9 12 2 2 4-4"/>
+              </svg>
+              <span>Audit Log &amp; Compliance</span>
+            </a>
+          </li>
+
+          <li class="admin-nav-item">
+            <a href="#onboarding" class="admin-nav-link" data-tab="onboarding-tab">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+                <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+              </svg>
+              <span>Onboarding &amp; LMS</span>
+              <span class="admin-nav-badge">5 Courses</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+
+      <div class="admin-sidebar-footer">
+        <div class="admin-user-info" id="admin-profile-pill" style="cursor: pointer;" title="Click to view Administrator Profile">
+          <div class="admin-avatar" id="user-avatar-initials">SA</div>
+          <div class="admin-user-details">
+            <span class="admin-user-name" id="user-name-text">Super Admin</span>
+            <span class="role-badge super-admin" id="user-role-badge">SUPER ADMIN</span>
+          </div>
+        </div>
+        <button class="admin-logout-btn" id="admin-logout-btn" title="Lock Session">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+            <polyline points="16 17 21 12 16 7"/>
+            <line x1="21" y1="12" x2="9" y2="12"/>
+          </svg>
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="admin-main">
+      <!-- TOPBAR HEADER -->
+      <header class="admin-topbar">
+        <div class="admin-topbar-left">
+          <button class="admin-mobile-toggle" id="admin-menu-toggle" aria-label="Open Sidebar Menu">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </button>
+          <h1 class="admin-topbar-title" id="page-current-title">
+            Overview Analytics
+          </h1>
+          <span class="admin-pulse-badge">
+            <span class="pulse-dot"></span>
+            <span class="pulse-text">Live Operational Telemetry</span>
+          </span>
+        </div>
+
+        <div class="admin-topbar-right">
+          <!-- Theme Switcher Toggle -->
+          <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle Light/Dark Theme">
+            <span id="theme-toggle-icon">☀️</span>
+            <span id="theme-toggle-label" class="theme-label-text">Light Mode</span>
+          </button>
+
+          <!-- Search Box Input -->
+          <div class="admin-search-box">
+            <svg class="admin-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" class="admin-search-input" id="global-admin-search" placeholder="Search facilities, nurses, applicants...">
+          </div>
+
+          <a href="index.html" target="_blank" class="action-btn view-site-btn" style="text-decoration: none;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            <span class="view-site-text">View Site</span>
+          </a>
+        </div>
+      </header>
+
+      <!-- BODY CONTENT PANELS -->
+      <div class="admin-body">
+
+        <!-- ========================================== -->
+        <!-- TAB 1: OVERVIEW ANALYTICS (FUTURISTIC GRAPHS) -->
+        <!-- ========================================== -->
+        <div class="admin-view-tab active-tab" id="overview-tab">
+          <!-- TOP STATS METRIC STRIP -->
+          <div class="admin-stats-grid">
+            <!-- Stat 1 -->
+            <div class="admin-stat-card">
+              <div class="stat-card-top">
+                <div class="stat-icon-wrapper">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                </div>
+                <span class="stat-trend trend-up">↑ +14.2%</span>
+              </div>
+              <div class="stat-val" id="stat-total-requests">28</div>
+              <div class="stat-lbl">Total Shift Requests</div>
+            </div>
+
+            <!-- Stat 2 -->
+            <div class="admin-stat-card">
+              <div class="stat-card-top">
+                <div class="stat-icon-wrapper" style="color: #10B981; background: rgba(16, 185, 129, 0.12);">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                </div>
+                <span class="stat-trend trend-up" style="color: #10B981; background: rgba(16, 185, 129, 0.15);">98.5% Filled</span>
+              </div>
+              <div class="stat-val" id="stat-active-shifts">24</div>
+              <div class="stat-lbl">Active Shift Placements</div>
+            </div>
+
+            <!-- Stat 3 -->
+            <div class="admin-stat-card">
+              <div class="stat-card-top">
+                <div class="stat-icon-wrapper" style="color: #60A5FA; background: rgba(59, 130, 246, 0.12);">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                </div>
+                <span class="stat-trend trend-neutral">Pending Review</span>
+              </div>
+              <div class="stat-val" id="stat-pending-applicants">19</div>
+              <div class="stat-lbl">Candidate Applicants</div>
+            </div>
+
+            <!-- Stat 4 -->
+            <div class="admin-stat-card">
+              <div class="stat-card-top">
+                <div class="stat-icon-wrapper" style="color: #A78BFA; background: rgba(139, 92, 246, 0.12);">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                </div>
+                <span class="stat-trend trend-up">Ready for Dispatch</span>
+              </div>
+              <div class="stat-val" id="stat-vetted-roster">42</div>
+              <div class="stat-lbl">Vetted Nurse &amp; PSW Roster</div>
+            </div>
+          </div>
+
+          <!-- FUTURISTIC CHARTS GRID -->
+          <div class="admin-charts-grid">
+            <!-- Chart Unit 1: Shift Volume & Placement Velocity Area Chart -->
+            <div class="admin-chart-card">
+              <div class="chart-header">
+                <div class="chart-title-box">
+                  <h3 class="chart-title">Shift Demand &amp; Staff Dispatch Velocity</h3>
+                  <span class="chart-subtitle">Weekly comparison of incoming staffing requests vs deployed healthcare personnel</span>
+                </div>
+                <span class="chart-badge">REAL-TIME TELEMETRY</span>
+              </div>
+              <div class="chart-canvas-wrapper">
+                <canvas id="shiftVolumeChart"></canvas>
+              </div>
+            </div>
+
+            <!-- Chart Unit 2: Role Distribution & Fulfillment Meter -->
+            <div class="admin-chart-card">
+              <div class="chart-header">
+                <div class="chart-title-box">
+                  <h3 class="chart-title">Role Placements</h3>
+                  <span class="chart-subtitle">RN, RPN vs PSW Deployment Ratio</span>
+                </div>
+              </div>
+              <div class="chart-canvas-wrapper" style="height: 220px;">
+                <canvas id="roleBreakdownChart"></canvas>
+              </div>
+              <div class="gauge-center-text">
+                <span class="gauge-percentage">98.4%</span>
+                <span class="gauge-subtext">On-Time Shift Fulfillment Rate</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- RECENT OPERATIONAL LOG -->
+          <div class="admin-panel-card">
+            <div class="panel-header">
+              <div class="panel-title-group">
+                <h3 class="panel-title">Recent Facility Requests &amp; Candidate Activity</h3>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Time / Date</th>
+                    <th>Type</th>
+                    <th>Name / Facility</th>
+                    <th>Role / Details</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="overview-recent-tbody">
+                  <!-- Dynamic JS rows -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- TAB 2: STAFFING REQUESTS MANAGEMENT -->
+        <!-- ========================================== -->
+        <div class="admin-view-tab" id="requests-tab">
+          <div class="admin-panel-card">
+            <div class="panel-header">
+              <div class="panel-title-group">
+                <h3 class="panel-title">Client Facility Staffing Requests</h3>
+              </div>
+              <div class="table-controls">
+                <select class="admin-filter-select" id="requests-status-filter">
+                  <option value="all">All Statuses</option>
+                  <option value="pending">Pending</option>
+                  <option value="assigned">Assigned / Staffed</option>
+                  <option value="completed">Completed</option>
+                </select>
+                <button class="action-btn" id="export-requests-csv">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  Export CSV
+                </button>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Facility Name</th>
+                    <th>Contact Person</th>
+                    <th>Role Required</th>
+                    <th>Shift Details</th>
+                    <th>Date / Time</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="requests-tbody">
+                  <!-- Dynamic JS rows -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- TAB 3: JOB APPLICANTS (ATS) -->
+        <!-- ========================================== -->
+        <div class="admin-view-tab" id="applicants-tab">
+          <div class="admin-panel-card">
+            <div class="panel-header">
+              <div class="panel-title-group">
+                <h3 class="panel-title">Nurse &amp; PSW Candidate Applications (ATS)</h3>
+              </div>
+              <div class="table-controls">
+                <select class="admin-filter-select" id="applicants-role-filter">
+                  <option value="all">All Roles</option>
+                  <option value="RN">Registered Nurse (RN)</option>
+                  <option value="RPN">Registered Practical Nurse (RPN)</option>
+                  <option value="PSW">Personal Support Worker (PSW)</option>
+                </select>
+                <button class="action-btn" id="export-applicants-csv">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  Export Candidates
+                </button>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Candidate Name</th>
+                    <th>Applied Role</th>
+                    <th>Phone / Email</th>
+                    <th>CNO License # / Cert</th>
+                    <th>Application Stage</th>
+                    <th>Resume / CV</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="applicants-tbody">
+                  <!-- Dynamic JS rows -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- TAB 4: CAREGIVER ROSTER POOL -->
+        <!-- ========================================== -->
+        <div class="admin-view-tab" id="roster-tab">
+          <div class="admin-panel-card">
+            <div class="panel-header">
+              <div class="panel-title-group">
+                <h3 class="panel-title">Vetted Healthcare Roster &amp; Dispatch Pool</h3>
+              </div>
+              <div class="table-controls">
+                <select class="admin-filter-select" id="roster-availability-filter">
+                  <option value="all">All Staff Availability</option>
+                  <option value="available">Available for Dispatch</option>
+                  <option value="on-shift">On Shift Placement</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Staff Name</th>
+                    <th>Title &amp; Credential</th>
+                    <th>Contact Line</th>
+                    <th>Region / Location</th>
+                    <th>Availability Status</th>
+                    <th>Quick Dispatch</th>
+                  </tr>
+                </thead>
+                <tbody id="roster-tbody">
+                  <!-- Dynamic JS rows -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- TAB 5: INQUIRIES & ALERTS -->
+        <!-- ========================================== -->
+        <div class="admin-view-tab" id="inquiries-tab">
+          <div class="admin-panel-card">
+            <div class="panel-header">
+              <div class="panel-title-group">
+                <h3 class="panel-title">General Inquiries &amp; Shift Alert Subscribers</h3>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Sender Name</th>
+                    <th>Email Address</th>
+                    <th>Phone</th>
+                    <th>Inquiry Subject / Type</th>
+                    <th>Message / Date</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="inquiries-tbody">
+                  <!-- Dynamic JS rows -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        <!-- ========================================== -->
+        <!-- TAB 6: AUDIT LOG & COMPLIANCE -->
+        <!-- ========================================== -->
+        <div class="admin-view-tab" id="audit-tab">
+          <div class="admin-panel-card">
+            <div class="panel-header">
+              <div class="panel-title-group">
+                <h3 class="panel-title">System &amp; Operational Audit Log</h3>
+              </div>
+              <div class="table-controls">
+                <select class="admin-filter-select" id="audit-severity-filter">
+                  <option value="all">All Severities</option>
+                  <option value="info">Info</option>
+                  <option value="success">Success</option>
+                  <option value="warning">Warning</option>
+                  <option value="danger">Danger</option>
+                </select>
+                <button class="action-btn" id="export-audit-csv">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  Export Audit CSV
+                </button>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Timestamp</th>
+                    <th>Actor / User</th>
+                    <th>Action Performed</th>
+                    <th>Target Entity</th>
+                    <th>Operation Details</th>
+                    <th>Level</th>
+                  </tr>
+                </thead>
+                <tbody id="audit-tbody">
+                  <!-- Dynamic JS audit log rows -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- TAB 7: EMPLOYEE ONBOARDING & LEARNING (LMS) -->
+        <!-- ========================================== -->
+        <div class="admin-view-tab" id="onboarding-tab">
+          <!-- Onboarding Metrics Strip -->
+          <div class="admin-stats-grid" style="margin-bottom: 1.5rem;">
+            <div class="admin-stat-card">
+              <div class="stat-card-top">
+                <div class="stat-icon-wrapper">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </div>
+                <span class="stat-trend trend-up">Active Staff</span>
+              </div>
+              <div class="stat-val">64</div>
+              <div class="stat-lbl">Enrolled Healthcare Workers</div>
+            </div>
+
+            <div class="admin-stat-card">
+              <div class="stat-card-top">
+                <div class="stat-icon-wrapper">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                </div>
+                <span class="stat-trend trend-up">91.2%</span>
+              </div>
+              <div class="stat-val">58</div>
+              <div class="stat-lbl">Fully Certified &amp; Cleared</div>
+            </div>
+
+            <div class="admin-stat-card">
+              <div class="stat-card-top">
+                <div class="stat-icon-wrapper">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                </div>
+                <span class="stat-trend trend-neutral">In Progress</span>
+              </div>
+              <div class="stat-val">6</div>
+              <div class="stat-lbl">Pending Onboarding Courses</div>
+            </div>
+
+            <div class="admin-stat-card">
+              <div class="stat-card-top">
+                <div class="stat-icon-wrapper">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+                </div>
+                <span class="stat-trend trend-up">100% Validated</span>
+              </div>
+              <div class="stat-val">284</div>
+              <div class="stat-lbl">LMS Course Modules Completed</div>
+            </div>
+          </div>
+
+          <!-- Staff Onboarding Progress & Compliance Table -->
+          <div class="admin-panel-card" style="margin-bottom: 1.8rem;">
+            <div class="panel-header">
+              <div class="panel-title-group">
+                <h3 class="panel-title">Staff Onboarding &amp; Compliance Directory</h3>
+              </div>
+              <div class="table-controls">
+                <select class="admin-filter-select" id="onboarding-role-filter">
+                  <option value="all">All Healthcare Roles</option>
+                  <option value="RN">RN (Registered Nurse)</option>
+                  <option value="RPN">RPN (Practical Nurse)</option>
+                  <option value="PSW">PSW (Personal Support Worker)</option>
+                </select>
+                <button class="action-btn" id="assign-onboarding-btn">
+                  🎓 Assign Onboarding Package
+                </button>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Staff Member</th>
+                    <th>Healthcare Role</th>
+                    <th>Onboarding Progress</th>
+                    <th>Mandatory Courses</th>
+                    <th>Document Clearance</th>
+                    <th>Certificate Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="onboarding-tbody">
+                  <!-- Dynamic JS Onboarding Rows -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Clinical LMS Course Library Grid -->
+          <div class="admin-panel-card">
+            <div class="panel-header">
+              <div class="panel-title-group">
+                <h3 class="panel-title">Mandatory Healthcare LMS Training Courses</h3>
+              </div>
+              <span class="chart-badge">2026 Ontario Health Standard Compliant</span>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem;">
+              <!-- Course 1 -->
+              <div style="background: #0A0F1D; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between;">
+                <div style="height: 140px; overflow: hidden; position: relative;">
+                  <img src="assets/images/goggles.jpg" alt="IPAC Infection Control" style="width: 100%; height: 100%; object-fit: cover;">
+                  <span class="badge-status badge-assigned" style="position: absolute; top: 10px; left: 10px;">100% Mandatory</span>
+                </div>
+                <div style="padding: 1.2rem;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                    <span style="font-size: 0.75rem; color: #64748B; font-weight: 600;">25 Mins • 4 Modules</span>
+                    <span style="font-size: 0.72rem; color: var(--cyan-turquoise); font-weight: 700;">IPAC 2026</span>
+                  </div>
+                  <h4 style="color: var(--white); font-family: var(--font-heading); font-size: 1rem; margin: 0 0 0.5rem 0;">IPAC 2026 Infection Control &amp; PPE Protocols</h4>
+                  <p style="color: #94A3B8; font-size: 0.82rem; margin: 0 0 1rem 0; line-height: 1.5;">Ontario Public Health standards for personal protective equipment, hand hygiene, isolation precautions, and outbreak management in long-term care.</p>
+                  <button class="action-btn launch-course-btn" data-course-id="CRS-101" data-course-title="IPAC 2026 Infection Control & PPE Protocols" style="width: 100%; justify-content: center; background: rgba(27, 174, 207, 0.15); color: var(--cyan-turquoise); border-color: rgba(27, 174, 207, 0.3);">
+                    ▶ Launch Course &amp; Quiz
+                  </button>
+                </div>
+              </div>
+
+              <!-- Course 2 -->
+              <div style="background: #0A0F1D; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between;">
+                <div style="height: 140px; overflow: hidden; position: relative;">
+                  <img src="assets/images/role_education_care.jpg" alt="WHMIS Hazardous Materials" style="width: 100%; height: 100%; object-fit: cover;">
+                  <span class="badge-status badge-assigned" style="position: absolute; top: 10px; left: 10px;">100% Mandatory</span>
+                </div>
+                <div style="padding: 1.2rem;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                    <span style="font-size: 0.75rem; color: #64748B; font-weight: 600;">30 Mins • 3 Modules</span>
+                    <span style="font-size: 0.72rem; color: var(--cyan-turquoise); font-weight: 700;">WHMIS 2026</span>
+                  </div>
+                  <h4 style="color: var(--white); font-family: var(--font-heading); font-size: 1rem; margin: 0 0 0.5rem 0;">WHMIS 2026 Hazardous Materials in Healthcare</h4>
+                  <p style="color: #94A3B8; font-size: 0.82rem; margin: 0 0 1rem 0; line-height: 1.5;">Workplace Hazardous Materials Information System guidelines, chemical safety data sheets (SDS), disposal, and spill response protocols.</p>
+                  <button class="action-btn launch-course-btn" data-course-id="CRS-102" data-course-title="WHMIS 2026 Hazardous Materials in Healthcare" style="width: 100%; justify-content: center; background: rgba(27, 174, 207, 0.15); color: var(--cyan-turquoise); border-color: rgba(27, 174, 207, 0.3);">
+                    ▶ Launch Course &amp; Quiz
+                  </button>
+                </div>
+              </div>
+
+              <!-- Course 3 -->
+              <div style="background: #0A0F1D; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between;">
+                <div style="height: 140px; overflow: hidden; position: relative;">
+                  <img src="assets/images/service_nurse.jpg" alt="AODA Accessible Care" style="width: 100%; height: 100%; object-fit: cover;">
+                  <span class="badge-status badge-assigned" style="position: absolute; top: 10px; left: 10px;">100% Mandatory</span>
+                </div>
+                <div style="padding: 1.2rem;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                    <span style="font-size: 0.75rem; color: #64748B; font-weight: 600;">20 Mins • 3 Modules</span>
+                    <span style="font-size: 0.72rem; color: var(--cyan-turquoise); font-weight: 700;">AODA 2026</span>
+                  </div>
+                  <h4 style="color: var(--white); font-family: var(--font-heading); font-size: 1rem; margin: 0 0 0.5rem 0;">AODA &amp; Accessible Care Standards in Ontario</h4>
+                  <p style="color: #94A3B8; font-size: 0.82rem; margin: 0 0 1rem 0; line-height: 1.5;">Accessibility for Ontarians with Disabilities Act standards, patient dignity, communication accessibility, and barrier-free care delivery.</p>
+                  <button class="action-btn launch-course-btn" data-course-id="CRS-103" data-course-title="AODA & Accessible Care Standards in Ontario" style="width: 100%; justify-content: center; background: rgba(27, 174, 207, 0.15); color: var(--cyan-turquoise); border-color: rgba(27, 174, 207, 0.3);">
+                    ▶ Launch Course &amp; Quiz
+                  </button>
+                </div>
+              </div>
+
+              <!-- Course 4 -->
+              <div style="background: #0A0F1D; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between;">
+                <div style="height: 140px; overflow: hidden; position: relative;">
+                  <img src="assets/images/service_dementia_care.jpg" alt="PHIPA Patient Privacy" style="width: 100%; height: 100%; object-fit: cover;">
+                  <span class="badge-status badge-completed" style="position: absolute; top: 10px; left: 10px;">Clinical Certification</span>
+                </div>
+                <div style="padding: 1.2rem;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                    <span style="font-size: 0.75rem; color: #64748B; font-weight: 600;">45 Mins • 5 Modules</span>
+                    <span style="font-size: 0.72rem; color: var(--cyan-turquoise); font-weight: 700;">PHIPA 2026</span>
+                  </div>
+                  <h4 style="color: var(--white); font-family: var(--font-heading); font-size: 1rem; margin: 0 0 0.5rem 0;">PHIPA Patient Privacy &amp; E-Charting Compliance</h4>
+                  <p style="color: #94A3B8; font-size: 0.82rem; margin: 0 0 1rem 0; line-height: 1.5;">Personal Health Information Protection Act guidelines, digital medical record confidentiality, consent protocols, and data breach prevention.</p>
+                  <button class="action-btn launch-course-btn" data-course-id="CRS-104" data-course-title="PHIPA Patient Privacy & E-Charting Compliance" style="width: 100%; justify-content: center; background: rgba(27, 174, 207, 0.15); color: var(--cyan-turquoise); border-color: rgba(27, 174, 207, 0.3);">
+                    ▶ Launch Course &amp; Quiz
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- 3. RECORD INSPECTION MODAL BACKDROP -->
+  <div class="admin-modal-backdrop" id="admin-detail-modal">
+    <div class="admin-modal-card">
+      <div class="admin-modal-header">
+        <h3 class="admin-modal-title" id="modal-title">Record Details</h3>
+        <button class="admin-modal-close" id="modal-close-btn">&times;</button>
+      </div>
+      <div class="admin-modal-body" id="modal-body-content">
+        <!-- Dynamic detail fields -->
+      </div>
+      <div class="admin-modal-footer">
+        <button class="action-btn" id="modal-dismiss-btn">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript Admin Controller -->
+  <script src="admin.js"></script>
+</body>
+</html>
