@@ -14,10 +14,10 @@
     const isLocalHost = window.location.hostname === 'localhost' || 
                         window.location.hostname === '127.0.0.1' || 
                         window.location.hostname === '';
-    if (isFile || isLocalHost) {
-      return window.location.port === '3000' ? '/api' : 'http://localhost:3000/api';
+    if (isFile || (isLocalHost && window.location.port !== '3000')) {
+      return 'http://localhost:3000/api';
     }
-    return 'https://api.divinefingershealthcare.ca/api';
+    return '/api';
   })();
 
   // ── 2. Live In-Memory Data Store ────────────────────────────────────────────

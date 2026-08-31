@@ -212,18 +212,15 @@ document.addEventListener('DOMContentLoaded', () => {
   //     automatically the next time a form submission succeeds or the page reloads
   // ==========================================================================
   const API_BASE = window.API_BASE_URL || (() => {
-    if (typeof window === 'undefined') return 'http://localhost:3000/api';
+    if (typeof window === 'undefined') return '/api';
     const isFile = window.location.protocol === 'file:';
     const isLocalHost = window.location.hostname === 'localhost' || 
                         window.location.hostname === '127.0.0.1' || 
                         window.location.hostname === '';
-    if (isFile || isLocalHost) {
-      const port = window.location.port || '3000';
-      const host = window.location.hostname || 'localhost';
-      return `http://${host}:${port}/api`;
+    if (isFile || (isLocalHost && window.location.port !== '3000')) {
+      return 'http://localhost:3000/api';
     }
-    // Remote production domain
-    return 'https://api.divinefingershealthcare.ca/api';
+    return '/api';
   })();
 
   // ── Retry Buffer (localStorage) ──────────────────────────────────────────────

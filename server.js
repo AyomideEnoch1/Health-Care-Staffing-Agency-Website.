@@ -145,26 +145,28 @@ app.get('/api/health', async (req, res) => {
 // ── Centralized Error Handler ─────────────────────────────────────────────────
 app.use(errorHandler);
 
-// ── Start Server ──────────────────────────────────────────────────────────────
-const server = app.listen(PORT, async () => {
-  console.log(`🚀 Divine Fingers Healthcare API running on http://localhost:${PORT}`);
-  console.log(`🔒 Environment: ${process.env.NODE_ENV || 'development'}`);
+// ── Start Server (Local / Standalone execution) ───────────────────────────────
+if (!process.env.VERCEL) {
+  const server = app.listen(PORT, async () => {
+    console.log(`🚀 Divine Fingers Healthcare API running on http://localhost:${PORT}`);
+    console.log(`🔒 Environment: ${process.env.NODE_ENV || 'development'}`);
 
-  // Verify DB connection on startup
-  try {
-    await pool.query('SELECT 1');
-    console.log(`✅ [Database] Connected to MySQL (${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME})`);
-  } catch (err) {
-    console.error(`❌ [Database] Connection failed: ${err.message}`);
-  }
+    // Verify DB connection on startup
+    try {
+      await pool.query('SELECT 1');
+      console.log(`✅ [Database] Connected to MySQL (${process.env.DB_HOST || '127.0.0.1'}:${process.env.DB_PORT || 3306}/${process.env.DB_NAME || 'divine_fingers_dev'})`);
+    } catch (err) {
+      console.error(`❌ [Database] Connection failed: ${err.message}`);
+    }
 
-  // Verify SMTP (non-blocking warning only)
-  try {
-    const mailer = require('./utils/mailer');
-    await mailer.verifyConnection();
-  } catch (err) {
-    console.warn(`⚠️  [SMTP Warning] Could not connect to mail server: ${err.message}`);
-  }
-});
+    // Verify SMTP (non-blocking warning only)
+    try {
+      const mailer = require('./utils/mailer');
+      await mailer.verifyConnection();
+    } catch (err) {
+      console.warn(`⚠️  [SMTP Warning] Could not connect to mail server: ${err.message}`);
+    }
+  });
+}
 
-module.exports = { app, server };
+module.exports = app;

@@ -8,26 +8,26 @@
 const mysql = require('mysql2/promise');
 require('dotenv').config();
 
-const requiredEnv = ['DB_HOST', 'DB_USER', 'DB_NAME'];
-for (const key of requiredEnv) {
-  if (process.env[key] === undefined || process.env[key] === '') {
-    throw new Error(`CRITICAL CONFIG ERROR: Missing environment variable [${key}]. Check your .env file.`);
-  }
-}
+const host = process.env.DB_HOST || '127.0.0.1';
+const user = process.env.DB_USER || 'root';
+const password = process.env.DB_PASSWORD || '';
+const database = process.env.DB_NAME || 'divine_fingers_dev';
+const port = parseInt(process.env.DB_PORT || '3306', 10);
 
 // Scoped connection pool: The application user MUST NOT have DROP/ALTER/GRANT permissions in production.
 const pool = mysql.createPool({
-  host: process.env.DB_HOST,
-  port: parseInt(process.env.DB_PORT || '3306', 10),
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
+  host,
+  port,
+  user,
+  password,
+  database,
   waitForConnections: true,
   connectionLimit: parseInt(process.env.DB_CONNECTION_LIMIT || '10', 10),
   queueLimit: 0,
   enableKeepAlive: true,
   keepAliveInitialDelay: 10000,
-  timezone: '+00:00'
+  timezone: '+00:00',
+  connectTimeout: 10000
 });
 
 // Boot connection test
