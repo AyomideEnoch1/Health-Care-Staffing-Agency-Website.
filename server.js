@@ -146,7 +146,7 @@ app.get('/api/health', async (req, res) => {
 app.use(errorHandler);
 
 // ── Start Server (Local / Standalone execution) ───────────────────────────────
-if (!process.env.VERCEL) {
+if (require.main === module) {
   const server = app.listen(PORT, async () => {
     console.log(`🚀 Divine Fingers Healthcare API running on http://localhost:${PORT}`);
     console.log(`🔒 Environment: ${process.env.NODE_ENV || 'development'}`);
