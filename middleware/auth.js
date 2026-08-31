@@ -15,6 +15,7 @@
 
 const jwt = require('jsonwebtoken');
 const pool = require('../db');
+const JWT_SECRET = process.env.JWT_SECRET || 'divine_fingers_default_secure_jwt_secret_key_2026_production_fallback';
 
 /**
  * requireAdminAuth — validates httpOnly session cookie and checks live database status.
@@ -36,7 +37,7 @@ function requireAdminAuth(allowedRoles = []) {
     }
 
     try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const decoded = jwt.verify(token, JWT_SECRET);
 
       // Verify active account status in real-time
       const [rows] = await pool.query('SELECT id, email, role, full_name, is_active FROM admins WHERE id = ?', [decoded.id]);

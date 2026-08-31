@@ -24,6 +24,7 @@ const pool = require('../db');
 const { authLoginLimiter } = require('../middleware/rateLimiter');
 const { requireAdminAuth } = require('../middleware/auth');
 const { sendAdminEmailVerificationOtp } = require('../utils/mailer');
+const JWT_SECRET = process.env.JWT_SECRET || 'divine_fingers_default_secure_jwt_secret_key_2026_production_fallback';
 
 const loginSchema = z.object({
   email: z.string().email({ message: 'A valid email address is required.' }),
@@ -131,7 +132,7 @@ router.post('/login', authLoginLimiter, async (req, res, next) => {
           subnet: clientFP.subnet,
           uaHash: clientFP.uaHash
         },
-        process.env.JWT_SECRET,
+        JWT_SECRET,
         { expiresIn: '15m' }
       );
 
@@ -163,7 +164,7 @@ router.post('/login', authLoginLimiter, async (req, res, next) => {
           subnet: clientFP.subnet,
           uaHash: clientFP.uaHash
         },
-        process.env.JWT_SECRET,
+        JWT_SECRET,
         { expiresIn: '5m' }
       );
 
@@ -196,7 +197,7 @@ router.post('/login', authLoginLimiter, async (req, res, next) => {
         subnet: clientFP.subnet,
         uaHash: clientFP.uaHash
       },
-      process.env.JWT_SECRET,
+      JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRES_IN || '8h' }
     );
 
@@ -243,7 +244,7 @@ router.post('/email/verify', authLoginLimiter, async (req, res, next) => {
 
     let decoded;
     try {
-      decoded = jwt.verify(verify_token, process.env.JWT_SECRET);
+      decoded = jwt.verify(verify_token, JWT_SECRET);
       if (decoded.purpose !== 'email_verification_pending') throw new Error('Invalid token purpose');
     } catch {
       return res.status(401).json({ success: false, error: 'Verification session expired or invalid. Please log in again.' });
@@ -301,7 +302,7 @@ router.post('/email/verify', authLoginLimiter, async (req, res, next) => {
           subnet: clientFP.subnet,
           uaHash: clientFP.uaHash
         },
-        process.env.JWT_SECRET,
+        JWT_SECRET,
         { expiresIn: '5m' }
       );
 
@@ -328,7 +329,7 @@ router.post('/email/verify', authLoginLimiter, async (req, res, next) => {
         subnet: clientFP.subnet,
         uaHash: clientFP.uaHash
       },
-      process.env.JWT_SECRET,
+      JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRES_IN || '8h' }
     );
 
@@ -368,7 +369,7 @@ router.post('/email/resend', authLoginLimiter, async (req, res, next) => {
 
     let decoded;
     try {
-      decoded = jwt.verify(verify_token, process.env.JWT_SECRET);
+      decoded = jwt.verify(verify_token, JWT_SECRET);
       if (decoded.purpose !== 'email_verification_pending') throw new Error('Invalid token purpose');
     } catch {
       return res.status(401).json({ success: false, error: 'Verification session expired. Please log in again.' });
@@ -410,7 +411,7 @@ router.post('/mfa/verify', authLoginLimiter, async (req, res, next) => {
 
     let decoded;
     try {
-      decoded = jwt.verify(mfa_token, process.env.JWT_SECRET);
+      decoded = jwt.verify(mfa_token, JWT_SECRET);
       if (decoded.purpose !== 'mfa_pending') throw new Error('Invalid token purpose');
     } catch {
       return res.status(401).json({ success: false, error: 'MFA session expired or invalid. Please log in again.' });
@@ -455,7 +456,7 @@ router.post('/mfa/verify', authLoginLimiter, async (req, res, next) => {
         subnet: clientFP.subnet,
         uaHash: clientFP.uaHash
       },
-      process.env.JWT_SECRET,
+      JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRES_IN || '8h' }
     );
 
