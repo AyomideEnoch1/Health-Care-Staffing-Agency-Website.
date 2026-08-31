@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Divine Fingers Healthcare Services - Architectural Blueprint & Technical Schema</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+    @page {
+      size: A4;
+      margin: 18mm 16mm 18mm 16mm;
+      @bottom-right {
+        content: counter(page);
+        font-family: 'Inter', sans-serif;
+        font-size: 8pt;
+        color: #64748b;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: #0f172a;
+      background-color: #ffffff;
+      line-height: 1.5;
+      font-size: 9.5pt;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 14px;
+      border-bottom: 2px solid #00a896;
+      margin-bottom: 20px;
+    }
+
+    .brand-title {
+      font-size: 16pt;
+      font-weight: 800;
+      color: #0b192c;
+      letter-spacing: -0.5px;
+    }
+
+    .brand-subtitle {
+      font-size: 8.5pt;
+      color: #00a896;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+    }
+
+    .doc-meta {
+      text-align: right;
+      font-size: 8pt;
+      color: #64748b;
+      line-height: 1.4;
+    }
+
+    .doc-meta strong {
+      color: #0f172a;
+    }
+
+    h1 {
+      font-size: 14pt;
+      font-weight: 800;
+      color: #0b192c;
+      margin: 22px 0 10px 0;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e2e8f0;
+      page-break-after: avoid;
+    }
+
+    h2 {
+      font-size: 11pt;
+      font-weight: 700;
+      color: #028090;
+      margin: 16px 0 8px 0;
+      page-break-after: avoid;
+    }
+
+    h3 {
+      font-size: 10pt;
+      font-weight: 600;
+      color: #1e293b;
+      margin: 12px 0 6px 0;
+      page-break-after: avoid;
+    }
+
+    p {
+      margin-bottom: 8px;
+      color: #334155;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 7px;
+      font-size: 7.5pt;
+      font-weight: 700;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+
+    .badge-teal { background: #e6fffa; color: #00a896; border: 1px solid #b2f5ea; }
+    .badge-navy { background: #ebf8ff; color: #0b192c; border: 1px solid #bee3f8; }
+    .badge-gold { background: #fefcbf; color: #b7791f; border: 1px solid #fef08a; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 10px 0 16px 0;
+      font-size: 8.5pt;
+      page-break-inside: avoid;
+    }
+
+    th, td {
+      padding: 6px 9px;
+      text-align: left;
+      border: 1px solid #e2e8f0;
+      vertical-align: top;
+    }
+
+    th {
+      background-color: #f8fafc;
+      color: #0f172a;
+      font-weight: 700;
+    }
+
+    tr:nth-child(even) td {
+      background-color: #fcfcfc;
+    }
+
+    code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 8pt;
+      background-color: #f1f5f9;
+      color: #0f172a;
+      padding: 1px 4px;
+      border-radius: 3px;
+    }
+
+    .code-block {
+      background-color: #0b192c;
+      color: #e2e8f0;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 8pt;
+      padding: 12px;
+      border-radius: 6px;
+      margin: 10px 0 14px 0;
+      line-height: 1.45;
+      white-space: pre;
+      page-break-inside: avoid;
+    }
+
+    .callout {
+      background-color: #f0fdfa;
+      border-left: 4px solid #00a896;
+      padding: 10px 14px;
+      border-radius: 0 6px 6px 0;
+      margin: 12px 0;
+      font-size: 8.5pt;
+      page-break-inside: avoid;
+    }
+
+    .callout-title {
+      font-weight: 700;
+      color: #00a896;
+      margin-bottom: 3px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin: 10px 0;
+      page-break-inside: avoid;
+    }
+
+    .card {
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 10px 12px;
+      background: #ffffff;
+    }
+
+    .card-title {
+      font-weight: 700;
+      color: #0b192c;
+      font-size: 9pt;
+      margin-bottom: 4px;
+    }
+
+    .page-break {
+      page-break-before: always;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <div class="header-bar">
+    <div>
+      <div class="brand-title">Divine Fingers Healthcare Services Inc.</div>
+      <div class="brand-subtitle">System Architecture &amp; Database Technical Blueprint</div>
+    </div>
+    <div class="doc-meta">
+      <strong>Corporation ID:</strong> 1592082-5<br>
+      <strong>Version:</strong> 2.0 (Production-Ready Node.js + MySQL)<br>
+      <strong>Date:</strong> August 31, 2026
+    </div>
+  </div>
+
+  <!-- EXECUTIVE SUMMARY -->
+  <div class="callout">
+    <div class="callout-title">Executive Summary</div>
+    This document outlines the complete architectural schema for Divine Fingers Healthcare Services Inc. The system transitioned from an insecure, client-side <code>localStorage</code> prototype to a production-grade <strong>Node.js (Express) + MySQL</strong> backend. Key features include real-time dispatch via Server-Sent Events (SSE), role-based JWT authentication, rate limiting, and PHIPA/PIPEDA-compliant candidate resume handling.
+  </div>
+
+  <!-- 1. SYSTEM ARCHITECTURE & TOPOLOGY -->
+  <h1>1. High-Level Architecture &amp; Deployment Topology</h1>
+  <p>The system operates on a decoupled, secure hybrid architecture (Option B) designed for high reliability, fast global delivery, and data isolation:</p>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Frontend Layer (Vercel Edge)</div>
+      <p style="font-size: 8pt; color: #64748b;">Multi-Page Static Application served across global Edge CDN nodes for minimal latency and 100% uptime.</p>
+      <ul style="font-size: 8pt; padding-left: 14px; color: #334155;">
+        <li>HTML5 / CSS3 (Design System)</li>
+        <li>GSAP ScrollTrigger Animation Engine</li>
+        <li>EventSource Real-Time Listener</li>
+        <li>Asynchronous Multipart Form Handlers</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-title">Backend &amp; Database (Hostinger)</div>
+      <p style="font-size: 8pt; color: #64748b;">Hardened Node.js Express REST API paired with a localized MySQL 8.0+ relational database engine.</p>
+      <ul style="font-size: 8pt; padding-left: 14px; color: #334155;">
+        <li>Node.js 20.x LTS + Express.js</li>
+        <li>MySQL 8.0 (InnoDB utf8mb4)</li>
+        <li>JWT RBAC &amp; Bcrypt (Cost 12)</li>
+        <li>Protected Disk Storage (chmod 700)</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 2. FRONTEND ARCHITECTURE -->
+  <h1>2. Frontend Architecture &amp; Page Specifications</h1>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 20%;">Page File</th>
+        <th style="width: 25%;">Primary Audience</th>
+        <th style="width: 35%;">Key Functional Components</th>
+        <th style="width: 20%;">Connected API</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>index.html</code></td>
+        <td>Public Visitors / Clients</td>
+        <td>Hero Carousel, Role Pagination (1–5), Clinical Highlights</td>
+        <td><code>POST /api/contact</code></td>
+      </tr>
+      <tr>
+        <td><code>about.html</code></td>
+        <td>Corporate &amp; Partners</td>
+        <td>Executive leadership bios, Corporation ID (1592082-5)</td>
+        <td>Static Content</td>
+      </tr>
+      <tr>
+        <td><code>services.html</code></td>
+        <td>Healthcare Facilities</td>
+        <td>Deep-dive nursing services: RN, RPN, PSW, Travel Nursing</td>
+        <td>Static Content</td>
+      </tr>
+      <tr>
+        <td><code>clients.html</code></td>
+        <td>Hospitals, LTCs, Clinics</td>
+        <td>Staffing Request Form (facility, role, shift, urgency)</td>
+        <td><code>POST /api/requests</code></td>
+      </tr>
+      <tr>
+        <td><code>jobseekers.html</code></td>
+        <td>Nurses &amp; Caregivers</td>
+        <td>Candidate Portal &amp; Multipart Resume Upload (.pdf/.docx)</td>
+        <td><code>POST /api/applications</code></td>
+      </tr>
+      <tr>
+        <td><code>blog.html</code></td>
+        <td>Clinical Professionals</td>
+        <td>Continuing education guides, LTC compliance updates</td>
+        <td>Static Content</td>
+      </tr>
+      <tr>
+        <td><code>contact.html</code></td>
+        <td>General Public</td>
+        <td>24/7 Care Coordination desk info, Scarborough location</td>
+        <td><code>POST /api/contact</code></td>
+      </tr>
+      <tr>
+        <td><code>admin.html</code></td>
+        <td>Agency Coordinators</td>
+        <td><strong>9-Module Operations Dashboard</strong> with Real-Time SSE</td>
+        <td><code>/api/admin/*</code>, <code>/api/auth/*</code></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- ADMIN MODULES -->
+  <h2>Admin Operations Dashboard Modules (admin.html / admin.js)</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Module Name</th>
+        <th>Tab ID</th>
+        <th>Capabilities &amp; Interactive Features</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Dashboard Overview</strong></td>
+        <td><code>#overview-tab</code></td>
+        <td>6 Live KPI metric cards, shift fulfillment area chart, role donut chart, live operational activity feed.</td>
+      </tr>
+      <tr>
+        <td><strong>Staff Roster</strong></td>
+        <td><code>#roster-tab</code></td>
+        <td>Active caregiver table with CNO verification badges, ratings, hourly billing rates, and slide-over profile drawer.</td>
+      </tr>
+      <tr>
+        <td><strong>Client Requests</strong></td>
+        <td><code>#requests-tab</code></td>
+        <td>Real-time Kanban board &amp; Data Table with 1-click status transitions (Pending &rarr; Dispatched &rarr; Completed).</td>
+      </tr>
+      <tr>
+        <td><strong>Job Applications (ATS)</strong></td>
+        <td><code>#applicants-tab</code></td>
+        <td>Recruitment pipeline with stage tracking and secure one-click candidate resume PDF/DOCX downloads.</td>
+      </tr>
+      <tr>
+        <td><strong>Shift Scheduler</strong></td>
+        <td><code>#scheduler-tab</code></td>
+        <td>Weekly coverage matrix for GTA hospitals (Sunnybrook, Humber River, Chartwell, Scarborough Health Network).</td>
+      </tr>
+      <tr>
+        <td><strong>Live Dispatch Inbox</strong></td>
+        <td><code>#messages-tab</code></td>
+        <td>Direct facility communication channels and urgent shift notifications.</td>
+      </tr>
+      <tr>
+        <td><strong>Compliance &amp; Docs</strong></td>
+        <td><code>#compliance-tab</code></td>
+        <td>Regulatory matrix for CNO licensure, Vulnerable Sector Screening (VSS), N95 fit tests, and CPR/BLS expiry dates.</td>
+      </tr>
+      <tr>
+        <td><strong>Reports &amp; Export</strong></td>
+        <td><code>#reports-tab</code></td>
+        <td>Standardized CSV export generator for shift fulfillment rates, active staff rosters, and ATS pipeline data.</td>
+      </tr>
+      <tr>
+        <td><strong>Settings &amp; Audit Log</strong></td>
+        <td><code>#settings-tab</code></td>
+        <td>Immutable database audit log capturing operator logins, status changes, and client IP addresses.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="page-break"></div>
+
+  <!-- 3. BACKEND API SPECIFICATION -->
+  <h1>3. Backend Architecture &amp; REST API Endpoints</h1>
+  <p>The Express.js backend layer orchestrates security, data validation, rate limiting, and real-time broadcasting:</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 10%;">Method</th>
+        <th style="width: 30%;">Endpoint</th>
+        <th style="width: 15%;">Authorization</th>
+        <th style="width: 45%;">Description &amp; Security Validation</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="badge badge-teal">POST</span></td>
+        <td><code>/api/requests</code></td>
+        <td>Public (Limiter)</td>
+        <td>Zod validation. Inserts shift order into <code>staffing_requests</code>, triggers email alert, broadcasts SSE.</td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-teal">POST</span></td>
+        <td><code>/api/applications</code></td>
+        <td>Public (Limiter)</td>
+        <td>Multipart upload via Multer. Enforces PDF/DOCX MIME type and 10MB limit. Stores file to protected disk.</td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-teal">POST</span></td>
+        <td><code>/api/contact</code></td>
+        <td>Public (Limiter)</td>
+        <td>Validates inquiry data and writes to <code>contact_inquiries</code> table.</td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-teal">POST</span></td>
+        <td><code>/api/auth/login</code></td>
+        <td>Public (Strict)</td>
+        <td>Bcrypt compare. Limits 5 failed attempts per 15 min; locks account and logs audit; issues signed JWT.</td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-navy">GET</span></td>
+        <td><code>/api/admin/stream</code></td>
+        <td>JWT Required</td>
+        <td><strong>Server-Sent Events (SSE) stream</strong> providing instant real-time updates to connected admin clients.</td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-navy">GET</span></td>
+        <td><code>/api/admin/requests</code></td>
+        <td>JWT Required</td>
+        <td>Returns all facility requests with joined staff roster names sorted by recency.</td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-gold">PATCH</span></td>
+        <td><code>/api/admin/requests/:id/status</code></td>
+        <td>JWT Required</td>
+        <td>Updates request status &amp; assigned nurse; writes record into immutable <code>audit_logs</code> table.</td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-navy">GET</span></td>
+        <td><code>/api/admin/applications</code></td>
+        <td>JWT Required</td>
+        <td>Fetches recruitment pipeline entries.</td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-navy">GET</span></td>
+        <td><code>/api/admin/applications/:id/resume</code></td>
+        <td>JWT Required</td>
+        <td>Securely streams candidate resume file from protected storage directory to authorized admin.</td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-navy">GET</span></td>
+        <td><code>/api/admin/roster</code></td>
+        <td>JWT Required</td>
+        <td>Retrieves active agency nurse &amp; PSW records.</td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-navy">GET</span></td>
+        <td><code>/api/admin/audit-logs</code></td>
+        <td>JWT Required</td>
+        <td>Retrieves last 100 immutable administrative audit log entries.</td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-navy">GET</span></td>
+        <td><code>/api/health</code></td>
+        <td>Public</td>
+        <td>System liveness check.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- 4. DATABASE SCHEMA -->
+  <h1>4. Database Relational Schema (MySQL 3NF Normalized)</h1>
+  <p>The database (<code>divine_fingers_dev</code>) utilizes InnoDB engine with strict foreign key constraints and performance indexes:</p>
+
+  <h3>Table 1: <code>admins</code> (Administrative Accounts &amp; RBAC)</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Column</th>
+        <th>Type</th>
+        <th>Constraints</th>
+        <th>Purpose &amp; Security Justification</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td><code>id</code></td><td>VARCHAR(36)</td><td>PRIMARY KEY</td><td>UUID v4 identifier.</td></tr>
+      <tr><td><code>email</code></td><td>VARCHAR(191)</td><td>UNIQUE, NOT NULL</td><td>Administrator email address (login username).</td></tr>
+      <tr><td><code>password_hash</code></td><td>VARCHAR(255)</td><td>NOT NULL</td><td>Bcrypt cryptographic hash with cost factor 12.</td></tr>
+      <tr><td><code>full_name</code></td><td>VARCHAR(100)</td><td>NOT NULL</td><td>Operator's legal name for audit log attribution.</td></tr>
+      <tr><td><code>role</code></td><td>ENUM</td><td>NOT NULL</td><td><code>super-admin</code>, <code>dispatch</code>, <code>care-coordinator</code>.</td></tr>
+      <tr><td><code>failed_login_attempts</code></td><td>INT UNSIGNED</td><td>DEFAULT 0</td><td>Counter for automated brute-force protection.</td></tr>
+      <tr><td><code>lock_until</code></td><td>DATETIME</td><td>NULL</td><td>Timestamp for 15-minute temporary lockout.</td></tr>
+      <tr><td><code>totp_secret</code></td><td>VARCHAR(128)</td><td>NULL</td><td>Prepared for future Time-based One-Time Password 2FA.</td></tr>
+      <tr><td><code>is_active</code></td><td>TINYINT(1)</td><td>DEFAULT 1</td><td>Flag to immediately deactivate former staff.</td></tr>
+      <tr><td><code>created_at</code></td><td>TIMESTAMP</td><td>CURRENT_TIMESTAMP</td><td>Record creation timestamp.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Table 2: <code>staffing_requests</code> (Facility Shift Orders)</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Column</th>
+        <th>Type</th>
+        <th>Constraints</th>
+        <th>Purpose</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td><code>id</code></td><td>VARCHAR(36)</td><td>PRIMARY KEY</td><td>UUID v4.</td></tr>
+      <tr><td><code>request_code</code></td><td>VARCHAR(20)</td><td>UNIQUE, NOT NULL</td><td>Human-readable reference code (e.g. <code>REQ-482</code>).</td></tr>
+      <tr><td><code>facility_name</code></td><td>VARCHAR(150)</td><td>NOT NULL</td><td>Hospital or Long-Term Care facility name.</td></tr>
+      <tr><td><code>unit_department</code></td><td>VARCHAR(100)</td><td>NULL</td><td>Clinical department (e.g. ICU, Emergency, Memory Care).</td></tr>
+      <tr><td><code>contact_name</code></td><td>VARCHAR(100)</td><td>NOT NULL</td><td>Charge nurse or facility staffing coordinator name.</td></tr>
+      <tr><td><code>contact_email</code></td><td>VARCHAR(191)</td><td>NOT NULL</td><td>Facility official work email.</td></tr>
+      <tr><td><code>contact_phone</code></td><td>VARCHAR(30)</td><td>NOT NULL</td><td>Direct dispatch phone number.</td></tr>
+      <tr><td><code>role_requested</code></td><td>ENUM</td><td>NOT NULL</td><td><code>RN</code>, <code>RPN</code>, <code>PSW</code>, <code>Companion</code>, <code>Travel Nurse</code>, <code>Multiple</code>.</td></tr>
+      <tr><td><code>shift_type</code></td><td>VARCHAR(60)</td><td>NOT NULL</td><td>Day, Night, Weekend, or 24/7 Surge shift.</td></tr>
+      <tr><td><code>urgency_level</code></td><td>ENUM</td><td>DEFAULT 'routine'</td><td><code>routine</code>, <code>urgent</code>, <code>emergency_surge</code>.</td></tr>
+      <tr><td><code>status</code></td><td>ENUM</td><td>DEFAULT 'pending'</td><td><code>pending</code>, <code>dispatched</code>, <code>completed</code>, <code>cancelled</code>.</td></tr>
+      <tr><td><code>assigned_staff_id</code></td><td>VARCHAR(36)</td><td>FOREIGN KEY</td><td>References <code>staff_roster.id</code> (ON DELETE SET NULL).</td></tr>
+      <tr><td><code>special_instructions</code></td><td>TEXT</td><td>NULL</td><td>Patient acuity notes or unit-specific requirements.</td></tr>
+      <tr><td><code>ip_address</code></td><td>VARCHAR(45)</td><td>NULL</td><td>Originating client IP for audit integrity.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="page-break"></div>
+
+  <h3>Table 3: <code>job_applications</code> (Candidate Submissions &amp; ATS)</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Column</th>
+        <th>Type</th>
+        <th>Constraints</th>
+        <th>Purpose</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td><code>id</code></td><td>VARCHAR(36)</td><td>PRIMARY KEY</td><td>UUID v4.</td></tr>
+      <tr><td><code>application_code</code></td><td>VARCHAR(20)</td><td>UNIQUE, NOT NULL</td><td>Human-readable applicant code (e.g. <code>APP-710</code>).</td></tr>
+      <tr><td><code>full_name</code></td><td>VARCHAR(120)</td><td>NOT NULL</td><td>Candidate's legal name.</td></tr>
+      <tr><td><code>role_applied</code></td><td>ENUM</td><td>NOT NULL</td><td><code>RN</code>, <code>RPN</code>, <code>PSW</code>, <code>Companion</code>, <code>Travel Nurse</code>.</td></tr>
+      <tr><td><code>email</code></td><td>VARCHAR(191)</td><td>NOT NULL</td><td>Candidate contact email.</td></tr>
+      <tr><td><code>phone</code></td><td>VARCHAR(30)</td><td>NOT NULL</td><td>Candidate mobile phone number.</td></tr>
+      <tr><td><code>license_registration</code></td><td>VARCHAR(80)</td><td>NOT NULL</td><td>CNO Registration number or PSW Certificate ID.</td></tr>
+      <tr><td><code>stage</code></td><td>ENUM</td><td>DEFAULT 'new'</td><td><code>new</code>, <code>review</code>, <code>interview</code>, <code>hired</code>, <code>rejected</code>.</td></tr>
+      <tr><td><code>resume_original_name</code></td><td>VARCHAR(255)</td><td>NOT NULL</td><td>Original upload filename (e.g. <code>Sarah_RN_CV.pdf</code>).</td></tr>
+      <tr><td><code>resume_stored_name</code></td><td>VARCHAR(255)</td><td>NOT NULL</td><td>UUID-randomized filename on protected disk storage.</td></tr>
+      <tr><td><code>resume_mime_type</code></td><td>VARCHAR(100)</td><td>NOT NULL</td><td>Verified MIME (<code>application/pdf</code>, <code>application/docx</code>).</td></tr>
+      <tr><td><code>resume_file_size</code></td><td>INT UNSIGNED</td><td>NOT NULL</td><td>File size in bytes (capped at 10MB).</td></tr>
+      <tr><td><code>resume_storage_path</code></td><td>VARCHAR(255)</td><td>NOT NULL</td><td>Absolute path on host server outside webroot.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Table 4: <code>staff_roster</code> (Agency Clinical Personnel)</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Column</th>
+        <th>Type</th>
+        <th>Constraints</th>
+        <th>Purpose</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td><code>id</code></td><td>VARCHAR(36)</td><td>PRIMARY KEY</td><td>UUID v4.</td></tr>
+      <tr><td><code>staff_code</code></td><td>VARCHAR(20)</td><td>UNIQUE</td><td>Roster identifier (e.g. <code>STF-101</code>).</td></tr>
+      <tr><td><code>name</code></td><td>VARCHAR(120)</td><td>NOT NULL</td><td>Healthcare professional full name.</td></tr>
+      <tr><td><code>role</code></td><td>ENUM</td><td>NOT NULL</td><td><code>RN</code>, <code>RPN</code>, <code>PSW</code>, <code>Companion</code>, <code>Travel Nurse</code>.</td></tr>
+      <tr><td><code>specialty</code></td><td>VARCHAR(120)</td><td>NOT NULL</td><td>Clinical specialty (ICU, Cardiology, Geriatric, Dementia).</td></tr>
+      <tr><td><code>cno_registration_num</code></td><td>VARCHAR(50)</td><td>NULL</td><td>College of Nurses of Ontario Registration ID.</td></tr>
+      <tr><td><code>status</code></td><td>ENUM</td><td>DEFAULT 'available'</td><td><code>available</code>, <code>on-shift</code>, <code>off-duty</code>, <code>suspended</code>.</td></tr>
+      <tr><td><code>credential_status</code></td><td>ENUM</td><td>DEFAULT 'verified'</td><td><code>verified</code>, <code>expiring</code>, <code>expired</code>.</td></tr>
+      <tr><td><code>rating</code></td><td>DECIMAL(3,2)</td><td>DEFAULT 5.00</td><td>Facility feedback rating (1.00 – 5.00).</td></tr>
+      <tr><td><code>shifts_completed</code></td><td>INT UNSIGNED</td><td>DEFAULT 0</td><td>Total shifts successfully filled with agency.</td></tr>
+      <tr><td><code>region</code></td><td>VARCHAR(80)</td><td>NOT NULL</td><td>Assigned GTA Region (Scarborough, North York, Peel, etc.).</td></tr>
+      <tr><td><code>hourly_rate</code></td><td>DECIMAL(6,2)</td><td>NOT NULL</td><td>Hourly pay rate in CAD.</td></tr>
+      <tr><td><code>cpr_expiry_date</code></td><td>DATE</td><td>NOT NULL</td><td>Heart &amp; Stroke BLS/CPR expiration date.</td></tr>
+      <tr><td><code>vss_status</code></td><td>VARCHAR(60)</td><td>DEFAULT 'Clear'</td><td>Ontario Police Vulnerable Sector Screening status.</td></tr>
+      <tr><td><code>n95_fit_test</code></td><td>VARCHAR(60)</td><td>DEFAULT '3M Valid'</td><td>N95 Mask Fit test certification status.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Table 5: <code>contact_inquiries</code> &amp; Table 6: <code>audit_logs</code></h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Table</th>
+        <th>Key Columns</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>contact_inquiries</code></td>
+        <td><code>id</code>, <code>inquiry_code</code>, <code>name</code>, <code>email</code>, <code>phone</code>, <code>inquiry_type</code>, <code>message</code>, <code>status</code></td>
+        <td>Stores public inquiries from <code>contact.html</code> and <code>index.html</code> forms.</td>
+      </tr>
+      <tr>
+        <td><code>audit_logs</code></td>
+        <td><code>id</code>, <code>admin_id</code>, <code>actor_name</code>, <code>action</code>, <code>target_entity</code>, <code>target_id</code>, <code>details</code>, <code>severity</code>, <code>ip_address</code>, <code>created_at</code></td>
+        <td>Immutable ledger capturing all security events, status transitions, and dispatch actions for regulatory compliance.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- 5. SECURITY & COMPLIANCE SUMMARY -->
+  <h1>5. Security, Privacy &amp; Canadian Compliance Matrix</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>Security Dimension</th>
+        <th>Implementation Standard</th>
+        <th>Compliance Alignment</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Data in Transit</strong></td>
+        <td>TLS 1.3 / HTTPS 301 mandatory redirection with strict CORS origin locking.</td>
+        <td>PIPEDA Schedule 1 (Principle 7)</td>
+      </tr>
+      <tr>
+        <td><strong>Password Security</strong></td>
+        <td>Bcrypt with cost factor 12, salting, and 15-minute brute-force lockout.</td>
+        <td>NIST SP 800-63B Authentication Guidelines</td>
+      </tr>
+      <tr>
+        <td><strong>Nurse PII &amp; CV Storage</strong></td>
+        <td>Stored outside webroot (<code>/home/.../secure_uploads</code>) with <code>chmod 700</code> and UUID obfuscation.</td>
+        <td>PHIPA (Personal Health Information Protection Act)</td>
+      </tr>
+      <tr>
+        <td><strong>Injection Prevention</strong></td>
+        <td>100% Parameterized queries via <code>mysql2/promise</code>. Zero SQL string concatenations.</td>
+        <td>OWASP Top 10 (A03: Injection)</td>
+      </tr>
+      <tr>
+        <td><strong>Audit Trail</strong></td>
+        <td>Immutable database audit log capturing administrative actions with timestamps and IP records.</td>
+        <td>College of Nurses of Ontario (CNO) Regulatory Records</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div style="margin-top: 25px; padding-top: 10px; border-top: 1px solid #e2e8f0; font-size: 7.5pt; color: #94a3b8; display: flex; justify-content: space-between;">
+    <span>Divine Fingers Healthcare Services Inc. (Corp ID: 1592082-5)</span>
+    <span>CONFIDENTIAL &bull; ENGINEERING SPECIFICATION &bull; SCARBOROUGH, ON</span>
+  </div>
+
+</body>
+</html>

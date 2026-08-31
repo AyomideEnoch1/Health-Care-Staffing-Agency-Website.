@@ -1,2 +1,21 @@
+# Environment files
+.env
+.env.local
+.env.production
+
+# Dependencies
+node_modules/
+
+# File uploads (Candidate resumes containing PII)
+uploads/
+
+# Deployments & IDE
 .vercel
 .expo
+.idea
+.vscode
+*.log
+.DS_Store
+Thumbs.db
+*.zip
+*.docx

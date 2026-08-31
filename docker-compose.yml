@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  # MySQL 8.0 matching Hostinger's production engine
+  db:
+    image: mysql:8.0
+    container_name: df_mysql_dev
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: local_root_dev_password_2026!
+      MYSQL_DATABASE: divine_fingers_dev
+      MYSQL_USER: df_app_user
+      MYSQL_PASSWORD: local_app_dev_password_2026!
+    ports:
+      - "3306:3306"
+    volumes:
+      - df_mysql_data:/var/lib/mysql
+      # Auto-initializes schema on first boot
+      - ./schema.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
+    networks:
+      - df_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-plocal_root_dev_password_2026!"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # Local Email Catcher (Intercepts and renders all outgoing SMTP emails)
+  mailhog:
+    image: mailhog/mailhog:v1.0.1
+    container_name: df_mailhog_dev
+    restart: unless-stopped
+    ports:
+      - "1025:1025" # SMTP server
+      - "8025:8025" # Web UI (http://localhost:8025)
+    networks:
+      - df_network
+
+volumes:
+  df_mysql_data:
+
+networks:
+  df_network:
+    driver: bridge

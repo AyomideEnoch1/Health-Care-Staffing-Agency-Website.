@@ -202,139 +202,310 @@ document.addEventListener('DOMContentLoaded', () => {
     startHeroAutoCycle();
   }
 
-  // 4. Form Feedback Submission & Live Admin Storage Link
-  function saveToAdminDB(key, newEntry) {
-    try {
-      const existing = JSON.parse(localStorage.getItem(key) || '[]');
-      existing.unshift(newEntry);
-      localStorage.setItem(key, JSON.stringify(existing));
+  // ==========================================================================
+  // 4. SECURE API FORM SUBMISSIONS — WITH TIMEOUT, RETRY BUFFER & OFFLINE BANNER
+  // All public forms: staffing requests, applications, contact inquiries.
+  // Uses a hardened fetch wrapper with:
+  //   - 15-second AbortController timeout
+  //   - Visible "service unavailable" banner on failure
+  //   - localStorage retry buffer: failed submissions are saved and retried
+  //     automatically the next time a form submission succeeds or the page reloads
+  // ==========================================================================
+  const API_BASE = window.API_BASE_URL || (() => {
+    if (typeof window === 'undefined') return 'http://localhost:3000/api';
+    const isFile = window.location.protocol === 'file:';
+    const isLocalHost = window.location.hostname === 'localhost' || 
+                        window.location.hostname === '127.0.0.1' || 
+                        window.location.hostname === '';
+    if (isFile || isLocalHost) {
+      const port = window.location.port || '3000';
+      const host = window.location.hostname || 'localhost';
+      return `http://${host}:${port}/api`;
+    }
+    // Remote production domain
+    return 'https://api.divinefingershealthcare.ca/api';
+  })();
 
-      // Append Audit Log
-      const logs = JSON.parse(localStorage.getItem('df_audit_logs') || '[]');
-      const now = new Date();
-      const timestamp = now.toISOString().slice(0, 10) + ' ' + now.toTimeString().slice(0, 8);
-      logs.unshift({
-        id: `AUD-${Math.floor(1000 + Math.random() * 9000)}`,
-        timestamp: timestamp,
-        actor: 'Website Visitor',
-        action: 'WEB_SUBMISSION',
-        target: key,
-        details: `New submission received from ${newEntry.name || newEntry.facility || newEntry.email || 'Website Form'}`,
-        severity: 'info'
-      });
-      localStorage.setItem('df_audit_logs', JSON.stringify(logs));
-    } catch (e) {
-      console.warn('Unable to sync to local admin storage:', e);
+  // ── Retry Buffer (localStorage) ──────────────────────────────────────────────
+  const RETRY_KEY = 'df_form_retry_buffer';
+
+  function saveToRetryBuffer(endpoint, payload, isFormData) {
+    if (isFormData) return; // Can't serialize multipart FormData to localStorage
+    try {
+      const buffer = JSON.parse(localStorage.getItem(RETRY_KEY) || '[]');
+      buffer.push({ endpoint, payload, timestamp: Date.now() });
+      // Keep max 10 entries to avoid unbounded growth
+      if (buffer.length > 10) buffer.splice(0, buffer.length - 10);
+      localStorage.setItem(RETRY_KEY, JSON.stringify(buffer));
+    } catch { /* localStorage full or unavailable — ignore */ }
+  }
+
+  async function flushRetryBuffer() {
+    try {
+      const buffer = JSON.parse(localStorage.getItem(RETRY_KEY) || '[]');
+      if (!buffer.length) return;
+
+      const succeeded = [];
+      for (const item of buffer) {
+        try {
+          await apiPost(item.endpoint, item.payload, null, null, false /* no re-buffer on fail */);
+          succeeded.push(item);
+        } catch { /* Keep failed items in buffer */ }
+      }
+
+      if (succeeded.length > 0) {
+        const remaining = buffer.filter(i => !succeeded.includes(i));
+        localStorage.setItem(RETRY_KEY, JSON.stringify(remaining));
+        console.info(`[Retry Buffer] Re-submitted ${succeeded.length} buffered form(s) successfully.`);
+      }
+    } catch { /* Ignore buffer flush errors */ }
+  }
+
+  // ── Service Unavailable Banner ────────────────────────────────────────────────
+  let degradedBanner = null;
+
+  function showUnavailableBanner(feedbackEl) {
+    if (feedbackEl) {
+      feedbackEl.style.color = '#e63946';
+      feedbackEl.innerHTML = `
+        ⚠️ Our dispatch server is temporarily unreachable.
+        Your request has been saved and will be submitted automatically when the connection is restored.
+        For urgent staffing needs, call us directly at <strong>+1 (647) 210-6463</strong>.
+      `;
+    }
+    if (!degradedBanner) {
+      degradedBanner = document.createElement('div');
+      degradedBanner.id = 'df-degraded-banner';
+      degradedBanner.style.cssText = `
+        position:fixed;top:0;left:0;right:0;z-index:99998;
+        background:#b91c1c;color:#fff;font-weight:700;font-size:.85rem;
+        padding:.75rem 1.5rem;text-align:center;
+      `;
+      degradedBanner.innerHTML = '⚠️ System temporarily unavailable. Your form data has been saved for automatic retry. Call <a href="tel:+16472106463" style="color:#fef9c3;text-decoration:underline;">+1 (647) 210-6463</a> for urgent requests.';
+      document.body.prepend(degradedBanner);
     }
   }
 
-  // Client Request Form
-  const clientForm = document.getElementById('client-request-form');
-  const clientFeedback = document.getElementById('client-form-feedback');
-  if (clientForm) {
-    clientForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const facility = document.getElementById('facility-name')?.value || 'Facility Client';
-      const contact = document.getElementById('client-contact-name')?.value || 'Contact Person';
-      const email = document.getElementById('client-work-email')?.value || '';
-      const phone = document.getElementById('client-phone-num')?.value || '';
-      const role = document.getElementById('client-service-needed')?.value || 'RN (Registered Nurse)';
-      const shift = document.getElementById('client-shift-location')?.value || 'Day Shift';
+  function clearUnavailableBanner() {
+    if (degradedBanner) { degradedBanner.remove(); degradedBanner = null; }
+  }
 
-      saveToAdminDB('df_staff_requests', {
-        id: `REQ-${Math.floor(100 + Math.random() * 900)}`,
-        facility: facility,
-        contact: contact,
-        email: email,
-        phone: phone,
-        role: role,
-        shift: shift,
-        date: new Date().toISOString().slice(0, 10),
-        status: 'pending',
-        assignedStaff: 'Unassigned',
-        notes: 'Submitted via Clients Request Form'
-      });
+  // ── Core Fetch Wrapper ────────────────────────────────────────────────────────
+  async function apiPost(endpoint, payload, feedbackEl, isFormData = false, bufferOnFail = true) {
+    const controller = new AbortController();
+    const timeoutId  = setTimeout(() => controller.abort(), 15000); // 15-second timeout
+
+    try {
+      const opts = {
+        method: 'POST',
+        signal: controller.signal,
+        credentials: 'same-origin'
+      };
+
+      if (isFormData) {
+        opts.body = payload; // FormData — browser sets Content-Type automatically
+      } else {
+        opts.headers = { 'Content-Type': 'application/json' };
+        opts.body    = JSON.stringify(payload);
+      }
+
+      const response = await fetch(`${API_BASE}${endpoint}`, opts);
+      clearTimeout(timeoutId);
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Server error');
+
+      clearUnavailableBanner();
+      // Flush any previously buffered submissions now that we're back online
+      flushRetryBuffer();
+      return data;
+
+    } catch (err) {
+      clearTimeout(timeoutId);
+      const isTimeout  = err.name === 'AbortError';
+      const isNetwork  = err.message === 'Failed to fetch' || isTimeout;
+
+      if (isNetwork && bufferOnFail && !isFormData) {
+        saveToRetryBuffer(endpoint, payload, isFormData);
+        showUnavailableBanner(feedbackEl);
+      }
+      throw err;
+    }
+  }
+
+  // ── Client Staffing Request Form ──────────────────────────────────────────────
+  const clientForm     = document.getElementById('client-request-form');
+  const clientFeedback = document.getElementById('client-form-feedback');
+
+  if (clientForm) {
+    clientForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const submitBtn = clientForm.querySelector('button[type="submit"]');
+      if (submitBtn) submitBtn.disabled = true;
+
+      const staffVal = document.getElementById('staff-needed')?.value || document.getElementById('client-service-needed')?.value || 'rn_rpn';
+      const staffRoleMap = {
+        'personal_care': 'PSW',
+        'travelling_nursing': 'Travel Nurse',
+        'companionship': 'Companion',
+        'respite': 'PSW',
+        'household': 'Companion',
+        'dementia': 'PSW',
+        'rn_rpn': 'RN',
+        'psw': 'PSW',
+        'RN': 'RN',
+        'RPN': 'RPN',
+        'PSW': 'PSW',
+        'Travel Nurse': 'Travel Nurse',
+        'Companion': 'Companion'
+      };
+
+      const payload = {
+        facility_name:  document.getElementById('facility-name')?.value || '',
+        contact_name:   document.getElementById('client-contact-name')?.value || '',
+        contact_email:  document.getElementById('client-email')?.value || document.getElementById('client-work-email')?.value || '',
+        contact_phone:  document.getElementById('client-phone')?.value || document.getElementById('client-phone-num')?.value || '',
+        role_requested: staffRoleMap[staffVal] || 'RN',
+        shift_type:     document.getElementById('shift-details')?.value || document.getElementById('client-shift-location')?.value || 'Day Shift',
+        urgency_level:  document.getElementById('client-urgency-level')?.value || 'routine'
+      };
 
       if (clientFeedback) {
-        clientFeedback.style.color = '#3CAF8A';
-        clientFeedback.textContent = 'Staffing request submitted successfully! Divine Fingers team will reach out promptly.';
+        clientFeedback.style.color = '#00A896';
+        clientFeedback.textContent = 'Submitting staffing request securely...';
       }
-      clientForm.reset();
+
+      try {
+        const data = await apiPost('/requests', payload, clientFeedback);
+        if (clientFeedback) {
+          clientFeedback.style.color = '#3CAF8A';
+          clientFeedback.textContent = `✅ Request submitted! Reference: ${data.data.request_code}. A Divine Fingers coordinator will reach out promptly.`;
+        }
+        clientForm.reset();
+      } catch (err) {
+        if (clientFeedback && !degradedBanner) {
+          clientFeedback.style.color = '#E63946';
+          clientFeedback.textContent = err.message || 'Unable to connect. Please call +1 (647) 210-6463.';
+        }
+      } finally {
+        if (submitBtn) submitBtn.disabled = false;
+      }
     });
   }
 
-  // Candidate Application Form
-  const applyForm = document.getElementById('candidate-apply-form');
+  // ── Candidate Application Form (multipart — resume file upload) ───────────────
+  const applyForm     = document.getElementById('candidate-apply-form');
   const applyFeedback = document.getElementById('candidate-form-feedback');
-  if (applyForm) {
-    applyForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const name = document.getElementById('applicant-name')?.value || 'Candidate';
-      const role = document.getElementById('applicant-role-select')?.value || 'RN';
-      const phone = document.getElementById('applicant-phone')?.value || '';
-      const email = document.getElementById('applicant-email')?.value || '';
-      const license = document.getElementById('applicant-license')?.value || 'Pending Verification';
-      const resumeInput = document.getElementById('applicant-resume');
-      const resumeName = (resumeInput && resumeInput.files && resumeInput.files[0]) ? resumeInput.files[0].name : `${name.replace(/\s+/g, '_')}_Resume.pdf`;
 
-      saveToAdminDB('df_job_applicants', {
-        id: `APP-${Math.floor(200 + Math.random() * 800)}`,
-        name: name,
-        role: role,
-        phone: phone,
-        email: email,
-        license: license,
-        stage: 'new',
-        date: new Date().toISOString().slice(0, 10),
-        experience: 'Applied via Web Portal',
-        resumeFileName: resumeName,
-        resumeFileType: resumeName.endsWith('.pdf') ? 'PDF Document' : 'DOCX Document',
-        resumeFileSize: '240 KB',
-        resumeSummary: `Certified ${role} applicant with verified credentials submitted via Candidate Portal.`
-      });
+  if (applyForm) {
+    applyForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const submitBtn = applyForm.querySelector('button[type="submit"]');
+      if (submitBtn) submitBtn.disabled = true;
+
+      const resumeInput = document.getElementById('applicant-resume');
+      if (!resumeInput || !resumeInput.files || resumeInput.files.length === 0) {
+        if (applyFeedback) {
+          applyFeedback.style.color = '#E63946';
+          applyFeedback.textContent = 'Please select a resume file (PDF, DOC, or DOCX) to upload.';
+        }
+        if (submitBtn) submitBtn.disabled = false;
+        return;
+      }
 
       if (applyFeedback) {
-        applyFeedback.style.color = '#3CAF8A';
-        applyFeedback.textContent = 'Application & resume received! Divine Fingers recruitment coordinator will contact you.';
+        applyFeedback.style.color = '#00A896';
+        applyFeedback.textContent = 'Uploading resume and submitting application...';
       }
-      applyForm.reset();
+
+      const formData = new FormData();
+      formData.append('full_name',            document.getElementById('applicant-name')?.value || '');
+
+      // Map HTML option values (lowercase) to API enum values (API expects exact case)
+      const roleRaw = document.getElementById('applicant-profession')?.value || 'rn';
+      const roleMap = {
+        'rn':      'RN',
+        'rpn':     'RPN',
+        'psw':     'PSW',
+        'travel':  'Travel Nurse',
+        'support': 'Companion' // closest match for Support Staff
+      };
+      formData.append('role_applied', roleMap[roleRaw] || 'RN');
+
+      formData.append('phone', document.getElementById('applicant-phone')?.value || '');
+      formData.append('email', document.getElementById('applicant-email')?.value || '');
+      // Correct ID is 'license-num' in the HTML form (not 'applicant-license')
+      formData.append('license_registration', document.getElementById('license-num')?.value || '');
+      formData.append('resume', resumeInput.files[0]);
+
+      try {
+        // FormData (file upload) — cannot be buffered in localStorage
+        const data = await apiPost('/applications', formData, applyFeedback, true /* isFormData */);
+        if (applyFeedback) {
+          applyFeedback.style.color = '#3CAF8A';
+          applyFeedback.textContent = `✅ Application received! Reference: ${data.data.application_code}. Our coordinator will contact you.`;
+        }
+        applyForm.reset();
+        const fileLabel = document.getElementById('file-chosen-name');
+        if (fileLabel) {
+          fileLabel.textContent = 'Click to browse or drag & drop file here (PDF, DOC, DOCX - Max 10MB)';
+          fileLabel.style.color = '#475569';
+          fileLabel.style.fontWeight = 'normal';
+        }
+      } catch (err) {
+        if (applyFeedback) {
+          applyFeedback.style.color = '#E63946';
+          applyFeedback.textContent = err.message || 'Upload failed. Please try again or call +1 (647) 210-6463.';
+        }
+      } finally {
+        if (submitBtn) submitBtn.disabled = false;
+      }
     });
   }
 
-  // Contact Forms
+  // ── Contact / Inquiry Forms ───────────────────────────────────────────────────
   ['general-contact-form', 'home-contact-form'].forEach(formId => {
-    const form = document.getElementById(formId);
+    const form     = document.getElementById(formId);
     const feedback = document.getElementById(formId === 'general-contact-form' ? 'contact-form-feedback' : 'home-form-feedback');
-    if (form) {
-      form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const inputs = form.querySelectorAll('input, textarea');
-        let name = 'Website Visitor', email = '', phone = '', message = 'General Inquiry';
-        inputs.forEach(inp => {
-          if (inp.placeholder && inp.placeholder.includes('NAME')) name = inp.value || name;
-          if (inp.type === 'email' || (inp.placeholder && inp.placeholder.includes('EMAIL'))) email = inp.value || email;
-          if (inp.type === 'tel' || (inp.placeholder && inp.placeholder.includes('PHONE'))) phone = inp.value || phone;
-          if (inp.tagName === 'TEXTAREA') message = inp.value || message;
-        });
+    if (!form) return;
 
-        saveToAdminDB('df_inquiries', {
-          id: `INQ-${Math.floor(400 + Math.random() * 500)}`,
-          name: name,
-          email: email,
-          phone: phone,
-          type: 'Website Message',
-          message: message,
-          date: new Date().toISOString().slice(0, 10)
-        });
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const submitBtn = form.querySelector('button[type="submit"]');
+      if (submitBtn) submitBtn.disabled = true;
 
+      let name = 'Website Visitor', email = '', phone = '', message = 'General Inquiry';
+      form.querySelectorAll('input, textarea').forEach(inp => {
+        if (inp.placeholder?.includes('NAME'))  name    = inp.value || name;
+        if (inp.type === 'email' || inp.placeholder?.includes('EMAIL')) email = inp.value || email;
+        if (inp.type === 'tel'   || inp.placeholder?.includes('PHONE')) phone = inp.value || phone;
+        if (inp.tagName === 'TEXTAREA') message = inp.value || message;
+      });
+
+      if (feedback) { feedback.style.color = '#00A896'; feedback.textContent = 'Sending message...'; }
+
+      try {
+        await apiPost('/contact', { name, email, phone: phone || undefined, message }, feedback);
         if (feedback) {
           feedback.style.color = '#3CAF8A';
-          feedback.textContent = 'Message sent! Thank you for reaching out to Divine Fingers Healthcare Services.';
+          feedback.textContent = '✅ Message sent! Thank you for reaching out to Divine Fingers Healthcare Services.';
         }
         form.reset();
-      });
-    }
+      } catch (err) {
+        if (feedback && !degradedBanner) {
+          feedback.style.color = '#E63946';
+          feedback.textContent = err.message || 'Error sending message. Please try again.';
+        }
+      } finally {
+        if (submitBtn) submitBtn.disabled = false;
+      }
+    });
   });
+
+  // Attempt to flush any buffered submissions on page load
+  flushRetryBuffer();
+
+
 
   // ==========================================================================
   // GSAP SCROLLTRIGGER ANIMATION ENGINE (100% GUARANTEED VISIBILITY & REVEALS)
@@ -502,14 +673,34 @@ document.addEventListener('DOMContentLoaded', () => {
     staggerLists.forEach((list) => staggerObserver.observe(list));
   }
 
-  // 7. Custom Resume File Input Indicator
+  // 7. Custom Resume File Input Indicator & Client-Side Validation
   const resumeInput = document.getElementById('applicant-resume');
   const fileChosenLabel = document.getElementById('file-chosen-name');
   if (resumeInput && fileChosenLabel) {
     resumeInput.addEventListener('change', function () {
       if (this.files && this.files.length > 0) {
-        const fileName = this.files[0].name;
-        fileChosenLabel.textContent = `Selected: ${fileName} (Ready to upload)`;
+        const file = this.files[0];
+        const validExtensions = ['.pdf', '.doc', '.docx'];
+        const fileExt = '.' + file.name.split('.').pop().toLowerCase();
+
+        if (!validExtensions.includes(fileExt)) {
+          fileChosenLabel.textContent = `❌ Invalid file type (${fileExt}). Please select a PDF, DOC, or DOCX file.`;
+          fileChosenLabel.style.color = '#E63946';
+          fileChosenLabel.style.fontWeight = '700';
+          this.value = ''; // Reset input
+          return;
+        }
+
+        if (file.size > 10 * 1024 * 1024) {
+          fileChosenLabel.textContent = `❌ File too large (${(file.size / (1024*1024)).toFixed(1)}MB). Max limit is 10MB.`;
+          fileChosenLabel.style.color = '#E63946';
+          fileChosenLabel.style.fontWeight = '700';
+          this.value = ''; // Reset input
+          return;
+        }
+
+        const sizeKb = Math.round(file.size / 1024);
+        fileChosenLabel.textContent = `Selected: ${file.name} (${sizeKb} KB - Ready to upload)`;
         fileChosenLabel.style.color = '#00A896';
         fileChosenLabel.style.fontWeight = '700';
       } else {
