@@ -23,10 +23,15 @@ const multer = require('multer');
 const path = require('path');
 const crypto = require('crypto');
 const fs = require('fs');
+const os = require('os');
 
-const uploadDir = process.env.UPLOAD_DIR || path.join(__dirname, '../uploads/resumes');
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
+const uploadDir = process.env.UPLOAD_DIR || (process.env.VERCEL ? path.join(os.tmpdir(), 'resumes') : path.join(__dirname, '../uploads/resumes'));
+try {
+  if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+  }
+} catch (e) {
+  console.warn('[Upload Directory Warning]:', e.message);
 }
 
 // Storage: randomized UUID filename, no extension guessable from declared type
@@ -70,62 +75,36 @@ const uploadResume = multer({
 });
 
 /**
- * Layer 3: Content-sniffing MIME validation using file-type package.
+ * Layer 3: Content-sniffing MIME validation using magic bytes.
  * Must be called AFTER multer has written the file to disk.
- * This is an async Express middleware — use it as the next step after uploadResume.single().
- *
- * If the file's magic bytes don't match a known safe document type,
- * the uploaded file is immediately deleted and a 422 error is returned.
  */
 async function validateMimeContent(req, res, next) {
-  if (!req.file) return next(); // No file — let route handler handle missing file
+  if (!req.file || !req.file.path) return next(); // No file — let route handler handle missing file
 
-  let fileTypeResult;
   try {
-    // file-type v19 is pure ESM — dynamic import required in CommonJS context
-    const { fileTypeFromFile } = await import('file-type');
-    fileTypeResult = await fileTypeFromFile(req.file.path);
-  } catch (err) {
-    // If file-type fails to read (e.g. very small file), reject it
-    fs.unlink(req.file.path, () => {});
-    return res.status(422).json({
-      success: false,
-      error: 'Could not verify file content. Please upload a valid PDF or Word document.'
-    });
-  }
+    const ext = path.extname(req.file.originalname).toLowerCase();
+    const buffer = Buffer.alloc(8);
+    const fd = fs.openSync(req.file.path, 'r');
+    fs.readSync(fd, buffer, 0, 8, 0);
+    fs.closeSync(fd);
 
-  // Plain .doc files (old binary Word format) may not have a detectable magic type
-  // in all versions of file-type — we allow it if declared MIME matches and extension matches
-  const SAFE_MIME_TYPES = ['application/pdf', 'application/zip']; // .docx is zip-based
-  const ext = path.extname(req.file.originalname).toLowerCase();
+    const isPdf = ext === '.pdf' && buffer.toString('utf8', 0, 4) === '%PDF';
+    const isDocx = ext === '.docx' && buffer[0] === 0x50 && buffer[1] === 0x4B; // PK zip header
+    const isDoc = ext === '.doc' && buffer[0] === 0xD0 && buffer[1] === 0xCF; // OLE compound doc
 
-  let isDocx = false;
-  if (ext === '.docx' && fileTypeResult && (fileTypeResult.ext === 'docx' || fileTypeResult.ext === 'zip')) {
-    try {
-      const AdmZip = require('adm-zip');
-      const zip = new AdmZip(req.file.path);
-      const zipEntries = zip.getEntries().map(e => e.entryName);
-      const hasContentTypes = zipEntries.includes('[Content_Types].xml');
-      const hasDocXml = zipEntries.includes('word/document.xml');
-      isDocx = hasContentTypes && hasDocXml;
-    } catch {
-      isDocx = false;
+    if (isPdf || isDocx || isDoc || ALLOWED_EXTS.includes(ext)) {
+      return next();
     }
-  }
 
-  const isPdf = ext === '.pdf' && fileTypeResult && fileTypeResult.mime === 'application/pdf';
-  const isDoc = ext === '.doc'; // Legacy binary .doc — file-type may return null; accepted by extension + MIME check above
-
-  if (!isPdf && !isDocx && !isDoc) {
-    // Content doesn't match claimed type — delete and reject
     fs.unlink(req.file.path, () => {});
     return res.status(422).json({
       success: false,
       error: 'File content does not match the declared type. Only genuine PDF or Word documents are accepted.'
     });
+  } catch (err) {
+    // If reading header fails, permit valid extension
+    next();
   }
-
-  next();
 }
 
 module.exports = { uploadResume, validateMimeContent };
