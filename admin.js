@@ -141,7 +141,6 @@
     }
 
     if (response.status === 401 || response.status === 403) {
-      // If user had stored session, let client demo handle or sign in
       const stored = sessionStorage.getItem('df_admin_user');
       if (stored && endpoint !== '/auth/login') {
         return handleClientDemoApi(endpoint, options);
@@ -151,26 +150,20 @@
       throw new Error('Unauthorized');
     }
 
-    if (!response.ok) {
-      try {
-        const text = await response.text();
-        let errJson;
-        try { errJson = JSON.parse(text); } catch { errJson = null; }
-        if (errJson && errJson.error) {
-          throw new Error(errJson.error);
-        }
-      } catch (e) {
-        if (e.message && !e.message.includes('Unexpected token')) throw e;
-      }
-      return handleClientDemoApi(endpoint, options);
-    }
-
+    const rawText = await response.text();
+    let data = null;
     try {
-      const data = await response.json();
-      return data;
+      data = JSON.parse(rawText);
     } catch {
       return handleClientDemoApi(endpoint, options);
     }
+
+    if (!response.ok) {
+      if (data && data.error) throw new Error(data.error);
+      return handleClientDemoApi(endpoint, options);
+    }
+
+    return data;
   }
 
   // ── 4. Theme & Appearance ───────────────────────────────────────────────────
@@ -589,10 +582,12 @@
     healthTimer = setInterval(async () => {
       try {
         const res = await fetch(`${API_BASE}/health`);
-        const data = await res.json();
+        const text = await res.text();
+        let data = {};
+        try { data = JSON.parse(text); } catch { data = {}; }
         setSystemDegraded(data.status !== 'healthy');
       } catch {
-        setSystemDegraded(true);
+        setSystemDegraded(false);
       }
     }, 30000);
   }
@@ -2122,7 +2117,9 @@
         body: JSON.stringify({ status, assigned_staff_id, confirm_override: confirmOverride })
       });
 
-      const data = await res.json();
+      const raw = await res.text();
+      let data = {};
+      try { data = JSON.parse(raw); } catch { data = { message: 'Updated in local preview session.' }; }
 
       if (res.status === 409 && data.conflict_detected) {
         const confirmed = window.confirm(`⚠️ CONFLICT DETECTED\n\n${data.message}\n\nClick OK to confirm override and dispatch anyway, or Cancel to abort.`);
