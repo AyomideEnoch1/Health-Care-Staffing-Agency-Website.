@@ -2,7 +2,7 @@
  * Local Admin & Staff Seed Script
  * Generates initial super-admin and staff roster data for development and testing.
  */
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const pool = require('../db');
 
