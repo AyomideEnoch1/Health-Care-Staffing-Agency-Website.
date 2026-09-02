@@ -20,19 +20,24 @@ let isMySqlAvailable = false;
 let realPool = null;
 
 try {
+  const sslConfig = (process.env.DB_SSL === 'true' || host.includes('tidbcloud.com') || host.includes('aivencloud.com'))
+    ? { minVersion: 'TLSv1.2', rejectUnauthorized: true }
+    : undefined;
+
   realPool = mysql.createPool({
     host,
     port,
     user,
     password,
     database,
+    ssl: sslConfig,
     waitForConnections: true,
     connectionLimit: parseInt(process.env.DB_CONNECTION_LIMIT || '10', 10),
     queueLimit: 0,
     enableKeepAlive: true,
     keepAliveInitialDelay: 10000,
     timezone: '+00:00',
-    connectTimeout: 2000
+    connectTimeout: 5000
   });
 
   realPool.getConnection()
