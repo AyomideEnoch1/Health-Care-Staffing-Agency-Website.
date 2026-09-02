@@ -11,14 +11,19 @@ const transporter = nodemailer.createTransport({
   } : undefined
 });
 
-// Verify connection
-transporter.verify((error) => {
-  if (error) {
-    console.warn('⚠️ [SMTP Warning] Could not connect to mail server:', error.message);
-  } else {
-    console.log('✅ [SMTP Mailer] Connected to mail server.');
-  }
-});
+// Export connection verifier without blocking module load
+async function verifyConnection() {
+  return new Promise((resolve) => {
+    transporter.verify((error) => {
+      if (error) {
+        console.warn('⚠️ [SMTP Warning] Could not connect to mail server:', error.message);
+      } else {
+        console.log('✅ [SMTP Mailer] Connected to mail server.');
+      }
+      resolve(!error);
+    });
+  });
+}
 
 async function sendStaffingRequestAlert(requestData) {
   const mailOptions = {
@@ -127,10 +132,6 @@ async function sendNewsletterWelcomeEmail(subscriberEmail) {
     console.warn(`⚠️ [SMTP Offline / Dev Intercept] Newsletter email delivery failed (${err.message}).`);
     return { mock: true, accepted: [subscriberEmail] };
   }
-}
-
-async function verifyConnection() {
-  return transporter.verify();
 }
 
 module.exports = {
