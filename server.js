@@ -33,6 +33,9 @@ const applicationsRoute = require('./routes/applications');
 const contactRoute      = require('./routes/contact');
 const authRoute         = require('./routes/auth');
 const adminRoute        = require('./routes/admin');
+const shiftsRoute       = require('./routes/shifts');
+const newsletterRoute   = require('./routes/newsletter');
+const { startShiftLifecycleDaemon } = require('./utils/shiftLifecycle');
 const errorHandler      = require('./middleware/errorHandler');
 
 const app  = express();
@@ -116,6 +119,8 @@ app.use('/api/admin', (req, res, next) => {
   next();
 });
 app.use('/api/admin', adminRoute);
+app.use('/api/shifts', shiftsRoute);
+app.use('/api/newsletter', newsletterRoute);
 
 // ── Health Check ──────────────────────────────────────────────────────────────
 // Checks both API liveness AND active DB connection.
@@ -166,6 +171,9 @@ if (require.main === module) {
     } catch (err) {
       console.warn(`⚠️  [SMTP Warning] Could not connect to mail server: ${err.message}`);
     }
+
+    // Start automated shift progression lifecycle engine
+    startShiftLifecycleDaemon(60000);
   });
 }
 

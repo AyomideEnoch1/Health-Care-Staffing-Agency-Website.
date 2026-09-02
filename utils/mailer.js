@@ -98,6 +98,37 @@ async function sendAdminEmailVerificationOtp(adminEmail, adminName, otpCode) {
   }
 }
 
+async function sendNewsletterWelcomeEmail(subscriberEmail) {
+  const mailOptions = {
+    from: `"Divine Fingers Healthcare" <${process.env.SMTP_USER || 'no-reply@divinefingershealthcare.ca'}>`,
+    to: subscriberEmail,
+    subject: `Welcome to Divine Fingers Staffing & Shift Alerts`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 560px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 8px; background: #ffffff;">
+        <h2 style="color: #00a896; margin-top: 0;">Welcome to Divine Fingers Shift Alerts</h2>
+        <p>Hello,</p>
+        <p>Thank you for subscribing to the <strong>Divine Fingers Healthcare Services Inc.</strong> newsletter and clinical staffing alerts network.</p>
+        <p>You will now receive:</p>
+        <ul>
+          <li>🚨 Priority Ontario healthcare staffing & urgent surge availability</li>
+          <li>📋 Hospital, LTC, and community care shift openings</li>
+          <li>💡 Healthcare regulatory compliance updates & CNO bulletins</li>
+        </ul>
+        <br>
+        <p>If you have urgent staffing needs or questions, our 24/7 Clinical Dispatch team is always available at <strong>+1 (647) 210-6463</strong> or <strong>info@divinefingershealthcare.ca</strong>.</p>
+        <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 20px 0;" />
+        <p style="font-size: 12px; color: #94a3b8; margin: 0;">Divine Fingers Healthcare Services Inc. (Corp ID: 1592082-5) &bull; 17-2 Dailing Gate, Scarborough, ON M1B 1Z8</p>
+      </div>
+    `
+  };
+  try {
+    return await transporter.sendMail(mailOptions);
+  } catch (err) {
+    console.warn(`⚠️ [SMTP Offline / Dev Intercept] Newsletter email delivery failed (${err.message}).`);
+    return { mock: true, accepted: [subscriberEmail] };
+  }
+}
+
 async function verifyConnection() {
   return transporter.verify();
 }
@@ -106,6 +137,7 @@ module.exports = {
   sendStaffingRequestAlert,
   sendApplicantConfirmation,
   sendAdminEmailVerificationOtp,
+  sendNewsletterWelcomeEmail,
   verifyConnection
 };
 

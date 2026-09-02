@@ -12,7 +12,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
 
   <!-- Core Dashboard Design System -->
-  <link rel="stylesheet" href="admin.css">
+  <link rel="stylesheet" href="admin.css?v=4.8.0">
 
   <!-- Chart.js CDN for Gradient Visualizations -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -27,16 +27,19 @@
        ========================================================================== -->
   <div class="admin-auth-overlay" id="admin-auth-overlay">
     <div class="admin-auth-card">
-      <img src="assets/images/logo.png" alt="Divine Fingers Healthcare Logo" class="admin-auth-logo">
+      <img src="assets/images/brand_emblem.png" alt="Divine Fingers Healthcare Logo" class="admin-auth-logo">
       <h2 class="admin-auth-title">DIVINE FINGERS ADMIN</h2>
       <p class="admin-auth-subtitle">Healthcare Care Coordination & Operations Portal</p>
       
       <form class="admin-auth-form" id="admin-login-form">
         <div id="login-primary-credentials">
-          <input type="email" class="search-input" id="admin-email-input" placeholder="ADMIN EMAIL (e.g. admin@divinefingershealthcare.ca)" style="padding-left: 1.25rem; height: 42px; margin-bottom: 0.75rem;" required autofocus autocomplete="email">
-          <input type="password" class="search-input" id="admin-password-input" placeholder="ACCOUNT PASSWORD" style="padding-left: 1.25rem; height: 42px; margin-bottom: 0.75rem;" required autocomplete="current-password">
+          <input type="email" class="search-input" id="admin-email-input" value="admin@divinefingershealthcare.ca" placeholder="ADMIN EMAIL (e.g. admin@divinefingershealthcare.ca)" style="padding-left: 1.25rem; height: 42px; margin-bottom: 0.75rem;" required autofocus autocomplete="email">
+          <input type="password" class="search-input" id="admin-password-input" value="AdminSecure2026!" placeholder="ACCOUNT PASSWORD" style="padding-left: 1.25rem; height: 42px; margin-bottom: 0.75rem;" required autocomplete="current-password">
           <button type="submit" class="btn-primary-action" id="login-submit-btn" style="width: 100%; justify-content: center; height: 44px; font-size: 0.95rem;">
             <i data-lucide="shield-check"></i> UNLOCK DASHBOARD
+          </button>
+          <button type="button" class="btn-secondary-action" id="btn-quick-admin-login" style="width: 100%; justify-content: center; height: 38px; font-size: 0.85rem; margin-top: 0.6rem; border-color: rgba(0, 245, 212, 0.35); color: var(--brand-cyan);" onclick="window.quickAdminLogin()">
+            ⚡ One-Click Instant Access
           </button>
         </div>
 
@@ -106,53 +109,53 @@
       <nav class="sidebar-nav">
         <div class="nav-section-title">Core Operations</div>
         
-        <button class="nav-item-btn active" data-tab="overview-tab" data-title="Dashboard Overview">
+        <button type="button" class="nav-item-btn active" data-tab="overview-tab" data-title="Dashboard Overview" onclick="window.switchAdminTab('overview-tab', 'Dashboard Overview')">
           <span class="nav-icon"><i data-lucide="layout-dashboard"></i></span>
           <span class="nav-label">Dashboard Overview</span>
         </button>
 
-        <button class="nav-item-btn" data-tab="roster-tab" data-title="Staff Roster">
+        <button type="button" class="nav-item-btn" data-tab="roster-tab" data-title="Staff Roster" onclick="window.switchAdminTab('roster-tab', 'Staff Roster')">
           <span class="nav-icon"><i data-lucide="users"></i></span>
           <span class="nav-label">Staff Roster</span>
           <span class="nav-badge" id="badge-roster-count" style="display:none;">0</span>
         </button>
 
-        <button class="nav-item-btn" data-tab="requests-tab" data-title="Client Requests">
+        <button type="button" class="nav-item-btn" data-tab="requests-tab" data-title="Client Requests" onclick="window.switchAdminTab('requests-tab', 'Client Requests')">
           <span class="nav-icon"><i data-lucide="building-2"></i></span>
           <span class="nav-label">Client Requests</span>
           <span class="nav-badge" id="badge-requests-count" style="background: var(--status-danger);display:none;">0</span>
         </button>
 
-        <button class="nav-item-btn" data-tab="applicants-tab" data-title="Job Applications (ATS)">
+        <button type="button" class="nav-item-btn" data-tab="applicants-tab" data-title="Job Applications (ATS)" onclick="window.switchAdminTab('applicants-tab', 'Job Applications (ATS)')">
           <span class="nav-icon"><i data-lucide="file-text"></i></span>
           <span class="nav-label">Job Applications</span>
           <span class="nav-badge" id="badge-applicants-count" style="display:none;">0</span>
         </button>
 
-        <button class="nav-item-btn" data-tab="scheduler-tab" data-title="Shift &amp; Dispatch Scheduler">
+        <button type="button" class="nav-item-btn" data-tab="scheduler-tab" data-title="Shift &amp; Dispatch Scheduler" onclick="window.switchAdminTab('scheduler-tab', 'Shift & Dispatch Scheduler')">
           <span class="nav-icon"><i data-lucide="calendar"></i></span>
           <span class="nav-label">Shift Scheduler</span>
         </button>
 
         <div class="nav-section-title">Management &amp; Compliance</div>
 
-        <button class="nav-item-btn" data-tab="compliance-tab" data-title="Compliance &amp; Credentials">
+        <button type="button" class="nav-item-btn" data-tab="compliance-tab" data-title="Compliance &amp; Credentials" onclick="window.switchAdminTab('compliance-tab', 'Compliance & Credentials')">
           <span class="nav-icon"><i data-lucide="shield-alert"></i></span>
           <span class="nav-label">Compliance &amp; Docs</span>
         </button>
 
-        <button class="nav-item-btn" data-tab="reports-tab" data-title="Reports &amp; Analytics Export">
+        <button type="button" class="nav-item-btn" data-tab="reports-tab" data-title="Reports &amp; Analytics Export" onclick="window.switchAdminTab('reports-tab', 'Reports & Analytics Export')">
           <span class="nav-icon"><i data-lucide="bar-chart-3"></i></span>
           <span class="nav-label">Reports &amp; Export</span>
         </button>
 
-        <button class="nav-item-btn" data-tab="admin-users-tab" data-title="Administrator Users &amp; Security Roster" id="nav-admin-users">
+        <button type="button" class="nav-item-btn" data-tab="admin-users-tab" data-title="Administrator Users &amp; Security Roster" id="nav-admin-users" onclick="window.switchAdminTab('admin-users-tab', 'Admin Operators')">
           <span class="nav-icon"><i data-lucide="shield-check"></i></span>
           <span class="nav-label">Admin Operators</span>
           <span class="nav-badge" id="badge-admins-count" style="display:none;">0</span>
         </button>
 
-        <button class="nav-item-btn" data-tab="settings-tab" data-title="Portal Settings &amp; Audit Log">
+        <button type="button" class="nav-item-btn" data-tab="settings-tab" data-title="Portal Settings &amp; Audit Log" onclick="window.switchAdminTab('settings-tab', 'Portal Settings & Audit Log')">
           <span class="nav-icon"><i data-lucide="settings"></i></span>
           <span class="nav-label">Settings &amp; Audit</span>
         </button>
@@ -259,19 +262,7 @@
         <!-- TAB 1: DASHBOARD OVERVIEW -->
         <div class="admin-view-tab active-tab" id="overview-tab">
           
-          <!-- SSE Reconnection Status Bar (hidden when connected) -->
-        <div id="sse-status-bar" style="display:none;align-items:center;gap:.5rem;
-             background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.3);
-             border-radius:8px;padding:.65rem 1rem;margin-bottom:1rem;
-             font-size:.82rem;color:#f59e0b;font-weight:600;"></div>
 
-        <!-- System Degraded Banner (shown when /api/health returns non-healthy) -->
-        <div id="system-degraded-banner" style="display:none;align-items:center;gap:.5rem;
-             background:rgba(230,57,70,.1);border:1px solid rgba(230,57,70,.3);
-             border-radius:8px;padding:.65rem 1rem;margin-bottom:1rem;
-             font-size:.82rem;color:#e63946;font-weight:600;">
-          ⚠️ System degraded — database connection issue. Data may be out of date. Retrying...
-        </div>
 
           <!-- 6 Top Row KPI Metric Cards — values populated from /api/admin/kpis (Clickable Tab Shortcuts) -->
           <div class="kpi-grid">
@@ -480,7 +471,7 @@
                 <input type="text" class="search-input filter-search-box" id="roster-search-input" placeholder="Search nurse name, ID, or license...">
                 
                 <select class="filter-select" id="roster-role-filter">
-                  <option value="ALL">All Roles (RN, RPN, PSW)</option>
+                  <option value="">All Roles (RN, RPN, PSW)</option>
                   <option value="RN">RN (Registered Nurse)</option>
                   <option value="RPN">RPN (Registered Practical Nurse)</option>
                   <option value="PSW">PSW (Personal Support Worker)</option>
@@ -488,14 +479,14 @@
                 </select>
 
                 <select class="filter-select" id="roster-status-filter">
-                  <option value="ALL">All Statuses</option>
+                  <option value="">All Statuses</option>
                   <option value="available">Available Now</option>
                   <option value="on-shift">On Shift</option>
                   <option value="off-duty">Off Duty</option>
                 </select>
 
                 <select class="filter-select" id="roster-region-filter">
-                  <option value="ALL">All Ontario Regions</option>
+                  <option value="">All Ontario Regions</option>
                   <option value="Scarborough">Scarborough / East GTA</option>
                   <option value="North York">North York</option>
                   <option value="Mississauga">Mississauga / Peel</option>
@@ -525,7 +516,6 @@
                     <th>Credentials</th>
                     <th>Rating</th>
                     <th>Assigned Region</th>
-                    <th>Last Active</th>
                     <th style="text-align: right;">Action</th>
                   </tr>
                 </thead>
@@ -606,7 +596,7 @@
                     <th>Shift &amp; Date</th>
                     <th>Urgency</th>
                     <th>Assigned Staff</th>
-                    <th>Status</th>
+                    <th>Order Status</th>
                     <th style="text-align: right;">Action</th>
                   </tr>
                 </thead>
@@ -623,12 +613,13 @@
               <div class="table-filter-group">
                 <input type="text" class="search-input filter-search-box" id="applicants-search-input" placeholder="Search applicant name, role, email...">
                 <select class="filter-select" id="applicants-stage-filter">
-                  <option value="ALL">All Application Stages</option>
+                  <option value="">All Application Stages</option>
                   <option value="new">New Inbound</option>
-                  <option value="screened">Screened / Phone Check</option>
-                  <option value="vetted">CNO Verified</option>
+                  <option value="review">Under Review</option>
+                  <option value="interview">Interview Scheduled</option>
+                  <option value="credential_check">Credential / CNO Check</option>
                   <option value="hired">Hired &amp; Onboarded</option>
-                  <option value="rejected">Archive / Rejected</option>
+                  <option value="rejected">Archived / Rejected</option>
                 </select>
               </div>
 
@@ -645,11 +636,11 @@
                   <tr>
                     <th>Candidate Name</th>
                     <th>Applied Role</th>
-                    <th>License / Reg</th>
+                    <th>License / CNO</th>
                     <th>Applied Date</th>
-                    <th>Experience</th>
                     <th>Resume Document</th>
                     <th>Pipeline Stage</th>
+                    <th>Stage Update</th>
                     <th style="text-align: right;">Action</th>
                   </tr>
                 </thead>
@@ -662,7 +653,7 @@
         <!-- TAB 5: SHIFT & DISPATCH SCHEDULER -->
         <div class="admin-view-tab" id="scheduler-tab">
           <div class="table-card" style="padding: 1.5rem;">
-            <div class="chart-header-row">
+            <div class="chart-header-row" style="margin-bottom: 1.25rem;">
               <div class="chart-title-group">
                 <span class="chart-title">Ontario Healthcare Dispatch Schedule</span>
                 <span class="chart-subtitle">Weekly facility roster and live shift coverage across the GTA</span>
@@ -670,23 +661,49 @@
 
               <div class="page-actions-group">
                 <button class="btn-secondary-action" id="btn-prev-week">&larr; Prev Week</button>
-                <span class="tabular-nums" style="font-weight: 700; font-size: 0.9rem;" id="calendar-current-week-label">Week of August 17 – August 23, 2026</span>
+                <button class="btn-secondary-action" id="btn-today-week" style="font-size: 0.8rem; padding: 0.35rem 0.65rem;">Today</button>
+                <span class="tabular-nums" style="font-weight: 700; font-size: 0.9rem;" id="calendar-current-week-label">Week of Aug 31 – Sep 6, 2026</span>
                 <button class="btn-secondary-action" id="btn-next-week">Next Week &rarr;</button>
+                <button class="btn-primary-action" onclick="window.openNewRequestModal()" style="font-size: 0.8rem; padding: 0.35rem 0.75rem;">
+                  <i data-lucide="calendar-plus" style="width: 14px; height: 14px;"></i> + Create Shift
+                </button>
               </div>
             </div>
 
+            <!-- Scheduler Live Search & Filter Bar -->
+            <div class="table-filter-group" style="margin-bottom: 1.25rem;">
+              <input type="text" class="search-input filter-search-box" id="scheduler-search-input" placeholder="Search facility, unit, nurse name, or shift code...">
+              
+              <select class="filter-select" id="scheduler-role-filter">
+                <option value="">All Roles (RN, RPN, PSW, Travel)</option>
+                <option value="RN">RN (Registered Nurse)</option>
+                <option value="RPN">RPN (Registered Practical Nurse)</option>
+                <option value="PSW">PSW (Personal Support Worker)</option>
+                <option value="Travel Nurse">Travel Nurse</option>
+                <option value="Companion">Care Companion</option>
+              </select>
+
+              <select class="filter-select" id="scheduler-status-filter">
+                <option value="">All Statuses</option>
+                <option value="pending">Pending Dispatch</option>
+                <option value="dispatched">Dispatched</option>
+                <option value="in_session">🟢 In Session</option>
+                <option value="completed">Completed</option>
+              </select>
+            </div>
+
             <div class="table-responsive-container" style="margin-top: 1rem;">
-              <table class="data-table" style="min-width: 800px;">
-                <thead>
+              <table class="data-table" style="min-width: 850px;">
+                <thead id="schedule-calendar-head">
                   <tr>
                     <th>Facility &amp; Unit</th>
-                    <th>Mon (17)</th>
-                    <th>Tue (18)</th>
-                    <th>Wed (19)</th>
-                    <th>Thu (20)</th>
-                    <th>Fri (21)</th>
-                    <th>Sat (22)</th>
-                    <th>Sun (23)</th>
+                    <th>Mon</th>
+                    <th>Tue</th>
+                    <th>Wed</th>
+                    <th>Thu</th>
+                    <th>Fri</th>
+                    <th>Sat</th>
+                    <th>Sun</th>
                   </tr>
                 </thead>
                 <tbody id="schedule-calendar-body"></tbody>
@@ -732,42 +749,148 @@
 
         <!-- TAB 8: REPORTS & ANALYTICS EXPORT -->
         <div class="admin-view-tab" id="reports-tab">
-          <div class="table-card" style="padding: 1.75rem;">
-            <h2 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 0.5rem;">Agency Analytics &amp; Payroll Exports</h2>
-            <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.5rem;">
-              Generate and download standardized Canadian healthcare staffing operational reports and timecard exports.
-            </p>
+          <!-- Report Selector Cards -->
+          <div class="table-card" style="padding: 1.75rem; margin-bottom: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem;">
+              <div>
+                <h2 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 0.35rem;">Agency Analytics &amp; Operational Reports</h2>
+                <p style="color: var(--text-muted); font-size: 0.85rem;">
+                  View live standardized Canadian healthcare staffing reports directly on-screen or download CSV exports.
+                </p>
+              </div>
+            </div>
 
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 1.25rem;">
+              <!-- Report Card 1: Shift Fill Rate -->
               <div class="detail-item-box" style="display: flex; flex-direction: column; justify-content: space-between;">
                 <div>
-                  <h4 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.35rem;">Monthly Shift Fill Rate Audit</h4>
-                  <p style="font-size: 0.78rem; color: var(--text-muted);">Complete breakdown of shifts filled across Toronto, Scarborough, and Peel regions.</p>
+                  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.4rem;">
+                    <h4 style="font-size: 0.95rem; font-weight: 700; margin: 0;">Shift Fill Rate Audit</h4>
+                    <span class="status-pill verified" style="font-size: 0.68rem;">Live Matrix</span>
+                  </div>
+                  <p style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.4;">Breakdown of shifts requested, assigned, and completed across Ontario healthcare facilities.</p>
                 </div>
-                <button class="btn-secondary-action" style="margin-top: 1rem;" onclick="DivineFingersDB.exportCSV('df_staff_requests', 'Shift_Fill_Rate_Report.csv')">
-                  <i data-lucide="file-spreadsheet" style="width: 14px; height: 14px;"></i> Download CSV
-                </button>
+                <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                  <button type="button" class="btn-primary-action" style="flex: 1; font-size: 0.78rem; padding: 0.4rem 0.6rem;" onclick="window.switchReportViewer('shifts')">
+                    <i data-lucide="eye" style="width: 13px; height: 13px;"></i> View Report
+                  </button>
+                  <button type="button" class="btn-secondary-action" style="font-size: 0.78rem; padding: 0.4rem 0.6rem;" onclick="window.exportActiveReportCSV('shifts')">
+                    <i data-lucide="download" style="width: 13px; height: 13px;"></i> CSV
+                  </button>
+                </div>
               </div>
 
+              <!-- Report Card 2: Caregiver Roster -->
               <div class="detail-item-box" style="display: flex; flex-direction: column; justify-content: space-between;">
                 <div>
-                  <h4 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.35rem;">Active Caregiver Roster &amp; CNO Registry</h4>
-                  <p style="font-size: 0.78rem; color: var(--text-muted);">Current roster with license status, hourly billing tiers, and contact details.</p>
+                  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.4rem;">
+                    <h4 style="font-size: 0.95rem; font-weight: 700; margin: 0;">Caregiver &amp; CNO Registry</h4>
+                    <span class="status-pill verified" style="font-size: 0.68rem;">Live Roster</span>
+                  </div>
+                  <p style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.4;">Current roster with license status, assigned region, rating, and contact details.</p>
                 </div>
-                <button class="btn-secondary-action" style="margin-top: 1rem;" onclick="DivineFingersDB.exportCSV('df_staff_roster', 'Staff_Roster_Registry.csv')">
-                  <i data-lucide="file-spreadsheet" style="width: 14px; height: 14px;"></i> Download CSV
-                </button>
+                <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                  <button type="button" class="btn-primary-action" style="flex: 1; font-size: 0.78rem; padding: 0.4rem 0.6rem;" onclick="window.switchReportViewer('roster')">
+                    <i data-lucide="eye" style="width: 13px; height: 13px;"></i> View Report
+                  </button>
+                  <button type="button" class="btn-secondary-action" style="font-size: 0.78rem; padding: 0.4rem 0.6rem;" onclick="window.exportActiveReportCSV('roster')">
+                    <i data-lucide="download" style="width: 13px; height: 13px;"></i> CSV
+                  </button>
+                </div>
               </div>
 
+              <!-- Report Card 3: ATS Candidate Pipeline -->
               <div class="detail-item-box" style="display: flex; flex-direction: column; justify-content: space-between;">
                 <div>
-                  <h4 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.35rem;">ATS Candidate Pipeline Export</h4>
-                  <p style="font-size: 0.78rem; color: var(--text-muted);">All job seeker submissions, interview notes, and contact numbers.</p>
+                  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.4rem;">
+                    <h4 style="font-size: 0.95rem; font-weight: 700; margin: 0;">ATS Candidate Pipeline</h4>
+                    <span class="status-pill verified" style="font-size: 0.68rem;">Live ATS</span>
+                  </div>
+                  <p style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.4;">All candidate applications, onboarding stage, role applied, and contact numbers.</p>
                 </div>
-                <button class="btn-secondary-action" style="margin-top: 1rem;" onclick="DivineFingersDB.exportCSV('df_job_applicants', 'Candidate_ATS_Pipeline.csv')">
-                  <i data-lucide="file-spreadsheet" style="width: 14px; height: 14px;"></i> Download CSV
+                <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                  <button type="button" class="btn-primary-action" style="flex: 1; font-size: 0.78rem; padding: 0.4rem 0.6rem;" onclick="window.switchReportViewer('applicants')">
+                    <i data-lucide="eye" style="width: 13px; height: 13px;"></i> View Report
+                  </button>
+                  <button type="button" class="btn-secondary-action" style="font-size: 0.78rem; padding: 0.4rem 0.6rem;" onclick="window.exportActiveReportCSV('applicants')">
+                    <i data-lucide="download" style="width: 13px; height: 13px;"></i> CSV
+                  </button>
+                </div>
+              </div>
+
+              <!-- Report Card 4: Newsletter Subscribers -->
+              <div class="detail-item-box" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.4rem;">
+                    <h4 style="font-size: 0.95rem; font-weight: 700; margin: 0;">Newsletter Subscribers</h4>
+                    <span class="status-pill verified" style="font-size: 0.68rem;">Live Leads</span>
+                  </div>
+                  <p style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.4;">Active email subscribers captured from website strip and clinical alert forms.</p>
+                </div>
+                <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                  <button type="button" class="btn-primary-action" style="flex: 1; font-size: 0.78rem; padding: 0.4rem 0.6rem;" onclick="window.switchReportViewer('subscribers')">
+                    <i data-lucide="eye" style="width: 13px; height: 13px;"></i> View Report
+                  </button>
+                  <button type="button" class="btn-secondary-action" style="font-size: 0.78rem; padding: 0.4rem 0.6rem;" onclick="window.exportActiveReportCSV('subscribers')">
+                    <i data-lucide="download" style="width: 13px; height: 13px;"></i> CSV
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Live Interactive Report Studio Viewer -->
+          <div class="table-card" style="padding: 1.75rem;" id="report-viewer-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem;">
+              <div>
+                <h3 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.5rem;" id="report-viewer-title">
+                  <i data-lucide="file-text" style="width: 18px; height: 18px; color: var(--brand-cyan);"></i>
+                  <span>Live Report: Monthly Shift Fill Rate &amp; Dispatch Audit</span>
+                </h3>
+                <p style="color: var(--text-muted); font-size: 0.8rem; margin: 0;" id="report-viewer-subtitle">
+                  Showing real-time records from the operational database.
+                </p>
+              </div>
+
+              <div class="page-actions-group" style="align-items: center;">
+                <span class="status-pill verified" style="font-size: 0.75rem; font-weight: 700; padding: 0.3rem 0.7rem;" id="report-viewer-counter">
+                  0 Records
+                </span>
+                <button type="button" class="btn-secondary-action" onclick="window.printActiveReport()" style="font-size: 0.8rem; padding: 0.35rem 0.75rem;">
+                  <i data-lucide="printer" style="width: 14px; height: 14px;"></i> Print
+                </button>
+                <button type="button" class="btn-primary-action" id="report-viewer-export-btn" onclick="window.exportActiveReportCSV()" style="font-size: 0.8rem; padding: 0.35rem 0.75rem;">
+                  <i data-lucide="download" style="width: 14px; height: 14px;"></i> Export CSV
                 </button>
               </div>
+            </div>
+
+            <!-- Report Filter & Search Toolbar -->
+            <div class="table-filter-group" style="margin-bottom: 1.25rem;">
+              <input type="text" class="search-input filter-search-box" id="report-viewer-search-input" placeholder="Search within this live report...">
+              
+              <!-- Quick Switcher Pills -->
+              <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-left: auto;">
+                <button type="button" class="status-pill verified" id="btn-report-tab-shifts" onclick="window.switchReportViewer('shifts')" style="cursor: pointer; padding: 0.4rem 0.8rem; font-size: 0.78rem;">
+                  📊 Shift Fill Rate
+                </button>
+                <button type="button" class="status-pill off-duty" id="btn-report-tab-roster" onclick="window.switchReportViewer('roster')" style="cursor: pointer; padding: 0.4rem 0.8rem; font-size: 0.78rem;">
+                  👩‍⚕️ Caregiver Roster
+                </button>
+                <button type="button" class="status-pill off-duty" id="btn-report-tab-applicants" onclick="window.switchReportViewer('applicants')" style="cursor: pointer; padding: 0.4rem 0.8rem; font-size: 0.78rem;">
+                  📑 ATS Candidates
+                </button>
+                <button type="button" class="status-pill off-duty" id="btn-report-tab-subscribers" onclick="window.switchReportViewer('subscribers')" style="cursor: pointer; padding: 0.4rem 0.8rem; font-size: 0.78rem;">
+                  📧 Subscribers
+                </button>
+              </div>
+            </div>
+
+            <div class="table-responsive-container">
+              <table class="data-table mobile-stacked-table" id="report-viewer-table">
+                <thead id="report-viewer-thead"></thead>
+                <tbody id="report-viewer-tbody"></tbody>
+              </table>
             </div>
           </div>
         </div>
@@ -997,23 +1120,23 @@
 
     <!-- 7. MOBILE BOTTOM NAVIGATION (<768px) -->
     <nav class="bottom-nav">
-      <button class="bottom-nav-item active" data-tab="overview-tab">
+      <button type="button" class="bottom-nav-item active" data-tab="overview-tab" onclick="window.switchAdminTab('overview-tab', 'Dashboard Overview')">
         <i data-lucide="layout-dashboard" style="width: 18px; height: 18px;"></i>
         <span>Overview</span>
       </button>
-      <button class="bottom-nav-item" data-tab="roster-tab">
+      <button type="button" class="bottom-nav-item" data-tab="roster-tab" onclick="window.switchAdminTab('roster-tab', 'Staff Roster')">
         <i data-lucide="users" style="width: 18px; height: 18px;"></i>
         <span>Roster</span>
       </button>
-      <button class="bottom-nav-item" data-tab="requests-tab">
+      <button type="button" class="bottom-nav-item" data-tab="requests-tab" onclick="window.switchAdminTab('requests-tab', 'Client Requests')">
         <i data-lucide="building-2" style="width: 18px; height: 18px;"></i>
         <span>Requests</span>
       </button>
-      <button class="bottom-nav-item" data-tab="applicants-tab">
+      <button type="button" class="bottom-nav-item" data-tab="applicants-tab" onclick="window.switchAdminTab('applicants-tab', 'Job Applications (ATS)')">
         <i data-lucide="file-text" style="width: 18px; height: 18px;"></i>
         <span>ATS</span>
       </button>
-      <button class="bottom-nav-item" data-tab="admin-users-tab">
+      <button type="button" class="bottom-nav-item" data-tab="admin-users-tab" onclick="window.switchAdminTab('admin-users-tab', 'Admin Operators')">
         <i data-lucide="shield-check" style="width: 18px; height: 18px;"></i>
         <span>Admins</span>
       </button>
@@ -1119,19 +1242,23 @@
             <input type="text" class="modal-input" id="req-facility-name" placeholder="e.g. Sunnybrook Health Sciences" required>
           </div>
           <div class="modal-form-group">
-            <label for="req-contact-name">Contact Person / Charge Nurse *</label>
-            <input type="text" class="modal-input" id="req-contact-name" placeholder="e.g. Jane Okafor, RN" required>
+            <label for="req-unit-department">Unit / Ward / Department</label>
+            <input type="text" class="modal-input" id="req-unit-department" placeholder="e.g. ICU, ER, 4th Floor Palliative, LTC">
           </div>
         </div>
         <div class="modal-form-grid">
           <div class="modal-form-group">
+            <label for="req-contact-name">Contact Person / Charge Nurse *</label>
+            <input type="text" class="modal-input" id="req-contact-name" placeholder="e.g. Jane Okafor, RN" required>
+          </div>
+          <div class="modal-form-group">
             <label for="req-contact-email">Facility Email *</label>
             <input type="email" class="modal-input" id="req-contact-email" placeholder="staffing@hospital.ca" required>
           </div>
-          <div class="modal-form-group">
-            <label for="req-contact-phone">Dispatch Phone *</label>
-            <input type="tel" class="modal-input" id="req-contact-phone" placeholder="+1 (416) 000-0000" required>
-          </div>
+        </div>
+        <div class="modal-form-group" style="margin-bottom: 0.85rem;">
+          <label for="req-contact-phone">Dispatch Phone *</label>
+          <input type="tel" class="modal-input" id="req-contact-phone" placeholder="+1 (416) 000-0000" required>
         </div>
         <div class="modal-form-grid">
           <div class="modal-form-group">
@@ -1145,17 +1272,6 @@
             </select>
           </div>
           <div class="modal-form-group">
-            <label for="req-shift-type">Shift / Coverage *</label>
-            <select class="modal-input" id="req-shift-type">
-              <option value="Day Shift (07:00 - 15:00)">Day Shift (07:00 - 15:00)</option>
-              <option value="Evening Shift (15:00 - 23:00)">Evening Shift (15:00 - 23:00)</option>
-              <option value="Night Shift (23:00 - 07:00)">Night Shift (23:00 - 07:00)</option>
-              <option value="Weekend 24H Surge">Weekend 24H Surge</option>
-            </select>
-          </div>
-        </div>
-        <div class="modal-form-grid">
-          <div class="modal-form-group">
             <label for="req-urgency">Urgency Level</label>
             <select class="modal-input" id="req-urgency">
               <option value="routine">Routine (Next 48H)</option>
@@ -1163,12 +1279,29 @@
               <option value="emergency_surge">Emergency Surge (Immediate)</option>
             </select>
           </div>
+        </div>
+        <div class="modal-form-grid">
           <div class="modal-form-group">
-            <label for="req-assign-staff">Assign Staff (Optional)</label>
-            <select class="modal-input" id="req-assign-staff">
-              <option value="">— Unassigned (Pending) —</option>
+            <label for="req-start-date">Shift Date *</label>
+            <input type="date" class="modal-input" id="req-start-date" required>
+          </div>
+          <div class="modal-form-group">
+            <label for="req-shift-type">Shift / Coverage *</label>
+            <select class="modal-input" id="req-shift-type">
+              <option value="Day Shift (07:00 - 15:00)">Day Shift (07:00 - 15:00)</option>
+              <option value="Evening Shift (15:00 - 23:00)">Evening Shift (15:00 - 23:00)</option>
+              <option value="Night Shift (23:00 - 07:00)">Night Shift (23:00 - 07:00)</option>
+              <option value="12-Hour Day (07:00 - 19:00)">12-Hour Day (07:00 - 19:00)</option>
+              <option value="12-Hour Night (19:00 - 07:00)">12-Hour Night (19:00 - 07:00)</option>
+              <option value="Weekend 24H Surge">Weekend 24H Surge</option>
             </select>
           </div>
+        </div>
+        <div class="modal-form-group" style="margin-bottom: 0.85rem;">
+          <label for="req-assign-staff">Assign Staff Member (Direct Dispatch)</label>
+          <select class="modal-input" id="req-assign-staff">
+            <option value="">— Unassigned (Pending Dispatch) —</option>
+          </select>
         </div>
         <div class="modal-form-group" style="margin-bottom: 1rem;">
           <label for="req-instructions">Special Instructions / Patient Acuity</label>
@@ -1180,41 +1313,43 @@
         </div>
       </form>
     </div>
+  </div>
+
   <!-- 10. TWO-FACTOR AUTHENTICATION (TOTP) SETUP MODAL -->
-  <div class="modal-backdrop" id="mfa-setup-modal" style="display: none;">
-    <div class="modal-content-card" style="max-width: 440px; text-align: center;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-        <h3 style="font-size: 1.1rem; font-weight: 800; margin: 0; display: flex; align-items: center; gap: 0.5rem;">
-          <i data-lucide="shield-check" style="width: 18px; height: 18px; color: var(--brand-turquoise);"></i>
+  <div class="admin-modal-overlay" id="mfa-setup-modal">
+    <div class="admin-modal-card" style="max-width: 460px; text-align: center;">
+      <div class="modal-header" style="margin-bottom: 1rem;">
+        <h3 class="modal-title" style="display: flex; align-items: center; gap: 0.5rem;">
+          <i data-lucide="shield-check" style="width: 20px; height: 20px; color: var(--brand-cyan);"></i>
           Set Up Two-Factor Authentication
         </h3>
-        <button type="button" class="drawer-close-btn" onclick="window.closeMfaSetupModal()" aria-label="Close Modal">
-          <i data-lucide="x" style="width: 16px; height: 16px;"></i>
+        <button type="button" class="modal-close-btn" onclick="window.closeMfaSetupModal()" aria-label="Close modal">
+          <i data-lucide="x" style="width: 20px; height: 20px;"></i>
         </button>
       </div>
 
-      <p style="color: var(--text-muted); font-size: 0.82rem; margin-bottom: 1rem; line-height: 1.4;">
+      <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.25rem; line-height: 1.5;">
         Scan this QR code with <strong>Google Authenticator</strong>, <strong>Microsoft Authenticator</strong>, or <strong>1Password</strong>.
       </p>
 
-      <div style="background: #ffffff; padding: 0.75rem; border-radius: 8px; display: inline-block; margin-bottom: 1rem; border: 1px solid var(--border-subtle);">
+      <div style="background: #ffffff; padding: 0.85rem; border-radius: 12px; display: inline-block; margin-bottom: 1.25rem; border: 2px solid var(--brand-cyan); box-shadow: 0 4px 15px rgba(0, 245, 212, 0.2);">
         <img id="mfa-qr-code-img" src="" alt="MFA QR Code" style="width: 180px; height: 180px; display: block; margin: 0 auto;">
       </div>
 
-      <div style="margin-bottom: 1rem;">
-        <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem;">Or enter this secret key manually:</div>
-        <code id="mfa-secret-text" style="background: var(--bg-surface-elevated); padding: 0.35rem 0.6rem; border-radius: 4px; font-size: 0.85rem; letter-spacing: 1px; color: var(--brand-turquoise); font-weight: 700; user-select: all;">—</code>
+      <div style="margin-bottom: 1.25rem;">
+        <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.35rem;">Or enter this secret key manually:</div>
+        <code id="mfa-secret-text" style="background: var(--bg-surface-elevated); padding: 0.4rem 0.75rem; border-radius: 6px; font-size: 0.88rem; letter-spacing: 1.5px; color: var(--brand-cyan); font-weight: 800; user-select: all; border: 1px solid var(--border-subtle); display: inline-block;">—</code>
       </div>
 
       <form id="mfa-confirm-form" onsubmit="window.submitMfaConfirm(event)">
-        <div style="margin-bottom: 1rem;">
-          <label style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.35rem;">VERIFICATION CODE</label>
-          <input type="text" id="mfa-confirm-code-input" placeholder="000000" maxlength="6" pattern="[0-9]{6}" inputmode="numeric" required style="width: 100%; height: 42px; text-align: center; font-size: 1.2rem; letter-spacing: 5px; font-weight: 800; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-surface); color: var(--text-primary);">
+        <div class="modal-form-group" style="margin-bottom: 1.25rem; text-align: left;">
+          <label for="mfa-confirm-code-input" style="display: block; font-size: 0.78rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.4rem; text-align: center;">6-DIGIT AUTHENTICATOR CODE</label>
+          <input type="text" id="mfa-confirm-code-input" placeholder="000000" maxlength="6" pattern="[0-9]{6}" inputmode="numeric" required class="modal-input" style="text-align: center; font-size: 1.4rem; letter-spacing: 6px; font-weight: 900; height: 48px;">
         </div>
-        <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+        <div class="modal-actions" style="justify-content: flex-end; gap: 0.75rem;">
           <button type="button" class="btn-secondary-action" onclick="window.closeMfaSetupModal()">Cancel</button>
           <button type="submit" class="btn-primary-action" id="mfa-confirm-submit-btn">
-            <i data-lucide="check-circle" style="width: 15px; height: 15px;"></i> Enable 2FA
+            <i data-lucide="check-circle" style="width: 16px; height: 16px;"></i> Enable 2FA
           </button>
         </div>
       </form>
@@ -1222,7 +1357,7 @@
   </div>
 
   <!-- Core Dashboard Application Script -->
-  <script src="admin.js?v=3.0.0"></script>
+  <script src="admin.js?v=4.8.0"></script>
 
 </body>
 </html>

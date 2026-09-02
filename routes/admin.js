@@ -30,6 +30,7 @@ const path = require('path');
 const pool = require('../db');
 const bcrypt = require('bcryptjs');
 const { z } = require('zod');
+const { uploadCredential } = require('../middleware/uploadCredentials');
 const { requireAdminAuth } = require('../middleware/auth');
 const adminEvents = require('../utils/events');
 const { sendAdminEmailVerificationOtp } = require('../utils/mailer');
@@ -169,15 +170,15 @@ router.get('/requests', async (req, res, next) => {
 // PATCH /api/admin/requests/:id/status
 router.patch('/requests/:id/status', async (req, res, next) => {
   try {
-    const { status, assigned_staff_id, confirm_override } = req.body;
+    const { status, assigned_staff_id, confirm_override, start_date, shift_type, unit_department } = req.body;
     const { id } = req.params;
 
-    const VALID_STATUSES = ['pending', 'dispatched', 'completed', 'cancelled'];
+    const VALID_STATUSES = ['pending', 'dispatched', 'in_session', 'confirmed', 'completed', 'cancelled'];
     if (!VALID_STATUSES.includes(status)) {
       return res.status(400).json({ success: false, error: `Invalid status. Must be one of: ${VALID_STATUSES.join(', ')}` });
     }
 
-    const [existing] = await pool.query('SELECT request_code, facility_name FROM staffing_requests WHERE id = ?', [id]);
+    const [existing] = await pool.query('SELECT request_code, facility_name, start_date, shift_type, unit_department FROM staffing_requests WHERE id = ?', [id]);
     const reqCode = existing.length ? existing[0].request_code : id.slice(0, 8);
     const facilityName = existing.length ? existing[0].facility_name : '';
 
@@ -220,8 +221,14 @@ router.patch('/requests/:id/status', async (req, res, next) => {
     }
 
     await pool.query(
-      'UPDATE staffing_requests SET status = ?, assigned_staff_id = ? WHERE id = ?',
-      [status, assigned_staff_id || null, id]
+      `UPDATE staffing_requests SET 
+        status = ?, 
+        assigned_staff_id = ?,
+        start_date = COALESCE(?, start_date),
+        shift_type = COALESCE(?, shift_type),
+        unit_department = COALESCE(?, unit_department)
+       WHERE id = ?`,
+      [status, assigned_staff_id || null, start_date || null, shift_type || null, unit_department || null, id]
     );
 
     const logAction = isConflict ? 'DISPATCH_CONFLICT_CONFIRMED' : 'STATUS_CHANGED';
@@ -275,7 +282,7 @@ router.patch('/applications/:id/stage', async (req, res, next) => {
     const { stage } = req.body;
     const { id } = req.params;
 
-    const VALID_STAGES = ['new', 'review', 'interview', 'hired', 'rejected'];
+    const VALID_STAGES = ['new', 'review', 'interview', 'credential_check', 'hired', 'rejected'];
     if (!VALID_STAGES.includes(stage)) {
       return res.status(400).json({ success: false, error: `Invalid stage. Must be one of: ${VALID_STAGES.join(', ')}` });
     }
@@ -451,14 +458,151 @@ router.patch('/roster/:id', async (req, res, next) => {
 });
 
 // ============================================================================
+// CLINICAL CREDENTIALS & STAFF DOCUMENTS
+// ============================================================================
+
+// GET /api/admin/staff/:id/documents — Retrieve all documents for a staff member
+router.get('/staff/:id/documents', async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const [docs] = await pool.query(
+      `SELECT id, staff_id, doc_type, title, file_name, file_size, mime_type, expiry_date, uploaded_by, created_at
+       FROM staff_documents WHERE staff_id = ? ORDER BY created_at DESC`,
+      [id]
+    );
+    res.json({ success: true, data: docs });
+  } catch (err) { next(err); }
+});
+
+// POST /api/admin/staff/:id/documents — Upload new document / certificate
+router.post('/staff/:id/documents', uploadCredential.single('document'), async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { doc_type, title, expiry_date } = req.body;
+
+    if (!req.file) {
+      return res.status(400).json({ success: false, error: 'No file was uploaded.' });
+    }
+
+    const [staffRows] = await pool.query('SELECT name, staff_code FROM staff_roster WHERE id = ?', [id]);
+    if (!staffRows.length) {
+      if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+      return res.status(404).json({ success: false, error: 'Staff member not found.' });
+    }
+
+    const docId = crypto.randomUUID();
+    const docTitle = title || req.file.originalname;
+    const docType = doc_type || 'other';
+
+    await pool.query(
+      `INSERT INTO staff_documents
+        (id, staff_id, doc_type, title, file_path, file_name, file_size, mime_type, expiry_date, uploaded_by)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        docId, id, docType, docTitle, req.file.path, req.file.originalname,
+        req.file.size, req.file.mimetype, expiry_date || null, req.admin.full_name
+      ]
+    );
+
+    // If doc is CPR or CNO and has expiry date, update caregiver profile
+    if (expiry_date && (docType === 'cpr_card' || docType === 'cno_license')) {
+      const exp = new Date(expiry_date);
+      const today = new Date();
+      const thirtyDays = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000);
+      const credStatus = exp < today ? 'expired' : (exp <= thirtyDays ? 'expiring' : 'verified');
+
+      await pool.query(
+        `UPDATE staff_roster SET cpr_expiry_date = ?, credential_status = ? WHERE id = ?`,
+        [expiry_date, credStatus, id]
+      );
+    } else if (docType === 'vss_check') {
+      await pool.query(`UPDATE staff_roster SET vss_status = 'Clear' WHERE id = ?`, [id]);
+    } else if (docType === 'n95_fit') {
+      await pool.query(`UPDATE staff_roster SET n95_fit_test = '3M Valid' WHERE id = ?`, [id]);
+    }
+
+    await pool.query(
+      `INSERT INTO audit_logs (id, admin_id, actor_name, action, target_entity, target_id, details, severity, ip_address)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [crypto.randomUUID(), req.admin.id, req.admin.full_name,
+       'CREDENTIAL_UPLOADED', 'staff_documents', docId,
+       `Uploaded ${docType} (${docTitle}) for ${staffRows[0].name} (${staffRows[0].staff_code})`, 'info', req.ip]
+    );
+
+    res.status(201).json({
+      success: true,
+      message: `Document "${docTitle}" uploaded successfully.`,
+      data: {
+        id: docId,
+        staff_id: id,
+        doc_type: docType,
+        title: docTitle,
+        file_name: req.file.originalname,
+        file_size: req.file.size,
+        mime_type: req.file.mimetype,
+        expiry_date: expiry_date || null
+      }
+    });
+  } catch (err) { next(err); }
+});
+
+// GET /api/admin/staff/documents/:docId/download — Preview or download credential document
+router.get('/staff/documents/:docId/download', async (req, res, next) => {
+  try {
+    const { docId } = req.params;
+    const [rows] = await pool.query('SELECT * FROM staff_documents WHERE id = ?', [docId]);
+    if (!rows.length) {
+      return res.status(404).json({ success: false, error: 'Document not found.' });
+    }
+
+    const doc = rows[0];
+    if (!fs.existsSync(doc.file_path)) {
+      return res.status(404).json({ success: false, error: 'Document file missing from server storage.' });
+    }
+
+    res.setHeader('Content-Type', doc.mime_type || 'application/octet-stream');
+    res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(doc.file_name)}"`);
+    fs.createReadStream(doc.file_path).pipe(res);
+  } catch (err) { next(err); }
+});
+
+// DELETE /api/admin/staff/documents/:docId — Delete document
+router.delete('/staff/documents/:docId', async (req, res, next) => {
+  try {
+    const { docId } = req.params;
+    const [rows] = await pool.query('SELECT * FROM staff_documents WHERE id = ?', [docId]);
+    if (!rows.length) {
+      return res.status(404).json({ success: false, error: 'Document not found.' });
+    }
+
+    const doc = rows[0];
+    if (fs.existsSync(doc.file_path)) {
+      fs.unlinkSync(doc.file_path);
+    }
+
+    await pool.query('DELETE FROM staff_documents WHERE id = ?', [docId]);
+
+    await pool.query(
+      `INSERT INTO audit_logs (id, admin_id, actor_name, action, target_entity, target_id, details, severity, ip_address)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [crypto.randomUUID(), req.admin.id, req.admin.full_name,
+       'CREDENTIAL_DELETED', 'staff_documents', docId,
+       `Deleted document ${doc.title} (${doc.file_name})`, 'warning', req.ip]
+    );
+
+    res.json({ success: true, message: `Document "${doc.title}" deleted successfully.` });
+  } catch (err) { next(err); }
+});
+
+// ============================================================================
 // MANUAL SHIFT REQUEST CREATION (FROM ADMIN)
 // POST /api/admin/requests
 // ============================================================================
 router.post('/requests', async (req, res, next) => {
   try {
     const {
-      facility_name, contact_name, contact_email, contact_phone,
-      role_requested, shift_type, urgency_level, special_instructions,
+      facility_name, unit_department, contact_name, contact_email, contact_phone,
+      role_requested, shift_type, start_date, urgency_level, special_instructions,
       assigned_staff_id, status
     } = req.body;
 
@@ -467,18 +611,18 @@ router.post('/requests', async (req, res, next) => {
     }
 
     const id = crypto.randomUUID();
-    const reqCode = `REQ-${Math.floor(100 + Math.random() * 900)}`;
+    const reqCode = `REQ-${Date.now().toString().slice(-4)}${Math.floor(10 + Math.random() * 90)}`;
 
     await pool.query(
       `INSERT INTO staffing_requests
-        (id, request_code, facility_name, contact_name, contact_email, contact_phone,
-         role_requested, shift_type, urgency_level, special_instructions, assigned_staff_id, status, ip_address)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        (id, request_code, facility_name, unit_department, contact_name, contact_email, contact_phone,
+         role_requested, shift_type, start_date, urgency_level, special_instructions, assigned_staff_id, status, ip_address)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
-        id, reqCode, facility_name, contact_name, contact_email, contact_phone,
-        role_requested || 'RN', shift_type || 'Day Shift', urgency_level || 'routine',
-        special_instructions || null, assigned_staff_id || null, status || (assigned_staff_id ? 'dispatched' : 'pending'),
-        req.ip
+        id, reqCode, facility_name, unit_department || 'General Care', contact_name, contact_email, contact_phone,
+        role_requested || 'RN', shift_type || 'Day Shift', start_date || new Date().toISOString().slice(0, 10),
+        urgency_level || 'routine', special_instructions || null, assigned_staff_id || null,
+        status || (assigned_staff_id ? 'dispatched' : 'pending'), req.ip
       ]
     );
 
@@ -506,6 +650,22 @@ router.post('/requests', async (req, res, next) => {
       message: `Staffing request ${reqCode} created successfully.`,
       data: { id, request_code: reqCode }
     });
+  } catch (err) { next(err); }
+});
+
+// ============================================================================
+// AUDIT LOGS LEDGER
+// GET /api/admin/audit-logs & GET /api/admin/audit
+// ============================================================================
+router.get(['/audit-logs', '/audit'], async (req, res, next) => {
+  try {
+    const [logs] = await pool.query(`
+      SELECT id, admin_id, actor_name, action, target_entity, target_id, details, severity, ip_address, created_at
+      FROM audit_logs
+      ORDER BY created_at DESC
+      LIMIT 100
+    `);
+    res.json({ success: true, data: logs });
   } catch (err) { next(err); }
 });
 

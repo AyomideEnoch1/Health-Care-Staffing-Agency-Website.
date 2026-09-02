@@ -135,6 +135,16 @@ body {
   padding: 1.5rem;
 }
 
+.admin-auth-overlay.hidden,
+.admin-auth-overlay.authenticated,
+.admin-auth-overlay[style*="display: none"] {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  z-index: -1 !important;
+}
+
 .admin-auth-card {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
@@ -159,11 +169,12 @@ body {
 }
 
 .admin-auth-logo {
-  width: 64px;
-  height: 64px;
+  width: 90px;
+  height: 90px;
   object-fit: contain;
-  margin: 0 auto 1.25rem;
+  margin: 0 auto 1.5rem auto;
   display: block;
+  filter: drop-shadow(0 4px 16px rgba(0, 245, 212, 0.3));
 }
 
 .admin-auth-title {
@@ -1381,6 +1392,25 @@ body {
   animation: urgentPulse 2s infinite;
 }
 
+.status-pill.in_session {
+  background: rgba(0, 245, 212, 0.15);
+  color: var(--brand-cyan);
+  border: 1px solid rgba(0, 245, 212, 0.45);
+  animation: liveActivePulse 2s infinite;
+}
+
+.status-pill.completed {
+  background: var(--status-success-bg);
+  color: var(--status-success);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+@keyframes liveActivePulse {
+  0% { box-shadow: 0 0 0 0 rgba(0, 245, 212, 0.45); }
+  70% { box-shadow: 0 0 0 6px rgba(0, 245, 212, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(0, 245, 212, 0); }
+}
+
 @keyframes urgentPulse {
   0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
   70% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
@@ -1517,6 +1547,7 @@ body {
    9. SLIDE-IN SIDE PANEL (DETAIL DRAWER)
    ========================================================================== */
 .side-drawer-backdrop {
+  display: none;
   position: fixed;
   top: 0;
   left: 0;
@@ -1527,12 +1558,15 @@ body {
   z-index: 10000;
   opacity: 0;
   visibility: hidden;
-  transition: all var(--transition-normal);
+  pointer-events: none;
+  transition: opacity var(--transition-normal);
 }
 
 .side-drawer-backdrop.open {
+  display: block;
   opacity: 1;
   visibility: visible;
+  pointer-events: auto;
 }
 
 .side-drawer-panel {
@@ -1869,10 +1903,12 @@ body {
   align-items: center;
   justify-content: center;
   padding: 1.5rem;
+  pointer-events: none;
 }
 
 .admin-modal-overlay.open {
   display: flex;
+  pointer-events: auto;
   animation: modalFadeIn 0.2s ease-out;
 }
 
@@ -2044,5 +2080,183 @@ body {
 .notif-item-sub {
   font-size: 0.72rem;
   color: var(--text-muted);
+}
+
+/* ── Admin Custom File Upload Dropzone ── */
+.admin-file-upload-box {
+  margin-bottom: 0.85rem;
+  width: 100%;
+  position: relative;
+}
+
+.admin-hidden-file-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+.admin-file-upload-label {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.85rem 1rem;
+  background: rgba(0, 245, 212, 0.04);
+  border: 2px dashed rgba(0, 245, 212, 0.4);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-sizing: border-box;
+}
+
+.admin-file-upload-label:hover {
+  background: rgba(0, 245, 212, 0.09);
+  border-color: var(--brand-cyan);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(0, 245, 212, 0.18);
+}
+
+.admin-file-upload-icon-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: var(--bg-card);
+  color: var(--brand-cyan);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid var(--border-subtle);
+}
+
+.admin-file-upload-text-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  flex: 1;
+  text-align: left;
+  overflow: hidden;
+}
+
+.admin-file-upload-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: 0.3px;
+}
+
+.admin-file-upload-subtitle {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.admin-file-upload-btn-chip {
+  padding: 0.3rem 0.65rem;
+  background: var(--brand-gradient);
+  color: #051622;
+  font-size: 0.72rem;
+  font-weight: 800;
+  border-radius: 6px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(0, 245, 212, 0.25);
+}
+
+/* ── Admin Action Button Toolbar ── */
+.admin-action-toolbar {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: nowrap;
+}
+
+.admin-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.32rem 0.65rem;
+  border-radius: 6px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-surface-elevated);
+  color: var(--text-primary);
+  text-decoration: none;
+}
+
+.admin-action-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+}
+
+.admin-action-btn.btn-status-toggle {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--border-subtle);
+  color: var(--text-primary);
+}
+
+.admin-action-btn.btn-status-toggle:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--text-muted);
+}
+
+.admin-action-btn.btn-resend-mail {
+  background: rgba(0, 245, 212, 0.08);
+  border-color: rgba(0, 245, 212, 0.35);
+  color: var(--brand-cyan);
+}
+
+.admin-action-btn.btn-resend-mail:hover {
+  background: rgba(0, 245, 212, 0.2);
+  border-color: var(--brand-cyan);
+}
+
+.admin-action-btn.btn-reset-mfa {
+  background: rgba(245, 158, 11, 0.08);
+  border-color: rgba(245, 158, 11, 0.35);
+  color: #f59e0b;
+}
+
+.admin-action-btn.btn-reset-mfa:hover {
+  background: rgba(245, 158, 11, 0.2);
+  border-color: #f59e0b;
+}
+
+.admin-action-btn.btn-delete-admin {
+  background: rgba(230, 57, 70, 0.08);
+  border-color: rgba(230, 57, 70, 0.35);
+  color: #e63946;
+}
+
+.admin-action-btn.btn-delete-admin:hover {
+  background: #e63946;
+  color: #ffffff;
+  border-color: #e63946;
+  box-shadow: 0 4px 12px rgba(230, 57, 70, 0.35);
+}
+
+.admin-action-badge-self {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.75rem;
+  background: rgba(0, 245, 212, 0.08);
+  border: 1px solid rgba(0, 245, 212, 0.3);
+  color: var(--brand-cyan);
+  border-radius: 6px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
 }
 

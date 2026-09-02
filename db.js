@@ -95,7 +95,9 @@ const inMemoryStore = {
   staffing_requests: [],
   job_applications: [],
   contact_inquiries: [],
-  audit_logs: []
+  audit_logs: [],
+  staff_documents: [],
+  newsletter_subscribers: []
 };
 
 // ── In-Memory Query Router ────────────────────────────────────────────────────
@@ -205,8 +207,26 @@ function handleInMemoryQuery(sql, params = []) {
       return [inMemoryStore.staffing_requests];
     }
     if (normalized.startsWith('insert')) {
-      inMemoryStore.staffing_requests.push({ id: params[0] || crypto.randomUUID(), request_code: 'REQ-' + Date.now().toString().slice(-4), created_at: new Date().toISOString() });
-      return [{ affectedRows: 1 }];
+      const hasBatch = normalized.includes('batch_code');
+      const newReq = {
+        id: params[0] || crypto.randomUUID(),
+        request_code: params[1] || 'REQ-' + Date.now().toString().slice(-4),
+        batch_code: hasBatch ? params[2] : null,
+        facility_name: hasBatch ? params[3] : params[2] || 'Facility',
+        unit_department: hasBatch ? params[4] : params[3] || 'General Care',
+        contact_name: hasBatch ? params[5] : params[4] || 'Contact',
+        contact_email: hasBatch ? params[6] : params[5] || 'contact@example.com',
+        contact_phone: hasBatch ? params[7] : params[6] || '416-555-0100',
+        role_requested: hasBatch ? params[8] : params[7] || 'RN',
+        shift_type: hasBatch ? params[9] : params[8] || 'Day Shift',
+        start_date: hasBatch ? params[10] : null,
+        urgency_level: hasBatch ? params[11] : params[9] || 'routine',
+        status: 'pending',
+        special_instructions: hasBatch ? params[12] : params[10] || null,
+        created_at: new Date().toISOString()
+      };
+      inMemoryStore.staffing_requests.push(newReq);
+      return [{ affectedRows: 1, insertId: 1 }];
     }
     if (normalized.startsWith('delete')) {
       inMemoryStore.staffing_requests = [];
@@ -250,6 +270,68 @@ function handleInMemoryQuery(sql, params = []) {
     if (normalized.startsWith('delete')) {
       inMemoryStore.audit_logs = [];
       return [{ affectedRows: 0 }];
+    }
+  }
+
+  // 10. STAFF_DOCUMENTS
+  if (normalized.includes('staff_documents')) {
+    if (normalized.startsWith('select')) {
+      if (params.length > 0) {
+        return [inMemoryStore.staff_documents.filter(d => d.staff_id === params[0] || d.id === params[0])];
+      }
+      return [inMemoryStore.staff_documents];
+    }
+    if (normalized.startsWith('insert')) {
+      const newDoc = {
+        id: params[0] || crypto.randomUUID(),
+        staff_id: params[1],
+        doc_type: params[2] || 'other',
+        title: params[3],
+        file_path: params[4],
+        file_name: params[5],
+        file_size: params[6] || 0,
+        mime_type: params[7] || 'application/pdf',
+        expiry_date: params[8] || null,
+        uploaded_by: params[9] || 'Admin',
+        created_at: new Date().toISOString()
+      };
+      inMemoryStore.staff_documents.push(newDoc);
+      return [{ affectedRows: 1, insertId: 1 }];
+    }
+    if (normalized.startsWith('delete')) {
+      inMemoryStore.staff_documents = inMemoryStore.staff_documents.filter(d => d.id !== params[0]);
+      return [{ affectedRows: 1 }];
+    }
+  }
+
+  // 11. NEWSLETTER_SUBSCRIBERS
+  if (normalized.includes('newsletter_subscribers')) {
+    if (normalized.startsWith('select')) {
+      if (params.length > 0) {
+        return [inMemoryStore.newsletter_subscribers.filter(s => s.email === params[0] || s.id === params[0])];
+      }
+      return [inMemoryStore.newsletter_subscribers];
+    }
+    if (normalized.startsWith('insert')) {
+      const existing = inMemoryStore.newsletter_subscribers.find(s => s.email === params[1]);
+      if (existing) {
+        existing.status = 'active';
+        return [{ affectedRows: 1 }];
+      }
+      const newSub = {
+        id: params[0] || crypto.randomUUID(),
+        email: params[1],
+        status: params[2] || 'active',
+        source: params[3] || 'homepage_strip',
+        ip_address: params[4] || null,
+        created_at: new Date().toISOString()
+      };
+      inMemoryStore.newsletter_subscribers.push(newSub);
+      return [{ affectedRows: 1, insertId: 1 }];
+    }
+    if (normalized.startsWith('delete')) {
+      inMemoryStore.newsletter_subscribers = inMemoryStore.newsletter_subscribers.filter(s => s.id !== params[0] && s.email !== params[0]);
+      return [{ affectedRows: 1 }];
     }
   }
 

@@ -290,27 +290,43 @@
               <!-- Watermark Logo -->
               <img src="assets/images/logo.png" alt="" class="form-watermark-logo" aria-hidden="true">
               <h3 class="form-title">Facility &amp; Care Staffing Request Form</h3>
+
+              <!-- Enterprise High-Volume Staffing Banner -->
+              <div class="bulk-order-cta-box" style="background: linear-gradient(135deg, rgba(0, 168, 150, 0.08) 0%, rgba(27, 174, 207, 0.12) 100%); border: 2px dashed var(--teal-green); border-radius: 12px; padding: 1.1rem 1.25rem; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 220px; text-align: left;">
+                  <span style="display: inline-block; background: var(--teal-green); color: #fff; font-size: 0.65rem; font-weight: 800; padding: 0.15rem 0.5rem; border-radius: 4px; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 0.35rem;">HOSPITAL &amp; BULK ORDERS</span>
+                  <h4 style="font-size: 0.95rem; font-weight: 800; color: var(--navy); margin: 0 0 0.2rem 0;">Ordering Multiple Workers or Have an Excel Schedule?</h4>
+                  <p style="font-size: 0.78rem; color: #555; margin: 0; line-height: 1.35;">Use our multi-role headcount builder or upload your hospital shift spreadsheet directly.</p>
+                </div>
+                <a href="bulk-staffing.html" class="btn btn-pill-hero" style="padding: 0.6rem 1.1rem; font-size: 0.78rem; white-space: nowrap; box-shadow: 0 4px 12px rgba(0, 168, 150, 0.25);">
+                  OPEN BULK PORTAL &rarr;
+                </a>
+              </div>
+
               <div class="form-row-grid">
                 <input type="text" class="form-field" id="facility-name" placeholder="ORGANIZATION / FACILITY NAME" required>
+                <input type="text" class="form-field" id="unit-department" placeholder="UNIT / DEPARTMENT (e.g. ICU, ER, General Care, LTC)">
+              </div>
+              <div class="form-row-grid">
                 <input type="text" class="form-field" id="client-contact-name" placeholder="CONTACT PERSON NAME &amp; TITLE" required>
-              </div>
-              <div class="form-row-grid">
                 <input type="email" class="form-field" id="client-email" placeholder="WORK EMAIL ADDRESS" required>
-                <input type="tel" class="form-field" id="client-phone" placeholder="PHONE NUMBER (DIRECT LINE)" required>
               </div>
               <div class="form-row-grid">
+                <input type="tel" class="form-field" id="client-phone" placeholder="PHONE NUMBER (DIRECT LINE)" required>
                 <select class="form-field" id="staff-needed" required>
                   <option value="">SELECT SERVICE NEEDED...</option>
-                  <option value="personal_care">Personal Care Support</option>
+                  <option value="rn_rpn">RN / RPN Facility Staffing</option>
+                  <option value="psw">PSW / Health Care Aide Staffing</option>
                   <option value="travelling_nursing">Travelling Nursing Program</option>
+                  <option value="personal_care">Personal Care Support</option>
                   <option value="companionship">Support &amp; Companionship Services</option>
                   <option value="respite">Respite Care Services</option>
                   <option value="household">Light Household Support</option>
                   <option value="dementia">Alzheimer's &amp; Dementia Care</option>
-                  <option value="rn_rpn">RN / RPN Facility Staffing</option>
-                  <option value="psw">PSW / Health Care Aide Staffing</option>
                 </select>
-                <input type="text" class="form-field" id="shift-details" placeholder="SHIFT DATE / LOCATION / DURATION" required>
+              </div>
+              <div class="form-row-grid" style="margin-bottom: 1.25rem;">
+                <input type="text" class="form-field" id="shift-details" placeholder="SHIFT DATE / TIME / DURATION (e.g. Tomorrow 07:00 - 15:00)" style="width: 100%;" required>
               </div>
               <button type="submit" class="btn btn-pill-hero full-width-btn">SUBMIT STAFFING REQUEST</button>
               <div class="form-feedback-msg" id="client-form-feedback"></div>
