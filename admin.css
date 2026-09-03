@@ -1336,6 +1336,14 @@ body {
   background-color: var(--bg-subtle);
 }
 
+.meta-label {
+  display: none;
+}
+
+.row-status-top {
+  display: none;
+}
+
 .table-user-cell {
   display: flex;
   align-items: center;
@@ -1902,7 +1910,7 @@ body {
      ========================================================================== */
   .table-responsive-container {
     overflow-x: visible !important;
-    width: 100%;
+    width: 100% !important;
   }
 
   .mobile-stacked-table {
@@ -1915,140 +1923,188 @@ body {
     display: none !important;
   }
 
-  .mobile-stacked-table tbody,
-  .mobile-stacked-table tr,
-  .mobile-stacked-table td {
+  .mobile-stacked-table tbody {
     display: block !important;
     width: 100% !important;
-    box-sizing: border-box !important;
   }
 
-  .mobile-stacked-table tr {
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
-    border-left: 4px solid var(--brand-turquoise);
-    border-radius: var(--radius-lg);
-    margin-bottom: 1.25rem;
-    padding: 1.15rem 1.25rem;
-    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
-    position: relative;
-    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  .table-card-row {
+    display: flex !important;
+    flex-direction: column !important;
+    background: var(--bg-card) !important;
+    border: 1px solid var(--border-color) !important;
+    border-left: 4px solid var(--brand-turquoise) !important;
+    border-radius: var(--radius-lg) !important;
+    margin-bottom: 1.25rem !important;
+    padding: 1.15rem 1.25rem !important;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06) !important;
+    position: relative !important;
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease !important;
   }
 
-  [data-theme="dark"] .mobile-stacked-table tr {
-    background: linear-gradient(180deg, rgba(17, 34, 64, 0.85) 0%, rgba(10, 25, 47, 0.95) 100%);
-    border-color: rgba(0, 245, 212, 0.18);
-    border-left: 4px solid var(--brand-cyan);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+  [data-theme="dark"] .table-card-row {
+    background: linear-gradient(180deg, rgba(17, 34, 64, 0.9) 0%, rgba(10, 25, 47, 0.98) 100%) !important;
+    border-color: rgba(0, 245, 212, 0.18) !important;
+    border-left: 4px solid var(--brand-cyan) !important;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35) !important;
   }
 
-  .mobile-stacked-table tr:hover {
-    border-color: var(--brand-cyan);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 26px rgba(0, 0, 0, 0.12);
+  .table-card-row:hover {
+    border-color: var(--brand-cyan) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
   }
 
-  .mobile-stacked-table td {
-    padding: 0.6rem 0;
-    border-bottom: 1px solid var(--border-subtle);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 0.85rem;
-    text-align: right;
-    font-size: 0.85rem;
+  /* Reset all table cells on mobile */
+  .table-card-row > td {
+    display: block !important;
+    width: 100% !important;
+    padding: 0 !important;
+    border: none !important;
+    text-align: left !important;
   }
 
-  .mobile-stacked-table td:first-child {
-    padding-top: 0.1rem;
-    padding-bottom: 0.75rem;
-    border-bottom: 1.5px solid var(--border-color);
-    margin-bottom: 0.35rem;
-    font-size: 0.95rem;
-    font-weight: 800;
-    color: var(--text-primary);
-  }
-
-  .mobile-stacked-table td:last-child {
-    border-bottom: none;
-    padding-top: 0.95rem;
-    margin-top: 0.35rem;
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    justify-content: center;
-    gap: 0.5rem;
-  }
-
-  .mobile-stacked-table td::before {
-    content: attr(data-label);
-    font-size: 0.72rem;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--text-muted);
-    background: var(--bg-subtle);
-    padding: 0.22rem 0.55rem;
-    border-radius: 6px;
-    border: 1px solid var(--border-color);
-    flex-shrink: 0;
-    text-align: left;
-  }
-
-  [data-theme="dark"] .mobile-stacked-table td::before {
-    background: rgba(255, 255, 255, 0.05);
-    color: #94A3B8;
-    border-color: rgba(255, 255, 255, 0.1);
-  }
-
-  .mobile-stacked-table td:first-child::before {
-    background: rgba(0, 168, 150, 0.12);
-    color: var(--brand-turquoise);
-    border-color: rgba(0, 168, 150, 0.3);
-  }
-
-  [data-theme="dark"] .mobile-stacked-table td:first-child::before {
-    background: rgba(0, 245, 212, 0.15);
-    color: var(--brand-cyan);
-    border-color: rgba(0, 245, 212, 0.4);
-  }
-
-  .mobile-stacked-table td:last-child::before {
+  .table-card-row > td::before {
     display: none !important;
   }
 
-  /* Toolbar buttons inside mobile card view */
+  /* 1. Header Row (Primary Title + Status on Top Right) */
+  .cell-primary {
+    margin-bottom: 0.65rem !important;
+    padding-bottom: 0.65rem !important;
+    border-bottom: 1px solid var(--border-color) !important;
+  }
+
+  .row-header-wrapper {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: flex-start !important;
+    gap: 0.75rem !important;
+    width: 100% !important;
+  }
+
+  .user-meta-name {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.2rem !important;
+  }
+
+  .user-display-name {
+    font-size: 1.05rem !important;
+    font-weight: 800 !important;
+    color: var(--text-primary) !important;
+    letter-spacing: -0.01em !important;
+  }
+
+  .user-role-sub {
+    font-size: 0.75rem !important;
+    color: var(--text-muted) !important;
+  }
+
+  .row-status-top {
+    display: block !important;
+    flex-shrink: 0 !important;
+  }
+
+  /* 2. Subtitle / Email Row */
+  .cell-email,
+  .cell-subtitle {
+    margin-bottom: 0.75rem !important;
+    font-size: 0.85rem !important;
+    color: var(--text-secondary) !important;
+  }
+
+  .cell-email .meta-label,
+  .cell-subtitle .meta-label {
+    display: none !important;
+  }
+
+  /* 3. Metadata Grid (Structured Key-Value Blocks) */
+  .cell-grid-item {
+    background: var(--bg-subtle) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 8px !important;
+    padding: 0.65rem 0.85rem !important;
+    margin-bottom: 0.5rem !important;
+  }
+
+  [data-theme="dark"] .cell-grid-item {
+    background: rgba(255, 255, 255, 0.03) !important;
+    border-color: rgba(255, 255, 255, 0.06) !important;
+  }
+
+  .meta-label {
+    display: block !important;
+    font-size: 0.68rem !important;
+    font-weight: 800 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    color: var(--text-muted) !important;
+    margin-bottom: 0.25rem !important;
+  }
+
+  [data-theme="dark"] .meta-label {
+    color: #94A3B8 !important;
+  }
+
+  .meta-value {
+    display: block !important;
+    font-size: 0.85rem !important;
+    font-weight: 700 !important;
+    color: var(--text-primary) !important;
+    word-break: break-word !important;
+  }
+
+  /* Hide redundant desktop status column and select checkbox */
+  .cell-status-desktop,
+  .cell-checkbox {
+    display: none !important;
+  }
+
+  /* 4. Bottom Action Bar */
+  .cell-actions {
+    margin-top: 0.65rem !important;
+    padding-top: 0.65rem !important;
+    border-top: 1px solid var(--border-color) !important;
+    width: 100% !important;
+  }
+
   .admin-action-toolbar {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    width: 100%;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 0.5rem !important;
+    width: 100% !important;
   }
 
   .admin-action-toolbar .admin-action-btn,
   .admin-action-toolbar .btn-secondary-action,
-  .admin-action-toolbar .btn-primary-action {
-    flex: 1 1 calc(50% - 0.5rem);
-    min-width: 120px;
-    height: 38px;
-    justify-content: center;
-    font-size: 0.8rem;
-    font-weight: 700;
-    border-radius: var(--radius-md);
+  .admin-action-toolbar .btn-primary-action,
+  .cell-actions .btn-secondary-action,
+  .cell-actions .btn-primary-action {
+    flex: 1 1 calc(50% - 0.5rem) !important;
+    min-width: 120px !important;
+    height: 38px !important;
+    justify-content: center !important;
+    font-size: 0.8rem !important;
+    font-weight: 700 !important;
+    border-radius: var(--radius-md) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 5px !important;
   }
 
   .admin-action-badge-self {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    padding: 0.5rem 1rem;
-    border-radius: var(--radius-md);
-    background: rgba(0, 168, 150, 0.1);
-    color: var(--brand-turquoise);
-    font-size: 0.82rem;
-    font-weight: 700;
-    border: 1px solid rgba(0, 168, 150, 0.25);
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    padding: 0.6rem 1rem !important;
+    border-radius: var(--radius-md) !important;
+    background: rgba(0, 168, 150, 0.1) !important;
+    color: var(--brand-turquoise) !important;
+    font-size: 0.82rem !important;
+    font-weight: 700 !important;
+    border: 1px solid rgba(0, 168, 150, 0.25) !important;
   }
 
   .admin-action-btn.btn-delete-admin {

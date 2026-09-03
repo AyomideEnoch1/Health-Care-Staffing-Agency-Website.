@@ -898,27 +898,45 @@
     tbody.innerHTML = filtered.map(s => {
       const isSelected = LiveStore.selectedStaffIds.has(s.id);
       return `
-        <tr data-id="${s.id}" onclick="window.openStaffDrawer('${s.id}')" style="cursor:pointer;" class="${isSelected ? 'selected-row' : ''}">
-          <td data-label="Select" onclick="event.stopPropagation()">
+        <tr data-id="${s.id}" onclick="window.openStaffDrawer('${s.id}')" style="cursor:pointer;" class="table-card-row ${isSelected ? 'selected-row' : ''}">
+          <td class="cell-checkbox" onclick="event.stopPropagation()" data-label="Select">
             <input type="checkbox" class="roster-check" data-id="${s.id}" ${isSelected ? 'checked' : ''} onchange="window.toggleStaffSelection('${s.id}', this.checked)">
           </td>
-          <td data-label="Staff Member">
-            <div class="table-user-cell">
-              <img src="${s.avatar_url || 'assets/images/logo_icon.png'}" alt="${s.name}" class="table-user-avatar" onerror="this.src='assets/images/logo_icon.png'">
-              <div class="table-user-info">
-                <span class="table-user-name">${s.name}</span>
-                <span class="table-user-sub">${s.staff_code} &bull; ${s.phone || '—'}</span>
+          <td class="cell-primary" data-label="Staff Member">
+            <div class="row-header-wrapper">
+              <div class="table-user-cell">
+                <img src="${s.avatar_url || 'assets/images/logo_icon.png'}" alt="${s.name}" class="table-user-avatar" onerror="this.src='assets/images/logo_icon.png'">
+                <div class="table-user-info">
+                  <span class="user-display-name">${s.name}</span>
+                  <span class="user-role-sub">${s.staff_code} &bull; ${s.phone || '—'}</span>
+                </div>
               </div>
+              <div class="row-status-top"><span class="status-pill ${s.status}">${(s.status || '').replace('-', ' ')}</span></div>
             </div>
           </td>
-          <td data-label="Role"><span class="status-pill ${s.role === 'RN' ? 'verified' : 'off-duty'}">${s.role}</span></td>
-          <td data-label="Status"><span class="status-pill ${s.status}">${(s.status || '').replace('-', ' ')}</span></td>
-          <td data-label="Compliance"><span class="status-pill ${s.credential_status || 'verified'}">${s.credential_status || 'Verified'}</span></td>
-          <td data-label="Rating & Shifts" class="tabular-nums">★ ${parseFloat(s.rating || 5).toFixed(2)} (${s.shifts_completed || 0})</td>
-          <td data-label="Region">${s.region || 'Scarborough'}</td>
-          <td data-label="Actions" onclick="event.stopPropagation()" style="text-align:right;">
-            <button type="button" class="btn-secondary-action" style="padding:.35rem .65rem;font-size:.75rem;display:inline-flex;align-items:center;gap:4px;" onclick="window.openStaffDrawer('${s.id}')">
-              <i data-lucide="eye" style="width:12px;height:12px;"></i> View Profile
+          <td class="cell-grid-item" data-label="Role">
+            <div class="meta-label">Role / Discipline</div>
+            <div class="meta-value"><span class="status-pill ${s.role === 'RN' ? 'verified' : 'off-duty'}">${s.role}</span></div>
+          </td>
+          <td class="cell-status-desktop" data-label="Status">
+            <div class="meta-label">Status</div>
+            <div class="meta-value"><span class="status-pill ${s.status}">${(s.status || '').replace('-', ' ')}</span></div>
+          </td>
+          <td class="cell-grid-item" data-label="Compliance">
+            <div class="meta-label">Compliance</div>
+            <div class="meta-value"><span class="status-pill ${s.credential_status || 'verified'}">${s.credential_status || 'Verified'}</span></div>
+          </td>
+          <td class="cell-grid-item tabular-nums" data-label="Rating & Shifts">
+            <div class="meta-label">Performance</div>
+            <div class="meta-value">★ ${parseFloat(s.rating || 5).toFixed(2)} (${s.shifts_completed || 0} shifts)</div>
+          </td>
+          <td class="cell-grid-item" data-label="Region">
+            <div class="meta-label">Assigned Region</div>
+            <div class="meta-value">${s.region || 'Scarborough'}</div>
+          </td>
+          <td class="cell-actions" onclick="event.stopPropagation()" data-label="Actions">
+            <button type="button" class="btn-secondary-action" style="padding:.35rem .65rem;font-size:.75rem;display:inline-flex;align-items:center;gap:4px;width:100%;justify-content:center;" onclick="window.openStaffDrawer('${s.id}')">
+              <i data-lucide="eye" style="width:12px;height:12px;"></i> View Full Profile
             </button>
           </td>
         </tr>`;
@@ -998,19 +1016,42 @@
         tableBody.innerHTML = `<tr><td colspan="8">${emptyState('📋', 'No Staffing Requests Found', 'Use the "+ New Request" button or await facility submissions via the public portal.')}</td></tr>`;
       } else {
         tableBody.innerHTML = filtered.map(r => `
-          <tr onclick="window.openRequestDrawer('${r.id}')" style="cursor:pointer;">
-            <td data-label="Request Code">
-              <strong>${r.request_code}</strong>
-              ${r.batch_code ? `<br><span class="badge" style="background:rgba(0,245,212,0.12);color:var(--brand-cyan);font-size:0.68rem;padding:2px 5px;border-radius:4px;border:1px solid rgba(0,245,212,0.3);display:inline-block;margin-top:2px;">📦 ${r.batch_code}</span>` : ''}
+          <tr onclick="window.openRequestDrawer('${r.id}')" style="cursor:pointer;" class="table-card-row">
+            <td class="cell-primary" data-label="Request Code">
+              <div class="row-header-wrapper">
+                <div>
+                  <strong class="user-display-name" style="color:var(--brand-cyan);">${r.request_code}</strong>
+                  ${r.batch_code ? `<span class="badge" style="background:rgba(0,245,212,0.12);color:var(--brand-cyan);font-size:0.68rem;padding:2px 5px;border-radius:4px;border:1px solid rgba(0,245,212,0.3);display:inline-block;margin-top:2px;">📦 ${r.batch_code}</span>` : ''}
+                </div>
+                <div class="row-status-top"><span class="status-pill ${r.status}">${(r.status || 'new').toUpperCase()}</span></div>
+              </div>
             </td>
-            <td data-label="Facility & Unit">${r.facility_name}<br><span style="font-size:.72rem;color:var(--text-muted);">${r.unit_department || 'General Care'}</span></td>
-            <td data-label="Role Requested"><span class="status-pill verified">${r.role_requested}</span></td>
-            <td data-label="Shift Type">${r.shift_type || 'Day Shift'}</td>
-            <td data-label="Urgency"><span class="status-pill ${r.urgency_level === 'emergency_surge' || r.urgency_level === 'urgent' ? 'urgent' : 'verified'}">${(r.urgency_level || 'routine').toUpperCase()}</span></td>
-            <td data-label="Assigned Clinician">${r.assigned_staff_name ? `<span style="font-weight:700;color:var(--brand-cyan);">${r.assigned_staff_name}</span>` : '<span style="color:var(--text-muted);">Unassigned</span>'}</td>
-            <td data-label="Status"><span class="status-pill ${r.status}">${(r.status || 'new').toUpperCase()}</span></td>
-            <td data-label="Action" style="text-align:right;">
-              <button type="button" class="btn-secondary-action" style="font-size:.75rem;padding:.3rem .6rem;display:inline-flex;align-items:center;gap:4px;" onclick="event.stopPropagation();window.openRequestDrawer('${r.id}')">
+            <td class="cell-subtitle" data-label="Facility & Unit">
+              <div class="meta-label">Facility & Unit</div>
+              <div class="meta-value"><strong>${r.facility_name}</strong> &bull; <span style="font-size:.78rem;color:var(--text-muted);">${r.unit_department || 'General Care'}</span></div>
+            </td>
+            <td class="cell-grid-item" data-label="Role Requested">
+              <div class="meta-label">Role Requested</div>
+              <div class="meta-value"><span class="status-pill verified">${r.role_requested}</span></div>
+            </td>
+            <td class="cell-grid-item" data-label="Shift Type">
+              <div class="meta-label">Shift Type</div>
+              <div class="meta-value">${r.shift_type || 'Day Shift'}</div>
+            </td>
+            <td class="cell-grid-item" data-label="Urgency">
+              <div class="meta-label">Urgency Level</div>
+              <div class="meta-value"><span class="status-pill ${r.urgency_level === 'emergency_surge' || r.urgency_level === 'urgent' ? 'urgent' : 'verified'}">${(r.urgency_level || 'routine').toUpperCase()}</span></div>
+            </td>
+            <td class="cell-grid-item" data-label="Assigned Clinician">
+              <div class="meta-label">Assigned Clinician</div>
+              <div class="meta-value">${r.assigned_staff_name ? `<span style="font-weight:700;color:var(--brand-cyan);">👤 ${r.assigned_staff_name}</span>` : '<span style="color:#f59e0b;font-size:0.78rem;">⚠️ Unassigned</span>'}</div>
+            </td>
+            <td class="cell-status-desktop" data-label="Status">
+              <div class="meta-label">Status</div>
+              <div class="meta-value"><span class="status-pill ${r.status}">${(r.status || 'new').toUpperCase()}</span></div>
+            </td>
+            <td class="cell-actions" data-label="Action">
+              <button type="button" class="btn-secondary-action" style="font-size:.75rem;padding:.35rem .65rem;display:inline-flex;align-items:center;gap:4px;width:100%;justify-content:center;" onclick="event.stopPropagation();window.openRequestDrawer('${r.id}')">
                 <i data-lucide="user-check" style="width:12px;height:12px;"></i> Dispatch &amp; Manage
               </button>
             </td>
@@ -1054,30 +1095,56 @@
     }
 
     tbody.innerHTML = filtered.map(a => `
-      <tr>
-        <td data-label="Candidate"><strong>${a.full_name}</strong><br><span style="font-size:.72rem;color:var(--text-muted);">${a.phone || ''} &bull; ${a.email}</span></td>
-        <td data-label="Role Applied"><span class="status-pill verified">${a.role_applied}</span></td>
-        <td data-label="License / Reg">${a.license_registration || 'Pending Verification'}</td>
-        <td data-label="Date Applied">${a.created_at ? a.created_at.slice(0,10) : '—'}</td>
-        <td data-label="Resume / CV">
-          ${a.resume_original_name
-            ? `<a href="${API_BASE}/admin/applications/${a.id}/resume" target="_blank" style="color:var(--brand-cyan);font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:4px;"><i data-lucide="download" style="width:14px;height:14px;"></i> ${a.resume_original_name}</a>`
-            : '<span style="color:var(--text-muted);">No CV Uploaded</span>'}
+      <tr class="table-card-row">
+        <td class="cell-primary" data-label="Candidate">
+          <div class="row-header-wrapper">
+            <div class="user-meta-name">
+              <strong class="user-display-name">${a.full_name}</strong>
+              <span class="user-role-sub">${a.phone || ''} &bull; ${a.email}</span>
+            </div>
+            <div class="row-status-top"><span class="status-pill ${a.stage}">${(a.stage || '').replace('_', ' ').toUpperCase()}</span></div>
+          </div>
         </td>
-        <td data-label="Onboarding Stage"><span class="status-pill ${a.stage}">${(a.stage || '').replace('_', ' ').toUpperCase()}</span></td>
-        <td data-label="Stage Selector">
-          <select class="filter-select" style="font-size:.75rem;padding:.3rem .5rem;" onchange="window.updateApplicantStage('${a.id}', this.value)">
-            <option value="new"              ${a.stage==='new'              ? 'selected':''}>New Inbound</option>
-            <option value="review"           ${a.stage==='review'           ? 'selected':''}>Under Review</option>
-            <option value="interview"        ${a.stage==='interview'        ? 'selected':''}>Interview</option>
-            <option value="credential_check" ${a.stage==='credential_check' ? 'selected':''}>Credential Check</option>
-            <option value="hired"            ${a.stage==='hired'            ? 'selected':''}>Hired</option>
-            <option value="rejected"         ${a.stage==='rejected'         ? 'selected':''}>Rejected</option>
-          </select>
+        <td class="cell-grid-item" data-label="Role Applied">
+          <div class="meta-label">Role Applied</div>
+          <div class="meta-value"><span class="status-pill verified">${a.role_applied}</span></div>
         </td>
-        <td data-label="Enroll Action" style="text-align:right;">
-          <button type="button" class="btn-primary-action" style="font-size:.75rem;padding:.35rem .65rem;height:28px;display:inline-flex;align-items:center;gap:4px;" onclick="window.openAddStaffModal({ full_name: '${(a.full_name || '').replace(/'/g, "\\'")}', role_applied: '${a.role_applied || 'RN'}', email: '${a.email || ''}', phone: '${a.phone || ''}', license_registration: '${a.license_registration || ''}' })">
-            <i data-lucide="user-plus" style="width:12px;height:12px;"></i> Enroll
+        <td class="cell-grid-item" data-label="License / Reg">
+          <div class="meta-label">License / Reg #</div>
+          <div class="meta-value">${a.license_registration || 'Pending Verification'}</div>
+        </td>
+        <td class="cell-grid-item" data-label="Date Applied">
+          <div class="meta-label">Date Applied</div>
+          <div class="meta-value">${a.created_at ? a.created_at.slice(0,10) : '—'}</div>
+        </td>
+        <td class="cell-grid-item" data-label="Resume / CV">
+          <div class="meta-label">Resume / CV</div>
+          <div class="meta-value">
+            ${a.resume_original_name
+              ? `<a href="${API_BASE}/admin/applications/${a.id}/resume" target="_blank" style="color:var(--brand-cyan);font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:4px;"><i data-lucide="download" style="width:13px;height:13px;"></i> Download</a>`
+              : '<span style="color:var(--text-muted);font-size:0.75rem;">None</span>'}
+          </div>
+        </td>
+        <td class="cell-status-desktop" data-label="Onboarding Stage">
+          <div class="meta-label">Stage</div>
+          <div class="meta-value"><span class="status-pill ${a.stage}">${(a.stage || '').replace('_', ' ').toUpperCase()}</span></div>
+        </td>
+        <td class="cell-grid-item" data-label="Stage Selector">
+          <div class="meta-label">Update Stage</div>
+          <div class="meta-value">
+            <select class="filter-select" style="font-size:.75rem;padding:.3rem .5rem;width:100%;" onchange="window.updateApplicantStage('${a.id}', this.value)">
+              <option value="new"              ${a.stage==='new'              ? 'selected':''}>New Inbound</option>
+              <option value="review"           ${a.stage==='review'           ? 'selected':''}>Under Review</option>
+              <option value="interview"        ${a.stage==='interview'        ? 'selected':''}>Interview</option>
+              <option value="credential_check" ${a.stage==='credential_check' ? 'selected':''}>Credential Check</option>
+              <option value="hired"            ${a.stage==='hired'            ? 'selected':''}>Hired</option>
+              <option value="rejected"         ${a.stage==='rejected'         ? 'selected':''}>Rejected</option>
+            </select>
+          </div>
+        </td>
+        <td class="cell-actions" data-label="Enroll Action">
+          <button type="button" class="btn-primary-action" style="font-size:.75rem;padding:.35rem .65rem;height:36px;display:inline-flex;align-items:center;gap:4px;width:100%;justify-content:center;" onclick="window.openAddStaffModal({ full_name: '${(a.full_name || '').replace(/'/g, "\\'")}', role_applied: '${a.role_applied || 'RN'}', email: '${a.email || ''}', phone: '${a.phone || ''}', license_registration: '${a.license_registration || ''}' })">
+            <i data-lucide="user-plus" style="width:13px;height:13px;"></i> Enroll as Staff
           </button>
         </td>
       </tr>`).join('');
@@ -1192,14 +1259,32 @@
           tbody.innerHTML = `<tr><td colspan="7">${emptyState('🔒', 'Audit Ledger Empty', 'Immutable security events will record here.')}</td></tr>`;
         } else {
           tbody.innerHTML = LiveStore.auditLogs.map(l => `
-            <tr>
-              <td data-label="Log ID" class="tabular-nums"><strong>${l.id ? l.id.slice(0,8) : '—'}…</strong></td>
-              <td data-label="Timestamp">${l.created_at ? l.created_at.replace('T',' ').slice(0,19) : '—'}</td>
-              <td data-label="Operator Actor"><strong>${l.actor_name}</strong></td>
-              <td data-label="Security Action"><span class="status-pill verified">${l.action}</span></td>
-              <td data-label="Target Entity">${l.target_entity}</td>
-              <td data-label="Event Details">${l.details || '—'}</td>
-              <td data-label="Severity"><span class="status-pill ${l.severity === 'warning' || l.severity === 'critical' ? 'urgent' : 'verified'}">${l.severity.toUpperCase()}</span></td>
+            <tr class="table-card-row">
+              <td class="cell-primary" data-label="Security Action">
+                <div class="row-header-wrapper">
+                  <div class="user-meta-name">
+                    <span class="status-pill verified" style="font-weight:800;font-size:0.75rem;">${l.action}</span>
+                    <span class="user-role-sub" style="margin-top:4px;">👤 <strong>${l.actor_name}</strong> &bull; ${l.created_at ? l.created_at.replace('T',' ').slice(0,19) : '—'}</span>
+                  </div>
+                  <div class="row-status-top"><span class="status-pill ${l.severity === 'warning' || l.severity === 'critical' ? 'urgent' : 'verified'}">${l.severity.toUpperCase()}</span></div>
+                </div>
+              </td>
+              <td class="cell-grid-item" data-label="Log ID">
+                <div class="meta-label">Audit Log ID</div>
+                <div class="meta-value tabular-nums">${l.id ? l.id.slice(0,8) : '—'}…</div>
+              </td>
+              <td class="cell-grid-item" data-label="Target Entity">
+                <div class="meta-label">Target Entity</div>
+                <div class="meta-value">${l.target_entity}</div>
+              </td>
+              <td class="cell-subtitle" data-label="Event Details" style="grid-column: span 2; margin-top: 0.35rem;">
+                <div class="meta-label">Event Details</div>
+                <div class="meta-value" style="font-size:0.82rem;color:var(--text-secondary);">${l.details || '—'}</div>
+              </td>
+              <td class="cell-status-desktop" data-label="Severity">
+                <div class="meta-label">Severity</div>
+                <div class="meta-value"><span class="status-pill ${l.severity === 'warning' || l.severity === 'critical' ? 'urgent' : 'verified'}">${l.severity.toUpperCase()}</span></div>
+              </td>
             </tr>`).join('');
         }
       }
@@ -1338,18 +1423,43 @@
              </div>`;
 
         return `
-          <tr>
-            <td data-label="Administrator">
-              <div style="font-weight: 700; color: var(--text-primary);">${escapeHTML(a.full_name)}</div>
-              <div style="font-size: 0.75rem; color: var(--text-muted);">${isSelf ? '⭐️ You' : 'Staff Admin'}</div>
+          <tr class="table-card-row">
+            <td class="cell-primary" data-label="Administrator">
+              <div class="row-header-wrapper">
+                <div class="user-meta-name">
+                  <span class="user-display-name">${escapeHTML(a.full_name)}</span>
+                  <span class="user-role-sub">${isSelf ? '⭐️ You' : 'Staff Admin'}</span>
+                </div>
+                <div class="row-status-top">${statusBadge}</div>
+              </div>
             </td>
-            <td data-label="Email Address" class="tabular-nums">${escapeHTML(a.email)}</td>
-            <td data-label="Role"><span class="status-pill ${a.role === 'super-admin' ? 'role-rn' : (a.role === 'dispatch' ? 'role-rpn' : 'role-psw')}">${roleLabel}</span></td>
-            <td data-label="Email Verification">${emailVerifiedBadge}</td>
-            <td data-label="2FA Security">${mfaBadge}</td>
-            <td data-label="Last Login">${lastLoginText}</td>
-            <td data-label="Status">${statusBadge}</td>
-            <td data-label="Action">${actionBtn}</td>
+            <td class="cell-email tabular-nums" data-label="Email Address">
+              <div class="meta-label">Email Address</div>
+              <div class="meta-value">${escapeHTML(a.email)}</div>
+            </td>
+            <td class="cell-grid-item" data-label="Role">
+              <div class="meta-label">Role Clearance</div>
+              <div class="meta-value"><span class="status-pill ${a.role === 'super-admin' ? 'role-rn' : (a.role === 'dispatch' ? 'role-rpn' : 'role-psw')}">${roleLabel}</span></div>
+            </td>
+            <td class="cell-grid-item" data-label="Email Verification">
+              <div class="meta-label">Verification</div>
+              <div class="meta-value">${emailVerifiedBadge}</div>
+            </td>
+            <td class="cell-grid-item" data-label="2FA Security">
+              <div class="meta-label">2FA Security</div>
+              <div class="meta-value">${mfaBadge}</div>
+            </td>
+            <td class="cell-grid-item" data-label="Last Login">
+              <div class="meta-label">Last Login</div>
+              <div class="meta-value">${lastLoginText}</div>
+            </td>
+            <td class="cell-status-desktop" data-label="Status">
+              <div class="meta-label">Status</div>
+              <div class="meta-value">${statusBadge}</div>
+            </td>
+            <td class="cell-actions" data-label="Action">
+              ${actionBtn}
+            </td>
           </tr>
         `;
       }).join('');
@@ -1724,16 +1834,44 @@
       }
 
       return `
-        <tr>
-          <td data-label="Clinician"><strong>${s.name}</strong><br><span style="font-size:.72rem;color:var(--text-muted);">${s.staff_code}</span></td>
-          <td data-label="Role"><span class="status-pill verified">${s.role}</span></td>
-          <td data-label="CNO Registration">${s.cno_registration_num || '<span style="color:var(--text-muted)">—</span>'}</td>
-          <td data-label="BLS / CPR Expiry">${s.cpr_expiry_date ? s.cpr_expiry_date.slice(0,10) : '<span style="color:var(--status-warning)">Not Set</span>'}</td>
-          <td data-label="VSS Check">${s.vss_status || 'Clear'}</td>
-          <td data-label="N95 Fit Test">${s.n95_fit_test || '3M Valid'}</td>
-          <td data-label="Overall Status">${expiryBadge}</td>
-          <td data-label="Action" style="text-align:right;">
-            <button class="btn-secondary-action" style="padding:.25rem .55rem;font-size:.75rem;" onclick="window.openStaffDrawer('${s.id}', 'tab-profile-docs')">Docs</button>
+        <tr class="table-card-row">
+          <td class="cell-primary" data-label="Clinician">
+            <div class="row-header-wrapper">
+              <div class="user-meta-name">
+                <strong class="user-display-name">${s.name}</strong>
+                <span class="user-role-sub">${s.staff_code}</span>
+              </div>
+              <div class="row-status-top">${expiryBadge}</div>
+            </div>
+          </td>
+          <td class="cell-grid-item" data-label="Role">
+            <div class="meta-label">Role</div>
+            <div class="meta-value"><span class="status-pill verified">${s.role}</span></div>
+          </td>
+          <td class="cell-grid-item" data-label="CNO Registration">
+            <div class="meta-label">CNO Registration</div>
+            <div class="meta-value">${s.cno_registration_num || '<span style="color:var(--text-muted)">—</span>'}</div>
+          </td>
+          <td class="cell-grid-item" data-label="BLS / CPR Expiry">
+            <div class="meta-label">BLS / CPR Expiry</div>
+            <div class="meta-value">${s.cpr_expiry_date ? s.cpr_expiry_date.slice(0,10) : '<span style="color:var(--status-warning)">Not Set</span>'}</div>
+          </td>
+          <td class="cell-grid-item" data-label="VSS Check">
+            <div class="meta-label">VSS Check</div>
+            <div class="meta-value">${s.vss_status || 'Clear'}</div>
+          </td>
+          <td class="cell-grid-item" data-label="N95 Fit Test">
+            <div class="meta-label">N95 Fit Test</div>
+            <div class="meta-value">${s.n95_fit_test || '3M Valid'}</div>
+          </td>
+          <td class="cell-status-desktop" data-label="Overall Status">
+            <div class="meta-label">Status</div>
+            <div class="meta-value">${expiryBadge}</div>
+          </td>
+          <td class="cell-actions" data-label="Action">
+            <button class="btn-secondary-action" style="padding:.35rem .65rem;font-size:.75rem;width:100%;justify-content:center;" onclick="window.openStaffDrawer('${s.id}', 'tab-profile-docs')">
+              <i data-lucide="file-text" style="width:12px;height:12px;"></i> View Credentials &amp; Docs
+            </button>
           </td>
         </tr>`;
     }).join('');
@@ -1825,28 +1963,40 @@
         tbody.innerHTML = `<tr><td colspan="8">${emptyState('📊', 'No Shift Records Found', 'No shift requests matched the report search query.')}</td></tr>`;
       } else {
         tbody.innerHTML = list.map(r => `
-          <tr onclick="window.openRequestDrawer('${r.id}')" style="cursor: pointer;">
-            <td data-label="Request Code"><strong style="color: var(--brand-cyan); font-family: monospace;">${escapeHTML(r.request_code || 'REQ-')}</strong></td>
-            <td data-label="Facility & Unit">
-              <div style="font-weight: 700; color: var(--text-primary);">${escapeHTML(r.facility_name)}</div>
-              <div style="font-size: 0.73rem; color: var(--text-muted);">📍 ${escapeHTML(r.unit_department || 'General Care')}</div>
+          <tr onclick="window.openRequestDrawer('${r.id}')" style="cursor: pointer;" class="table-card-row">
+            <td class="cell-primary" data-label="Request Code">
+              <div class="row-header-wrapper">
+                <strong class="user-display-name" style="color: var(--brand-cyan); font-family: monospace;">${escapeHTML(r.request_code || 'REQ-')}</strong>
+                <div class="row-status-top"><span class="status-pill ${r.status}">${(r.status || 'pending').replace('_', ' ').toUpperCase()}</span></div>
+              </div>
             </td>
-            <td data-label="Role Requested"><span class="status-pill ${r.role_requested === 'RN' ? 'verified' : 'off-duty'}">${escapeHTML(r.role_requested)}</span></td>
-            <td data-label="Shift Date & Time">
-              <div style="font-size: 0.82rem; font-weight: 600;">${r.start_date ? r.start_date.slice(0, 10) : (r.created_at ? r.created_at.slice(0, 10) : '—')}</div>
-              <div style="font-size: 0.72rem; color: var(--text-muted);">🕒 ${escapeHTML(r.shift_type || 'Day')}</div>
+            <td class="cell-subtitle" data-label="Facility & Unit">
+              <div class="meta-label">Facility & Unit</div>
+              <div class="meta-value"><strong>${escapeHTML(r.facility_name)}</strong> &bull; <span style="font-size: 0.73rem; color: var(--text-muted);">📍 ${escapeHTML(r.unit_department || 'General Care')}</span></div>
             </td>
-            <td data-label="Assigned Clinician">
-              ${r.assigned_staff_name 
-                ? `<span style="font-weight: 700; color: var(--text-primary);">👤 ${escapeHTML(r.assigned_staff_name)}</span>`
-                : '<span style="color: #f59e0b; font-size: 0.78rem;">⚠️ Unassigned</span>'
-              }
+            <td class="cell-grid-item" data-label="Role Requested">
+              <div class="meta-label">Role Requested</div>
+              <div class="meta-value"><span class="status-pill ${r.role_requested === 'RN' ? 'verified' : 'off-duty'}">${escapeHTML(r.role_requested)}</span></div>
             </td>
-            <td data-label="Urgency Level"><span class="status-pill ${r.urgency_level === 'emergency_surge' ? 'off-duty' : 'verified'}">${(r.urgency_level || 'routine').toUpperCase()}</span></td>
-            <td data-label="Shift Status"><span class="status-pill ${r.status}">${(r.status || 'pending').replace('_', ' ').toUpperCase()}</span></td>
-            <td data-label="Action" style="text-align: right;">
-              <button type="button" class="btn-secondary-action" style="font-size: 0.72rem; padding: 0.2rem 0.5rem;" onclick="event.stopPropagation(); window.openRequestDrawer('${r.id}')">
-                View
+            <td class="cell-grid-item" data-label="Shift Date & Time">
+              <div class="meta-label">Shift Date & Time</div>
+              <div class="meta-value">${r.start_date ? r.start_date.slice(0, 10) : (r.created_at ? r.created_at.slice(0, 10) : '—')} (${escapeHTML(r.shift_type || 'Day')})</div>
+            </td>
+            <td class="cell-grid-item" data-label="Assigned Clinician">
+              <div class="meta-label">Assigned Clinician</div>
+              <div class="meta-value">${r.assigned_staff_name ? `👤 ${escapeHTML(r.assigned_staff_name)}` : '<span style="color: #f59e0b; font-size: 0.78rem;">⚠️ Unassigned</span>'}</div>
+            </td>
+            <td class="cell-grid-item" data-label="Urgency Level">
+              <div class="meta-label">Urgency Level</div>
+              <div class="meta-value"><span class="status-pill ${r.urgency_level === 'emergency_surge' ? 'off-duty' : 'verified'}">${(r.urgency_level || 'routine').toUpperCase()}</span></div>
+            </td>
+            <td class="cell-status-desktop" data-label="Shift Status">
+              <div class="meta-label">Status</div>
+              <div class="meta-value"><span class="status-pill ${r.status}">${(r.status || 'pending').replace('_', ' ').toUpperCase()}</span></div>
+            </td>
+            <td class="cell-actions" data-label="Action">
+              <button type="button" class="btn-secondary-action" style="font-size: 0.75rem; padding: 0.35rem 0.65rem; width: 100%; justify-content: center;" onclick="event.stopPropagation(); window.openRequestDrawer('${r.id}')">
+                <i data-lucide="eye" style="width: 12px; height: 12px;"></i> View Shift Details
               </button>
             </td>
           </tr>
@@ -1887,25 +2037,46 @@
         tbody.innerHTML = `<tr><td colspan="8">${emptyState('👩‍⚕️', 'No Caregivers Found', 'No staff records matched the report search query.')}</td></tr>`;
       } else {
         tbody.innerHTML = list.map(s => `
-          <tr onclick="window.openStaffDrawer('${s.id}')" style="cursor: pointer;">
-            <td data-label="Caregiver">
-              <div style="display: flex; align-items: center; gap: 0.6rem;">
-                <img src="${s.avatar_url || 'assets/images/logo_icon.png'}" alt="${s.name}" class="table-user-avatar" onerror="this.src='assets/images/logo_icon.png'">
-                <div>
-                  <div style="font-weight: 700; color: var(--text-primary);">${escapeHTML(s.name)}</div>
-                  <div style="font-size: 0.72rem; color: var(--text-muted);">${escapeHTML(s.staff_code || '')} &bull; ${escapeHTML(s.phone || '—')}</div>
+          <tr onclick="window.openStaffDrawer('${s.id}')" style="cursor: pointer;" class="table-card-row">
+            <td class="cell-primary" data-label="Caregiver">
+              <div class="row-header-wrapper">
+                <div style="display: flex; align-items: center; gap: 0.6rem;">
+                  <img src="${s.avatar_url || 'assets/images/logo_icon.png'}" alt="${s.name}" class="table-user-avatar" onerror="this.src='assets/images/logo_icon.png'">
+                  <div>
+                    <div class="user-display-name">${escapeHTML(s.name)}</div>
+                    <div class="user-role-sub">${escapeHTML(s.staff_code || '')} &bull; ${escapeHTML(s.phone || '—')}</div>
+                  </div>
                 </div>
+                <div class="row-status-top"><span class="status-pill ${s.status}">${(s.status || '').replace('-', ' ').toUpperCase()}</span></div>
               </div>
             </td>
-            <td data-label="Role"><span class="status-pill ${s.role === 'RN' ? 'verified' : 'off-duty'}">${escapeHTML(s.role)}</span></td>
-            <td data-label="Status"><span class="status-pill ${s.status}">${(s.status || '').replace('-', ' ').toUpperCase()}</span></td>
-            <td data-label="CNO / License #"><code style="font-weight: 700; color: var(--brand-cyan);">${escapeHTML(s.cno_registration_number || 'CNO-VERIFIED')}</code></td>
-            <td data-label="Ontario Region">${escapeHTML(s.assigned_region || 'Greater Toronto Area')}</td>
-            <td data-label="Rating">⭐ ${s.rating || '5.0'}</td>
-            <td data-label="Expiring Credentials">${s.expiring_docs_count > 0 ? `<span class="status-pill off-duty">⚠️ ${s.expiring_docs_count} Expiring</span>` : '<span class="status-pill verified">✅ 100% Valid</span>'}</td>
-            <td data-label="Action" style="text-align: right;">
-              <button type="button" class="btn-secondary-action" style="font-size: 0.72rem; padding: 0.2rem 0.5rem;" onclick="event.stopPropagation(); window.openStaffDrawer('${s.id}')">
-                Profile
+            <td class="cell-grid-item" data-label="Role">
+              <div class="meta-label">Role</div>
+              <div class="meta-value"><span class="status-pill ${s.role === 'RN' ? 'verified' : 'off-duty'}">${escapeHTML(s.role)}</span></div>
+            </td>
+            <td class="cell-status-desktop" data-label="Status">
+              <div class="meta-label">Status</div>
+              <div class="meta-value"><span class="status-pill ${s.status}">${(s.status || '').replace('-', ' ').toUpperCase()}</span></div>
+            </td>
+            <td class="cell-grid-item" data-label="CNO / License #">
+              <div class="meta-label">CNO License</div>
+              <div class="meta-value"><code style="font-weight: 700; color: var(--brand-cyan);">${escapeHTML(s.cno_registration_number || 'CNO-VERIFIED')}</code></div>
+            </td>
+            <td class="cell-grid-item" data-label="Ontario Region">
+              <div class="meta-label">Region</div>
+              <div class="meta-value">${escapeHTML(s.assigned_region || 'Greater Toronto Area')}</div>
+            </td>
+            <td class="cell-grid-item" data-label="Rating">
+              <div class="meta-label">Rating</div>
+              <div class="meta-value">⭐ ${s.rating || '5.0'}</div>
+            </td>
+            <td class="cell-grid-item" data-label="Expiring Credentials">
+              <div class="meta-label">Credentials</div>
+              <div class="meta-value">${s.expiring_docs_count > 0 ? `<span class="status-pill off-duty">⚠️ ${s.expiring_docs_count} Expiring</span>` : '<span class="status-pill verified">✅ 100% Valid</span>'}</div>
+            </td>
+            <td class="cell-actions" data-label="Action">
+              <button type="button" class="btn-secondary-action" style="font-size: 0.75rem; padding: 0.35rem 0.65rem; width: 100%; justify-content: center;" onclick="event.stopPropagation(); window.openStaffDrawer('${s.id}')">
+                <i data-lucide="user" style="width: 12px; height: 12px;"></i> View Profile
               </button>
             </td>
           </tr>
@@ -1946,20 +2117,40 @@
         tbody.innerHTML = `<tr><td colspan="8">${emptyState('📑', 'No Candidates Found', 'No applicant records matched the report search query.')}</td></tr>`;
       } else {
         tbody.innerHTML = list.map(a => `
-          <tr onclick="window.openApplicantDrawer('${a.id}')" style="cursor: pointer;">
-            <td data-label="Applicant Code"><strong style="color: var(--brand-cyan); font-family: monospace;">${escapeHTML(a.application_code || 'APP-')}</strong></td>
-            <td data-label="Full Name"><div style="font-weight: 700; color: var(--text-primary);">${escapeHTML(a.full_name)}</div></td>
-            <td data-label="Role Applied"><span class="status-pill verified">${escapeHTML(a.role_applied)}</span></td>
-            <td data-label="Onboarding Stage"><span class="status-pill ${a.stage || 'new'}">${(a.stage || 'new').toUpperCase()}</span></td>
-            <td data-label="License / Reg"><code>${escapeHTML(a.license_registration || 'Provided')}</code></td>
-            <td data-label="Contact Email & Phone">
-              <div style="font-size: 0.8rem;">${escapeHTML(a.email)}</div>
-              <div style="font-size: 0.72rem; color: var(--text-muted);">${escapeHTML(a.phone || '—')}</div>
+          <tr onclick="window.openApplicantDrawer('${a.id}')" style="cursor: pointer;" class="table-card-row">
+            <td class="cell-primary" data-label="Applicant Code">
+              <div class="row-header-wrapper">
+                <strong class="user-display-name" style="color: var(--brand-cyan); font-family: monospace;">${escapeHTML(a.application_code || 'APP-')}</strong>
+                <div class="row-status-top"><span class="status-pill ${a.stage || 'new'}">${(a.stage || 'new').toUpperCase()}</span></div>
+              </div>
             </td>
-            <td data-label="Date Applied">${a.created_at ? a.created_at.slice(0, 10) : '—'}</td>
-            <td data-label="Action" style="text-align: right;">
-              <button type="button" class="btn-secondary-action" style="font-size: 0.72rem; padding: 0.2rem 0.5rem;" onclick="event.stopPropagation(); window.openApplicantDrawer('${a.id}')">
-                Review
+            <td class="cell-subtitle" data-label="Full Name">
+              <div class="meta-label">Applicant Name</div>
+              <div class="meta-value"><strong>${escapeHTML(a.full_name)}</strong> &bull; <span style="font-size:0.75rem;color:var(--text-muted);">${escapeHTML(a.email)}</span></div>
+            </td>
+            <td class="cell-grid-item" data-label="Role Applied">
+              <div class="meta-label">Role Applied</div>
+              <div class="meta-value"><span class="status-pill verified">${escapeHTML(a.role_applied)}</span></div>
+            </td>
+            <td class="cell-status-desktop" data-label="Onboarding Stage">
+              <div class="meta-label">Stage</div>
+              <div class="meta-value"><span class="status-pill ${a.stage || 'new'}">${(a.stage || 'new').toUpperCase()}</span></div>
+            </td>
+            <td class="cell-grid-item" data-label="License / Reg">
+              <div class="meta-label">License / Reg #</div>
+              <div class="meta-value"><code>${escapeHTML(a.license_registration || 'Provided')}</code></div>
+            </td>
+            <td class="cell-grid-item" data-label="Contact Phone">
+              <div class="meta-label">Phone Contact</div>
+              <div class="meta-value">${escapeHTML(a.phone || '—')}</div>
+            </td>
+            <td class="cell-grid-item" data-label="Date Applied">
+              <div class="meta-label">Date Applied</div>
+              <div class="meta-value">${a.created_at ? a.created_at.slice(0, 10) : '—'}</div>
+            </td>
+            <td class="cell-actions" data-label="Action">
+              <button type="button" class="btn-secondary-action" style="font-size: 0.75rem; padding: 0.35rem 0.65rem; width: 100%; justify-content: center;" onclick="event.stopPropagation(); window.openApplicantDrawer('${a.id}')">
+                <i data-lucide="file-text" style="width: 12px; height: 12px;"></i> Review Candidate
               </button>
             </td>
           </tr>
@@ -2003,15 +2194,32 @@
         tbody.innerHTML = `<tr><td colspan="6">${emptyState('📧', 'No Subscribers Found', 'No email subscribers matched the report search query.')}</td></tr>`;
       } else {
         tbody.innerHTML = list.map(s => `
-          <tr>
-            <td data-label="Subscriber Email"><strong style="color: var(--text-primary); font-size: 0.88rem;">${escapeHTML(s.email)}</strong></td>
-            <td data-label="Status"><span class="status-pill ${s.status === 'active' ? 'verified' : 'off-duty'}">${(s.status || 'active').toUpperCase()}</span></td>
-            <td data-label="Source Channel"><span class="status-pill verified" style="font-size: 0.72rem;">🌐 ${escapeHTML(s.source || 'homepage_strip')}</span></td>
-            <td data-label="IP Subnet"><code style="color: var(--text-muted); font-size: 0.75rem;">${escapeHTML(s.ip_address || '127.0.0.1')}</code></td>
-            <td data-label="Date Subscribed">${s.created_at ? s.created_at.slice(0, 10) : '—'}</td>
-            <td data-label="Action" style="text-align: right;">
-              <button type="button" class="btn-secondary-action" style="font-size: 0.72rem; padding: 0.2rem 0.5rem; color: #ef4444; border-color: rgba(239,68,68,0.3);" onclick="window.deleteNewsletterSubscriber('${s.id}')">
-                Remove
+          <tr class="table-card-row">
+            <td class="cell-primary" data-label="Subscriber Email">
+              <div class="row-header-wrapper">
+                <strong class="user-display-name" style="font-size: 0.92rem;">${escapeHTML(s.email)}</strong>
+                <div class="row-status-top"><span class="status-pill ${s.status === 'active' ? 'verified' : 'off-duty'}">${(s.status || 'active').toUpperCase()}</span></div>
+              </div>
+            </td>
+            <td class="cell-grid-item" data-label="Source Channel">
+              <div class="meta-label">Source Channel</div>
+              <div class="meta-value"><span class="status-pill verified" style="font-size: 0.72rem;">🌐 ${escapeHTML(s.source || 'homepage_strip')}</span></div>
+            </td>
+            <td class="cell-grid-item" data-label="IP Subnet">
+              <div class="meta-label">IP Address</div>
+              <div class="meta-value"><code style="color: var(--text-muted); font-size: 0.75rem;">${escapeHTML(s.ip_address || '127.0.0.1')}</code></div>
+            </td>
+            <td class="cell-grid-item" data-label="Date Subscribed">
+              <div class="meta-label">Date Subscribed</div>
+              <div class="meta-value">${s.created_at ? s.created_at.slice(0, 10) : '—'}</div>
+            </td>
+            <td class="cell-status-desktop" data-label="Status">
+              <div class="meta-label">Status</div>
+              <div class="meta-value"><span class="status-pill ${s.status === 'active' ? 'verified' : 'off-duty'}">${(s.status || 'active').toUpperCase()}</span></div>
+            </td>
+            <td class="cell-actions" data-label="Action">
+              <button type="button" class="btn-secondary-action" style="font-size: 0.75rem; padding: 0.35rem 0.65rem; color: #ef4444; border-color: rgba(239,68,68,0.3); width: 100%; justify-content: center;" onclick="window.deleteNewsletterSubscriber('${s.id}')">
+                <i data-lucide="trash-2" style="width: 12px; height: 12px;"></i> Remove Subscriber
               </button>
             </td>
           </tr>
