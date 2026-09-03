@@ -22,7 +22,7 @@
   <aside class="prototype-banner" aria-label="Prototype Version Notice">
     <div style="display: flex; align-items: center; gap: 0.75rem;">
       <span class="prototype-banner-badge">Services Prototype</span>
-      <span>Reference image layout alignment with floating circular icon badges.</span>
+      <span>Reference image layout with interactive "See More" capabilities expansion.</span>
     </div>
     <div style="display: flex; align-items: center; gap: 1.25rem;">
       <a href="about-prototype.html" style="font-size: 0.82rem;">&larr; About Prototype</a>
@@ -87,7 +87,7 @@
   </section>
 
   <!-- =========================================================================
-       SERVICES SHOWCASE (REFERENCE IMAGE ZIG-ZAG LAYOUT ALIGNMENT)
+       SERVICES SHOWCASE (REFERENCE IMAGE ALIGNMENT + SEE MORE FEATURE)
        ========================================================================= -->
   <section class="proto-ref-showcase-section sharp-top-slant-left">
     <div class="container">
@@ -106,25 +106,67 @@
         <!-- ===================================================================
              1. PERSONAL CARE SUPPORT (IMAGE LEFT, CONTENT RIGHT)
              =================================================================== -->
-        <article class="proto-ref-row" id="personal-care">
+        <article class="proto-ref-card-unit" id="personal-care">
           
-          <!-- Media Column with Overlapping Left Icon Badge -->
-          <div class="proto-ref-media">
-            <div class="proto-ref-icon-badge" title="Personal Care Support">
-              <i data-lucide="heart-pulse"></i>
+          <div class="proto-ref-row">
+            <!-- Media Column with Overlapping Left Icon Badge -->
+            <div class="proto-ref-media">
+              <div class="proto-ref-icon-badge" title="Personal Care Support">
+                <i data-lucide="heart-pulse"></i>
+              </div>
+              <div class="proto-ref-img-card">
+                <img src="assets/images/service_personal_care.jpg" alt="Personal Care Support">
+              </div>
             </div>
-            <div class="proto-ref-img-card">
-              <img src="assets/images/service_personal_care.jpg" alt="Personal Care Support">
+
+            <!-- Content Column -->
+            <div class="proto-ref-content">
+              <span class="proto-card-badge" style="margin-bottom: 0.4rem;">ASSISTIVE DAILY LIVING</span>
+              <h2 class="proto-ref-title">Personal Care Support</h2>
+              <p class="proto-ref-desc">
+                We provide comprehensive, person-centered support to promote independence, dignity, and overall well-being. Our focus is to deliver compassionate care tailored to meet unique needs in the comfort of home and community.
+              </p>
+              
+              <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                <button class="proto-btn-toggle-seemore" data-target="drawer-personal-care" aria-expanded="false">
+                  <span>See More</span>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+                <a href="clients.html" style="font-family: var(--font-heading); font-size: 0.88rem; font-weight: 700; color: var(--teal-green); text-decoration: underline;">Request Care &rarr;</a>
+              </div>
             </div>
           </div>
 
-          <!-- Content Column -->
-          <div class="proto-ref-content">
-            <h2 class="proto-ref-title">Personal Care Support</h2>
-            <p class="proto-ref-desc">
-              We provide comprehensive, person-centered support to promote independence, dignity, and overall well-being. Our focus is to deliver compassionate care tailored to meet unique needs in the comfort of home and community.
-            </p>
-            <a href="contact.html" class="proto-btn-pill-green">Learn More</a>
+          <!-- Expandable Detail Drawer -->
+          <div class="proto-see-more-drawer" id="drawer-personal-care">
+            <div class="proto-service-quote-box" style="margin-top: 0; margin-bottom: 1.5rem;">
+              <strong>Patient-Centered Commitment</strong>
+              <p>"Tailored to meet unique care needs in the comfort of home and community."</p>
+            </div>
+
+            <div class="proto-drawer-grid">
+              <div class="proto-drawer-category-box">
+                <div class="proto-drawer-category-title"><span class="proto-drawer-category-dot"></span> Core Hygiene &amp; Daily Living</div>
+                <div class="proto-drawer-list">
+                  <div class="proto-drawer-item"><span class="proto-drawer-check">✓</span><span>Personal hygiene support (bathing, showering, sponge baths)</span></div>
+                  <div class="proto-drawer-item"><span class="proto-drawer-check">✓</span><span>Assistance with dressing and undressing</span></div>
+                  <div class="proto-drawer-item"><span class="proto-drawer-check">✓</span><span>Grooming services (shaving, hair care, personal care)</span></div>
+                  <div class="proto-drawer-item"><span class="proto-drawer-check">✓</span><span>Continence care and support</span></div>
+                  <div class="proto-drawer-item"><span class="proto-drawer-check">✓</span><span>Assistance with eating and drinking</span></div>
+                </div>
+              </div>
+
+              <div class="proto-drawer-category-box">
+                <div class="proto-drawer-category-title"><span class="proto-drawer-category-dot" style="background: var(--sky-blue);"></span> Health, Mobility &amp; Supervision</div>
+                <div class="proto-drawer-list">
+                  <div class="proto-drawer-item"><span class="proto-drawer-check">✓</span><span>Support with rehabilitation programs &amp; therapies</span></div>
+                  <div class="proto-drawer-item"><span class="proto-drawer-check">✓</span><span>Medication supervision and reminders</span></div>
+                  <div class="proto-drawer-item"><span class="proto-drawer-check">✓</span><span>Assistance with mobility, transfers, and safe movement</span></div>
+                  <div class="proto-drawer-item"><span class="proto-drawer-check">✓</span><span>Support with the use of aids and assistive devices</span></div>
+                  <div class="proto-drawer-item"><span class="proto-drawer-check">✓</span><span>Meal planning and food preparation</span></div>
+                </div>
+              </div>
+            </div>
           </div>
 
         </article>
@@ -132,25 +174,65 @@
         <!-- ===================================================================
              2. TRAVELLING NURSING PROGRAM (CONTENT LEFT, IMAGE RIGHT - REVERSE)
              =================================================================== -->
-        <article class="proto-ref-row row-reverse" id="travelling-nursing">
+        <article class="proto-ref-card-unit" id="travelling-nursing">
           
-          <!-- Media Column with Overlapping Left Icon Badge -->
-          <div class="proto-ref-media">
-            <div class="proto-ref-icon-badge" title="Travelling Nursing Program">
-              <i data-lucide="map-pin"></i>
+          <div class="proto-ref-row row-reverse">
+            <!-- Media Column with Overlapping Left Icon Badge -->
+            <div class="proto-ref-media">
+              <div class="proto-ref-icon-badge" title="Travelling Nursing Program">
+                <i data-lucide="map-pin"></i>
+              </div>
+              <div class="proto-ref-img-card">
+                <img src="assets/images/service_travel_nurse.jpg" alt="Travelling Nursing Program">
+              </div>
             </div>
-            <div class="proto-ref-img-card">
-              <img src="assets/images/service_travel_nurse.jpg" alt="Travelling Nursing Program">
+
+            <!-- Content Column -->
+            <div class="proto-ref-content">
+              <span class="proto-card-badge" style="margin-bottom: 0.4rem; color: var(--sky-blue);">ON-DEMAND CLINICAL CARE</span>
+              <h2 class="proto-ref-title">Travelling Nursing Program</h2>
+              <p class="proto-ref-desc">
+                Bringing expert nursing care directly to where it's needed most. High-quality, on-demand clinical care delivered in homes, retirement residences, long-term care facilities, and community settings across Canada.
+              </p>
+              
+              <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                <button class="proto-btn-toggle-seemore" data-target="drawer-travel-nursing" aria-expanded="false">
+                  <span>See More</span>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+                <a href="clients.html" style="font-family: var(--font-heading); font-size: 0.88rem; font-weight: 700; color: var(--sky-blue); text-decoration: underline;">Request Clinical Staff &rarr;</a>
+              </div>
             </div>
           </div>
 
-          <!-- Content Column -->
-          <div class="proto-ref-content">
-            <h2 class="proto-ref-title">Travelling Nursing Program</h2>
-            <p class="proto-ref-desc">
-              Bringing expert nursing care directly to where it's needed most. High-quality, on-demand clinical care delivered in homes, retirement residences, long-term care facilities, and community settings across Canada.
-            </p>
-            <a href="contact.html" class="proto-btn-pill-green">Learn More</a>
+          <!-- Expandable Detail Drawer -->
+          <div class="proto-see-more-drawer" id="drawer-travel-nursing">
+            <div class="proto-service-quote-box" style="margin-top: 0; margin-bottom: 1.5rem;">
+              <strong>On-Demand Expertise</strong>
+              <p>"Clinical excellence delivered directly to homes, retirement residences, and facilities."</p>
+            </div>
+
+            <div class="proto-drawer-grid">
+              <div class="proto-drawer-category-box">
+                <div class="proto-drawer-category-title"><span class="proto-drawer-category-dot" style="background: var(--sky-blue);"></span> Clinical Assessment &amp; Wound Care</div>
+                <div class="proto-drawer-list">
+                  <div class="proto-drawer-item"><span class="proto-drawer-check">✓</span><span>On-site health assessments &amp; clinical monitoring</span></div>
+                  <div class="proto-drawer-item"><span class="proto-drawer-check">✓</span><span>Wound care &amp; advanced dressing management</span></div>
+                  <div class="proto-drawer-item"><span class="proto-drawer-check">✓</span><span>Chronic disease monitoring &amp; management</span></div>
+                  <div class="proto-drawer-item"><span class="proto-drawer-check">✓</span><span>Preventive care, health education, &amp; wellness coaching</span></div>
+                </div>
+              </div>
+
+              <div class="proto-drawer-category-box">
+                <div class="proto-drawer-category-title"><span class="proto-drawer-category-dot"></span> Medication &amp; Care Coordination</div>
+                <div class="proto-drawer-list">
+                  <div class="proto-drawer-item"><span class="proto-drawer-check">✓</span><span>Medication administration &amp; adherence support</span></div>
+                  <div class="proto-drawer-item"><span class="proto-drawer-check">✓</span><span>Post-discharge follow-up care to reduce readmissions</span></div>
+                  <div class="proto-drawer-item"><span class="proto-drawer-check">✓</span><span>Rehabilitation support &amp; coordinated care planning</span></div>
+                  <div class="proto-drawer-item"><span class="proto-drawer-check">✓</span><span>Collaboration with physicians &amp; care teams</span></div>
+                </div>
+              </div>
+            </div>
           </div>
 
         </article>
@@ -158,25 +240,63 @@
         <!-- ===================================================================
              3. SUPPORT & COMPANIONSHIP (IMAGE LEFT, CONTENT RIGHT)
              =================================================================== -->
-        <article class="proto-ref-row" id="companionship">
+        <article class="proto-ref-card-unit" id="companionship">
           
-          <!-- Media Column with Overlapping Left Icon Badge -->
-          <div class="proto-ref-media">
-            <div class="proto-ref-icon-badge" title="Support &amp; Companionship">
-              <i data-lucide="heart-handshake"></i>
+          <div class="proto-ref-row">
+            <!-- Media Column with Overlapping Left Icon Badge -->
+            <div class="proto-ref-media">
+              <div class="proto-ref-icon-badge" title="Support &amp; Companionship">
+                <i data-lucide="heart-handshake"></i>
+              </div>
+              <div class="proto-ref-img-card">
+                <img src="assets/images/service_companionship.jpg" alt="Support and Companionship">
+              </div>
             </div>
-            <div class="proto-ref-img-card">
-              <img src="assets/images/service_companionship.jpg" alt="Support and Companionship">
+
+            <!-- Content Column -->
+            <div class="proto-ref-content">
+              <span class="proto-card-badge" style="margin-bottom: 0.4rem; color: var(--cyan-turquoise);">COMPANIONSHIP &amp; ENGAGEMENT</span>
+              <h2 class="proto-ref-title">Support &amp; Companionship</h2>
+              <p class="proto-ref-desc">
+                Enhancing quality of life through meaningful social interaction, emotional support, and assistance with day-to-day community activities, promoting independence and reducing isolation.
+              </p>
+              
+              <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                <button class="proto-btn-toggle-seemore" data-target="drawer-companionship" aria-expanded="false">
+                  <span>See More</span>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+                <a href="clients.html" style="font-family: var(--font-heading); font-size: 0.88rem; font-weight: 700; color: var(--cyan-turquoise); text-decoration: underline;">Request Companion &rarr;</a>
+              </div>
             </div>
           </div>
 
-          <!-- Content Column -->
-          <div class="proto-ref-content">
-            <h2 class="proto-ref-title">Support &amp; Companionship</h2>
-            <p class="proto-ref-desc">
-              Enhancing quality of life through meaningful social interaction, emotional support, and assistance with day-to-day community activities, promoting independence and reducing isolation.
-            </p>
-            <a href="contact.html" class="proto-btn-pill-green">Learn More</a>
+          <!-- Expandable Detail Drawer -->
+          <div class="proto-see-more-drawer" id="drawer-companionship">
+            <div class="proto-service-quote-box" style="margin-top: 0; margin-bottom: 1.5rem;">
+              <strong>Social Well-Being Focus</strong>
+              <p>"Promoting independence, reducing isolation, and enriching everyday living."</p>
+            </div>
+
+            <div class="proto-drawer-grid">
+              <div class="proto-drawer-category-box">
+                <div class="proto-drawer-category-title"><span class="proto-drawer-category-dot" style="background: var(--cyan-turquoise);"></span> Social Interaction &amp; Errands</div>
+                <div class="proto-drawer-list">
+                  <div class="proto-drawer-item"><span class="proto-drawer-check">✓</span><span>Transportation &amp; accompaniment to medical appointments</span></div>
+                  <div class="proto-drawer-item"><span class="proto-drawer-check">✓</span><span>Assistance attending social outings &amp; community events</span></div>
+                  <div class="proto-drawer-item"><span class="proto-drawer-check">✓</span><span>Assistance with grocery shopping and running errands</span></div>
+                </div>
+              </div>
+
+              <div class="proto-drawer-category-box">
+                <div class="proto-drawer-category-title"><span class="proto-drawer-category-dot"></span> Physical &amp; Therapeutic Activity</div>
+                <div class="proto-drawer-list">
+                  <div class="proto-drawer-item"><span class="proto-drawer-check">✓</span><span>Support with light physical exercise &amp; walking</span></div>
+                  <div class="proto-drawer-item"><span class="proto-drawer-check">✓</span><span>Support with rehabilitation &amp; therapeutic activities</span></div>
+                  <div class="proto-drawer-item"><span class="proto-drawer-check">✓</span><span>Engagement in leisure activities (board games, cards)</span></div>
+                </div>
+              </div>
+            </div>
           </div>
 
         </article>
@@ -184,25 +304,62 @@
         <!-- ===================================================================
              4. RESPITE CARE SERVICES (CONTENT LEFT, IMAGE RIGHT - REVERSE)
              =================================================================== -->
-        <article class="proto-ref-row row-reverse" id="respite-care">
+        <article class="proto-ref-card-unit" id="respite-care">
           
-          <!-- Media Column with Overlapping Left Icon Badge -->
-          <div class="proto-ref-media">
-            <div class="proto-ref-icon-badge" title="Respite Care Services">
-              <i data-lucide="shield-check"></i>
+          <div class="proto-ref-row row-reverse">
+            <!-- Media Column with Overlapping Left Icon Badge -->
+            <div class="proto-ref-media">
+              <div class="proto-ref-icon-badge" title="Respite Care Services">
+                <i data-lucide="shield-check"></i>
+              </div>
+              <div class="proto-ref-img-card">
+                <img src="assets/images/service_respite_care.jpg" alt="Respite Care Services">
+              </div>
             </div>
-            <div class="proto-ref-img-card">
-              <img src="assets/images/service_respite_care.jpg" alt="Respite Care Services">
+
+            <!-- Content Column -->
+            <div class="proto-ref-content">
+              <span class="proto-card-badge" style="margin-bottom: 0.4rem;">CAREGIVER RELIEF &amp; ATTENDANT CARE</span>
+              <h2 class="proto-ref-title">Respite Care Services</h2>
+              <p class="proto-ref-desc">
+                Flexible and reliable respite care services designed to support primary caregivers while ensuring continuity of high-quality care for loved ones with dignity, safety, and individualized relief.
+              </p>
+              
+              <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                <button class="proto-btn-toggle-seemore" data-target="drawer-respite-care" aria-expanded="false">
+                  <span>See More</span>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+                <a href="clients.html" style="font-family: var(--font-heading); font-size: 0.88rem; font-weight: 700; color: var(--teal-green); text-decoration: underline;">Request Respite Care &rarr;</a>
+              </div>
             </div>
           </div>
 
-          <!-- Content Column -->
-          <div class="proto-ref-content">
-            <h2 class="proto-ref-title">Respite Care Services</h2>
-            <p class="proto-ref-desc">
-              Flexible and reliable respite care services designed to support primary caregivers while ensuring continuity of high-quality care for loved ones with dignity, safety, and individualized relief.
-            </p>
-            <a href="contact.html" class="proto-btn-pill-green">Learn More</a>
+          <!-- Expandable Detail Drawer -->
+          <div class="proto-see-more-drawer" id="drawer-respite-care">
+            <div class="proto-service-quote-box" style="margin-top: 0; margin-bottom: 1.5rem;">
+              <strong>Caregiver Relief Principle</strong>
+              <p>"Emphasizing dignity, safety, and individualized relief for primary family caregivers."</p>
+            </div>
+
+            <div class="proto-drawer-grid">
+              <div class="proto-drawer-category-box">
+                <div class="proto-drawer-category-title"><span class="proto-drawer-category-dot"></span> Primary Caregiver Relief</div>
+                <div class="proto-drawer-list">
+                  <div class="proto-drawer-item"><span class="proto-drawer-check">✓</span><span>Temporary relief for primary caregivers (rest &amp; personal needs)</span></div>
+                  <div class="proto-drawer-item"><span class="proto-drawer-check">✓</span><span>High-needs attendant care for intellectual/physical disabilities</span></div>
+                  <div class="proto-drawer-item"><span class="proto-drawer-check">✓</span><span>Social support to promote emotional well-being</span></div>
+                </div>
+              </div>
+
+              <div class="proto-drawer-category-box">
+                <div class="proto-drawer-category-title"><span class="proto-drawer-category-dot" style="background: var(--sky-blue);"></span> Behavioral &amp; Community Outings</div>
+                <div class="proto-drawer-list">
+                  <div class="proto-drawer-item"><span class="proto-drawer-check">✓</span><span>Patient support for responsive or challenging behaviors</span></div>
+                  <div class="proto-drawer-item"><span class="proto-drawer-check">✓</span><span>Companionship &amp; assistance with community outings</span></div>
+                </div>
+              </div>
+            </div>
           </div>
 
         </article>
@@ -210,25 +367,62 @@
         <!-- ===================================================================
              5. LIGHT HOUSEHOLD SUPPORT (IMAGE LEFT, CONTENT RIGHT)
              =================================================================== -->
-        <article class="proto-ref-row" id="household-support">
+        <article class="proto-ref-card-unit" id="household-support">
           
-          <!-- Media Column with Overlapping Left Icon Badge -->
-          <div class="proto-ref-media">
-            <div class="proto-ref-icon-badge" title="Light Household Support">
-              <i data-lucide="home"></i>
+          <div class="proto-ref-row">
+            <!-- Media Column with Overlapping Left Icon Badge -->
+            <div class="proto-ref-media">
+              <div class="proto-ref-icon-badge" title="Light Household Support">
+                <i data-lucide="home"></i>
+              </div>
+              <div class="proto-ref-img-card">
+                <img src="assets/images/service_household_support.jpg" alt="Light Household Support">
+              </div>
             </div>
-            <div class="proto-ref-img-card">
-              <img src="assets/images/service_household_support.jpg" alt="Light Household Support">
+
+            <!-- Content Column -->
+            <div class="proto-ref-content">
+              <span class="proto-card-badge" style="margin-bottom: 0.4rem; color: var(--sky-blue);">HOME ENVIRONMENT &amp; MEAL PREP</span>
+              <h2 class="proto-ref-title">Light Household Support</h2>
+              <p class="proto-ref-desc">
+                Assistance with light household tasks to help maintain a clean, safe, and comfortable living environment while supporting independence, respect, and personal attention to detail.
+              </p>
+              
+              <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                <button class="proto-btn-toggle-seemore" data-target="drawer-household-support" aria-expanded="false">
+                  <span>See More</span>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+                <a href="clients.html" style="font-family: var(--font-heading); font-size: 0.88rem; font-weight: 700; color: var(--sky-blue); text-decoration: underline;">Request Home Support &rarr;</a>
+              </div>
             </div>
           </div>
 
-          <!-- Content Column -->
-          <div class="proto-ref-content">
-            <h2 class="proto-ref-title">Light Household Support</h2>
-            <p class="proto-ref-desc">
-              Assistance with light household tasks to help maintain a clean, safe, and comfortable living environment while supporting independence, respect, and personal attention to detail.
-            </p>
-            <a href="contact.html" class="proto-btn-pill-green">Learn More</a>
+          <!-- Expandable Detail Drawer -->
+          <div class="proto-see-more-drawer" id="drawer-household-support">
+            <div class="proto-service-quote-box" style="margin-top: 0; margin-bottom: 1.5rem;">
+              <strong>Safe Home Living</strong>
+              <p>"Delivered with respect, reliability, and personal attention to details."</p>
+            </div>
+
+            <div class="proto-drawer-grid">
+              <div class="proto-drawer-category-box">
+                <div class="proto-drawer-category-title"><span class="proto-drawer-category-dot" style="background: var(--sky-blue);"></span> Housekeeping &amp; Tidying</div>
+                <div class="proto-drawer-list">
+                  <div class="proto-drawer-item"><span class="proto-drawer-check">✓</span><span>Kitchen cleaning and basic household tidying</span></div>
+                  <div class="proto-drawer-item"><span class="proto-drawer-check">✓</span><span>General housekeeping (vacuuming, dusting, polishing)</span></div>
+                  <div class="proto-drawer-item"><span class="proto-drawer-check">✓</span><span>Sweeping and light floor maintenance</span></div>
+                </div>
+              </div>
+
+              <div class="proto-drawer-category-box">
+                <div class="proto-drawer-category-title"><span class="proto-drawer-category-dot"></span> Meal Prep &amp; Daily Errands</div>
+                <div class="proto-drawer-list">
+                  <div class="proto-drawer-item"><span class="proto-drawer-check">✓</span><span>Meal preparation and cooking support</span></div>
+                  <div class="proto-drawer-item"><span class="proto-drawer-check">✓</span><span>Assistance with day-to-day shopping needs</span></div>
+                </div>
+              </div>
+            </div>
           </div>
 
         </article>
@@ -236,25 +430,62 @@
         <!-- ===================================================================
              6. ALZHEIMER'S & DEMENTIA CARE (CONTENT LEFT, IMAGE RIGHT - REVERSE)
              =================================================================== -->
-        <article class="proto-ref-row row-reverse" id="dementia-care">
+        <article class="proto-ref-card-unit" id="dementia-care">
           
-          <!-- Media Column with Overlapping Left Icon Badge -->
-          <div class="proto-ref-media">
-            <div class="proto-ref-icon-badge" title="Alzheimer's &amp; Dementia Care">
-              <i data-lucide="brain"></i>
+          <div class="proto-ref-row row-reverse">
+            <!-- Media Column with Overlapping Left Icon Badge -->
+            <div class="proto-ref-media">
+              <div class="proto-ref-icon-badge" title="Alzheimer's &amp; Dementia Care">
+                <i data-lucide="brain"></i>
+              </div>
+              <div class="proto-ref-img-card">
+                <img src="assets/images/service_dementia_care.jpg" alt="Alzheimer's and Dementia Care">
+              </div>
             </div>
-            <div class="proto-ref-img-card">
-              <img src="assets/images/service_dementia_care.jpg" alt="Alzheimer's and Dementia Care">
+
+            <!-- Content Column -->
+            <div class="proto-ref-content">
+              <span class="proto-card-badge" style="margin-bottom: 0.4rem; color: var(--cyan-turquoise);">MEMORY CARE &amp; COGNITIVE SUPPORT</span>
+              <h2 class="proto-ref-title">Alzheimer’s &amp; Dementia Care</h2>
+              <p class="proto-ref-desc">
+                Compassionate, person-centered support for individuals living with Alzheimer’s disease and other forms of dementia, focusing on dignity, safety, comfort, and structured daily routines.
+              </p>
+              
+              <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                <button class="proto-btn-toggle-seemore" data-target="drawer-dementia-care" aria-expanded="false">
+                  <span>See More</span>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+                <a href="clients.html" style="font-family: var(--font-heading); font-size: 0.88rem; font-weight: 700; color: var(--cyan-turquoise); text-decoration: underline;">Request Memory Care &rarr;</a>
+              </div>
             </div>
           </div>
 
-          <!-- Content Column -->
-          <div class="proto-ref-content">
-            <h2 class="proto-ref-title">Alzheimer’s &amp; Dementia Care</h2>
-            <p class="proto-ref-desc">
-              Compassionate, person-centered support for individuals living with Alzheimer’s disease and other forms of dementia, focusing on dignity, safety, comfort, and structured daily routines.
-            </p>
-            <a href="contact.html" class="proto-btn-pill-green">Learn More</a>
+          <!-- Expandable Detail Drawer -->
+          <div class="proto-see-more-drawer" id="drawer-dementia-care">
+            <div class="proto-service-quote-box" style="margin-top: 0; margin-bottom: 1.5rem;">
+              <strong>Memory Care Approach</strong>
+              <p>"Enhancing comfort, reducing anxiety, and supporting structured daily independence."</p>
+            </div>
+
+            <div class="proto-drawer-grid">
+              <div class="proto-drawer-category-box">
+                <div class="proto-drawer-category-title"><span class="proto-drawer-category-dot" style="background: var(--cyan-turquoise);"></span> Cognitive &amp; Memory Support</div>
+                <div class="proto-drawer-list">
+                  <div class="proto-drawer-item"><span class="proto-drawer-check">✓</span><span>Relationship-based care tailored to individual needs</span></div>
+                  <div class="proto-drawer-item"><span class="proto-drawer-check">✓</span><span>Cognitive stimulation &amp; meaningful engagement</span></div>
+                  <div class="proto-drawer-item"><span class="proto-drawer-check">✓</span><span>Support in maintaining a familiar, structured environment</span></div>
+                </div>
+              </div>
+
+              <div class="proto-drawer-category-box">
+                <div class="proto-drawer-category-title"><span class="proto-drawer-category-dot"></span> Empathy &amp; Routine Guidance</div>
+                <div class="proto-drawer-list">
+                  <div class="proto-drawer-item"><span class="proto-drawer-check">✓</span><span>Patience, empathy, &amp; compassionate interaction</span></div>
+                  <div class="proto-drawer-item"><span class="proto-drawer-check">✓</span><span>Assistance &amp; guidance with daily routines (ADLs)</span></div>
+                </div>
+              </div>
+            </div>
           </div>
 
         </article>
@@ -342,6 +573,31 @@
     if (window.lucide) {
       lucide.createIcons();
     }
+
+    // Interactive See More Drawer Toggle logic
+    document.querySelectorAll('.proto-btn-toggle-seemore').forEach(button => {
+      button.addEventListener('click', () => {
+        const targetId = button.getAttribute('data-target');
+        const drawer = document.getElementById(targetId);
+        const textSpan = button.querySelector('span');
+        
+        if (!drawer) return;
+
+        const isOpen = drawer.classList.contains('open');
+
+        if (isOpen) {
+          drawer.classList.remove('open');
+          button.classList.remove('active');
+          button.setAttribute('aria-expanded', 'false');
+          if (textSpan) textSpan.textContent = 'See More';
+        } else {
+          drawer.classList.add('open');
+          button.classList.add('active');
+          button.setAttribute('aria-expanded', 'true');
+          if (textSpan) textSpan.textContent = 'Show Less';
+        }
+      });
+    });
   </script>
 </body>
 </html>
