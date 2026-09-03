@@ -532,3 +532,170 @@
   transform: translateX(3px);
   color: #ffffff;
 }
+
+/* ── About Prototype Component Styles ────────────────────────────────────── */
+.proto-exec-highlights-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+  margin-top: 2rem;
+}
+@media (max-width: 600px) {
+  .proto-exec-highlights-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.proto-exec-card {
+  background: var(--proto-gray-light);
+  border: 1px solid var(--proto-border);
+  border-left: 4px solid var(--proto-teal);
+  border-radius: var(--proto-radius-md);
+  padding: 1.25rem 1.4rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.proto-exec-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
+}
+.proto-exec-card.card-cyan {
+  border-left-color: var(--proto-cyan);
+}
+.proto-exec-icon-box {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  background: rgba(0, 168, 150, 0.1);
+  color: var(--proto-teal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.proto-exec-card.card-cyan .proto-exec-icon-box {
+  background: rgba(0, 245, 212, 0.15);
+  color: #008f7d;
+}
+.proto-exec-card h4 {
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--proto-navy);
+  margin-bottom: 0.2rem;
+}
+.proto-exec-card p {
+  font-size: 0.86rem;
+  color: var(--proto-gray-text);
+  margin: 0;
+  line-height: 1.45;
+}
+
+/* Mission & Vision Dual Feature Cards */
+.proto-mv-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2.5rem;
+}
+@media (max-width: 800px) {
+  .proto-mv-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}
+
+.proto-mv-card {
+  background: #ffffff;
+  border-radius: var(--proto-radius-lg);
+  border: 1px solid var(--proto-border);
+  border-top: 5px solid var(--proto-teal);
+  padding: 2.8rem 2.4rem;
+  box-shadow: 0 8px 30px rgba(11, 37, 69, 0.04);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.proto-mv-card.vision-card {
+  border-top-color: var(--proto-cyan);
+}
+.proto-mv-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--proto-shadow-hover);
+}
+.proto-mv-icon-badge {
+  width: 54px;
+  height: 54px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--proto-navy) 0%, var(--proto-teal) 100%);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.4rem;
+  box-shadow: 0 6px 16px rgba(0, 168, 150, 0.25);
+}
+.proto-mv-card.vision-card .proto-mv-icon-badge {
+  background: linear-gradient(135deg, #007769 0%, #00F5D4 100%);
+  color: #051622;
+}
+.proto-mv-title {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: var(--proto-navy);
+  margin-bottom: 1rem;
+}
+.proto-mv-text {
+  font-size: 1.02rem;
+  line-height: 1.8;
+  color: var(--proto-gray-text);
+  margin: 0;
+}
+
+/* Team Narrative Benefit Cards */
+.proto-team-benefits {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin-top: 1.8rem;
+}
+.proto-benefit-card {
+  background: #ffffff;
+  border-radius: var(--proto-radius-md);
+  border: 1px solid var(--proto-border);
+  padding: 1.25rem 1.4rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03);
+}
+.proto-benefit-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgba(0, 168, 150, 0.12);
+  color: var(--proto-teal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.proto-benefit-content h4 {
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--proto-navy);
+  margin-bottom: 0.25rem;
+}
+.proto-benefit-content p {
+  font-size: 0.9rem;
+  color: var(--proto-gray-text);
+  margin: 0;
+  line-height: 1.55;
+}
+
