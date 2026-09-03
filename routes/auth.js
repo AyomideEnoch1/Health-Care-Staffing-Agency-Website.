@@ -428,8 +428,8 @@ router.post('/mfa/verify', authLoginLimiter, async (req, res, next) => {
 
     const admin = rows[0];
     const cleanedCode = String(totp_code).trim().replace(/\s+/g, '');
-    const checkRes = await otplib.verify({ token: cleanedCode, secret: admin.totp_secret });
-    const isValid = Boolean(checkRes && checkRes.valid);
+    const checkRes = await otplib.verify({ token: cleanedCode, secret: admin.totp_secret, window: 2 });
+    const isValid = Boolean(checkRes === true || (checkRes && checkRes.valid === true));
 
     if (!isValid) {
       await pool.query(
@@ -522,8 +522,8 @@ router.post('/mfa/confirm', requireAdminAuth(), async (req, res, next) => {
     }
 
     const cleanedCode = String(totp_code).trim().replace(/\s+/g, '');
-    const checkRes = await otplib.verify({ token: cleanedCode, secret: rows[0].totp_secret });
-    const isValid = Boolean(checkRes && checkRes.valid);
+    const checkRes = await otplib.verify({ token: cleanedCode, secret: rows[0].totp_secret, window: 2 });
+    const isValid = Boolean(checkRes === true || (checkRes && checkRes.valid === true));
 
     if (!isValid) {
       return res.status(400).json({ success: false, error: 'Verification code incorrect. Please try again.' });

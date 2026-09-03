@@ -54,8 +54,8 @@ function generateHOTP(secret, counter) {
   return String(code).padStart(6, '0');
 }
 
-function verify({ token, secret, window = 1 }) {
-  if (!token || !secret) return false;
+function verify({ token, secret, window = 2 }) {
+  if (!token || !secret) return { valid: false };
   const cleanedToken = String(token).trim();
   const currentCounter = Math.floor(Date.now() / 1000 / 30);
 
@@ -63,10 +63,10 @@ function verify({ token, secret, window = 1 }) {
     const counter = currentCounter + i;
     const expected = generateHOTP(secret, counter);
     if (expected === cleanedToken) {
-      return true;
+      return { valid: true };
     }
   }
-  return false;
+  return { valid: false };
 }
 
 module.exports = {
