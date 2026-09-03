@@ -1090,8 +1090,44 @@
   font-size: 0.98rem;
   line-height: 1.65;
   color: #4B5563;
-  margin: 0 0 1.4rem 0;
-  max-width: 420px;
+  margin: 0 0 1.1rem 0;
+  max-width: 440px;
+}
+
+/* Micro-Pill Tag Cloud for Option 1 */
+.ref-pills-cloud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-bottom: 1.4rem;
+  max-width: 440px;
+}
+
+.ref-micro-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: #ffffff;
+  border: 1px solid rgba(27, 79, 140, 0.12);
+  padding: 0.32rem 0.75rem;
+  border-radius: 50px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #1A3A63;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ref-micro-pill:hover {
+  transform: translateY(-2px);
+  border-color: #3CAF8A;
+  box-shadow: 0 4px 10px rgba(60, 175, 138, 0.15);
+}
+
+.ref-pill-check {
+  color: #3CAF8A;
+  font-weight: 800;
+  font-size: 0.85rem;
 }
 
 /* Soft Green Pill Button */
