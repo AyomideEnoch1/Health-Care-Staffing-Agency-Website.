@@ -347,11 +347,10 @@ function handleInMemoryQuery(sql, params = []) {
 // ── Unified Database Pool Export ──────────────────────────────────────────────
 const pool = {
   async query(sql, params = []) {
-    if (isMySqlAvailable && realPool) {
+    if (realPool) {
       try {
         return await realPool.query(sql, params);
       } catch (err) {
-        // If MySQL connection dropped, seamlessly fallback to in-memory store
         console.warn(`⚠️ [Database] MySQL query failed (${err.message}). Using In-Memory fallback.`);
         return handleInMemoryQuery(sql, params);
       }
@@ -359,7 +358,7 @@ const pool = {
     return handleInMemoryQuery(sql, params);
   },
   async getConnection() {
-    if (isMySqlAvailable && realPool) {
+    if (realPool) {
       try {
         return await realPool.getConnection();
       } catch (err) {
@@ -375,7 +374,7 @@ const pool = {
     };
   },
   isMySqlAvailable() {
-    return isMySqlAvailable;
+    return isMySqlAvailable || Boolean(realPool);
   }
 };
 
