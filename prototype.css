@@ -964,6 +964,206 @@
   font-weight: 500;
 }
 
+/* ── Reference Image Alternating Service Showcase Layout ─────────────────── */
+.proto-services-showcase-section {
+  padding: 5rem 0 6rem 0;
+  position: relative;
+  background-color: var(--proto-bg-tint);
+}
+
+.proto-services-showcase-list {
+  display: flex;
+  flex-direction: column;
+  gap: 5.5rem;
+  max-width: 1140px;
+  margin: 0 auto;
+}
+
+.proto-service-zigzag-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 4.5rem;
+}
+
+/* Alternate row order */
+.proto-service-zigzag-row.row-reverse {
+  direction: rtl;
+}
+.proto-service-zigzag-row.row-reverse > * {
+  direction: ltr;
+}
+
+/* Image Container with Floating Badge */
+.proto-zigzag-media-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  margin: 0 auto;
+}
+
+.proto-zigzag-image-card {
+  width: 100%;
+  height: 380px;
+  border-radius: 28px;
+  overflow: hidden;
+  box-shadow: 0 16px 36px rgba(11, 37, 69, 0.08);
+  border: 4px solid #ffffff;
+  background: #ffffff;
+}
+
+.proto-zigzag-image-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  display: block;
+}
+
+.proto-zigzag-media-wrapper:hover .proto-zigzag-image-card img {
+  transform: scale(1.05);
+}
+
+/* Floating Overlapping Circular Icon Badge */
+.proto-floating-icon-badge {
+  position: absolute;
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2px solid var(--teal-green);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--teal-green);
+  box-shadow: 0 10px 24px rgba(11, 37, 69, 0.1);
+  z-index: 5;
+  top: 15%;
+  left: -32px;
+  transition: transform 0.35s ease, border-color 0.35s ease, background 0.35s ease, color 0.35s ease;
+}
+
+.proto-service-zigzag-row.row-reverse .proto-floating-icon-badge {
+  left: -32px;
+}
+
+.proto-zigzag-media-wrapper:hover .proto-floating-icon-badge {
+  transform: scale(1.1) rotate(-6deg);
+  border-color: var(--sky-blue);
+  background: linear-gradient(135deg, var(--teal-green) 0%, var(--sky-blue) 100%);
+  color: #ffffff;
+}
+
+.proto-floating-icon-badge i {
+  width: 32px;
+  height: 32px;
+  stroke-width: 2;
+}
+
+/* Text Content Column */
+.proto-zigzag-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.proto-zigzag-title {
+  font-family: var(--font-heading);
+  font-size: 2.1rem;
+  font-weight: 800;
+  color: var(--proto-navy);
+  margin-bottom: 1rem;
+  line-height: 1.25;
+}
+
+.proto-zigzag-desc {
+  font-size: 1.05rem;
+  line-height: 1.8;
+  color: #334155;
+  margin-bottom: 1.4rem;
+}
+
+/* Capability Badges List */
+.proto-capability-chips-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-bottom: 1.8rem;
+}
+
+.proto-capability-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: #ffffff;
+  border: 1px solid rgba(11, 37, 69, 0.08);
+  padding: 0.45rem 0.9rem;
+  border-radius: 50px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--proto-navy);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+.proto-capability-chip:hover {
+  transform: translateY(-2px);
+  border-color: var(--teal-green);
+}
+
+.proto-capability-chip span.chip-check {
+  color: var(--teal-green);
+  font-weight: 800;
+  font-size: 0.95rem;
+}
+
+/* Pill CTA Button (Soft Green/Teal as in reference) */
+.proto-btn-pill-green {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: var(--lime-green);
+  color: #ffffff;
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  font-weight: 700;
+  padding: 0.75rem 2rem;
+  border-radius: 50px;
+  text-decoration: none;
+  box-shadow: 0 6px 18px rgba(124, 194, 66, 0.35);
+  transition: transform 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
+}
+
+.proto-btn-pill-green:hover {
+  background: #6bb033;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(124, 194, 66, 0.45);
+  color: #ffffff;
+}
+
+@media (max-width: 860px) {
+  .proto-service-zigzag-row,
+  .proto-service-zigzag-row.row-reverse {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+    direction: ltr;
+  }
+  .proto-zigzag-media-wrapper {
+    max-width: 100%;
+  }
+  .proto-zigzag-image-card {
+    height: 300px;
+  }
+  .proto-floating-icon-badge {
+    left: 10px;
+    top: -25px;
+    width: 64px;
+    height: 64px;
+  }
+}
+
+
 
 
 
