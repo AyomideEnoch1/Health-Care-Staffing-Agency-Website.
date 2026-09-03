@@ -11,10 +11,12 @@
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Open+Sans:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&family=Pacifico&display=swap" rel="stylesheet">
   
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="prototype.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
 
-  <!-- HEADER / NAVIGATION (UNCHANGED HEADER DESIGN) -->
+  <!-- HEADER / NAVIGATION -->
   <header class="site-header" id="site-header">
     <div class="header-container container">
       <a href="index.html" class="brand-logo">
@@ -56,7 +58,7 @@
     <div class="hero-bg-container">
       <div class="hero-diagonal-shape"></div>
       <div class="hero-image-wrapper">
-        <img src="assets/images/hero_divine.jpg" alt="Divine Fingers Staffing & Community Care Services" class="hero-img">
+        <img src="assets/images/hero_divine.jpg" alt="Divine Fingers Staffing &amp; Community Care Services" class="hero-img">
       </div>
     </div>
 
@@ -70,651 +72,263 @@
     </div>
   </section>
 
-
-  <!-- SEGMENT 1: PERSONAL CARE SUPPORT (FULL-WIDTH 3-ROW ARCHITECTURE) -->
-  <section id="personal-care" class="section-padding geometric-ribbon-cyan sharp-top-slant-left">
-    <div class="container sectors-section" style="max-width: 1440px;">
+  <!-- =========================================================================
+       SERVICES SHOWCASE (EXPANDED ALTERNATING LAYOUT WITH MICRO-PILL TAGS)
+       ========================================================================= -->
+  <section class="ref-showcase-section sharp-top-slant-left">
+    <div class="ref-showcase-container">
       
-      <!-- Row 1: Header Bar & Category Badge -->
-      <div class="service-section-header-row" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 2.2rem; border-bottom: 2px solid rgba(0, 168, 150, 0.2); padding-bottom: 1.2rem;">
-        <div class="accent-heading-wrapper" style="margin-bottom: 0;">
-          <h2 class="welcome-title" style="margin-bottom: 0;">Personal Care <span class="brand-highlight">SUPPORT</span></h2>
-          <div class="welcome-accent-line"></div>
-        </div>
-        <span class="service-section-badge" style="font-family: var(--font-heading); font-size: 0.82rem; font-weight: 800; color: var(--teal-green); background: rgba(0, 168, 150, 0.12); padding: 0.5rem 1.2rem; border-radius: 4px; text-transform: uppercase; letter-spacing: 1px;">ASSISTIVE DAILY LIVING</span>
+      <!-- Center Section Eyebrow Header -->
+      <div class="ref-showcase-header">
+        <h2>Healthcare Services for Every Care Need</h2>
       </div>
 
-      <!-- Row 2: Narrative Overview & Image -->
-      <div class="service-row2-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 3.5rem; align-items: center; margin-bottom: 3.5rem;">
-        <div class="slide-from-left">
-          <div class="narrative-card narrative-card-teal">
-            <p>We provide comprehensive, person-centered support to promote independence, dignity, and overall well-being. Our focus is to deliver compassionate care tailored to meet unique needs in the comfort of home and community.</p>
-          </div>
-          <div style="background: var(--white); border: 2px solid #CBD5E1; border-left: 5px solid var(--teal-green); border-radius: 8px; padding: 1.6rem; box-shadow: var(--shadow-soft);">
-            <strong style="font-family: var(--font-heading); font-size: 1.05rem; color: var(--navy); display: block; margin-bottom: 0.4rem;">Patient-Centered Commitment</strong>
-            <p style="font-size: 0.92rem; color: #475569; margin: 0; font-style: italic;">"Tailored to meet unique care needs in the comfort of home and community."</p>
-          </div>
-        </div>
+      <!-- Alternating 2-Column Services List -->
+      <div class="ref-showcase-list">
 
-        <div class="slide-from-right" style="border-radius: 12px; overflow: hidden; box-shadow: var(--shadow-hover); height: 320px;">
-          <img src="assets/images/service_personal_care.jpg" alt="Personal Care Support" style="width: 100%; height: 320px; object-fit: cover; object-position: top center; display: block;">
-        </div>
-      </div>
-
-      <!-- Row 3: Included Offerings & Capabilities (CATEGORIZED DUAL-GROUP PANELS) -->
-      <div>
-        <h3 class="service-row3-subheader" style="font-family: var(--font-heading); font-size: 1.3rem; color: var(--navy); margin-bottom: 1.8rem; text-transform: uppercase; letter-spacing: 0.5px;">Services &amp; Support Included:</h3>
-        
-        <div class="service-row3-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 2rem; align-items: start;">
+        <!-- ===================================================================
+             1. PERSONAL CARE SUPPORT (IMAGE LEFT, CONTENT RIGHT)
+             =================================================================== -->
+        <article class="ref-service-row" id="personal-care">
           
-          <!-- Category 1 Panel: Core Hygiene & Daily Living -->
-          <div class="slide-from-left service-row3-panel" style="background: var(--white); border: 2px solid #CBD5E1; border-top: 4px solid var(--teal-green); border-radius: 8px; padding: 2rem 1.8rem; box-shadow: var(--shadow-soft);">
-            <div class="service-row3-panel-header" style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; padding-bottom: 0.8rem; border-bottom: 1px solid #E2E8F0;">
-              <div style="width: 10px; height: 10px; border-radius: 50%; background: var(--teal-green);"></div>
-              <h4 style="font-family: var(--font-heading); font-size: 1.1rem; color: var(--navy); margin: 0; text-transform: uppercase; letter-spacing: 0.5px;">Core Hygiene &amp; Daily Living</h4>
+          <!-- Image with Floating Circular Badge -->
+          <div class="ref-media-col">
+            <div class="ref-circular-badge" title="Personal Care Support">
+              <i data-lucide="heart-pulse"></i>
             </div>
-
-            <div class="roles-stagger-list" style="display: flex; flex-direction: column; gap: 1rem;">
-              <div class="service-offering-card roles-stagger-item" style="--delay: 0.1s; ">
-                <div class="service-icon-badge">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                </div>
-                <p class="service-offering-text">Personal hygiene support (bathing, showering, sponge baths)</p>
-              </div>
-
-              <div class="service-offering-card roles-stagger-item" style="--delay: 0.25s;">
-                <div class="service-icon-badge">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                </div>
-                <p class="service-offering-text">Assistance with dressing and undressing</p>
-              </div>
-
-              <div class="service-offering-card roles-stagger-item" style="--delay: 0.4s;">
-                <div class="service-icon-badge">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                </div>
-                <p class="service-offering-text">Grooming services (shaving, hair care, personal care)</p>
-              </div>
-
-              <div class="service-offering-card roles-stagger-item" style="--delay: 0.55s;">
-                <div class="service-icon-badge">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                </div>
-                <p class="service-offering-text">Continence care and support</p>
-              </div>
-
-              <div class="service-offering-card roles-stagger-item" style="--delay: 0.7s;">
-                <div class="service-icon-badge">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                </div>
-                <p class="service-offering-text">Assistance with eating and drinking</p>
-              </div>
+            <div class="ref-image-wrapper">
+              <img src="assets/images/service_personal_care.jpg" alt="Personal Care Support">
             </div>
           </div>
 
-          <!-- Category 2 Panel: Health, Mobility & Therapy -->
-          <div class="slide-from-right service-row3-panel" style="background: var(--white); border: 2px solid #CBD5E1; border-top: 4px solid var(--sky-blue); border-radius: 8px; padding: 2rem 1.8rem; box-shadow: var(--shadow-soft);">
-            <div class="service-row3-panel-header" style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; padding-bottom: 0.8rem; border-bottom: 1px solid #E2E8F0;">
-              <div style="width: 10px; height: 10px; border-radius: 50%; background: var(--sky-blue);"></div>
-              <h4 style="font-family: var(--font-heading); font-size: 1.1rem; color: var(--navy); margin: 0; text-transform: uppercase; letter-spacing: 0.5px;">Health, Mobility &amp; Supervision</h4>
+          <!-- Content Column with Micro-Pill Tag Cloud -->
+          <div class="ref-content-col">
+            <h3 class="ref-service-title">Personal Care Support</h3>
+            <p class="ref-service-desc">
+              We provide comprehensive, person-centered support to promote independence, dignity, and overall well-being. Our focus is to deliver compassionate care tailored to meet unique needs in the comfort of home and community.
+            </p>
+
+            <!-- Micro-Pill Tag Cloud -->
+            <div class="ref-pills-cloud">
+              <span class="ref-micro-pill"><span class="ref-pill-check">✓</span> Hygiene &amp; Bathing</span>
+              <span class="ref-micro-pill"><span class="ref-pill-check">✓</span> Dressing &amp; Grooming</span>
+              <span class="ref-micro-pill"><span class="ref-pill-check">✓</span> Continence Care</span>
+              <span class="ref-micro-pill"><span class="ref-pill-check">✓</span> Eating Assistance</span>
+              <span class="ref-micro-pill"><span class="ref-pill-check">✓</span> Rehab &amp; Therapies</span>
+              <span class="ref-micro-pill"><span class="ref-pill-check">✓</span> Medication Reminders</span>
+              <span class="ref-micro-pill"><span class="ref-pill-check">✓</span> Safe Transfers &amp; Mobility</span>
+              <span class="ref-micro-pill"><span class="ref-pill-check">✓</span> Meal Planning</span>
             </div>
 
-            <div class="roles-stagger-list" style="display: flex; flex-direction: column; gap: 1rem;">
-              <div class="service-offering-card roles-stagger-item" style="--delay: 0.1s; ">
-                <div class="service-icon-badge">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                </div>
-                <p class="service-offering-text">Support with rehabilitation programs &amp; therapies</p>
-              </div>
+            <a href="contact.html" class="ref-pill-btn">Learn More</a>
+          </div>
 
-              <div class="service-offering-card roles-stagger-item" style="--delay: 0.25s;">
-                <div class="service-icon-badge">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                </div>
-                <p class="service-offering-text">Medication supervision and reminders</p>
-              </div>
+        </article>
 
-              <div class="service-offering-card roles-stagger-item" style="--delay: 0.4s;">
-                <div class="service-icon-badge">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                </div>
-                <p class="service-offering-text">Assistance with mobility, transfers, and safe movement</p>
-              </div>
-
-              <div class="service-offering-card roles-stagger-item" style="--delay: 0.55s;">
-                <div class="service-icon-badge">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                </div>
-                <p class="service-offering-text">Support with the use of aids and assistive devices</p>
-              </div>
-
-              <div class="service-offering-card roles-stagger-item" style="--delay: 0.7s;">
-                <div class="service-icon-badge">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                </div>
-                <p class="service-offering-text">Meal planning and food preparation</p>
-              </div>
+        <!-- ===================================================================
+             2. TRAVELLING NURSING PROGRAM (CONTENT LEFT, IMAGE RIGHT - REVERSE)
+             =================================================================== -->
+        <article class="ref-service-row reverse-row" id="travelling-nursing">
+          
+          <!-- Image with Floating Circular Badge -->
+          <div class="ref-media-col">
+            <div class="ref-circular-badge" title="Travelling Nursing Program">
+              <i data-lucide="map-pin"></i>
+            </div>
+            <div class="ref-image-wrapper">
+              <img src="assets/images/service_travel_nurse.jpg" alt="Travelling Nursing Program">
             </div>
           </div>
 
-        </div>
+          <!-- Content Column with Micro-Pill Tag Cloud -->
+          <div class="ref-content-col">
+            <h3 class="ref-service-title">Travelling Nursing Program</h3>
+            <p class="ref-service-desc">
+              Bringing expert nursing care directly to where it's needed most. High-quality, on-demand clinical care delivered in homes, retirement residences, long-term care facilities, and community settings across Canada.
+            </p>
+
+            <!-- Micro-Pill Tag Cloud -->
+            <div class="ref-pills-cloud">
+              <span class="ref-micro-pill"><span class="ref-pill-check">✓</span> On-Site Assessments</span>
+              <span class="ref-micro-pill"><span class="ref-pill-check">✓</span> Wound &amp; Dressing Care</span>
+              <span class="ref-micro-pill"><span class="ref-pill-check">✓</span> Chronic Disease Care</span>
+              <span class="ref-micro-pill"><span class="ref-pill-check">✓</span> Medication Administration</span>
+              <span class="ref-micro-pill"><span class="ref-pill-check">✓</span> Post-Discharge Follow-Up</span>
+              <span class="ref-micro-pill"><span class="ref-pill-check">✓</span> Rehab Care Planning</span>
+              <span class="ref-micro-pill"><span class="ref-pill-check">✓</span> Wellness Coaching</span>
+              <span class="ref-micro-pill"><span class="ref-pill-check">✓</span> Physician Collaboration</span>
+            </div>
+
+            <a href="contact.html" class="ref-pill-btn">Learn More</a>
+          </div>
+
+        </article>
+
+        <!-- ===================================================================
+             3. SUPPORT & COMPANIONSHIP (IMAGE LEFT, CONTENT RIGHT)
+             =================================================================== -->
+        <article class="ref-service-row" id="companionship">
+          
+          <!-- Image with Floating Circular Badge -->
+          <div class="ref-media-col">
+            <div class="ref-circular-badge" title="Support &amp; Companionship">
+              <i data-lucide="heart-handshake"></i>
+            </div>
+            <div class="ref-image-wrapper">
+              <img src="assets/images/service_companionship.jpg" alt="Support and Companionship">
+            </div>
+          </div>
+
+          <!-- Content Column with Micro-Pill Tag Cloud -->
+          <div class="ref-content-col">
+            <h3 class="ref-service-title">Support &amp; Companionship</h3>
+            <p class="ref-service-desc">
+              Enhancing quality of life through meaningful social interaction, emotional support, and assistance with day-to-day community activities, promoting independence and reducing isolation.
+            </p>
+
+            <!-- Micro-Pill Tag Cloud -->
+            <div class="ref-pills-cloud">
+              <span class="ref-micro-pill"><span class="ref-pill-check">✓</span> Medical Appt. Escort</span>
+              <span class="ref-micro-pill"><span class="ref-pill-check">✓</span> Social &amp; Community Outings</span>
+              <span class="ref-micro-pill"><span class="ref-pill-check">✓</span> Grocery Shopping &amp; Errands</span>
+              <span class="ref-micro-pill"><span class="ref-pill-check">✓</span> Light Physical Exercise</span>
+              <span class="ref-micro-pill"><span class="ref-pill-check">✓</span> Therapeutic Activities</span>
+              <span class="ref-micro-pill"><span class="ref-pill-check">✓</span> Leisure &amp; Board Games</span>
+            </div>
+
+            <a href="contact.html" class="ref-pill-btn">Learn More</a>
+          </div>
+
+        </article>
+
+        <!-- ===================================================================
+             4. RESPITE CARE SERVICES (CONTENT LEFT, IMAGE RIGHT - REVERSE)
+             =================================================================== -->
+        <article class="ref-service-row reverse-row" id="respite-care">
+          
+          <!-- Image with Floating Circular Badge -->
+          <div class="ref-media-col">
+            <div class="ref-circular-badge" title="Respite Care Services">
+              <i data-lucide="shield-check"></i>
+            </div>
+            <div class="ref-image-wrapper">
+              <img src="assets/images/service_respite_care.jpg" alt="Respite Care Services">
+            </div>
+          </div>
+
+          <!-- Content Column with Micro-Pill Tag Cloud -->
+          <div class="ref-content-col">
+            <h3 class="ref-service-title">Respite Care Services</h3>
+            <p class="ref-service-desc">
+              Flexible and reliable respite care services designed to support primary caregivers while ensuring continuity of high-quality care for loved ones with dignity, safety, and individualized relief.
+            </p>
+
+            <!-- Micro-Pill Tag Cloud -->
+            <div class="ref-pills-cloud">
+              <span class="ref-micro-pill"><span class="ref-pill-check">✓</span> Primary Caregiver Relief</span>
+              <span class="ref-micro-pill"><span class="ref-pill-check">✓</span> High-Needs Attendant Care</span>
+              <span class="ref-micro-pill"><span class="ref-pill-check">✓</span> Emotional Social Support</span>
+              <span class="ref-micro-pill"><span class="ref-pill-check">✓</span> Responsive Behavior Care</span>
+              <span class="ref-micro-pill"><span class="ref-pill-check">✓</span> Community Outings</span>
+            </div>
+
+            <a href="contact.html" class="ref-pill-btn">Learn More</a>
+          </div>
+
+        </article>
+
+        <!-- ===================================================================
+             5. LIGHT HOUSEHOLD SUPPORT (IMAGE LEFT, CONTENT RIGHT)
+             =================================================================== -->
+        <article class="ref-service-row" id="household-support">
+          
+          <!-- Image with Floating Circular Badge -->
+          <div class="ref-media-col">
+            <div class="ref-circular-badge" title="Light Household Support">
+              <i data-lucide="home"></i>
+            </div>
+            <div class="ref-image-wrapper">
+              <img src="assets/images/service_household_support.jpg" alt="Light Household Support">
+            </div>
+          </div>
+
+          <!-- Content Column with Micro-Pill Tag Cloud -->
+          <div class="ref-content-col">
+            <h3 class="ref-service-title">Light Household Support</h3>
+            <p class="ref-service-desc">
+              Assistance with light household tasks to help maintain a clean, safe, and comfortable living environment while supporting independence, respect, and personal attention to detail.
+            </p>
+
+            <!-- Micro-Pill Tag Cloud -->
+            <div class="ref-pills-cloud">
+              <span class="ref-micro-pill"><span class="ref-pill-check">✓</span> Kitchen Cleaning &amp; Tidying</span>
+              <span class="ref-micro-pill"><span class="ref-pill-check">✓</span> Vacuuming &amp; Dusting</span>
+              <span class="ref-micro-pill"><span class="ref-pill-check">✓</span> Sweeping &amp; Floor Care</span>
+              <span class="ref-micro-pill"><span class="ref-pill-check">✓</span> Meal Preparation &amp; Cooking</span>
+              <span class="ref-micro-pill"><span class="ref-pill-check">✓</span> Day-to-Day Shopping</span>
+            </div>
+
+            <a href="contact.html" class="ref-pill-btn">Learn More</a>
+          </div>
+
+        </article>
+
+        <!-- ===================================================================
+             6. ALZHEIMER'S & DEMENTIA CARE (CONTENT LEFT, IMAGE RIGHT - REVERSE)
+             =================================================================== -->
+        <article class="ref-service-row reverse-row" id="dementia-care">
+          
+          <!-- Image with Floating Circular Badge -->
+          <div class="ref-media-col">
+            <div class="ref-circular-badge" title="Alzheimer's &amp; Dementia Care">
+              <i data-lucide="brain"></i>
+            </div>
+            <div class="ref-image-wrapper">
+              <img src="assets/images/service_dementia_care.jpg" alt="Alzheimer's and Dementia Care">
+            </div>
+          </div>
+
+          <!-- Content Column with Micro-Pill Tag Cloud -->
+          <div class="ref-content-col">
+            <h3 class="ref-service-title">Alzheimer’s &amp; Dementia Care</h3>
+            <p class="ref-service-desc">
+              Compassionate, person-centered support for individuals living with Alzheimer’s disease and other forms of dementia, focusing on dignity, safety, comfort, and structured daily routines.
+            </p>
+
+            <!-- Micro-Pill Tag Cloud -->
+            <div class="ref-pills-cloud">
+              <span class="ref-micro-pill"><span class="ref-pill-check">✓</span> Relationship-Based Care</span>
+              <span class="ref-micro-pill"><span class="ref-pill-check">✓</span> Cognitive Stimulation</span>
+              <span class="ref-micro-pill"><span class="ref-pill-check">✓</span> Structured Environment</span>
+              <span class="ref-micro-pill"><span class="ref-pill-check">✓</span> Patience &amp; Empathy</span>
+              <span class="ref-micro-pill"><span class="ref-pill-check">✓</span> Daily ADL Routine Guidance</span>
+            </div>
+
+            <a href="contact.html" class="ref-pill-btn">Learn More</a>
+          </div>
+
+        </article>
+
       </div>
-
     </div>
   </section>
 
-  <!-- SEGMENT 2: TRAVELLING NURSING PROGRAM (FULL-WIDTH 3-ROW ARCHITECTURE) -->
-  <section id="travelling-nursing" class="section-padding geometric-ribbon-section sharp-top-slant-right">
-    <div class="container sectors-section" style="max-width: 1440px;">
-      
-      <!-- Row 1: Header Bar & Category Badge -->
-      <div class="service-section-header-row" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 2.2rem; border-bottom: 2px solid rgba(27, 174, 207, 0.2); padding-bottom: 1.2rem;">
-        <div class="accent-heading-wrapper" style="margin-bottom: 0;">
-          <h2 class="welcome-title" style="margin-bottom: 0;">Travelling Nursing <span class="brand-highlight">PROGRAM</span></h2>
-          <div class="welcome-accent-line"></div>
-        </div>
-        <span class="service-section-badge" style="font-family: var(--font-heading); font-size: 0.82rem; font-weight: 800; color: var(--sky-blue); background: rgba(27, 174, 207, 0.12); padding: 0.5rem 1.2rem; border-radius: 4px; text-transform: uppercase; letter-spacing: 1px;">ON-DEMAND CLINICAL CARE</span>
+  <!-- =========================================================================
+       QUICK CONTACT CALLOUT BANNER (SHARP TOP SLANT RIGHT)
+       ========================================================================= -->
+  <section class="callout-banner-section sharp-top-slant-right">
+    <div class="container callout-banner-grid">
+      <div class="callout-text-block">
+        <h3>Ready to Request Staffing or Community Care?</h3>
+        <p>Our clinical coordination desk operates 24/7. Speak directly with our dispatch supervisors across Ontario.</p>
       </div>
 
-      <!-- Row 2: Narrative Overview & Image -->
-      <div class="service-row2-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 3.5rem; align-items: center; margin-bottom: 3.5rem;">
-        <div class="slide-from-left">
-          <div class="narrative-card narrative-card-teal">
-            <p>Bringing expert nursing care directly to where it's needed most. High-quality, on-demand clinical care delivered in homes, retirement residences, long-term care facilities, and community settings across Canada.</p>
-          </div>
-          <div style="background: var(--white); border: 2px solid #CBD5E1; border-left: 5px solid var(--sky-blue); border-radius: 8px; padding: 1.6rem; box-shadow: var(--shadow-soft);">
-            <strong style="font-family: var(--font-heading); font-size: 1.05rem; color: var(--navy); display: block; margin-bottom: 0.4rem;">On-Demand Expertise</strong>
-            <p style="font-size: 0.92rem; color: #475569; margin: 0; font-style: italic;">"Clinical excellence delivered directly to homes, retirement residences, and facilities."</p>
-          </div>
-        </div>
-
-        <div class="slide-from-right" style="border-radius: 12px; overflow: hidden; box-shadow: var(--shadow-hover); height: 320px;">
-          <img src="assets/images/service_travel_nurse.jpg" alt="Travelling Nursing Program" style="width: 100%; height: 320px; object-fit: cover; object-position: top center; display: block;">
-        </div>
+      <div class="callout-btn-group">
+        <a href="tel:+16472106463" class="btn btn-pill-hero">CALL +1 (647) 210-6463</a>
+        <a href="contact.html" class="btn btn-pill-outline">CONTACT US PAGE</a>
       </div>
-
-      <!-- Row 3: Included Offerings & Capabilities (CATEGORIZED DUAL-GROUP PANELS) -->
-      <div>
-        <h3 class="service-row3-subheader" style="font-family: var(--font-heading); font-size: 1.3rem; color: var(--navy); margin-bottom: 1.8rem; text-transform: uppercase; letter-spacing: 0.5px;">Clinical Services Included:</h3>
-        
-        <div class="service-row3-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 2rem; align-items: start;">
-          
-          <!-- Category 1 Panel: Clinical Assessment & Wound Care -->
-          <div class="slide-from-left service-row3-panel" style="background: var(--white); border: 2px solid #CBD5E1; border-top: 4px solid var(--sky-blue); border-radius: 8px; padding: 2rem 1.8rem; box-shadow: var(--shadow-soft);">
-            <div class="service-row3-panel-header" style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; padding-bottom: 0.8rem; border-bottom: 1px solid #E2E8F0;">
-              <div style="width: 10px; height: 10px; border-radius: 50%; background: var(--sky-blue);"></div>
-              <h4 style="font-family: var(--font-heading); font-size: 1.1rem; color: var(--navy); margin: 0; text-transform: uppercase; letter-spacing: 0.5px;">Clinical Assessment &amp; Wound Care</h4>
-            </div>
-
-            <div class="roles-stagger-list" style="display: flex; flex-direction: column; gap: 1rem;">
-              <div class="service-offering-card roles-stagger-item" style="--delay: 0.1s; ">
-                <div class="service-icon-badge">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                </div>
-                <p class="service-offering-text">On-site health assessments &amp; clinical monitoring</p>
-              </div>
-
-              <div class="service-offering-card roles-stagger-item" style="--delay: 0.25s;">
-                <div class="service-icon-badge">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                </div>
-                <p class="service-offering-text">Wound care &amp; advanced dressing management</p>
-              </div>
-
-              <div class="service-offering-card roles-stagger-item" style="--delay: 0.4s;">
-                <div class="service-icon-badge">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                </div>
-                <p class="service-offering-text">Chronic disease monitoring &amp; management</p>
-              </div>
-
-              <div class="service-offering-card roles-stagger-item" style="--delay: 0.55s;">
-                <div class="service-icon-badge">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                </div>
-                <p class="service-offering-text">Preventive care, health education, &amp; wellness coaching</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Category 2 Panel: Medication & Care Coordination -->
-          <div class="slide-from-right service-row3-panel" style="background: var(--white); border: 2px solid #CBD5E1; border-top: 4px solid var(--teal-green); border-radius: 8px; padding: 2rem 1.8rem; box-shadow: var(--shadow-soft);">
-            <div class="service-row3-panel-header" style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; padding-bottom: 0.8rem; border-bottom: 1px solid #E2E8F0;">
-              <div style="width: 10px; height: 10px; border-radius: 50%; background: var(--teal-green);"></div>
-              <h4 style="font-family: var(--font-heading); font-size: 1.1rem; color: var(--navy); margin: 0; text-transform: uppercase; letter-spacing: 0.5px;">Medication &amp; Care Coordination</h4>
-            </div>
-
-            <div class="roles-stagger-list" style="display: flex; flex-direction: column; gap: 1rem;">
-              <div class="service-offering-card roles-stagger-item" style="--delay: 0.1s; ">
-                <div class="service-icon-badge">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                </div>
-                <p class="service-offering-text">Medication administration &amp; adherence support</p>
-              </div>
-
-              <div class="service-offering-card roles-stagger-item" style="--delay: 0.25s;">
-                <div class="service-icon-badge">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                </div>
-                <p class="service-offering-text">Post-discharge follow-up care to reduce readmissions</p>
-              </div>
-
-              <div class="service-offering-card roles-stagger-item" style="--delay: 0.4s;">
-                <div class="service-icon-badge">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                </div>
-                <p class="service-offering-text">Rehabilitation support &amp; coordinated care planning</p>
-              </div>
-
-              <div class="service-offering-card roles-stagger-item" style="--delay: 0.55s;">
-                <div class="service-icon-badge">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                </div>
-                <p class="service-offering-text">Collaboration with physicians &amp; care teams</p>
-              </div>
-            </div>
-          </div>
-
-        </div>
-      </div>
-
     </div>
   </section>
-
-  <!-- SEGMENT 3: COMPANIONSHIP & SOCIAL SUPPORT (FULL-WIDTH 3-ROW ARCHITECTURE) -->
-  <section id="companionship" class="section-padding geometric-ribbon-cyan sharp-top-slant-left">
-    <div class="container sectors-section" style="max-width: 1440px;">
-      
-      <!-- Row 1: Header Bar & Category Badge -->
-      <div class="service-section-header-row" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 2.2rem; border-bottom: 2px solid rgba(78, 205, 196, 0.2); padding-bottom: 1.2rem;">
-        <div class="accent-heading-wrapper" style="margin-bottom: 0;">
-          <h2 class="welcome-title" style="margin-bottom: 0;">Companionship &amp; <span class="brand-highlight">SUPPORT</span></h2>
-          <div class="welcome-accent-line"></div>
-        </div>
-        <span class="service-section-badge" style="font-family: var(--font-heading); font-size: 0.82rem; font-weight: 800; color: var(--cyan-turquoise); background: rgba(78, 205, 196, 0.12); padding: 0.5rem 1.2rem; border-radius: 4px; text-transform: uppercase; letter-spacing: 1px;">COMPANIONSHIP &amp; ENGAGEMENT</span>
-      </div>
-
-      <!-- Row 2: Narrative Overview & Image -->
-      <div class="service-row2-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 3.5rem; align-items: center; margin-bottom: 3.5rem;">
-        <div class="slide-from-left">
-          <div class="narrative-card narrative-card-teal">
-            <p>Enhancing quality of life through meaningful social interaction, emotional support, and assistance with day-to-day community activities.</p>
-          </div>
-          <div style="background: var(--white); border: 2px solid #CBD5E1; border-left: 5px solid var(--cyan-turquoise); border-radius: 8px; padding: 1.6rem; box-shadow: var(--shadow-soft);">
-            <strong style="font-family: var(--font-heading); font-size: 1.05rem; color: var(--navy); display: block; margin-bottom: 0.4rem;">Social Well-Being Focus</strong>
-            <p style="font-size: 0.92rem; color: #475569; margin: 0; font-style: italic;">"Promoting independence, reducing isolation, and enriching everyday living."</p>
-          </div>
-        </div>
-
-        <div class="slide-from-right" style="border-radius: 12px; overflow: hidden; box-shadow: var(--shadow-hover); height: 320px;">
-          <img src="assets/images/service_companionship.jpg" alt="Support and Companionship" style="width: 100%; height: 320px; object-fit: cover; object-position: top center; display: block;">
-        </div>
-      </div>
-
-      <!-- Row 3: Included Offerings & Capabilities (CATEGORIZED DUAL-GROUP PANELS) -->
-      <div>
-        <h3 class="service-row3-subheader" style="font-family: var(--font-heading); font-size: 1.3rem; color: var(--navy); margin-bottom: 1.8rem; text-transform: uppercase; letter-spacing: 0.5px;">Companionship Offerings:</h3>
-        
-        <div class="service-row3-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 2rem; align-items: start;">
-          
-          <!-- Category 1 Panel: Social Interaction & Outings -->
-          <div class="slide-from-left service-row3-panel" style="background: var(--white); border: 2px solid #CBD5E1; border-top: 4px solid var(--cyan-turquoise); border-radius: 8px; padding: 2rem 1.8rem; box-shadow: var(--shadow-soft);">
-            <div class="service-row3-panel-header" style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; padding-bottom: 0.8rem; border-bottom: 1px solid #E2E8F0;">
-              <div style="width: 10px; height: 10px; border-radius: 50%; background: var(--cyan-turquoise);"></div>
-              <h4 style="font-family: var(--font-heading); font-size: 1.1rem; color: var(--navy); margin: 0; text-transform: uppercase; letter-spacing: 0.5px;">Social Interaction &amp; Errands</h4>
-            </div>
-
-            <div class="roles-stagger-list" style="display: flex; flex-direction: column; gap: 1rem;">
-              <div class="service-offering-card roles-stagger-item" style="--delay: 0.1s; ">
-                <div class="service-icon-badge">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                </div>
-                <p class="service-offering-text">Transportation &amp; accompaniment to medical appointments</p>
-              </div>
-
-              <div class="service-offering-card roles-stagger-item" style="--delay: 0.25s;">
-                <div class="service-icon-badge">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                </div>
-                <p class="service-offering-text">Assistance attending social outings &amp; community events</p>
-              </div>
-
-              <div class="service-offering-card roles-stagger-item" style="--delay: 0.4s;">
-                <div class="service-icon-badge">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                </div>
-                <p class="service-offering-text">Assistance with grocery shopping and running errands</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Category 2 Panel: Physical & Leisure Engagement -->
-          <div class="slide-from-right service-row3-panel" style="background: var(--white); border: 2px solid #CBD5E1; border-top: 4px solid var(--teal-green); border-radius: 8px; padding: 2rem 1.8rem; box-shadow: var(--shadow-soft);">
-            <div class="service-row3-panel-header" style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; padding-bottom: 0.8rem; border-bottom: 1px solid #E2E8F0;">
-              <div style="width: 10px; height: 10px; border-radius: 50%; background: var(--teal-green);"></div>
-              <h4 style="font-family: var(--font-heading); font-size: 1.1rem; color: var(--navy); margin: 0; text-transform: uppercase; letter-spacing: 0.5px;">Physical &amp; Therapeutic Activity</h4>
-            </div>
-
-            <div class="roles-stagger-list" style="display: flex; flex-direction: column; gap: 1rem;">
-              <div class="service-offering-card roles-stagger-item" style="--delay: 0.1s; ">
-                <div class="service-icon-badge">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                </div>
-                <p class="service-offering-text">Support with light physical exercise &amp; walking</p>
-              </div>
-
-              <div class="service-offering-card roles-stagger-item" style="--delay: 0.25s;">
-                <div class="service-icon-badge">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                </div>
-                <p class="service-offering-text">Support with rehabilitation &amp; therapeutic activities</p>
-              </div>
-
-              <div class="service-offering-card roles-stagger-item" style="--delay: 0.4s;">
-                <div class="service-icon-badge">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                </div>
-                <p class="service-offering-text">Engagement in leisure activities (board games, cards)</p>
-              </div>
-            </div>
-          </div>
-
-        </div>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- SEGMENT 4: RESPITE CARE SERVICES (FULL-WIDTH 3-ROW ARCHITECTURE) -->
-  <section id="respite-care" class="section-padding geometric-ribbon-section sharp-top-slant-right">
-    <div class="container sectors-section" style="max-width: 1440px;">
-      
-      <!-- Row 1: Header Bar & Category Badge -->
-      <div class="service-section-header-row" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 2.2rem; border-bottom: 2px solid rgba(0, 168, 150, 0.2); padding-bottom: 1.2rem;">
-        <div class="accent-heading-wrapper" style="margin-bottom: 0;">
-          <h2 class="welcome-title" style="margin-bottom: 0;">Respite Care <span class="brand-highlight">SERVICES</span></h2>
-          <div class="welcome-accent-line"></div>
-        </div>
-        <span class="service-section-badge" style="font-family: var(--font-heading); font-size: 0.82rem; font-weight: 800; color: var(--teal-green); background: rgba(0, 168, 150, 0.12); padding: 0.5rem 1.2rem; border-radius: 4px; text-transform: uppercase; letter-spacing: 1px;">CAREGIVER RELIEF &amp; ATTENDANT CARE</span>
-      </div>
-
-      <!-- Row 2: Narrative Overview & Image -->
-      <div class="service-row2-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 3.5rem; align-items: center; margin-bottom: 3.5rem;">
-        <div class="slide-from-left">
-          <div class="narrative-card narrative-card-teal">
-            <p>Flexible and reliable respite care services designed to support primary caregivers while ensuring continuity of high-quality care for loved ones.</p>
-          </div>
-          <div style="background: var(--white); border: 2px solid #CBD5E1; border-left: 5px solid var(--teal-green); border-radius: 8px; padding: 1.6rem; box-shadow: var(--shadow-soft);">
-            <strong style="font-family: var(--font-heading); font-size: 1.05rem; color: var(--navy); display: block; margin-bottom: 0.4rem;">Caregiver Relief Principle</strong>
-            <p style="font-size: 0.92rem; color: #475569; margin: 0; font-style: italic;">"Emphasizing dignity, safety, and individualized relief for primary family caregivers."</p>
-          </div>
-        </div>
-
-        <div class="slide-from-right" style="border-radius: 12px; overflow: hidden; box-shadow: var(--shadow-hover); height: 320px;">
-          <img src="assets/images/service_respite_care.jpg" alt="Respite Care Services" style="width: 100%; height: 320px; object-fit: cover; object-position: top center; display: block;">
-        </div>
-      </div>
-
-      <!-- Row 3: Included Offerings & Capabilities (CATEGORIZED DUAL-GROUP PANELS) -->
-      <div>
-        <h3 class="service-row3-subheader" style="font-family: var(--font-heading); font-size: 1.3rem; color: var(--navy); margin-bottom: 1.8rem; text-transform: uppercase; letter-spacing: 0.5px;">Respite Support Included:</h3>
-        
-        <div class="service-row3-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 2rem; align-items: start;">
-          
-          <!-- Category 1 Panel: Caregiver Relief & Attendant Care -->
-          <div class="slide-from-left service-row3-panel" style="background: var(--white); border: 2px solid #CBD5E1; border-top: 4px solid var(--teal-green); border-radius: 8px; padding: 2rem 1.8rem; box-shadow: var(--shadow-soft);">
-            <div class="service-row3-panel-header" style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; padding-bottom: 0.8rem; border-bottom: 1px solid #E2E8F0;">
-              <div style="width: 10px; height: 10px; border-radius: 50%; background: var(--teal-green);"></div>
-              <h4 style="font-family: var(--font-heading); font-size: 1.1rem; color: var(--navy); margin: 0; text-transform: uppercase; letter-spacing: 0.5px;">Primary Caregiver Relief</h4>
-            </div>
-
-            <div class="roles-stagger-list" style="display: flex; flex-direction: column; gap: 1rem;">
-              <div class="service-offering-card roles-stagger-item" style="--delay: 0.1s; ">
-                <div class="service-icon-badge">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                </div>
-                <p class="service-offering-text">Temporary relief for primary caregivers (rest &amp; personal needs)</p>
-              </div>
-
-              <div class="service-offering-card roles-stagger-item" style="--delay: 0.25s;">
-                <div class="service-icon-badge">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                </div>
-                <p class="service-offering-text">High-needs attendant care for intellectual/physical disabilities</p>
-              </div>
-
-              <div class="service-offering-card roles-stagger-item" style="--delay: 0.4s;">
-                <div class="service-icon-badge">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                </div>
-                <p class="service-offering-text">Social support to promote emotional well-being</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Category 2 Panel: Behavioral & Community Support -->
-          <div class="slide-from-right service-row3-panel" style="background: var(--white); border: 2px solid #CBD5E1; border-top: 4px solid var(--sky-blue); border-radius: 8px; padding: 2rem 1.8rem; box-shadow: var(--shadow-soft);">
-            <div class="service-row3-panel-header" style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; padding-bottom: 0.8rem; border-bottom: 1px solid #E2E8F0;">
-              <div style="width: 10px; height: 10px; border-radius: 50%; background: var(--sky-blue);"></div>
-              <h4 style="font-family: var(--font-heading); font-size: 1.1rem; color: var(--navy); margin: 0; text-transform: uppercase; letter-spacing: 0.5px;">Behavioral &amp; Community Outings</h4>
-            </div>
-
-            <div class="roles-stagger-list" style="display: flex; flex-direction: column; gap: 1rem;">
-              <div class="service-offering-card roles-stagger-item" style="--delay: 0.1s; ">
-                <div class="service-icon-badge">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                </div>
-                <p class="service-offering-text">Patient support for responsive or challenging behaviors</p>
-              </div>
-
-              <div class="service-offering-card roles-stagger-item" style="--delay: 0.25s;">
-                <div class="service-icon-badge">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                </div>
-                <p class="service-offering-text">Companionship &amp; assistance with community outings</p>
-              </div>
-            </div>
-          </div>
-
-        </div>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- SEGMENT 5: LIGHT HOUSEHOLD SUPPORT SERVICES (FULL-WIDTH 3-ROW ARCHITECTURE) -->
-  <section id="household-support" class="section-padding geometric-ribbon-cyan sharp-top-slant-left">
-    <div class="container sectors-section" style="max-width: 1440px;">
-      
-      <!-- Row 1: Header Bar & Category Badge -->
-      <div class="service-section-header-row" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 2.2rem; border-bottom: 2px solid rgba(27, 174, 207, 0.2); padding-bottom: 1.2rem;">
-        <div class="accent-heading-wrapper" style="margin-bottom: 0;">
-          <h2 class="welcome-title" style="margin-bottom: 0;">Light Household <span class="brand-highlight">SUPPORT</span></h2>
-          <div class="welcome-accent-line"></div>
-        </div>
-        <span class="service-section-badge" style="font-family: var(--font-heading); font-size: 0.82rem; font-weight: 800; color: var(--sky-blue); background: rgba(27, 174, 207, 0.12); padding: 0.5rem 1.2rem; border-radius: 4px; text-transform: uppercase; letter-spacing: 1px;">HOME ENVIRONMENT &amp; MEAL PREP</span>
-      </div>
-
-      <!-- Row 2: Narrative Overview & Image -->
-      <div class="service-row2-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 3.5rem; align-items: center; margin-bottom: 3.5rem;">
-        <div class="slide-from-left">
-          <div class="narrative-card narrative-card-teal">
-            <p>Assistance with light household tasks to help maintain a clean, safe, and comfortable living environment while supporting independence.</p>
-          </div>
-          <div style="background: var(--white); border: 2px solid #CBD5E1; border-left: 5px solid var(--sky-blue); border-radius: 8px; padding: 1.6rem; box-shadow: var(--shadow-soft);">
-            <strong style="font-family: var(--font-heading); font-size: 1.05rem; color: var(--navy); display: block; margin-bottom: 0.4rem;">Safe Home Living</strong>
-            <p style="font-size: 0.92rem; color: #475569; margin: 0; font-style: italic;">"Delivered with respect, reliability, and personal attention to details."</p>
-          </div>
-        </div>
-
-        <div class="slide-from-right" style="border-radius: 12px; overflow: hidden; box-shadow: var(--shadow-hover); height: 320px;">
-          <img src="assets/images/service_household_support.jpg" alt="Light Household Support" style="width: 100%; height: 320px; object-fit: cover; object-position: top center; display: block;">
-        </div>
-      </div>
-
-      <!-- Row 3: Included Offerings & Capabilities (CATEGORIZED DUAL-GROUP PANELS) -->
-      <div>
-        <h3 class="service-row3-subheader" style="font-family: var(--font-heading); font-size: 1.3rem; color: var(--navy); margin-bottom: 1.8rem; text-transform: uppercase; letter-spacing: 0.5px;">Household Tasks Included:</h3>
-        
-        <div class="service-row3-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 2rem; align-items: start;">
-          
-          <!-- Category 1 Panel: Housekeeping & Tidying -->
-          <div class="slide-from-left service-row3-panel" style="background: var(--white); border: 2px solid #CBD5E1; border-top: 4px solid var(--sky-blue); border-radius: 8px; padding: 2rem 1.8rem; box-shadow: var(--shadow-soft);">
-            <div class="service-row3-panel-header" style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; padding-bottom: 0.8rem; border-bottom: 1px solid #E2E8F0;">
-              <div style="width: 10px; height: 10px; border-radius: 50%; background: var(--sky-blue);"></div>
-              <h4 style="font-family: var(--font-heading); font-size: 1.1rem; color: var(--navy); margin: 0; text-transform: uppercase; letter-spacing: 0.5px;">Housekeeping &amp; Tidying</h4>
-            </div>
-
-            <div class="roles-stagger-list" style="display: flex; flex-direction: column; gap: 1rem;">
-              <div class="service-offering-card roles-stagger-item" style="--delay: 0.1s; ">
-                <div class="service-icon-badge">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                </div>
-                <p class="service-offering-text">Kitchen cleaning and basic household tidying</p>
-              </div>
-
-              <div class="service-offering-card roles-stagger-item" style="--delay: 0.25s;">
-                <div class="service-icon-badge">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                </div>
-                <p class="service-offering-text">General housekeeping (vacuuming, dusting, polishing)</p>
-              </div>
-
-              <div class="service-offering-card roles-stagger-item" style="--delay: 0.4s;">
-                <div class="service-icon-badge">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                </div>
-                <p class="service-offering-text">Sweeping and light floor maintenance</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Category 2 Panel: Meals & Shopping -->
-          <div class="slide-from-right service-row3-panel" style="background: var(--white); border: 2px solid #CBD5E1; border-top: 4px solid var(--teal-green); border-radius: 8px; padding: 2rem 1.8rem; box-shadow: var(--shadow-soft);">
-            <div class="service-row3-panel-header" style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; padding-bottom: 0.8rem; border-bottom: 1px solid #E2E8F0;">
-              <div style="width: 10px; height: 10px; border-radius: 50%; background: var(--teal-green);"></div>
-              <h4 style="font-family: var(--font-heading); font-size: 1.1rem; color: var(--navy); margin: 0; text-transform: uppercase; letter-spacing: 0.5px;">Meal Prep &amp; Daily Errands</h4>
-            </div>
-
-            <div class="roles-stagger-list" style="display: flex; flex-direction: column; gap: 1rem;">
-              <div class="service-offering-card roles-stagger-item" style="--delay: 0.1s; ">
-                <div class="service-icon-badge">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                </div>
-                <p class="service-offering-text">Meal preparation and cooking support</p>
-              </div>
-
-              <div class="service-offering-card roles-stagger-item" style="--delay: 0.25s;">
-                <div class="service-icon-badge">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                </div>
-                <p class="service-offering-text">Assistance with day-to-day shopping needs</p>
-              </div>
-            </div>
-          </div>
-
-        </div>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- SEGMENT 6: ALZHEIMER'S & DEMENTIA CARE (FULL-WIDTH 3-ROW ARCHITECTURE) -->
-  <section id="dementia-care" class="section-padding geometric-ribbon-section sharp-top-slant-right">
-    <div class="container sectors-section" style="max-width: 1440px;">
-      
-      <!-- Row 1: Header Bar & Category Badge -->
-      <div class="service-section-header-row" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 2.2rem; border-bottom: 2px solid rgba(78, 205, 196, 0.2); padding-bottom: 1.2rem;">
-        <div class="accent-heading-wrapper" style="margin-bottom: 0;">
-          <h2 class="welcome-title" style="margin-bottom: 0;">Alzheimer’s &amp; Dementia <span class="brand-highlight">CARE</span></h2>
-          <div class="welcome-accent-line"></div>
-        </div>
-        <span class="service-section-badge" style="font-family: var(--font-heading); font-size: 0.82rem; font-weight: 800; color: var(--cyan-turquoise); background: rgba(78, 205, 196, 0.12); padding: 0.5rem 1.2rem; border-radius: 4px; text-transform: uppercase; letter-spacing: 1px;">MEMORY CARE &amp; COGNITIVE SUPPORT</span>
-      </div>
-
-      <!-- Row 2: Narrative Overview & Image -->
-      <div class="service-row2-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 3.5rem; align-items: center; margin-bottom: 3.5rem;">
-        <div class="slide-from-left">
-          <div class="narrative-card narrative-card-teal">
-            <p>Compassionate, person-centered support for individuals living with Alzheimer’s disease and other forms of dementia, focusing on dignity, safety, and comfort.</p>
-          </div>
-          <div style="background: var(--white); border: 2px solid #CBD5E1; border-left: 5px solid var(--cyan-turquoise); border-radius: 8px; padding: 1.6rem; box-shadow: var(--shadow-soft);">
-            <strong style="font-family: var(--font-heading); font-size: 1.05rem; color: var(--navy); display: block; margin-bottom: 0.4rem;">Memory Care Approach</strong>
-            <p style="font-size: 0.92rem; color: #475569; margin: 0; font-style: italic;">"Enhancing comfort, reducing anxiety, and supporting structured daily independence."</p>
-          </div>
-        </div>
-
-        <div class="slide-from-right" style="border-radius: 12px; overflow: hidden; box-shadow: var(--shadow-hover); height: 320px;">
-          <img src="assets/images/service_dementia_care.jpg" alt="Alzheimer's and Dementia Care" style="width: 100%; height: 320px; object-fit: cover; object-position: top center; display: block;">
-        </div>
-      </div>
-
-      <!-- Row 3: Included Offerings & Capabilities (CATEGORIZED DUAL-GROUP PANELS) -->
-      <div>
-        <h3 class="service-row3-subheader" style="font-family: var(--font-heading); font-size: 1.3rem; color: var(--navy); margin-bottom: 1.8rem; text-transform: uppercase; letter-spacing: 0.5px;">Memory Care Offerings:</h3>
-        
-        <div class="service-row3-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 2rem; align-items: start;">
-          
-          <!-- Category 1 Panel: Cognitive & Memory Engagement -->
-          <div class="slide-from-left service-row3-panel" style="background: var(--white); border: 2px solid #CBD5E1; border-top: 4px solid var(--cyan-turquoise); border-radius: 8px; padding: 2rem 1.8rem; box-shadow: var(--shadow-soft);">
-            <div class="service-row3-panel-header" style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; padding-bottom: 0.8rem; border-bottom: 1px solid #E2E8F0;">
-              <div style="width: 10px; height: 10px; border-radius: 50%; background: var(--cyan-turquoise);"></div>
-              <h4 style="font-family: var(--font-heading); font-size: 1.1rem; color: var(--navy); margin: 0; text-transform: uppercase; letter-spacing: 0.5px;">Cognitive &amp; Memory Support</h4>
-            </div>
-
-            <div class="roles-stagger-list" style="display: flex; flex-direction: column; gap: 1rem;">
-              <div class="service-offering-card roles-stagger-item" style="--delay: 0.1s; ">
-                <div class="service-icon-badge">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                </div>
-                <p class="service-offering-text">Relationship-based care tailored to individual needs</p>
-              </div>
-
-              <div class="service-offering-card roles-stagger-item" style="--delay: 0.25s;">
-                <div class="service-icon-badge">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                </div>
-                <p class="service-offering-text">Cognitive stimulation &amp; meaningful engagement</p>
-              </div>
-
-              <div class="service-offering-card roles-stagger-item" style="--delay: 0.4s;">
-                <div class="service-icon-badge">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                </div>
-                <p class="service-offering-text">Support in maintaining a familiar, structured environment</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Category 2 Panel: Empathy & Routine Guidance -->
-          <div class="slide-from-right service-row3-panel" style="background: var(--white); border: 2px solid #CBD5E1; border-top: 4px solid var(--teal-green); border-radius: 8px; padding: 2rem 1.8rem; box-shadow: var(--shadow-soft);">
-            <div class="service-row3-panel-header" style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; padding-bottom: 0.8rem; border-bottom: 1px solid #E2E8F0;">
-              <div style="width: 10px; height: 10px; border-radius: 50%; background: var(--teal-green);"></div>
-              <h4 style="font-family: var(--font-heading); font-size: 1.1rem; color: var(--navy); margin: 0; text-transform: uppercase; letter-spacing: 0.5px;">Empathy &amp; Routine Guidance</h4>
-            </div>
-
-            <div class="roles-stagger-list" style="display: flex; flex-direction: column; gap: 1rem;">
-              <div class="service-offering-card roles-stagger-item" style="--delay: 0.1s; ">
-                <div class="service-icon-badge">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                </div>
-                <p class="service-offering-text">Patience, empathy, &amp; compassionate interaction</p>
-              </div>
-
-              <div class="service-offering-card roles-stagger-item" style="--delay: 0.25s;">
-                <div class="service-icon-badge">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                </div>
-                <p class="service-offering-text">Assistance &amp; guidance with daily routines (ADLs)</p>
-              </div>
-            </div>
-          </div>
-
-        </div>
-      </div>
-
-    </div>
-  </section>ion>
 
   <!-- FOOTER -->
   <footer class="site-footer">
@@ -774,5 +388,10 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <script src="script.js?v=3.0.0"></script>
+  <script>
+    if (window.lucide) {
+      lucide.createIcons();
+    }
+  </script>
 </body>
 </html>

@@ -4,17 +4,19 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>About Us | Divine Fingers Healthcare Services Inc.</title>
-  <meta name="description" content="Learn about Divine Fingers Healthcare Services Inc. - Where Innovation Meets Compassionate Care. Providing well-vetted nurses and PSWs across Scarborough, Toronto, and Ontario.">
+  <meta name="description" content="Discover Divine Fingers Healthcare Services Inc. – delivering qualified nurses, PSWs, and healthcare staffing solutions across Ontario and Canada.">
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Open+Sans:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&family=Pacifico&display=swap" rel="stylesheet">
   
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="prototype.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
 
-  <!-- HEADER / NAVIGATION (UNCHANGED HEADER DESIGN) -->
+  <!-- HEADER / NAVIGATION -->
   <header class="site-header" id="site-header">
     <div class="header-container container">
       <a href="index.html" class="brand-logo">
@@ -70,42 +72,58 @@
     </div>
   </section>
 
-  <!-- 1. EXECUTIVE OVERVIEW SPLIT SECTION (SLIDES IN FROM THE RIGHT - SHARP TOP SLANT LEFT) -->
-  <section class="section-padding slide-from-right sharp-top-slant-left" id="executive-overview" style="background-color: var(--white); border-bottom: 1px solid #E2E8F0; overflow: hidden;">
+  <!-- =========================================================================
+       1. EXECUTIVE OVERVIEW (SHARP TOP SLANT LEFT)
+       ========================================================================= -->
+  <section class="section-padding sharp-top-slant-left" id="executive-overview" style="background-color: var(--white); overflow: hidden;">
     <div class="container sectors-section" style="max-width: 1440px;">
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 3.5rem; align-items: center;">
+      <div class="proto-split-grid">
         
-        <!-- Left Text Block -->
+        <!-- Left: Text Block & Key Highlights -->
         <div>
-          <div class="welcome-header">
-            <h2 class="welcome-title">Executive <span class="brand-highlight">OVERVIEW</span></h2>
+          <div class="accent-heading-wrapper" style="margin-bottom: 1.5rem;">
+            <h2 class="welcome-title" style="margin-bottom: 0;">
+              Executive <span class="brand-highlight">OVERVIEW</span>
+            </h2>
             <div class="welcome-accent-line"></div>
           </div>
-          <p class="welcome-text" style="font-size: 1.15rem; color: #1E293B; line-height: 1.85; margin-bottom: 1.8rem; font-weight: 500;">
+          
+          <p class="welcome-text" style="font-size: 1.15rem; color: #1E293B; line-height: 1.85; margin-bottom: 1.5rem; font-weight: 500;">
             At Divine fingers healthcare services, we value people first. We partner with healthcare organizations to craft high-quality patient centered care rooted in trusted healthcare expertise with critical thinking to achieve great result within the targeted period. Our focus is to provide well-vetted nurses and PSWs with high level skills and competency.
           </p>
 
-          <!-- Key Highlights Grid -->
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.2rem; margin-top: 1.8rem;">
-            <div style="background: var(--bg-light); border: 1.5px solid #CBD5E1; border-left: 4px solid var(--teal-green); border-radius: 8px; padding: 1.2rem 1rem;">
-              <h4 style="font-size: 1.1rem; color: var(--navy); font-weight: 800; margin-bottom: 0.2rem;">24/7 Availability</h4>
-              <p style="font-size: 0.84rem; color: #475569; margin: 0;">Continuous surge staffing dispatch</p>
+          <!-- Modern Highlight Cards -->
+          <div class="proto-exec-highlights-row">
+            <div class="proto-exec-card">
+              <div class="proto-exec-icon-box">
+                <i data-lucide="clock-3"></i>
+              </div>
+              <div>
+                <h4>24/7 Availability</h4>
+                <p>Continuous surge staffing dispatch</p>
+              </div>
             </div>
-            <div style="background: var(--bg-light); border: 1.5px solid #CBD5E1; border-left: 4px solid var(--sky-blue); border-radius: 8px; padding: 1.2rem 1rem;">
-              <h4 style="font-size: 1.1rem; color: var(--navy); font-weight: 800; margin-bottom: 0.2rem;">Qualified Staff</h4>
-              <p style="font-size: 0.84rem; color: #475569; margin: 0;">Vetted RNs, RPNs &amp; PSWs</p>
+
+            <div class="proto-exec-card card-cyan">
+              <div class="proto-exec-icon-box">
+                <i data-lucide="user-check"></i>
+              </div>
+              <div>
+                <h4>Qualified Staff</h4>
+                <p>Vetted RNs, RPNs &amp; PSWs</p>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- Right Photo Block -->
+        <!-- Right: Photo Block with Floating Badge -->
         <div style="position: relative;">
-          <div style="border-radius: 16px; overflow: hidden; box-shadow: var(--shadow-hover); border: 4px solid var(--white);">
-            <img src="assets/images/team_divine.jpg" alt="Divine Fingers Care Team" style="width: 100%; height: 380px; object-fit: cover; display: block;">
+          <div style="border-radius: var(--proto-radius-lg); overflow: hidden; box-shadow: var(--proto-shadow); border: 4px solid var(--white);">
+            <img src="assets/images/team_divine.jpg" alt="Divine Fingers Care Team" style="width: 100%; height: 420px; object-fit: cover; display: block;">
           </div>
-          <div style="position: absolute; bottom: -20px; right: 20px; background: linear-gradient(135deg, var(--teal-green) 0%, var(--sky-blue) 100%); color: var(--white); padding: 1rem 1.6rem; border-radius: 12px; box-shadow: 0 8px 24px rgba(0, 168, 150, 0.35);">
-            <span style="font-size: 0.75rem; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; display: block;">CANADIAN HEALTHCARE</span>
-            <strong style="font-size: 1.1rem;">Trusted Staffing Partner</strong>
+          <div style="position: absolute; bottom: -20px; right: 20px; background: linear-gradient(135deg, var(--proto-navy) 0%, var(--proto-teal) 100%); color: var(--white); padding: 1.1rem 1.75rem; border-radius: 14px; box-shadow: 0 12px 28px rgba(0, 168, 150, 0.35); border: 1px solid rgba(255,255,255,0.15);">
+            <span style="font-size: 0.75rem; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; display: block; color: var(--proto-cyan);">CANADIAN HEALTHCARE</span>
+            <strong style="font-size: 1.12rem; font-family: var(--font-heading);">Trusted Staffing Partner</strong>
           </div>
         </div>
 
@@ -113,148 +131,178 @@
     </div>
   </section>
 
-  <!-- 2. MISSION & VISION SPLIT FEATURE BLOCKS (SHARP TOP SLANT RIGHT) -->
-  <section class="section-padding geometric-ribbon-cyan sharp-top-slant-right">
+  <!-- =========================================================================
+       2. OUR PURPOSE & VISION (SPLIT-SCREEN STORYTELLING - SHARP TOP SLANT RIGHT)
+       ========================================================================= -->
+  <section class="section-padding sharp-top-slant-right" style="background-color: var(--proto-bg-tint); overflow: hidden;">
     <div class="container sectors-section" style="max-width: 1440px;">
-      <div class="accent-heading-wrapper" style="margin-bottom: 2.5rem;">
-        <h2 class="welcome-title" style="margin-bottom: 0;">OUR PURPOSE &amp; <span class="brand-highlight">VISION</span></h2>
-        <div class="welcome-accent-line"></div>
-      </div>
+      
+      <div class="proto-split-grid" style="align-items: center; gap: 3.5rem;">
+        
+        <!-- Left Column: Purpose Narrative Anchor -->
+        <div>
+          <span class="proto-section-eyebrow">PURPOSE-DRIVEN HEALTHCARE</span>
+          <h2 class="proto-heading-lg" style="margin-bottom: 1.25rem;">
+            Empowering healthcare organizations with trusted talent.
+          </h2>
+          <p class="proto-body-text" style="font-size: 1.05rem; line-height: 1.8; margin-bottom: 1.8rem;">
+            Divine Fingers Healthcare Services Inc. was founded on a commitment to elevate clinical standards and bridge workforce gaps. We align professional healthcare expertise, compassion, and rapid responsiveness to support healthcare providers across Canada.
+          </p>
+          <a href="services.html" class="proto-arrow-link" style="font-size: 1.02rem;">
+            Explore our staffing services <i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i>
+          </a>
+        </div>
 
-      <div class="sectors-grid" style="margin-top: 0; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));">
-        <!-- Mission Card -->
-        <article class="sector-card" style="border-top: 5px solid var(--cyan-turquoise); background: var(--white);">
-          <div class="sector-body" style="padding: 2.5rem; height: 100%; display: flex; flex-direction: column;">
-            <div class="value-icon-box">
-              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="10"></circle>
-                <circle cx="12" cy="12" r="6"></circle>
-                <circle cx="12" cy="12" r="2"></circle>
-              </svg>
+        <!-- Right Column: Stacked Interactive Mission & Vision Cards -->
+        <div class="proto-stacked-mv-cards">
+          
+          <!-- Mission Card -->
+          <article class="proto-stacked-mv-card mission-card">
+            <div class="proto-mv-badge-row">
+              <div class="proto-mv-icon-badge">
+                <i data-lucide="target" style="width: 24px; height: 24px;"></i>
+              </div>
+              <div>
+                <span class="proto-card-badge" style="margin-bottom: 0.2rem;">CORE PURPOSE</span>
+                <h3 class="proto-mv-title">OUR MISSION</h3>
+              </div>
             </div>
-            <h3 class="sector-title" style="font-size: 1.35rem; margin-bottom: 1rem;">OUR MISSION</h3>
-            <p class="sector-text" style="font-size: 0.95rem; line-height: 1.75; color: #475569; flex: 1; margin: 0;">
+            <p class="proto-mv-text" style="margin-top: 1rem;">
               To support healthcare organizations by delivering experienced, reliable, and compassionate nurses and Personal Support Workers who uphold excellence in care, professional competence, and ethical conduct.
             </p>
-          </div>
-        </article>
+          </article>
 
-        <!-- Vision Card -->
-        <article class="sector-card" style="border-top: 5px solid var(--cyan-turquoise); background: var(--white);">
-          <div class="sector-body" style="padding: 2.5rem; height: 100%; display: flex; flex-direction: column;">
-            <div class="value-icon-box">
-              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                <circle cx="12" cy="12" r="3"></circle>
-              </svg>
+          <!-- Vision Card -->
+          <article class="proto-stacked-mv-card vision-card">
+            <div class="proto-mv-badge-row">
+              <div class="proto-mv-icon-badge icon-cyan">
+                <i data-lucide="eye" style="width: 24px; height: 24px;"></i>
+              </div>
+              <div>
+                <span class="proto-card-badge" style="margin-bottom: 0.2rem; color: #00A896;">FUTURE HORIZON</span>
+                <h3 class="proto-mv-title">OUR VISION</h3>
+              </div>
             </div>
-            <h3 class="sector-title" style="font-size: 1.35rem; margin-bottom: 1rem;">OUR VISION</h3>
-            <p class="sector-text" style="font-size: 0.95rem; line-height: 1.75; color: #475569; flex: 1; margin: 0;">
+            <p class="proto-mv-text" style="margin-top: 1rem;">
               To be a leading healthcare staffing agency, delivering qualified and compassionate professionals who effectively bridge workforce gaps across the healthcare industry.
             </p>
-          </div>
-        </article>
+          </article>
+
+        </div>
+
       </div>
     </div>
   </section>
 
-  <!-- 3. OUR CORE VALUES SECTION (SHARP TOP SLANT LEFT) -->
-  <section class="sectors-section section-padding geometric-ribbon-section sharp-top-slant-left">
+  <!-- =========================================================================
+       3. OUR CORE VALUES (2x2 ARCHITECTURAL NUMBERED GRID - SHARP TOP SLANT LEFT)
+       ========================================================================= -->
+  <section class="proto-tricard-section section-padding geometric-ribbon-section sharp-top-slant-left">
     <div class="container">
       <div class="accent-heading-wrapper" style="margin-bottom: 2.5rem;">
         <h2 class="welcome-title" style="margin-bottom: 0;">OUR CORE <span class="brand-highlight">VALUES</span></h2>
         <div class="welcome-accent-line"></div>
       </div>
 
-      <div class="sectors-grid" style="margin-top: 0;">
-        <!-- Value 1 -->
-        <article class="sector-card" style="border-top: 5px solid var(--cyan-turquoise); background: var(--white);">
-          <div class="sector-body" style="padding: 2.4rem 2.2rem; height: 100%; display: flex; flex-direction: column; align-items: flex-start;">
-            <div class="value-icon-box">
-              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l8.78-8.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-              </svg>
+      <div class="proto-values-2x2-grid">
+        
+        <!-- Value 01: Respect for People & Practice -->
+        <article class="proto-value-card-2x2">
+          <span class="proto-card-num-watermark">01</span>
+          <div class="proto-value-header-row">
+            <div class="proto-value-icon-box-2x2">
+              <i data-lucide="heart" style="width: 22px; height: 22px;"></i>
             </div>
-            <h3 class="sector-title" style="font-size: 1.25rem; margin-bottom: 0.8rem;">Respect for People &amp; Practice</h3>
-            <p class="sector-text" style="margin-bottom: 0; flex: 1; line-height: 1.65;">
-              We treat healthcare professionals, clients and patients with respect and dignity. We prioritize patients’ needs and care in every interaction to ensure safe and compassionate care.
-            </p>
+            <div>
+              <span class="proto-card-badge" style="margin-bottom: 0.15rem;">PATIENT &amp; PROVIDER DIGNITY</span>
+              <h3 class="proto-value-title-2x2">Respect for People &amp; Practice</h3>
+            </div>
           </div>
+          <p class="proto-value-text-2x2">
+            We treat healthcare professionals, clients and patients with respect and dignity. We prioritize patients’ needs and care in every interaction to ensure safe and compassionate care.
+          </p>
         </article>
 
-        <!-- Value 2 -->
-        <article class="sector-card" style="border-top: 5px solid var(--cyan-turquoise); background: var(--white);">
-          <div class="sector-body" style="padding: 2.4rem 2.2rem; height: 100%; display: flex; flex-direction: column; align-items: flex-start;">
-            <div class="value-icon-box">
-              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-                <path d="m9 12 2 2 4-4"></path>
-              </svg>
+        <!-- Value 02: Accountability at Every Level -->
+        <article class="proto-value-card-2x2">
+          <span class="proto-card-num-watermark">02</span>
+          <div class="proto-value-header-row">
+            <div class="proto-value-icon-box-2x2 icon-cyan">
+              <i data-lucide="shield-check" style="width: 22px; height: 22px;"></i>
             </div>
-            <h3 class="sector-title" style="font-size: 1.25rem; margin-bottom: 0.8rem;">Accountability at Every Level</h3>
-            <p class="sector-text" style="margin-bottom: 0; flex: 1; line-height: 1.65;">
-              We take responsibility for the professionals we provide, and we keep to our promises. We respond quickly, honestly and decisively when challenges arise.
-            </p>
+            <div>
+              <span class="proto-card-badge" style="margin-bottom: 0.15rem; color: #00A896;">ETHICAL PROMISE &amp; ACTION</span>
+              <h3 class="proto-value-title-2x2">Accountability at Every Level</h3>
+            </div>
           </div>
+          <p class="proto-value-text-2x2">
+            We take responsibility for the professionals we provide, and we keep to our promises. We respond quickly, honestly and decisively when challenges arise.
+          </p>
         </article>
 
-        <!-- Value 3 -->
-        <article class="sector-card" style="border-top: 5px solid var(--cyan-turquoise); background: var(--white);">
-          <div class="sector-body" style="padding: 2.4rem 2.2rem; height: 100%; display: flex; flex-direction: column; align-items: flex-start;">
-            <div class="value-icon-box">
-              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                <circle cx="9" cy="7" r="4"></circle>
-                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-              </svg>
+        <!-- Value 03: Partnership Not Transactions -->
+        <article class="proto-value-card-2x2">
+          <span class="proto-card-num-watermark">03</span>
+          <div class="proto-value-header-row">
+            <div class="proto-value-icon-box-2x2">
+              <i data-lucide="users" style="width: 22px; height: 22px;"></i>
             </div>
-            <h3 class="sector-title" style="font-size: 1.25rem; margin-bottom: 0.8rem;">Partnership Not Transactions</h3>
-            <p class="sector-text" style="margin-bottom: 0; flex: 1; line-height: 1.65;">
-              We work alongside our clients not just for them. We involve, listen, collaborate and adapt to support the evolving care/needs.
-            </p>
+            <div>
+              <span class="proto-card-badge" style="margin-bottom: 0.15rem;">COLLABORATIVE ADAPTATION</span>
+              <h3 class="proto-value-title-2x2">Partnership Not Transactions</h3>
+            </div>
           </div>
+          <p class="proto-value-text-2x2">
+            We work alongside our clients not just for them. We involve, listen, collaborate and adapt to support the evolving care/needs.
+          </p>
         </article>
 
-        <!-- Value 4 -->
-        <article class="sector-card" style="border-top: 5px solid var(--cyan-turquoise); background: var(--white);">
-          <div class="sector-body" style="padding: 2.4rem 2.2rem; height: 100%; display: flex; flex-direction: column; align-items: flex-start;">
-            <div class="value-icon-box">
-              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="8" r="7"></circle>
-                <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
-              </svg>
+        <!-- Value 04: Quality Over Quantity -->
+        <article class="proto-value-card-2x2">
+          <span class="proto-card-num-watermark">04</span>
+          <div class="proto-value-header-row">
+            <div class="proto-value-icon-box-2x2 icon-cyan">
+              <i data-lucide="award" style="width: 22px; height: 22px;"></i>
             </div>
-            <h3 class="sector-title" style="font-size: 1.25rem; margin-bottom: 0.8rem;">Quality Over Quantity</h3>
-            <p class="sector-text" style="margin-bottom: 0; flex: 1; line-height: 1.65;">
-              We prioritize competence, professionalism, reliability and trust in every nurse and Personal Support Worker we deploy.
-            </p>
+            <div>
+              <span class="proto-card-badge" style="margin-bottom: 0.15rem; color: #00A896;">CLINICAL BENCHMARK</span>
+              <h3 class="proto-value-title-2x2">Quality Over Quantity</h3>
+            </div>
           </div>
+          <p class="proto-value-text-2x2">
+            We prioritize competence, professionalism, reliability and trust in every nurse and Personal Support Worker we deploy.
+          </p>
         </article>
+
       </div>
     </div>
   </section>
 
-  <!-- 4. OUR TEAM NARRATIVE SECTION (SHARP TOP SLANT RIGHT) -->
-  <section class="why-choose-section section-padding sharp-top-slant-right" style="background-color: var(--white);">
+  <!-- =========================================================================
+       4. OUR TEAM NARRATIVE (SHARP TOP SLANT RIGHT)
+       ========================================================================= -->
+  <section class="section-padding sharp-top-slant-right" style="background-color: var(--white); overflow: hidden;">
     <div class="container why-choose-grid">
+      
+      <!-- Left: Signature 3-Picture Photo Collage -->
       <div class="gallery-photo-col">
         <div class="photo-collage-3">
-          <div class="collage-item collage-item-main slide-from-top">
+          <div class="collage-item collage-item-main">
             <img src="assets/images/team_divine.jpg" alt="Divine Fingers Healthcare Team" class="collage-img">
             <span class="collage-badge">DIVERSE &amp; CERTIFIED STAFF</span>
           </div>
           <div class="collage-row-sub">
-            <div class="collage-item collage-item-sub slide-from-left">
+            <div class="collage-item collage-item-sub">
               <img src="assets/images/hero_divine.jpg" alt="Registered Nurses &amp; PSWs" class="collage-img">
             </div>
-            <div class="collage-item collage-item-sub slide-from-right">
+            <div class="collage-item collage-item-sub">
               <img src="assets/images/role_psw_care.jpg" alt="Personal Support Workers Care" class="collage-img">
             </div>
           </div>
         </div>
       </div>
 
+      <!-- Right: Team Story & Benefit Points -->
       <div class="why-choose-info">
         <div class="accent-heading-wrapper" style="margin-bottom: 1.5rem;">
           <h2 class="gallery-title" style="margin-bottom: 0;">
@@ -262,30 +310,57 @@
           </h2>
           <div class="welcome-accent-line"></div>
         </div>
-        <p class="news-description" style="font-size: 0.96rem; line-height: 1.8; color: #334155; margin-bottom: 1.2rem;">
+        
+        <p class="news-description" style="font-size: 0.98rem; line-height: 1.8; color: #334155; margin-bottom: 1.2rem;">
           At Divine Fingers, our greatest asset is the dedicated team behind our mission. We bring together experienced healthcare professionals, support staff and certified Registered Nurses, Registered Practical Nurses, and Personal Support Workers/Health Care Aids from various cultural backgrounds, who share a common purpose: enhancing healthcare experiences for providers, patients, and communities.
         </p>
-        <p class="news-description" style="font-size: 0.96rem; line-height: 1.8; color: #334155; margin-bottom: 1.8rem;">
+        
+        <p class="news-description" style="font-size: 0.98rem; line-height: 1.8; color: #334155; margin-bottom: 1.8rem;">
           Guided by expertise and driven by compassion, we collaborate closely with healthcare organizations to address complex challenges and deliver meaningful solutions. Our approach combines deep industry insight with a thorough understanding of the evolving needs of both patients and care providers. Every member of our team is committed to supporting healthcare organizations in achieving greater efficiency, improving care delivery, and creating lasting positive impacts. Together, we are helping shape a more connected, responsive, and patient-focused future for healthcare.
         </p>
 
-        <div class="why-choose-list">
-          <div class="why-item">
-            <div class="why-icon-box">✓</div>
-            <div class="why-content">
+        <!-- Modern Benefit Points -->
+        <div class="proto-team-benefits">
+          <div class="proto-benefit-card">
+            <div class="proto-benefit-icon">✓</div>
+            <div class="proto-benefit-content">
               <h4>Expertise &amp; Compassion</h4>
               <p>Deep industry insight combined with empathetic patient-centered care delivery.</p>
             </div>
           </div>
 
-          <div class="why-item">
-            <div class="why-icon-box">✓</div>
-            <div class="why-content">
+          <div class="proto-benefit-card">
+            <div class="proto-benefit-icon">✓</div>
+            <div class="proto-benefit-content">
               <h4>Lasting Positive Impact</h4>
               <p>Shaping a responsive, connected, and patient-focused healthcare ecosystem across Canada.</p>
             </div>
           </div>
         </div>
+
+        <div style="margin-top: 2rem;">
+          <a href="clients.html" class="proto-arrow-link" style="font-size: 1.05rem;">
+            Request a staffing consultation <i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i>
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       QUICK CONTACT CALLOUT BANNER
+       ========================================================================= -->
+  <section class="callout-banner-section">
+    <div class="container callout-banner-grid">
+      <div class="callout-text-block">
+        <h3>Need Immediate Healthcare Staffing Support?</h3>
+        <p>Our Scarborough office is open 24 hours a day, 7 days a week. Speak directly with our care coordination team.</p>
+      </div>
+
+      <div class="callout-btn-group">
+        <a href="tel:+16472106463" class="btn btn-pill-hero">CALL +1 (647) 210-6463</a>
+        <a href="contact.html" class="btn btn-pill-outline">CONTACT US PAGE</a>
       </div>
     </div>
   </section>
@@ -348,5 +423,10 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <script src="script.js?v=3.0.0"></script>
+  <script>
+    if (window.lucide) {
+      lucide.createIcons();
+    }
+  </script>
 </body>
 </html>
