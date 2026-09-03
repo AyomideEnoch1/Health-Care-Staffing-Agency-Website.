@@ -1142,6 +1142,62 @@
   color: #ffffff;
 }
 
+/* Verbatim Detailed Capabilities List for Zig-Zag Cards */
+.proto-zigzag-items-block {
+  margin-top: 1rem;
+  margin-bottom: 1.5rem;
+  width: 100%;
+}
+.proto-zigzag-category-header {
+  font-family: var(--font-heading);
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: var(--proto-navy);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.6rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.proto-zigzag-category-header::before {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--teal-green);
+}
+.proto-zigzag-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.1rem;
+}
+.proto-zigzag-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  font-size: 0.94rem;
+  color: #334155;
+  line-height: 1.55;
+}
+.proto-zigzag-check {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(60, 175, 138, 0.15);
+  color: var(--teal-green);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.82rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+
 @media (max-width: 860px) {
   .proto-service-zigzag-row,
   .proto-service-zigzag-row.row-reverse {
