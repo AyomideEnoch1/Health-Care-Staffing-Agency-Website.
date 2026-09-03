@@ -238,46 +238,18 @@
       const meRes = await apiRequest('/auth/me');
       if (meRes && meRes.admin) {
         sessionStorage.setItem('df_admin_user', JSON.stringify(meRes.admin));
-      }
-      hideAuthGate();
-      updateUserHeader();
-      await loadAllDashboardData();
-      startRealtimeStream();
-      startHealthPolling();
-    } catch {
-      // Auto-unlock with primary admin account for seamless developer/testing experience
-      try {
-        const loginRes = await apiRequest('/auth/login', {
-          method: 'POST',
-          body: JSON.stringify({
-            email: 'admin@divinefingershealthcare.ca',
-            password: 'AdminSecure2026!'
-          })
-        });
-        if (loginRes && loginRes.admin) {
-          if (loginRes.csrfToken) sessionStorage.setItem('df_csrf_token', loginRes.csrfToken);
-          sessionStorage.setItem('df_admin_user', JSON.stringify(loginRes.admin));
-          hideAuthGate();
-          updateUserHeader();
-          await loadAllDashboardData();
-          startRealtimeStream();
-          startHealthPolling();
-          return;
-        }
-      } catch (autoLoginErr) {
-        const defaultAdmin = {
-          id: 'c4970cd8-eb90-4e33-9aba-446711e88d8b',
-          email: 'admin@divinefingershealthcare.ca',
-          full_name: 'Divine Fingers Administrator',
-          role: 'super-admin',
-          totp_enabled: false,
-          email_verified: true
-        };
-        sessionStorage.setItem('df_admin_user', JSON.stringify(defaultAdmin));
         hideAuthGate();
         updateUserHeader();
         await loadAllDashboardData();
+        startRealtimeStream();
+        startHealthPolling();
+      } else {
+        sessionStorage.removeItem('df_admin_user');
+        showAuthGate();
       }
+    } catch {
+      sessionStorage.removeItem('df_admin_user');
+      showAuthGate();
     }
   }
 
