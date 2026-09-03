@@ -903,7 +903,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Recalculate total
     const total = Object.values(window.bulkState.counts).reduce((a, b) => a + b, 0);
     const badge = document.getElementById('live-total-headcount-badge');
-    if (badge) badge.textContent = `Total Clinicians: ${total}`;
+    if (badge) {
+      badge.innerHTML = `<i data-lucide="user-check" style="width: 15px; height: 15px; color: var(--teal-green);"></i> Total Clinicians: ${total}`;
+      if (window.lucide) lucide.createIcons();
+    }
   };
 
   window.applySurgePreset = function(type) {
@@ -921,7 +924,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     const total = Object.values(window.bulkState.counts).reduce((a, b) => a + b, 0);
     const badge = document.getElementById('live-total-headcount-badge');
-    if (badge) badge.textContent = `Total Clinicians: ${total}`;
+    if (badge) {
+      badge.innerHTML = `<i data-lucide="user-check" style="width: 15px; height: 15px; color: var(--teal-green);"></i> Total Clinicians: ${total}`;
+      if (window.lucide) lucide.createIcons();
+    }
   };
 
   window.downloadSampleCsv = function() {
@@ -945,7 +951,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!input.files || !input.files[0]) return;
     const file = input.files[0];
     const label = document.getElementById('csv-chosen-name');
-    if (label) label.textContent = `✅ Selected: ${file.name} (${Math.round(file.size/1024)} KB)`;
+    if (label) label.textContent = `Selected: ${file.name} (${Math.round(file.size/1024)} KB)`;
 
     const reader = new FileReader();
     reader.onload = function(e) {
@@ -979,7 +985,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (previewSec && previewTbody) {
         previewSec.style.display = 'block';
-        if (countBadge) countBadge.textContent = `${rows.length} Schedule Rows Parsed`;
+        if (countBadge) {
+          countBadge.innerHTML = `<i data-lucide="check-circle" style="width: 13px; height: 13px;"></i> ${rows.length} Schedule Rows Parsed`;
+          if (window.lucide) lucide.createIcons();
+        }
         previewTbody.innerHTML = rows.map(r => `
           <tr>
             <td><strong>${r.shift_date}</strong></td>

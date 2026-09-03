@@ -11,6 +11,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Open+Sans:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&family=Pacifico&display=swap" rel="stylesheet">
   
   <link rel="stylesheet" href="style.css">
+  
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
   <style>
     .bulk-portal-hero {
       background: linear-gradient(135deg, var(--navy) 0%, #062b33 100%);
@@ -22,7 +26,7 @@
     .surge-preset-pill {
       background: rgba(255, 255, 255, 0.12);
       border: 1.5px solid rgba(0, 245, 212, 0.7);
-      padding: 0.5rem 1.1rem;
+      padding: 0.5rem 1.15rem;
       border-radius: 24px;
       font-size: 0.85rem;
       font-weight: 700;
@@ -31,9 +35,15 @@
       transition: all 0.25s ease;
       display: inline-flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.45rem;
       backdrop-filter: blur(6px);
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+    .surge-preset-pill i {
+      width: 15px;
+      height: 15px;
+      color: #00F5D4;
+      transition: color 0.25s ease;
     }
     .surge-preset-pill:hover {
       background: #00F5D4;
@@ -41,6 +51,37 @@
       border-color: #00F5D4;
       transform: translateY(-2px);
       box-shadow: 0 6px 20px rgba(0, 245, 212, 0.4);
+    }
+    .surge-preset-pill:hover i {
+      color: #051622;
+    }
+    .bulk-mode-btn i {
+      width: 18px;
+      height: 18px;
+      color: var(--teal-green);
+      transition: color 0.25s ease;
+    }
+    .bulk-mode-btn.active i {
+      color: #00F5D4;
+    }
+    .stepper-role-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      background: rgba(0, 168, 150, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--teal-green);
+      flex-shrink: 0;
+    }
+    .stepper-role-icon i {
+      width: 20px;
+      height: 20px;
+    }
+    .stepper-btn i {
+      width: 16px;
+      height: 16px;
     }
     .bulk-mode-switcher {
       display: flex;
@@ -229,8 +270,8 @@
   <!-- HERO SECTION -->
   <section class="bulk-portal-hero">
     <div class="container" style="text-align: center; position: relative; z-index: 2;">
-      <span style="display: inline-block; background: var(--teal-green); color: #fff; font-size: 0.75rem; font-weight: 800; padding: 0.3rem 0.85rem; border-radius: 20px; letter-spacing: 0.8px; text-transform: uppercase; margin-bottom: 0.75rem;">
-        HOSPITAL &amp; ENTERPRISE DISPATCH
+      <span style="display: inline-flex; align-items: center; gap: 0.4rem; background: var(--teal-green); color: #fff; font-size: 0.75rem; font-weight: 800; padding: 0.35rem 0.95rem; border-radius: 20px; letter-spacing: 0.8px; text-transform: uppercase; margin-bottom: 0.75rem;">
+        <i data-lucide="building-2" style="width: 14px; height: 14px;"></i> HOSPITAL &amp; ENTERPRISE DISPATCH
       </span>
       <h1 style="font-family: var(--font-heading); font-size: 2.2rem; font-weight: 900; margin-bottom: 0.6rem;">
         Enterprise Bulk Staffing &amp; Hospital Schedule Portal
@@ -241,12 +282,18 @@
 
       <!-- Quick Presets in a clean horizontal row -->
       <div style="display: flex; flex-direction: row; gap: 0.75rem; justify-content: center; flex-wrap: wrap; align-items: center; margin-top: 1.5rem;">
-        <span style="font-size: 0.82rem; font-weight: 800; color: #00F5D4; text-transform: uppercase; letter-spacing: 0.6px; display: inline-flex; align-items: center; gap: 4px;">
-          ⚡ Quick Surge Presets:
+        <span style="font-size: 0.82rem; font-weight: 800; color: #00F5D4; text-transform: uppercase; letter-spacing: 0.6px; display: inline-flex; align-items: center; gap: 6px;">
+          <i data-lucide="zap" style="width: 15px; height: 15px; color: #00F5D4;"></i> Quick Surge Presets:
         </span>
-        <button type="button" class="surge-preset-pill" onclick="window.applySurgePreset('outbreak')">🚨 Code Green Outbreak (4 RNs + 8 PSWs)</button>
-        <button type="button" class="surge-preset-pill" onclick="window.applySurgePreset('weekend')">📅 Weekend Block (2 RPNs + 6 PSWs)</button>
-        <button type="button" class="surge-preset-pill" onclick="window.applySurgePreset('acute')">🏥 Acute Surge (4 RNs ICU/ER)</button>
+        <button type="button" class="surge-preset-pill" onclick="window.applySurgePreset('outbreak')">
+          <i data-lucide="alert-triangle"></i> Code Green Outbreak (4 RNs + 8 PSWs)
+        </button>
+        <button type="button" class="surge-preset-pill" onclick="window.applySurgePreset('weekend')">
+          <i data-lucide="calendar"></i> Weekend Block (2 RPNs + 6 PSWs)
+        </button>
+        <button type="button" class="surge-preset-pill" onclick="window.applySurgePreset('acute')">
+          <i data-lucide="activity"></i> Acute Surge (4 RNs ICU/ER)
+        </button>
       </div>
     </div>
   </section>
@@ -258,10 +305,10 @@
       <!-- MODE SWITCHER -->
       <div class="bulk-mode-switcher">
         <button type="button" class="bulk-mode-btn active" id="btn-mode-stepper" onclick="window.switchBulkMode('stepper')">
-          ⚡ Mode 1: Interactive Multi-Role Builder
+          <i data-lucide="sliders"></i> Mode 1: Interactive Multi-Role Builder
         </button>
         <button type="button" class="bulk-mode-btn" id="btn-mode-csv" onclick="window.switchBulkMode('csv')">
-          📂 Mode 2: Upload Hospital Shift Spreadsheet (CSV)
+          <i data-lucide="file-spreadsheet"></i> Mode 2: Upload Hospital Shift Schedule (CSV)
         </button>
       </div>
 
@@ -270,7 +317,8 @@
         
         <!-- STEP 1: ORGANIZATION & CONTACT DETAILS -->
         <div style="margin-bottom: 2rem;">
-          <h3 style="font-family: var(--font-heading); font-size: 1.25rem; font-weight: 800; color: var(--navy); margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.5rem;">
+          <h3 style="font-family: var(--font-heading); font-size: 1.25rem; font-weight: 800; color: var(--navy); margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.6rem;">
+            <i data-lucide="building" style="width: 20px; height: 20px; color: var(--teal-green);"></i>
             <span>1.</span> Facility &amp; Authorized Contact Details
           </h3>
           <p style="font-size: 0.82rem; color: #666; margin-bottom: 1.25rem;">Information required for scheduling confirmation, badge access, and shift dispatch.</p>
@@ -288,7 +336,7 @@
             <select class="form-field" id="bulk-urgency-level" required>
               <option value="routine">Routine Advance Scheduling (24-48+ Hours)</option>
               <option value="urgent" selected>Urgent Coverage Needed (Within 12 Hours)</option>
-              <option value="emergency_surge">🚨 Emergency Outbreak / Acute Surge (Immediate 2-Hour Response)</option>
+              <option value="emergency_surge">Emergency Outbreak / Acute Surge (Immediate 2-Hour Response)</option>
             </select>
           </div>
         </div>
@@ -297,21 +345,29 @@
         <div id="section-stepper-mode">
           <div style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
             <div>
-              <h3 style="font-family: var(--font-heading); font-size: 1.25rem; font-weight: 800; color: var(--navy); margin-bottom: 0.2rem; display: flex; align-items: center; gap: 0.5rem;">
+              <h3 style="font-family: var(--font-heading); font-size: 1.25rem; font-weight: 800; color: var(--navy); margin-bottom: 0.2rem; display: flex; align-items: center; gap: 0.6rem;">
+                <i data-lucide="users" style="width: 20px; height: 20px; color: var(--teal-green);"></i>
                 <span>2.</span> Headcount &amp; Shift Breakdown
               </h3>
               <p style="font-size: 0.82rem; color: #666; margin: 0;">Specify the number of clinicians needed for each role and shift window.</p>
             </div>
             <div style="background: rgba(0, 168, 150, 0.1); border: 1px solid var(--teal-green); padding: 0.4rem 0.85rem; border-radius: 8px;">
-              <span style="font-size: 0.85rem; font-weight: 800; color: var(--navy);" id="live-total-headcount-badge">Total Clinicians: 0</span>
+              <span style="font-size: 0.85rem; font-weight: 800; color: var(--navy); display: inline-flex; align-items: center; gap: 5px;" id="live-total-headcount-badge">
+                <i data-lucide="user-check" style="width: 15px; height: 15px; color: var(--teal-green);"></i> Total Clinicians: 0
+              </span>
             </div>
           </div>
 
           <!-- RN Stepper Card -->
           <div class="stepper-card">
-            <div class="stepper-role-info">
-              <div class="stepper-role-title">Registered Nurse (RN)</div>
-              <div class="stepper-role-desc">CNO registered acute care, medication administration, charge duties</div>
+            <div style="display: flex; align-items: center; gap: 0.85rem; flex: 1.2; min-width: 220px;">
+              <div class="stepper-role-icon">
+                <i data-lucide="stethoscope"></i>
+              </div>
+              <div class="stepper-role-info" style="flex: 1; min-width: 0;">
+                <div class="stepper-role-title">Registered Nurse (RN)</div>
+                <div class="stepper-role-desc">CNO registered acute care, medication administration, charge duties</div>
+              </div>
             </div>
             <select class="stepper-shift-select" id="shift-rn">
               <option value="Day Shift (07:00 - 15:00)">Day Shift (07:00 - 15:00)</option>
@@ -321,17 +377,22 @@
               <option value="12-Hour Night (19:00 - 07:00)">12-Hour Night (19:00 - 07:00)</option>
             </select>
             <div class="stepper-controls">
-              <button type="button" class="stepper-btn" onclick="window.adjustStepper('rn', -1)">&minus;</button>
+              <button type="button" class="stepper-btn" onclick="window.adjustStepper('rn', -1)" aria-label="Decrease RN Count"><i data-lucide="minus"></i></button>
               <span class="stepper-count" id="count-rn">0</span>
-              <button type="button" class="stepper-btn" onclick="window.adjustStepper('rn', 1)">+</button>
+              <button type="button" class="stepper-btn" onclick="window.adjustStepper('rn', 1)" aria-label="Increase RN Count"><i data-lucide="plus"></i></button>
             </div>
           </div>
 
           <!-- RPN Stepper Card -->
           <div class="stepper-card">
-            <div class="stepper-role-info">
-              <div class="stepper-role-title">Registered Practical Nurse (RPN)</div>
-              <div class="stepper-role-desc">Wound care, medication administration, specialized clinical care</div>
+            <div style="display: flex; align-items: center; gap: 0.85rem; flex: 1.2; min-width: 220px;">
+              <div class="stepper-role-icon">
+                <i data-lucide="user-check"></i>
+              </div>
+              <div class="stepper-role-info" style="flex: 1; min-width: 0;">
+                <div class="stepper-role-title">Registered Practical Nurse (RPN)</div>
+                <div class="stepper-role-desc">Wound care, medication administration, specialized clinical care</div>
+              </div>
             </div>
             <select class="stepper-shift-select" id="shift-rpn">
               <option value="Day Shift (07:00 - 15:00)">Day Shift (07:00 - 15:00)</option>
@@ -341,17 +402,22 @@
               <option value="12-Hour Night (19:00 - 07:00)">12-Hour Night (19:00 - 07:00)</option>
             </select>
             <div class="stepper-controls">
-              <button type="button" class="stepper-btn" onclick="window.adjustStepper('rpn', -1)">&minus;</button>
+              <button type="button" class="stepper-btn" onclick="window.adjustStepper('rpn', -1)" aria-label="Decrease RPN Count"><i data-lucide="minus"></i></button>
               <span class="stepper-count" id="count-rpn">0</span>
-              <button type="button" class="stepper-btn" onclick="window.adjustStepper('rpn', 1)">+</button>
+              <button type="button" class="stepper-btn" onclick="window.adjustStepper('rpn', 1)" aria-label="Increase RPN Count"><i data-lucide="plus"></i></button>
             </div>
           </div>
 
           <!-- PSW Stepper Card -->
           <div class="stepper-card">
-            <div class="stepper-role-info">
-              <div class="stepper-role-title">Personal Support Worker (PSW)</div>
-              <div class="stepper-role-desc">ADL assistance, patient transfers, vital signs, palliative care support</div>
+            <div style="display: flex; align-items: center; gap: 0.85rem; flex: 1.2; min-width: 220px;">
+              <div class="stepper-role-icon">
+                <i data-lucide="heart-handshake"></i>
+              </div>
+              <div class="stepper-role-info" style="flex: 1; min-width: 0;">
+                <div class="stepper-role-title">Personal Support Worker (PSW)</div>
+                <div class="stepper-role-desc">ADL assistance, patient transfers, vital signs, palliative care support</div>
+              </div>
             </div>
             <select class="stepper-shift-select" id="shift-psw">
               <option value="Day Shift (07:00 - 15:00)">Day Shift (07:00 - 15:00)</option>
@@ -361,17 +427,22 @@
               <option value="12-Hour Night (19:00 - 07:00)">12-Hour Night (19:00 - 07:00)</option>
             </select>
             <div class="stepper-controls">
-              <button type="button" class="stepper-btn" onclick="window.adjustStepper('psw', -1)">&minus;</button>
+              <button type="button" class="stepper-btn" onclick="window.adjustStepper('psw', -1)" aria-label="Decrease PSW Count"><i data-lucide="minus"></i></button>
               <span class="stepper-count" id="count-psw">0</span>
-              <button type="button" class="stepper-btn" onclick="window.adjustStepper('psw', 1)">+</button>
+              <button type="button" class="stepper-btn" onclick="window.adjustStepper('psw', 1)" aria-label="Increase PSW Count"><i data-lucide="plus"></i></button>
             </div>
           </div>
 
           <!-- Travel Nurse Stepper Card -->
           <div class="stepper-card">
-            <div class="stepper-role-info">
-              <div class="stepper-role-title">Travelling &amp; Remote Nurse</div>
-              <div class="stepper-role-desc">Northern Ontario and remote facility emergency deployment</div>
+            <div style="display: flex; align-items: center; gap: 0.85rem; flex: 1.2; min-width: 220px;">
+              <div class="stepper-role-icon">
+                <i data-lucide="plane"></i>
+              </div>
+              <div class="stepper-role-info" style="flex: 1; min-width: 0;">
+                <div class="stepper-role-title">Travelling &amp; Remote Nurse</div>
+                <div class="stepper-role-desc">Northern Ontario and remote facility emergency deployment</div>
+              </div>
             </div>
             <select class="stepper-shift-select" id="shift-travel">
               <option value="12-Hour Rotating (Block Contract)">12-Hour Rotating (Block Contract)</option>
@@ -379,17 +450,22 @@
               <option value="Night Shift (23:00 - 07:00)">Night Shift (23:00 - 07:00)</option>
             </select>
             <div class="stepper-controls">
-              <button type="button" class="stepper-btn" onclick="window.adjustStepper('travel', -1)">&minus;</button>
+              <button type="button" class="stepper-btn" onclick="window.adjustStepper('travel', -1)" aria-label="Decrease Travel Nurse Count"><i data-lucide="minus"></i></button>
               <span class="stepper-count" id="count-travel">0</span>
-              <button type="button" class="stepper-btn" onclick="window.adjustStepper('travel', 1)">+</button>
+              <button type="button" class="stepper-btn" onclick="window.adjustStepper('travel', 1)" aria-label="Increase Travel Nurse Count"><i data-lucide="plus"></i></button>
             </div>
           </div>
 
           <!-- Companionship Stepper Card -->
           <div class="stepper-card">
-            <div class="stepper-role-info">
-              <div class="stepper-role-title">Care Companion &amp; Support Staff</div>
-              <div class="stepper-role-desc">1-on-1 patient observation, companionship, mealtime assistance</div>
+            <div style="display: flex; align-items: center; gap: 0.85rem; flex: 1.2; min-width: 220px;">
+              <div class="stepper-role-icon">
+                <i data-lucide="shield-check"></i>
+              </div>
+              <div class="stepper-role-info" style="flex: 1; min-width: 0;">
+                <div class="stepper-role-title">Care Companion &amp; Support Staff</div>
+                <div class="stepper-role-desc">1-on-1 patient observation, companionship, mealtime assistance</div>
+              </div>
             </div>
             <select class="stepper-shift-select" id="shift-companion">
               <option value="Day Shift (07:00 - 15:00)">Day Shift (07:00 - 15:00)</option>
@@ -397,9 +473,9 @@
               <option value="Night Shift (23:00 - 07:00)">Night Shift (23:00 - 07:00)</option>
             </select>
             <div class="stepper-controls">
-              <button type="button" class="stepper-btn" onclick="window.adjustStepper('companion', -1)">&minus;</button>
+              <button type="button" class="stepper-btn" onclick="window.adjustStepper('companion', -1)" aria-label="Decrease Companion Count"><i data-lucide="minus"></i></button>
               <span class="stepper-count" id="count-companion">0</span>
-              <button type="button" class="stepper-btn" onclick="window.adjustStepper('companion', 1)">+</button>
+              <button type="button" class="stepper-btn" onclick="window.adjustStepper('companion', 1)" aria-label="Increase Companion Count"><i data-lucide="plus"></i></button>
             </div>
           </div>
 
@@ -418,7 +494,8 @@
         <!-- MODE 2: CSV SPREADSHEET UPLOAD -->
         <div id="section-csv-mode" style="display: none;">
           <div style="margin-bottom: 1.5rem;">
-            <h3 style="font-family: var(--font-heading); font-size: 1.25rem; font-weight: 800; color: var(--navy); margin-bottom: 0.2rem; display: flex; align-items: center; gap: 0.5rem;">
+            <h3 style="font-family: var(--font-heading); font-size: 1.25rem; font-weight: 800; color: var(--navy); margin-bottom: 0.2rem; display: flex; align-items: center; gap: 0.6rem;">
+              <i data-lucide="file-spreadsheet" style="width: 20px; height: 20px; color: var(--teal-green);"></i>
               <span>2.</span> Upload Hospital Shift Schedule (CSV)
             </h3>
             <p style="font-size: 0.82rem; color: #666;">Upload your internal scheduling spreadsheet to automatically generate all shift requests.</p>
@@ -426,11 +503,13 @@
 
           <div style="background: rgba(0, 168, 150, 0.05); border: 1px solid rgba(0, 168, 150, 0.3); border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap;">
             <div>
-              <strong style="font-size: 0.88rem; color: var(--navy);">Need the hospital schedule format?</strong>
-              <div style="font-size: 0.78rem; color: #666;">Download our pre-formatted CSV template with standard shift headers.</div>
+              <strong style="font-size: 0.88rem; color: var(--navy); display: flex; align-items: center; gap: 5px;">
+                <i data-lucide="help-circle" style="width: 15px; height: 15px; color: var(--teal-green);"></i> Need the hospital schedule format?
+              </strong>
+              <div style="font-size: 0.78rem; color: #666; margin-top: 2px;">Download our pre-formatted CSV template with standard shift headers.</div>
             </div>
-            <button type="button" class="btn btn-secondary-action" onclick="window.downloadSampleCsv()" style="padding: 0.45rem 0.95rem; font-size: 0.78rem; background: #fff; border: 1px solid var(--teal-green); color: var(--teal-green); font-weight: 800; border-radius: 6px; cursor: pointer;">
-              📥 DOWNLOAD SAMPLE CSV TEMPLATE
+            <button type="button" class="btn btn-secondary-action" onclick="window.downloadSampleCsv()" style="padding: 0.5rem 1rem; font-size: 0.78rem; background: #fff; border: 1.5px solid var(--teal-green); color: var(--teal-green); font-weight: 800; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s;">
+              <i data-lucide="download" style="width: 14px; height: 14px;"></i> DOWNLOAD SAMPLE CSV TEMPLATE
             </button>
           </div>
 
@@ -439,13 +518,7 @@
             <input type="file" id="hospital-csv-file" class="hidden-file-input" accept=".csv" onchange="window.handleCsvFileSelected(this)">
             <label for="hospital-csv-file" class="file-upload-label">
               <div class="file-upload-icon-circle">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                  <polyline points="14 2 14 8 20 8"></polyline>
-                  <line x1="16" y1="13" x2="8" y2="13"></line>
-                  <line x1="16" y1="17" x2="8" y2="17"></line>
-                  <polyline points="10 9 9 9 8 9"></polyline>
-                </svg>
+                <i data-lucide="upload-cloud" style="width: 26px; height: 26px; color: var(--teal-green);"></i>
               </div>
               <div class="file-upload-text-group">
                 <span class="file-upload-title">DRAG &amp; DROP HOSPITAL SHIFT CSV HERE *</span>
@@ -458,8 +531,12 @@
           <!-- Parsed Table Preview -->
           <div id="csv-preview-section" style="display: none; margin-top: 1.25rem;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-              <h5 style="font-size: 0.88rem; font-weight: 800; color: var(--navy); margin: 0;">Parsed Shifts Table Preview:</h5>
-              <span id="csv-parsed-count-badge" style="font-size: 0.78rem; font-weight: 800; color: var(--teal-green);">0 Shifts Found</span>
+              <h5 style="font-size: 0.88rem; font-weight: 800; color: var(--navy); margin: 0; display: flex; align-items: center; gap: 5px;">
+                <i data-lucide="table" style="width: 15px; height: 15px; color: var(--teal-green);"></i> Parsed Shifts Table Preview:
+              </h5>
+              <span id="csv-parsed-count-badge" style="font-size: 0.78rem; font-weight: 800; color: var(--teal-green); display: inline-flex; align-items: center; gap: 3px;">
+                <i data-lucide="check-circle" style="width: 13px; height: 13px;"></i> 0 Shifts Found
+              </span>
             </div>
             <div class="csv-preview-table-wrapper">
               <table class="csv-preview-table" id="csv-preview-table">
@@ -480,8 +557,8 @@
 
         <!-- SUBMIT BUTTON -->
         <div style="margin-top: 2rem;">
-          <button type="submit" id="btn-submit-bulk-order" class="btn btn-pill-hero full-width-btn" style="padding: 1rem; font-size: 1.05rem; letter-spacing: 0.5px;">
-            🚀 SUBMIT BULK CLINICAL STAFFING REQUEST
+          <button type="submit" id="btn-submit-bulk-order" class="btn btn-pill-hero full-width-btn" style="padding: 1rem; font-size: 1.05rem; letter-spacing: 0.5px; display: flex; align-items: center; justify-content: center; gap: 0.6rem;">
+            <i data-lucide="send" style="width: 18px; height: 18px;"></i> SUBMIT BULK CLINICAL STAFFING REQUEST
           </button>
           <div class="form-feedback-msg" id="bulk-form-feedback"></div>
         </div>
@@ -525,5 +602,8 @@
   </footer>
 
   <script src="script.js?v=3.5.0"></script>
+  <script>
+    if (window.lucide) lucide.createIcons();
+  </script>
 </body>
 </html>
