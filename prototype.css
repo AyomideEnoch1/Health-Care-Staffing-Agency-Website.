@@ -684,21 +684,23 @@
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
 }
 .proto-benefit-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  background: linear-gradient(135deg, var(--teal-green) 0%, var(--sky-blue) 100%);
-  color: #ffffff;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(60, 175, 138, 0.15);
+  color: var(--teal-green);
   display: flex;
   align-items: center;
   justify-content: center;
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 1.15rem;
   flex-shrink: 0;
-  margin-top: 2px;
-  box-shadow: 0 3px 10px rgba(60, 175, 138, 0.25);
-  transition: transform 0.3s ease;
+  transition: transform 0.35s ease, background 0.35s ease;
 }
 .proto-benefit-card:hover .proto-benefit-icon {
-  transform: scale(1.1);
+  transform: scale(1.15) rotate(-4deg);
+  background: rgba(60, 175, 138, 0.25);
 }
 .proto-benefit-content h4 {
   font-family: var(--font-heading);
