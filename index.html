@@ -3,24 +3,25 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Divine Fingers Healthcare Services Inc. | Where Innovation Meets Compassionate Care</title>
-  <meta name="description" content="Divine Fingers Healthcare Services Inc. - Where Innovation Meets Compassionate Care. Trusted Canadian healthcare staffing & Community Care Services across Ontario and Canada.">
+  <title>Divine Fingers Healthcare Services Inc. | Healthcare Staffing &amp; Nursing</title>
+  <meta name="description" content="Divine Fingers Healthcare Services Inc. - Reliable healthcare staffing agency in Scarborough, Ontario &amp; across Canada. Certified RNs, RPNs, and PSWs.">
   
-  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Open+Sans:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&family=Pacifico&display=swap" rel="stylesheet">
   
-  <link rel="stylesheet" href="style.css?v=4.9.0">
+  <link rel="stylesheet" href="style.css?v=5.0.0">
+  <link rel="stylesheet" href="prototype.css?v=5.0.0">
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
 
   <!-- HEADER / NAVIGATION -->
   <header class="site-header" id="site-header">
     <div class="header-container container">
-      <a href="index.html" class="brand-logo" aria-label="Divine Fingers Healthcare Services Inc. Home">
+      <a href="index.html" class="brand-logo">
         <div class="logo-wrapper">
-          <img src="assets/images/logo.png" alt="Divine Fingers Healthcare Services Logo" class="brand-logo-img">
+          <img src="assets/images/logo.png" alt="Divine Fingers Logo" class="brand-logo-img">
           <div class="logo-text">
             <span class="brand-name">Divine Fingers</span>
             <span class="brand-tagline">HEALTHCARE SERVICES INC.</span>
@@ -52,8 +53,8 @@
     </div>
   </header>
 
-  <!-- HERO SECTION -->
-  <section class="hero-section" id="home">
+  <!-- HERO SECTION WITH DIAGONAL SPLIT -->
+  <section class="hero-section" id="hero-slider">
     <div class="hero-bg-container">
       <div class="hero-diagonal-shape"></div>
       <div class="hero-image-wrapper">
@@ -126,7 +127,7 @@
     </div>
   </section>
 
-  <!-- WELCOME / ABOUT US SUMMARY SECTION (SHARP TOP SLANT LEFT) -->
+  <!-- WELCOME / ABOUT US SUMMARY SECTION -->
   <section class="welcome-section section-padding geometric-ribbon-section sharp-top-slant-left">
     <div class="container">
       <div class="accent-heading-wrapper" style="margin-bottom: 1.5rem;">
@@ -139,266 +140,323 @@
         At Divine fingers healthcare services, we value people first. We partner with healthcare organizations to craft high-quality patient centered care rooted in trusted healthcare expertise with critical thinking to achieve great result within the targeted period. Our focus is to provide well-vetted nurses and PSWs with high level skills and competency.
       </p>
       <a href="about.html" class="link-more" style="font-size: 0.92rem;">LEARN MORE ABOUT OUR MISSION &gt;</a>
-
-
     </div>
   </section>
 
-  <!-- OUR CORE VALUES SECTION (SHARP TOP SLANT RIGHT - CRISP WHITE BACKGROUND) -->
-  <section class="sectors-section section-padding sharp-top-slant-right" style="background-color: var(--white);">
+  <!-- =========================================================================
+       SECTION 1: WORKFORCE MANAGEMENT SOLUTIONS + STAGGERED COLLAGE
+       ========================================================================= -->
+  <section class="proto-workforce-section section-padding sharp-top-slant-right" style="background-color: var(--white);">
     <div class="container">
-      <div class="accent-heading-wrapper" style="margin-bottom: 2.5rem;">
-        <h2 class="welcome-title" style="margin-bottom: 0;">OUR CORE <span class="brand-highlight">VALUES</span></h2>
+      <div class="proto-split-grid">
+        
+        <!-- Left: Content Block -->
+        <div class="slide-from-left">
+          <span class="proto-section-eyebrow">HEALTHCARE WORKFORCE MANAGEMENT</span>
+          <h2 class="proto-heading-lg">Workforce management &amp; staffing solutions</h2>
+          <p class="proto-body-text">
+            We collaborate closely with healthcare organizations to address complex staffing challenges and deliver meaningful solutions. Whether supporting acute surge hospital relief, long-term care facilities, or remote community care across Canada, our clinical dispatch team ensures seamless, responsive coverage.
+          </p>
+          <a href="clients.html" class="proto-arrow-link">
+            How we solve staffing challenges <i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i>
+          </a>
+        </div>
+
+        <!-- Right: Staggered Dual Collage -->
+        <div class="proto-staggered-collage slide-from-right">
+          <div class="proto-collage-card card-1">
+            <img src="assets/images/service_nurse.jpg" alt="Travelling Nurse Program">
+          </div>
+          <div class="proto-collage-card card-2">
+            <img src="assets/images/role_psw_care.jpg" alt="Dedicated PSW Support">
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       SECTION 2: OUR CORE VALUES (MODERN PILLAR CARDS)
+       ========================================================================= -->
+  <section class="proto-tricard-section section-padding geometric-ribbon-section sharp-top-slant-left">
+    <div class="container">
+      <div class="accent-heading-wrapper" style="margin-bottom: 2.2rem;">
+        <h2 class="welcome-title" style="margin-bottom: 0;">
+          Our Core <span class="brand-highlight">VALUES</span>
+        </h2>
         <div class="welcome-accent-line"></div>
       </div>
 
-      <div class="sectors-grid" style="margin-top: 0;">
-        <!-- Value 1 -->
-        <article class="sector-card" style="border-top: 5px solid var(--cyan-turquoise); background: var(--white);">
-          <div class="sector-body" style="padding: 2.4rem 2.2rem; height: 100%; display: flex; flex-direction: column; align-items: flex-start;">
-            <div class="value-icon-box">
-              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l8.78-8.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-              </svg>
-            </div>
-            <h3 class="sector-title" style="font-size: 1.25rem; margin-bottom: 0.8rem;">Respect for People &amp; Practice</h3>
-            <p class="sector-text" style="margin-bottom: 0; flex: 1; line-height: 1.65;">
+      <div class="proto-tricard-grid">
+        
+        <!-- Card 1: Respect for People & Practice -->
+        <article class="proto-pillar-card">
+          <div>
+            <span class="proto-card-badge">RESPECT &amp; COMPASSION</span>
+            <h3 class="proto-card-title">Respect for People &amp; Practice</h3>
+            <p class="proto-card-desc">
               We treat healthcare professionals, clients and patients with respect and dignity. We prioritize patients’ needs and care in every interaction to ensure safe and compassionate care.
             </p>
           </div>
+          <a href="about.html" class="proto-arrow-link">
+            Learn more about our practice <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i>
+          </a>
         </article>
 
-        <!-- Value 2 -->
-        <article class="sector-card" style="border-top: 5px solid var(--cyan-turquoise); background: var(--white);">
-          <div class="sector-body" style="padding: 2.4rem 2.2rem; height: 100%; display: flex; flex-direction: column; align-items: flex-start;">
-            <div class="value-icon-box">
-              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-                <path d="m9 12 2 2 4-4"></path>
-              </svg>
-            </div>
-            <h3 class="sector-title" style="font-size: 1.25rem; margin-bottom: 0.8rem;">Accountability at Every Level</h3>
-            <p class="sector-text" style="margin-bottom: 0; flex: 1; line-height: 1.65;">
+        <!-- Card 2: Accountability at Every Level -->
+        <article class="proto-pillar-card">
+          <div>
+            <span class="proto-card-badge">PROMISE &amp; INTEGRITY</span>
+            <h3 class="proto-card-title">Accountability at Every Level</h3>
+            <p class="proto-card-desc">
               We take responsibility for the professionals we provide, and we keep to our promises. We respond quickly, honestly and decisively when challenges arise.
             </p>
           </div>
+          <a href="bulk-staffing.html" class="proto-arrow-link">
+            Connect with dispatch <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i>
+          </a>
         </article>
 
-        <!-- Value 3 -->
-        <article class="sector-card" style="border-top: 5px solid var(--cyan-turquoise); background: var(--white);">
-          <div class="sector-body" style="padding: 2.4rem 2.2rem; height: 100%; display: flex; flex-direction: column; align-items: flex-start;">
-            <div class="value-icon-box">
-              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                <circle cx="9" cy="7" r="4"></circle>
-                <path d="M23 21v-2a4 4 0 0 1 0 7.75"></path>
-                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-              </svg>
-            </div>
-            <h3 class="sector-title" style="font-size: 1.25rem; margin-bottom: 0.8rem;">Partnership Not Transactions</h3>
-            <p class="sector-text" style="margin-bottom: 0; flex: 1; line-height: 1.65;">
-              We work alongside our clients not just for them. We involve, listen, collaborate and adapt to support the evolving care/needs.
+        <!-- Card 3: Collaborative Partnership -->
+        <article class="proto-pillar-card">
+          <div>
+            <span class="proto-card-badge">COORDINATION &amp; TRUST</span>
+            <h3 class="proto-card-title">Collaborative Partnership</h3>
+            <p class="proto-card-desc">
+              We work alongside our clients — not just for them. We involve, listen, collaborate and adapt to support evolving care needs across facilities in Canada.
             </p>
           </div>
+          <a href="clients.html" class="proto-arrow-link">
+            Partner with Divine Fingers <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i>
+          </a>
         </article>
 
-        <!-- Value 4 -->
-        <article class="sector-card" style="border-top: 5px solid var(--cyan-turquoise); background: var(--white);">
-          <div class="sector-body" style="padding: 2.4rem 2.2rem; height: 100%; display: flex; flex-direction: column; align-items: flex-start;">
-            <div class="value-icon-box">
-              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="8" r="7"></circle>
-                <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
-              </svg>
-            </div>
-            <h3 class="sector-title" style="font-size: 1.25rem; margin-bottom: 0.8rem;">Quality Over Quantity</h3>
-            <p class="sector-text" style="margin-bottom: 0; flex: 1; line-height: 1.65;">
-              We prioritize competence, professionalism, reliability and trust in every nurse and Personal Support Worker we deploy.
-            </p>
-          </div>
-        </article>
       </div>
     </div>
   </section>
 
-  <!-- COMMUNITY CARE SERVICES SHOWCASE (SHARP TOP SLANT LEFT) -->
-  <section class="sectors-section section-padding sharp-slanted-white sharp-top-slant-left">
+  <!-- =========================================================================
+       SECTION 3: SOFT-TINT ALTERNATING STORYTELLING BLOCK + SHOWCASE CARD
+       ========================================================================= -->
+  <section class="proto-soft-tint-section section-padding sharp-top-slant-right" style="background-color: var(--proto-bg-tint);">
+    
     <div class="container">
-      <div class="accent-heading-wrapper" style="margin-bottom: 1.8rem;">
-        <h2 class="welcome-title" style="margin-bottom: 0;">OUR COMMUNITY <span class="brand-highlight">CARE SERVICES</span></h2>
+      
+      <!-- Story Row 1: Problem & Solution -->
+      <div class="proto-story-row">
+        <div class="slide-from-left">
+          <span class="proto-section-eyebrow">COMPASSIONATE HEALTHCARE SOLUTIONS</span>
+          <h2 class="proto-heading-lg">No matter the clinical challenge, we've got a solution</h2>
+          <p class="proto-body-text">
+            From bustling acute-care hospitals to long-term care homes and intimate community settings, we understand the diverse needs of the healthcare landscape. We treat healthcare professionals, clients and patients with respect and dignity, prioritizing patients’ needs and care in every interaction.
+          </p>
+          <a href="services.html" class="proto-arrow-link">
+            See community care services <i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i>
+          </a>
+        </div>
+        <div class="proto-story-img-card slide-from-right">
+          <img src="assets/images/role_psw_care.jpg" alt="Compassionate Care in Ontario">
+        </div>
+      </div>
+
+      <!-- Story Row 2: Clinical Excellence Edge (Reversed) -->
+      <div class="proto-story-row reversed">
+        <div class="slide-from-left">
+          <span class="proto-section-eyebrow">OUR CLINICAL EXCELLENCE EDGE</span>
+          <h2 class="proto-heading-lg">Our clinical excellence &amp; community care services</h2>
+          <p class="proto-body-text">
+            Delivering clinically sound, compassionate, and accessible healthcare across home, community, and facility settings in Canada. Helping shape a more connected, responsive, and patient-focused future for healthcare through our Travelling Nursing Program, Personal Care Support, and Respite Care Services.
+          </p>
+          <a href="services.html" class="proto-arrow-link">
+            Explore all clinical practices <i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i>
+          </a>
+        </div>
+        <div class="proto-story-img-card slide-from-right">
+          <img src="assets/images/service_nurse.jpg" alt="Clinical Practice and Nurse Care">
+        </div>
+      </div>
+
+      <!-- Showcase Box: Mobile Shift Scheduling & Portal -->
+      <div class="proto-showcase-box">
+        
+        <!-- Left: Full Width Healthcare Portal Card -->
+        <div class="proto-showcase-visual slide-from-left">
+          <div class="proto-mockup-phone">
+            <h5>Divine Fingers</h5>
+            <p>Connecting people to care that matters.</p>
+            <div class="proto-mockup-btn-row">
+              <a href="clients.html" class="proto-mockup-btn btn-login">LOGIN &rarr;</a>
+              <a href="jobseekers.html" class="proto-mockup-btn btn-signup">SIGN UP &rarr;</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Content & Action Buttons -->
+        <div class="slide-from-right">
+          <h3 class="proto-heading-lg" style="font-size: 1.85rem; margin-bottom: 0.85rem;">
+            Own your schedule. Find healthcare shifts on your terms.
+          </h3>
+          <p class="proto-body-text" style="font-size: 0.95rem; margin-bottom: 1.5rem;">
+            Our clinical coordination desk puts you in control to discover open shifts at your fingertips, pick up work whenever it suits you, and seamlessly manage schedules across Ontario. Fast onboarding, shift notifications, and 24/7 coordinator support.
+          </p>
+          
+          <div class="proto-action-badges-group">
+            <a href="clients.html" class="proto-action-badge badge-facilities">
+              <div class="proto-badge-icon-box">
+                <i data-lucide="building-2"></i>
+              </div>
+              <div class="proto-badge-content">
+                <span class="proto-badge-eyebrow">FACILITIES &amp; HOSPITALS</span>
+                <strong class="proto-badge-title">Request Staff Online</strong>
+              </div>
+              <div class="proto-badge-arrow">
+                <i data-lucide="chevron-right"></i>
+              </div>
+            </a>
+
+            <a href="tel:+16472106463" class="proto-action-badge badge-hotline">
+              <div class="proto-badge-icon-box">
+                <i data-lucide="phone-call"></i>
+              </div>
+              <div class="proto-badge-content">
+                <span class="proto-badge-eyebrow">24/7 DIRECT LINE</span>
+                <strong class="proto-badge-title">+1 (647) 210-6463</strong>
+              </div>
+              <div class="proto-badge-arrow">
+                <i data-lucide="chevron-right"></i>
+              </div>
+            </a>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       SECTION 4: OUR DEDICATED HEALTHCARE TEAM
+       ========================================================================= -->
+  <section class="proto-mission-section section-padding geometric-ribbon-section sharp-top-slant-left">
+    <div class="container">
+      <div class="accent-heading-wrapper" style="margin-bottom: 2.2rem;">
+        <h2 class="welcome-title" style="margin-bottom: 0;">
+          Our Dedicated <span class="brand-highlight">CLINICAL TEAM</span>
+        </h2>
         <div class="welcome-accent-line"></div>
       </div>
-      <p class="welcome-text" style="max-width: 100%; margin-bottom: 2.5rem;">
-        Delivering clinically sound, compassionate, and accessible healthcare across home, community, and facility settings in Canada.
-      </p>
 
-      <div class="sectors-grid">
-        <article class="sector-card">
-          <div class="sector-img-box">
-            <img src="assets/images/role_psw_care.jpg" alt="Personal Care Support" class="sector-img">
+      <div class="proto-split-grid">
+        
+        <!-- Left: Original Photo Collage Layout -->
+        <div class="gallery-photo-col slide-from-left">
+          <div class="photo-collage-3">
+            <div class="collage-item collage-item-main">
+              <img src="assets/images/team_divine.jpg" alt="Divine Fingers Healthcare Team" class="collage-img">
+              <span class="collage-badge">PATIENT-CENTERED CARE</span>
+            </div>
+            <div class="collage-row-sub">
+              <div class="collage-item collage-item-sub">
+                <img src="assets/images/hero_divine.jpg" alt="Registered Nurses &amp; PSWs" class="collage-img">
+              </div>
+              <div class="collage-item collage-item-sub">
+                <img src="assets/images/role_psw_care.jpg" alt="Personal Support Workers Care" class="collage-img">
+              </div>
+            </div>
           </div>
-          <div class="sector-body">
-            <h3 class="sector-title">Personal Care Support</h3>
-            <p class="sector-text">Hygiene, dressing, grooming, continence care, mobility transfers, and daily living support.</p>
-            <a href="services.html" class="sector-link">EXPLORE PERSONAL CARE &gt;</a>
-          </div>
-        </article>
+        </div>
 
-        <article class="sector-card">
-          <div class="sector-img-box">
-            <img src="assets/images/service_nurse.jpg" alt="Travelling Nursing Program" class="sector-img">
-          </div>
-          <div class="sector-body">
-            <h3 class="sector-title">Travelling Nursing Program</h3>
-            <p class="sector-text">On-demand clinical nursing, wound care, health assessments, and chronic disease management across Canada.</p>
-            <a href="services.html" class="sector-link">EXPLORE TRAVELLING NURSING &gt;</a>
-          </div>
-        </article>
+        <!-- Right: Text Content -->
+        <div class="slide-from-right">
+          <span class="proto-section-eyebrow">OUR DEDICATED CLINICAL TEAM</span>
+          <h2 class="proto-heading-lg">Connecting people to care that matters.</h2>
+          <p class="proto-body-text">
+            At Divine Fingers, our greatest asset is the dedicated team behind our mission. We bring together experienced healthcare professionals, support staff and certified Registered Nurses, Registered Practical Nurses, and Personal Support Workers/Health Care Aids from various cultural backgrounds, who share a common purpose: enhancing healthcare experiences for providers, patients, and communities.
+          </p>
+          <a href="about.html" class="proto-arrow-link">
+            Learn more about our team <i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i>
+          </a>
+        </div>
 
-        <article class="sector-card">
-          <div class="sector-img-box">
-            <img src="assets/images/role_rn_care.jpg" alt="Support & Companionship" class="sector-img">
-          </div>
-          <div class="sector-body">
-            <h3 class="sector-title">Support &amp; Companionship</h3>
-            <p class="sector-text">Medical appointment accompaniment, physical exercise, social outings, and leisure engagement.</p>
-            <a href="services.html" class="sector-link">EXPLORE COMPANIONSHIP &gt;</a>
-          </div>
-        </article>
-
-        <article class="sector-card">
-          <div class="sector-img-box">
-            <img src="assets/images/role_icu_care.jpg" alt="Respite Care Services" class="sector-img">
-          </div>
-          <div class="sector-body">
-            <h3 class="sector-title">Respite Care Services</h3>
-            <p class="sector-text">Temporary relief for primary caregivers and high-needs attendant care for loved ones.</p>
-            <a href="services.html" class="sector-link">EXPLORE RESPITE CARE &gt;</a>
-          </div>
-        </article>
       </div>
     </div>
   </section>
 
-  <!-- OUR TEAM & COMMITMENT SPLIT SECTION (SHARP TOP SLANT RIGHT) -->
-  <section class="why-choose-section section-padding geometric-ribbon-section sharp-top-slant-right">
-    <div class="container why-choose-grid">
-      <div class="gallery-photo-col">
-        <div class="photo-collage-3">
-          <div class="collage-item collage-item-main slide-from-top">
-            <img src="assets/images/team_divine.jpg" alt="Divine Fingers Healthcare Team" class="collage-img">
-            <span class="collage-badge">PATIENT-CENTERED CARE</span>
-          </div>
-          <div class="collage-row-sub">
-            <div class="collage-item collage-item-sub slide-from-left">
-              <img src="assets/images/hero_divine.jpg" alt="Registered Nurses &amp; PSWs" class="collage-img">
-            </div>
-            <div class="collage-item collage-item-sub slide-from-right">
-              <img src="assets/images/role_psw_care.jpg" alt="Personal Support Workers Care" class="collage-img">
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="why-choose-info">
-        <div class="accent-heading-wrapper" style="margin-bottom: 1.5rem;">
-          <h2 class="gallery-title" style="margin-bottom: 0;">
-            OUR <span class="brand-highlight">TEAM</span>
-          </h2>
-          <div class="welcome-accent-line"></div>
-        </div>
-        <p class="news-description" style="font-size: 0.95rem; line-height: 1.7;">
-          At Divine Fingers, our greatest asset is the dedicated team behind our mission. We bring together experienced healthcare professionals, support staff and certified Registered Nurses, Registered Practical Nurses, and Personal Support Workers/Health Care Aids from various cultural backgrounds, who share a common purpose: enhancing healthcare experiences for providers, patients, and communities.
-        </p>
-
-
-
-        <div class="why-choose-list">
-          <div class="why-item">
-            <div class="why-icon-box">✓</div>
-            <div class="why-content">
-              <h4>Expertise &amp; Compassion</h4>
-              <p>We collaborate closely with healthcare organizations to address complex challenges and deliver meaningful solutions.</p>
-            </div>
-          </div>
-
-          <div class="why-item">
-            <div class="why-icon-box">✓</div>
-            <div class="why-content">
-              <h4>Lasting Positive Impact</h4>
-              <p>Helping shape a more connected, responsive, and patient-focused future for healthcare across Canada.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- HOMEPAGE DIRECT CONTACT FORM SECTION -->
-  <section class="section-padding contact-section" id="home-contact">
+  <!-- CONTACT US SECTION (SHARP TOP SLANT LEFT) -->
+  <section class="section-padding contact-section geometric-ribbon-section sharp-top-slant-right" id="contact">
     <div class="container">
-      <div class="welcome-header center-title">
+      <div class="welcome-header center-title slide-from-top" style="margin-bottom: 1.5rem;">
         <h2 class="welcome-title">
           Contact <span class="brand-highlight">DIVINE FINGERS HEALTHCARE SERVICES INC.</span>
         </h2>
         <div class="welcome-accent-line"></div>
       </div>
-      <p class="section-subtitle center-subtitle">
+      <p class="section-subtitle center-subtitle slide-from-bottom">
         Have questions about facility staffing, PSW / Nursing placements, or Travelling Nursing services? Send us a direct message below.
       </p>
 
       <div class="contact-grid-row">
         <!-- Contact Info Card -->
-        <div class="contact-info-card">
-          <h3 class="contact-card-title">Divine Fingers Healthcare Services Inc.</h3>
-          <p class="contact-card-subtitle">Serving Greater Toronto &amp; Healthcare Organizations Across Canada</p>
+        <div class="contact-info-card slide-from-left">
+          <div>
+            <span class="proto-card-badge" style="margin-bottom: 0.4rem;">DISPATCH &amp; HQ</span>
+            <h3 class="contact-card-title">Divine Fingers Healthcare Services Inc.</h3>
+            <p class="contact-card-subtitle">Serving Greater Toronto &amp; Healthcare Organizations Across Canada</p>
 
-          <div class="contact-detail-list roles-stagger-list">
-            <div class="detail-item roles-stagger-item" style="--delay: 0.1s;">
-              <div class="detail-icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+            <div class="contact-detail-list">
+              <div class="detail-item">
+                <div class="detail-icon">
+                  <i data-lucide="map-pin" style="width: 22px; height: 22px;"></i>
+                </div>
+                <div class="detail-text">
+                  <strong>Scarborough Office HQ</strong>
+                  <span>17-2 Dailing Gate, Scarborough, ON M1B 1Z8, Canada</span>
+                </div>
               </div>
-              <div class="detail-text">
-                <strong>Scarborough Office HQ</strong><br>
-                Scarborough, ON M1B 1Z8, Canada
-              </div>
-            </div>
 
-            <div class="detail-item roles-stagger-item" style="--delay: 0.25s;">
-              <div class="detail-icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+              <div class="detail-item">
+                <div class="detail-icon">
+                  <i data-lucide="phone-call" style="width: 22px; height: 22px;"></i>
+                </div>
+                <div class="detail-text">
+                  <strong>24/7 Dispatch Phone Lines</strong>
+                  <span>+1 (647) 210-6463 | +1 (647) 764-8522</span>
+                </div>
               </div>
-              <div class="detail-text">
-                <strong>24/7 Dispatch Phone Lines</strong><br>
-                +1 (647) 210-6463 | +1 (647) 764-8522
-              </div>
-            </div>
 
-            <div class="detail-item roles-stagger-item" style="--delay: 0.4s;">
-              <div class="detail-icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-              </div>
-              <div class="detail-text">
-                <strong>Official Email Inquiry</strong><br>
-                info@divinefingershealthcare.ca
+              <div class="detail-item">
+                <div class="detail-icon">
+                  <i data-lucide="mail" style="width: 22px; height: 22px;"></i>
+                </div>
+                <div class="detail-text">
+                  <strong>Official Email Inquiry</strong>
+                  <span>info@divinefingershealthcare.ca</span>
+                </div>
               </div>
             </div>
           </div>
+
+          <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid rgba(11, 37, 69, 0.08);">
+            <p style="font-size: 0.85rem; color: #64748B; margin: 0;">
+              <strong>Emergency Surge Staffing:</strong> Our on-call supervisors dispatch certified staff within 2 hours across Ontario.
+            </p>
+          </div>
         </div>
 
-        <!-- High Visibility Contact Form -->
-        <form class="custom-form" id="home-contact-form">
+        <!-- Modern Contact Form -->
+        <form class="custom-form slide-from-right" id="home-contact-form">
           <!-- Brand Header -->
           <div class="form-brand-header">
             <img src="assets/images/logo.png" alt="Divine Fingers Healthcare Logo">
             <div class="form-brand-header-text">
               <span class="form-brand-header-name">Divine Fingers Healthcare Services Inc.</span>
-              <span class="form-brand-header-tagline">General Enquiry</span>
+              <span class="form-brand-header-tagline">General &amp; Staffing Enquiry</span>
             </div>
           </div>
           <!-- Watermark Logo -->
           <img src="assets/images/logo.png" alt="" class="form-watermark-logo" aria-hidden="true">
-          <h3 class="form-title">Send Us a Direct Message</h3>
+          <h3 class="form-title" style="font-family: var(--font-heading); font-weight: 800; color: var(--navy); margin-bottom: 1.25rem;">Send Us a Direct Message</h3>
           <div class="form-row-grid">
             <input type="text" class="form-field" id="home-contact-name" placeholder="YOUR FULL NAME" required>
             <input type="email" class="form-field" id="home-contact-email" placeholder="YOUR EMAIL ADDRESS" required>
@@ -408,7 +466,7 @@
             <input type="text" class="form-field" id="home-contact-subject" placeholder="INQUIRY TYPE (Staffing / Travelling Nursing / Care)" required>
           </div>
           <textarea class="form-field textarea-field" id="home-contact-message" rows="4" placeholder="HOW CAN OUR HEALTHCARE TEAM ASSIST YOU TODAY?" required></textarea>
-          <button type="submit" class="btn btn-pill-hero full-width-btn">SEND MESSAGE</button>
+          <button type="submit" class="btn btn-pill-hero full-width-btn" style="padding: 1rem; font-size: 1rem; font-weight: 800; letter-spacing: 0.5px;">SEND MESSAGE</button>
           <div class="form-feedback-msg" id="home-form-feedback"></div>
         </form>
       </div>
@@ -418,12 +476,12 @@
   <!-- QUICK CONTACT CALLOUT BANNER -->
   <section class="callout-banner-section">
     <div class="container callout-banner-grid">
-      <div class="callout-text-block">
+      <div class="callout-text-block slide-from-left">
         <h3>Need Immediate Healthcare Staffing Support?</h3>
         <p>Our Scarborough office is open 24 hours a day, 7 days a week. Speak directly with our care coordination team.</p>
       </div>
 
-      <div class="callout-btn-group">
+      <div class="callout-btn-group slide-from-right">
         <a href="tel:+16472106463" class="btn btn-pill-hero">CALL +1 (647) 210-6463</a>
         <a href="contact.html" class="btn btn-pill-outline">CONTACT US PAGE</a>
       </div>
@@ -501,6 +559,9 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-  <script src="script.js?v=4.9.0"></script>
+  <script src="script.js?v=5.0.0"></script>
+  <script>
+    if (window.lucide) lucide.createIcons();
+  </script>
 </body>
 </html>

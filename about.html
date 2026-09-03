@@ -10,8 +10,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Open+Sans:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&family=Pacifico&display=swap" rel="stylesheet">
   
-  <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="prototype.css">
+  <link rel="stylesheet" href="style.css?v=5.0.0">
+  <link rel="stylesheet" href="prototype.css?v=5.0.0">
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
@@ -77,16 +77,14 @@
        ========================================================================= -->
   <section class="section-padding sharp-top-slant-left" id="executive-overview" style="background-color: var(--white); overflow: hidden;">
     <div class="container sectors-section" style="max-width: 1440px;">
-      <div class="proto-split-grid">
+      <div class="proto-split-grid" style="align-items: center; gap: 3.5rem;">
         
-        <!-- Left: Text Block & Key Highlights -->
-        <div>
-          <div class="accent-heading-wrapper" style="margin-bottom: 1.5rem;">
-            <h2 class="welcome-title" style="margin-bottom: 0;">
-              Executive <span class="brand-highlight">OVERVIEW</span>
-            </h2>
-            <div class="welcome-accent-line"></div>
-          </div>
+        <!-- Left: Narrative Column -->
+        <div class="welcome-narrative-col slide-from-left">
+          <span class="proto-section-eyebrow">ABOUT DIVINE FINGERS</span>
+          <h2 class="proto-heading-lg" style="margin-bottom: 1.25rem;">
+            Rooted in Trusted Healthcare Expertise &amp; Critical Thinking
+          </h2>
           
           <p class="welcome-text" style="font-size: 1.15rem; color: #1E293B; line-height: 1.85; margin-bottom: 1.5rem; font-weight: 500;">
             At Divine fingers healthcare services, we value people first. We partner with healthcare organizations to craft high-quality patient centered care rooted in trusted healthcare expertise with critical thinking to achieve great result within the targeted period. Our focus is to provide well-vetted nurses and PSWs with high level skills and competency.
@@ -117,7 +115,7 @@
         </div>
 
         <!-- Right: Photo Block with Floating Badge -->
-        <div style="position: relative;">
+        <div style="position: relative;" class="slide-from-right">
           <div style="border-radius: var(--proto-radius-lg); overflow: hidden; box-shadow: var(--proto-shadow); border: 4px solid var(--white);">
             <img src="assets/images/team_divine.jpg" alt="Divine Fingers Care Team" style="width: 100%; height: 420px; object-fit: cover; display: block;">
           </div>
@@ -140,7 +138,7 @@
       <div class="proto-split-grid" style="align-items: center; gap: 3.5rem;">
         
         <!-- Left Column: Purpose Narrative Anchor -->
-        <div>
+        <div class="slide-from-left">
           <span class="proto-section-eyebrow">PURPOSE-DRIVEN HEALTHCARE</span>
           <h2 class="proto-heading-lg" style="margin-bottom: 1.25rem;">
             Empowering healthcare organizations with trusted talent.
@@ -154,7 +152,7 @@
         </div>
 
         <!-- Right Column: Stacked Interactive Mission & Vision Cards -->
-        <div class="proto-stacked-mv-cards">
+        <div class="proto-stacked-mv-cards slide-from-right">
           
           <!-- Mission Card -->
           <article class="proto-stacked-mv-card mission-card">
@@ -231,7 +229,7 @@
               <i data-lucide="shield-check" style="width: 22px; height: 22px;"></i>
             </div>
             <div>
-              <span class="proto-card-badge" style="margin-bottom: 0.15rem; color: #00A896;">ETHICAL PROMISE &amp; ACTION</span>
+              <span class="proto-card-badge" style="margin-bottom: 0.15rem; color: #00A896;">INTEGRITY &amp; RESPONSIBILITY</span>
               <h3 class="proto-value-title-2x2">Accountability at Every Level</h3>
             </div>
           </div>
@@ -240,20 +238,20 @@
           </p>
         </article>
 
-        <!-- Value 03: Partnership Not Transactions -->
+        <!-- Value 03: Collaborative Partnership -->
         <article class="proto-value-card-2x2">
           <span class="proto-card-num-watermark">03</span>
           <div class="proto-value-header-row">
             <div class="proto-value-icon-box-2x2">
-              <i data-lucide="users" style="width: 22px; height: 22px;"></i>
+              <i data-lucide="handshake" style="width: 22px; height: 22px;"></i>
             </div>
             <div>
-              <span class="proto-card-badge" style="margin-bottom: 0.15rem;">COLLABORATIVE ADAPTATION</span>
-              <h3 class="proto-value-title-2x2">Partnership Not Transactions</h3>
+              <span class="proto-card-badge" style="margin-bottom: 0.15rem;">TEAMWORK &amp; LISTENING</span>
+              <h3 class="proto-value-title-2x2">Collaborative Partnership</h3>
             </div>
           </div>
           <p class="proto-value-text-2x2">
-            We work alongside our clients not just for them. We involve, listen, collaborate and adapt to support the evolving care/needs.
+            We work alongside our clients — not just for them. We involve, listen, collaborate and adapt to support evolving care needs across facilities in Canada.
           </p>
         </article>
 
@@ -265,12 +263,12 @@
               <i data-lucide="award" style="width: 22px; height: 22px;"></i>
             </div>
             <div>
-              <span class="proto-card-badge" style="margin-bottom: 0.15rem; color: #00A896;">CLINICAL BENCHMARK</span>
+              <span class="proto-card-badge" style="margin-bottom: 0.15rem; color: #00A896;">HIGH CLINICAL STANDARDS</span>
               <h3 class="proto-value-title-2x2">Quality Over Quantity</h3>
             </div>
           </div>
           <p class="proto-value-text-2x2">
-            We prioritize competence, professionalism, reliability and trust in every nurse and Personal Support Worker we deploy.
+            We prioritize competence, professionalism, reliability and trust in every placement. We match healthcare talent not just for headcount, but for clinical excellence.
           </p>
         </article>
 
@@ -279,31 +277,33 @@
   </section>
 
   <!-- =========================================================================
-       4. OUR TEAM NARRATIVE (SHARP TOP SLANT RIGHT)
+       4. OUR TEAM (STAGGERED GALLERY + EDITORIAL STORY - SHARP TOP SLANT RIGHT)
        ========================================================================= -->
   <section class="section-padding sharp-top-slant-right" style="background-color: var(--white); overflow: hidden;">
-    <div class="container why-choose-grid">
+    <div class="container sectors-section" style="max-width: 1440px;">
       
-      <!-- Left: Signature 3-Picture Photo Collage -->
-      <div class="gallery-photo-col">
-        <div class="photo-collage-3">
-          <div class="collage-item collage-item-main">
-            <img src="assets/images/team_divine.jpg" alt="Divine Fingers Healthcare Team" class="collage-img">
-            <span class="collage-badge">DIVERSE &amp; CERTIFIED STAFF</span>
-          </div>
-          <div class="collage-row-sub">
-            <div class="collage-item collage-item-sub">
-              <img src="assets/images/hero_divine.jpg" alt="Registered Nurses &amp; PSWs" class="collage-img">
+      <div class="proto-split-grid" style="align-items: center; gap: 3.5rem;">
+        
+        <!-- Left: Photo Collage Grid Layout -->
+        <div class="gallery-photo-col slide-from-left">
+          <div class="photo-collage-3">
+            <div class="collage-item collage-item-main">
+              <img src="assets/images/team_divine.jpg" alt="Divine Fingers Healthcare Team" class="collage-img">
+              <span class="collage-badge">DIVERSE &amp; CERTIFIED STAFF</span>
             </div>
-            <div class="collage-item collage-item-sub">
-              <img src="assets/images/role_psw_care.jpg" alt="Personal Support Workers Care" class="collage-img">
+            <div class="collage-row-sub">
+              <div class="collage-item collage-item-sub">
+                <img src="assets/images/hero_divine.jpg" alt="Registered Nurses &amp; PSWs" class="collage-img">
+              </div>
+              <div class="collage-item collage-item-sub">
+                <img src="assets/images/role_psw_care.jpg" alt="Personal Support Workers Care" class="collage-img">
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- Right: Team Story & Benefit Points -->
-      <div class="why-choose-info">
+        <!-- Right: Team Story & Benefit Points -->
+        <div class="why-choose-info slide-from-right">
         <div class="accent-heading-wrapper" style="margin-bottom: 1.5rem;">
           <h2 class="gallery-title" style="margin-bottom: 0;">
             OUR <span class="brand-highlight">TEAM</span>
@@ -353,12 +353,12 @@
        ========================================================================= -->
   <section class="callout-banner-section">
     <div class="container callout-banner-grid">
-      <div class="callout-text-block">
+      <div class="callout-text-block slide-from-left">
         <h3>Need Immediate Healthcare Staffing Support?</h3>
         <p>Our Scarborough office is open 24 hours a day, 7 days a week. Speak directly with our care coordination team.</p>
       </div>
 
-      <div class="callout-btn-group">
+      <div class="callout-btn-group slide-from-right">
         <a href="tel:+16472106463" class="btn btn-pill-hero">CALL +1 (647) 210-6463</a>
         <a href="contact.html" class="btn btn-pill-outline">CONTACT US PAGE</a>
       </div>

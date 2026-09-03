@@ -10,7 +10,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Open+Sans:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&family=Pacifico&display=swap" rel="stylesheet">
   
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=5.0.0">
+  <link rel="stylesheet" href="prototype.css?v=5.0.0">
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
 
@@ -85,46 +87,56 @@
       </div>
 
       <!-- Row 2: Overview text + Roles we hire -->
-      <div class="service-row2-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 3.5rem; align-items: center; margin-bottom: 3.5rem;">
+      <div class="contact-grid-row" style="margin-top: 0; align-items: stretch; margin-bottom: 3.5rem;">
 
-        <div class="slide-from-left">
-          <div class="narrative-card narrative-card-teal why-work-card">
-            <p>
+        <!-- Left: Overview Card -->
+        <div class="proto-content-card slide-from-left">
+          <div>
+            <span class="proto-card-badge" style="margin-bottom: 0.4rem;">EMPOWERING CLINICIANS</span>
+            <h3 class="contact-card-title">A Rewarding Healthcare Career</h3>
+            <p class="contact-card-subtitle" style="margin-bottom: 1.5rem;">
               At Divine Fingers, we are committed to creating a supportive, respectful, and rewarding workplace where healthcare professionals and support staff can thrive. We believe that when our team is valued and empowered, the quality of care delivered to clients is elevated.
             </p>
-          </div>
-          <div style="background: var(--white); border: 2px solid #CBD5E1; border-left: 5px solid var(--teal-green); border-radius: 8px; padding: 1.6rem; box-shadow: var(--shadow-soft);">
-            <strong style="font-family: var(--font-heading); font-size: 1.05rem; color: var(--navy); display: block; margin-bottom: 0.4rem;">Our Team Philosophy</strong>
-            <p style="font-size: 0.92rem; color: #475569; margin: 0; font-style: italic;">"When our team is valued and empowered, the quality of care we deliver to clients is elevated."</p>
-          </div>
-        </div>
 
-        <div class="slide-from-right">
-          <h3 style="font-family: var(--font-heading); font-size: 1.1rem; color: var(--navy); margin-bottom: 1.4rem; text-transform: uppercase; letter-spacing: 0.5px;">Roles We Hire For:</h3>
-          <div class="roles-stagger-list" style="display: flex; flex-direction: column; gap: 0.9rem;">
-            <div class="service-offering-card roles-stagger-item" style="--delay: 0.1s; ">
-              <div class="service-icon-badge"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
-              <p class="service-offering-text">Registered Nurses (RN) — Acute &amp; Community Settings</p>
-            </div>
-            <div class="service-offering-card roles-stagger-item" style="--delay: 0.25s; ">
-              <div class="service-icon-badge"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
-              <p class="service-offering-text">Registered Practical Nurses (RPN)</p>
-            </div>
-            <div class="service-offering-card roles-stagger-item" style="--delay: 0.4s; ">
-              <div class="service-icon-badge"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
-              <p class="service-offering-text">Personal Support Workers (PSW) &amp; Health Care Aides</p>
-            </div>
-            <div class="service-offering-card roles-stagger-item" style="--delay: 0.55s; ">
-              <div class="service-icon-badge"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
-              <p class="service-offering-text">Travelling Nurses — Cross-Regional Placements Across Canada</p>
-            </div>
-            <div class="service-offering-card roles-stagger-item" style="--delay: 0.7s; ">
-              <div class="service-icon-badge"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
-              <p class="service-offering-text">Community Support &amp; Companion Care Workers</p>
+            <div style="background: var(--proto-bg-tint); border: 1px solid rgba(11, 37, 69, 0.06); border-left: 4px solid var(--teal-green); border-radius: 12px; padding: 1.25rem 1.4rem;">
+              <strong style="font-family: var(--font-heading); font-size: 0.98rem; color: var(--navy); display: block; margin-bottom: 0.3rem;">Our Team Philosophy</strong>
+              <p style="font-size: 0.88rem; color: #475569; margin: 0; line-height: 1.6; font-style: italic;">
+                "When our team is valued and empowered, the quality of care we deliver to clients is elevated."
+              </p>
             </div>
           </div>
         </div>
 
+        <!-- Right: Roles We Hire For -->
+        <div class="proto-content-card slide-from-right">
+          <div>
+            <span class="proto-card-badge" style="margin-bottom: 0.4rem;">OPEN DISCIPLINES</span>
+            <h3 class="contact-card-title">Roles We Hire For</h3>
+            
+            <div class="contact-detail-list" style="gap: 0.85rem; margin-top: 1rem;">
+              <div class="detail-item">
+                <div class="detail-icon"><i data-lucide="stethoscope" style="width: 20px; height: 20px;"></i></div>
+                <div class="detail-text"><strong>Registered Nurses (RN)</strong><span>Acute, emergency, and long-term care settings</span></div>
+              </div>
+              <div class="detail-item">
+                <div class="detail-icon"><i data-lucide="user-check" style="width: 20px; height: 20px;"></i></div>
+                <div class="detail-text"><strong>Registered Practical Nurses (RPN)</strong><span>Complex continuing care and facility shifts</span></div>
+              </div>
+              <div class="detail-item">
+                <div class="detail-icon"><i data-lucide="heart-pulse" style="width: 20px; height: 20px;"></i></div>
+                <div class="detail-text"><strong>Personal Support Workers (PSW) &amp; Aides</strong><span>Daily living support and residential care</span></div>
+              </div>
+              <div class="detail-item">
+                <div class="detail-icon"><i data-lucide="map-pin" style="width: 20px; height: 20px;"></i></div>
+                <div class="detail-text"><strong>Travelling Nurses Program</strong><span>High-compensation cross-regional deployments</span></div>
+              </div>
+              <div class="detail-item">
+                <div class="detail-icon"><i data-lucide="heart-handshake" style="width: 20px; height: 20px;"></i></div>
+                <div class="detail-text"><strong>Community &amp; Companion Support</strong><span>One-on-one personalized community care</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
 
       </div>
     </div>
@@ -144,136 +156,144 @@
         <span class="service-section-badge" style="font-family: var(--font-heading); font-size: 0.82rem; font-weight: 800; color: var(--sky-blue); background: rgba(27, 174, 207, 0.12); padding: 0.5rem 1.2rem; border-radius: 4px; text-transform: uppercase; letter-spacing: 1px;">BENEFITS &amp; WORK ENVIRONMENT</span>
       </div>
 
-      <!-- Row 2: Two key offer columns -->
-      <div class="service-row2-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 3.5rem; align-items: start; margin-bottom: 3.5rem;">
+      <!-- Row 2: 4 Core Benefit Pillars Grid -->
+      <div class="proto-grid-2col" style="margin-bottom: 3.5rem;">
 
-        <!-- Left: Meaningful Work + Flexible Schedule -->
-        <div class="slide-from-left">
-          <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.2rem; padding-bottom: 0.8rem; border-bottom: 2px solid rgba(0, 168, 150, 0.15);">
-            <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(0, 168, 150, 0.12); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--teal-green);">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l8.78-8.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+        <!-- Card 1: Meaningful Work -->
+        <div class="proto-content-card slide-from-left">
+          <div>
+            <div class="proto-card-header-icon-row">
+              <div class="proto-icon-box-md">
+                <i data-lucide="heart" style="width: 24px; height: 24px;"></i>
+              </div>
+              <div>
+                <span class="proto-card-badge" style="margin-bottom: 0.2rem;">IMPACT &amp; PURPOSE</span>
+                <h3 class="proto-card-title" style="margin-bottom: 0; font-size: 1.3rem;">Meaningful Work</h3>
+              </div>
             </div>
-            <h3 style="font-family: var(--font-heading); font-size: 1.2rem; color: var(--navy); margin: 0; font-weight: 800;">Meaningful Work</h3>
-          </div>
-          <div class="narrative-card narrative-card-teal" style="margin-bottom: 1.8rem;">
-            <p>
+            <p class="contact-card-subtitle" style="margin-bottom: 1.2rem;">
               Make a real difference in the lives of seniors, individuals with disabilities, and community members across Canada. Every shift is an opportunity to bring dignity, comfort, and compassionate care to those who need it most.
             </p>
           </div>
+        </div>
 
-          <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.2rem; padding-bottom: 0.8rem; border-bottom: 2px solid rgba(27, 174, 207, 0.15);">
-            <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(27, 174, 207, 0.12); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--sky-blue);">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+        <!-- Card 2: Flexible Work Options -->
+        <div class="proto-content-card slide-from-right">
+          <div>
+            <div class="proto-card-header-icon-row">
+              <div class="proto-icon-box-md icon-cyan">
+                <i data-lucide="calendar" style="width: 24px; height: 24px;"></i>
+              </div>
+              <div>
+                <span class="proto-card-badge" style="margin-bottom: 0.2rem; color: #00A896;">WORK-LIFE BALANCE</span>
+                <h3 class="proto-card-title" style="margin-bottom: 0; font-size: 1.3rem;">Flexible Work Options</h3>
+              </div>
             </div>
-            <h3 style="font-family: var(--font-heading); font-size: 1.2rem; color: var(--navy); margin: 0; font-weight: 800;">Flexible Work Options</h3>
-          </div>
-          <div class="narrative-card narrative-card-sky" style="margin-bottom: 1.4rem;">
-            <p>
-              Choose schedules that fit your lifestyle — part-time, full-time, and casual opportunities are available. We work with you to find the right balance between your professional and personal life.
+            <p class="contact-card-subtitle" style="margin-bottom: 1.2rem;">
+              Choose schedules that fit your lifestyle — part-time, full-time, and casual opportunities available with day, evening, and overnight shift flexibility.
             </p>
-          </div>
-          <div class="roles-stagger-list" style="display: flex; flex-direction: column; gap: 0.8rem;">
-            <div class="service-offering-card roles-stagger-item" style="--delay: 0.1s; ">
-              <div class="service-icon-badge"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></div>
-              <p class="service-offering-text">Part-time, full-time, and casual shift options</p>
-            </div>
-            <div class="service-offering-card roles-stagger-item" style="--delay: 0.25s; ">
-              <div class="service-icon-badge"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></div>
-              <p class="service-offering-text">Day, evening, and overnight availability</p>
-            </div>
-            <div class="service-offering-card roles-stagger-item" style="--delay: 0.4s; ">
-              <div class="service-icon-badge"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></div>
-              <p class="service-offering-text">Location-based placement preferences honoured</p>
-            </div>
           </div>
         </div>
 
-        <!-- Right: Diverse Environments + Growth -->
-        <div class="slide-from-right">
-          <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.2rem; padding-bottom: 0.8rem; border-bottom: 2px solid rgba(78, 205, 196, 0.15);">
-            <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(78, 205, 196, 0.12); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--cyan-turquoise);">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"></path><path d="M5 21V7l8-4v18"></path><path d="M19 21V11l-6-3"></path><path d="M9 9v.01"></path><path d="M9 13v.01"></path><path d="M9 17v.01"></path></svg>
+        <!-- Card 3: Diverse Work Environments -->
+        <div class="proto-content-card slide-from-left">
+          <div>
+            <div class="proto-card-header-icon-row">
+              <div class="proto-icon-box-md">
+                <i data-lucide="building-2" style="width: 24px; height: 24px;"></i>
+              </div>
+              <div>
+                <span class="proto-card-badge" style="margin-bottom: 0.2rem;">CLINICAL EXPANSION</span>
+                <h3 class="proto-card-title" style="margin-bottom: 0; font-size: 1.3rem;">Diverse Work Environments</h3>
+              </div>
             </div>
-            <h3 style="font-family: var(--font-heading); font-size: 1.2rem; color: var(--navy); margin: 0; font-weight: 800;">Diverse Work Environments</h3>
-          </div>
-          <div class="narrative-card narrative-card-cyan" style="margin-bottom: 1.8rem;">
-            <p>
-              Gain valuable experience across multiple care settings — from home care and long-term care facilities to retirement homes, hospitals, and community health environments throughout Canada.
+            <p class="contact-card-subtitle" style="margin-bottom: 1.2rem;">
+              Gain valuable clinical experience across multiple healthcare settings — from home care and long-term care facilities to retirement homes, acute hospitals, and community health centers.
             </p>
           </div>
+        </div>
 
-          <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.2rem; padding-bottom: 0.8rem; border-bottom: 2px solid rgba(0, 168, 150, 0.15);">
-            <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(0, 168, 150, 0.12); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--teal-green);">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+        <!-- Card 4: Professional Growth -->
+        <div class="proto-content-card slide-from-right">
+          <div>
+            <div class="proto-card-header-icon-row">
+              <div class="proto-icon-box-md icon-cyan">
+                <i data-lucide="trending-up" style="width: 24px; height: 24px;"></i>
+              </div>
+              <div>
+                <span class="proto-card-badge" style="margin-bottom: 0.2rem; color: #00A896;">CAREER DEVELOPMENT</span>
+                <h3 class="proto-card-title" style="margin-bottom: 0; font-size: 1.3rem;">Professional Growth</h3>
+              </div>
             </div>
-            <h3 style="font-family: var(--font-heading); font-size: 1.2rem; color: var(--navy); margin: 0; font-weight: 800;">Professional Growth</h3>
-          </div>
-          <div class="narrative-card narrative-card-teal" style="margin-bottom: 1.4rem;">
-            <p>
-              Access ongoing training, skill development, and career advancement opportunities. We invest in your professional journey and support you in reaching your full potential.
+            <p class="contact-card-subtitle" style="margin-bottom: 1.2rem;">
+              Access ongoing training, competency development, CPR recertification support, and mentorship pathways designed to help you reach your full clinical potential.
             </p>
-          </div>
-          <div class="roles-stagger-list" style="display: flex; flex-direction: column; gap: 0.8rem;">
-            <div class="service-offering-card roles-stagger-item" style="--delay: 0.1s; ">
-              <div class="service-icon-badge"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg></div>
-              <p class="service-offering-text">Ongoing clinical training and skills upgrading</p>
-            </div>
-            <div class="service-offering-card roles-stagger-item" style="--delay: 0.25s; ">
-              <div class="service-icon-badge"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></div>
-              <p class="service-offering-text">Mentorship and performance feedback programs</p>
-            </div>
-            <div class="service-offering-card roles-stagger-item" style="--delay: 0.4s; ">
-              <div class="service-icon-badge"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg></div>
-              <p class="service-offering-text">Career advancement pathways and referral opportunities</p>
-            </div>
           </div>
         </div>
 
       </div>
 
-      <!-- Row 3: Supportive Culture Panel (full-width dual group) -->
+      <!-- Row 3: Supportive Culture & Recognition Grid -->
       <div>
-        <h3 class="service-row3-subheader" style="font-family: var(--font-heading); font-size: 1.3rem; color: var(--navy); margin-bottom: 1.8rem; text-transform: uppercase; letter-spacing: 0.5px;">Our Workplace Culture:</h3>
-        <div class="service-row3-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 2rem; align-items: start;">
+        <div class="accent-heading-wrapper" style="margin-bottom: 1.8rem;">
+          <h3 style="font-family: var(--font-heading); font-size: 1.3rem; font-weight: 800; color: var(--navy); margin-bottom: 0; text-transform: uppercase; letter-spacing: 0.5px;">Our Workplace Culture</h3>
+          <div class="welcome-accent-line"></div>
+        </div>
 
-          <div class="slide-from-left service-row3-panel" style="background: var(--white); border: 2px solid #CBD5E1; border-top: 4px solid var(--teal-green); border-radius: 8px; padding: 2rem 1.8rem; box-shadow: var(--shadow-soft);">
-            <div class="service-row3-panel-header" style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; padding-bottom: 0.8rem; border-bottom: 1px solid #E2E8F0;">
-              <div style="width: 10px; height: 10px; border-radius: 50%; background: var(--teal-green);"></div>
-              <h4 style="font-family: var(--font-heading); font-size: 1.1rem; color: var(--navy); margin: 0; text-transform: uppercase; letter-spacing: 0.5px;">Supportive Culture</h4>
-            </div>
-            <div class="roles-stagger-list" style="display: flex; flex-direction: column; gap: 1rem;">
-              <div class="service-offering-card roles-stagger-item" style="--delay: 0.1s; ">
-                <div class="service-icon-badge"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></div>
-                <p class="service-offering-text">Work with an agency that listens and respects your contribution</p>
+        <div class="proto-grid-2col">
+
+          <div class="proto-content-card slide-from-left">
+            <div>
+              <div class="proto-card-header-icon-row">
+                <div class="proto-icon-box-md">
+                  <i data-lucide="smile" style="width: 24px; height: 24px;"></i>
+                </div>
+                <div>
+                  <span class="proto-card-badge" style="margin-bottom: 0.2rem;">RESPECT &amp; CARE</span>
+                  <h4 class="proto-card-title" style="margin: 0; font-size: 1.2rem;">Supportive Culture</h4>
+                </div>
               </div>
-              <div class="service-offering-card roles-stagger-item" style="--delay: 0.25s; ">
-                <div class="service-icon-badge"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg></div>
-                <p class="service-offering-text">Prioritizing your safety, wellness, and work-life balance</p>
-              </div>
-              <div class="service-offering-card roles-stagger-item" style="--delay: 0.4s; ">
-                <div class="service-icon-badge"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><polyline points="17 11 19 13 23 9"></polyline></svg></div>
-                <p class="service-offering-text">Open-door communication and responsive HR support</p>
+              <div class="contact-detail-list" style="gap: 0.85rem;">
+                <div class="detail-item">
+                  <div class="detail-icon" style="width: 36px; height: 36px;"><i data-lucide="check" style="width: 18px; height: 18px;"></i></div>
+                  <div class="detail-text"><span>Work with an agency that actively listens and values your contribution</span></div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-icon" style="width: 36px; height: 36px;"><i data-lucide="check" style="width: 18px; height: 18px;"></i></div>
+                  <div class="detail-text"><span>Prioritizing your clinical safety, wellness, and healthy work-life balance</span></div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-icon" style="width: 36px; height: 36px;"><i data-lucide="check" style="width: 18px; height: 18px;"></i></div>
+                  <div class="detail-text"><span>Open-door communication and 24/7 responsive coordinator support</span></div>
+                </div>
               </div>
             </div>
           </div>
 
-          <div class="slide-from-right service-row3-panel" style="background: var(--white); border: 2px solid #CBD5E1; border-top: 4px solid var(--sky-blue); border-radius: 8px; padding: 2rem 1.8rem; box-shadow: var(--shadow-soft);">
-            <div class="service-row3-panel-header" style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; padding-bottom: 0.8rem; border-bottom: 1px solid #E2E8F0;">
-              <div style="width: 10px; height: 10px; border-radius: 50%; background: var(--sky-blue);"></div>
-              <h4 style="font-family: var(--font-heading); font-size: 1.1rem; color: var(--navy); margin: 0; text-transform: uppercase; letter-spacing: 0.5px;">Recognition &amp; Respect</h4>
-            </div>
-            <div class="roles-stagger-list" style="display: flex; flex-direction: column; gap: 1rem;">
-              <div class="service-offering-card roles-stagger-item" style="--delay: 0.1s; ">
-                <div class="service-icon-badge"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg></div>
-                <p class="service-offering-text">Recognition for dedication, reliability, and excellent care delivery</p>
+          <div class="proto-content-card slide-from-right">
+            <div>
+              <div class="proto-card-header-icon-row">
+                <div class="proto-icon-box-md icon-cyan">
+                  <i data-lucide="sparkles" style="width: 24px; height: 24px;"></i>
+                </div>
+                <div>
+                  <span class="proto-card-badge" style="margin-bottom: 0.2rem; color: #00A896;">MERIT &amp; COMPENSATION</span>
+                  <h4 class="proto-card-title" style="margin: 0; font-size: 1.2rem;">Recognition &amp; Respect</h4>
+                </div>
               </div>
-              <div class="service-offering-card roles-stagger-item" style="--delay: 0.25s; ">
-                <div class="service-icon-badge"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg></div>
-                <p class="service-offering-text">Inclusive and culturally respectful team environment</p>
-              </div>
-              <div class="service-offering-card roles-stagger-item" style="--delay: 0.4s; ">
-                <div class="service-icon-badge"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg></div>
-                <p class="service-offering-text">Competitive compensation and transparent pay structure</p>
+              <div class="contact-detail-list" style="gap: 0.85rem;">
+                <div class="detail-item">
+                  <div class="detail-icon" style="width: 36px; height: 36px;"><i data-lucide="check" style="width: 18px; height: 18px;"></i></div>
+                  <div class="detail-text"><span>Recognition for dedication, reliability, and excellence in care</span></div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-icon" style="width: 36px; height: 36px;"><i data-lucide="check" style="width: 18px; height: 18px;"></i></div>
+                  <div class="detail-text"><span>Inclusive and culturally respectful team environment across Ontario</span></div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-icon" style="width: 36px; height: 36px;"><i data-lucide="check" style="width: 18px; height: 18px;"></i></div>
+                  <div class="detail-text"><span>Competitive compensation rates and transparent, timely pay direct deposit</span></div>
+                </div>
               </div>
             </div>
           </div>
@@ -291,7 +311,7 @@
     <div class="container sectors-section" style="max-width: 1440px;">
 
       <!-- Row 1: Segment Header -->
-      <div class="service-section-header-row" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 2.2rem; border-bottom: 2px solid rgba(78, 205, 196, 0.2); padding-bottom: 1.2rem;">
+      <div class="service-section-header-row slide-from-top" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 2.2rem; border-bottom: 2px solid rgba(78, 205, 196, 0.2); padding-bottom: 1.2rem;">
         <div class="accent-heading-wrapper" style="margin-bottom: 0;">
           <h2 class="welcome-title" style="margin-bottom: 0;">Apply <span class="brand-highlight">NOW</span></h2>
           <div class="welcome-accent-line"></div>
@@ -300,86 +320,100 @@
       </div>
 
       <!-- Row 2: Context + Form side by side -->
-      <div class="service-row2-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 3.5rem; align-items: start;">
+      <div class="contact-grid-row" style="margin-top: 0; align-items: start;">
 
         <!-- Left: Application context -->
-        <div class="slide-from-left">
-          <div class="narrative-card narrative-card-cyan" style="margin-bottom: 1.8rem;">
-            <p>
-              Ready to join the Divine Fingers team? Fill out the quick application form and upload your resume. Our recruitment coordinator will review your submission and reach out to discuss your placement options.
+        <div class="contact-info-card slide-from-left">
+          <div>
+            <span class="proto-card-badge" style="margin-bottom: 0.4rem;">EXPEDITED RECRUITMENT DESK</span>
+            <h3 class="contact-card-title">Join Our Clinical Care Team</h3>
+            <p class="contact-card-subtitle">Ready to advance your healthcare career? Fill out our quick application and attach your CV. Our onboarding team will connect with you promptly.</p>
+
+            <div style="background: var(--proto-bg-tint); border: 1px solid rgba(11, 37, 69, 0.06); border-left: 4px solid var(--teal-green); border-radius: 12px; padding: 1.25rem 1.4rem; margin-bottom: 1.8rem;">
+              <strong style="font-family: var(--font-heading); font-size: 0.98rem; color: var(--navy); display: block; margin-bottom: 0.3rem;">What Happens After You Apply?</strong>
+              <p style="font-size: 0.88rem; color: #475569; margin: 0; line-height: 1.6;">Our clinical recruitment coordinator reviews your application, verifies credentials, and matches you to flexible shift placements within 48 hours.</p>
+            </div>
+
+            <h4 style="font-family: var(--font-heading); font-size: 0.95rem; font-weight: 800; color: var(--navy); margin-bottom: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px;">Application Requirements:</h4>
+            <div class="contact-detail-list" style="gap: 0.85rem;">
+              <div class="detail-item">
+                <div class="detail-icon" style="width: 36px; height: 36px;"><i data-lucide="check" style="width: 18px; height: 18px;"></i></div>
+                <div class="detail-text"><span>Valid provincial nursing registration (CNO) or PSW certificate</span></div>
+              </div>
+              <div class="detail-item">
+                <div class="detail-icon" style="width: 36px; height: 36px;"><i data-lucide="check" style="width: 18px; height: 18px;"></i></div>
+                <div class="detail-text"><span>Updated resume / CV (PDF, DOC or DOCX)</span></div>
+              </div>
+              <div class="detail-item">
+                <div class="detail-icon" style="width: 36px; height: 36px;"><i data-lucide="check" style="width: 18px; height: 18px;"></i></div>
+                <div class="detail-text"><span>Current CPR / Basic Life Support certification</span></div>
+              </div>
+              <div class="detail-item">
+                <div class="detail-icon" style="width: 36px; height: 36px;"><i data-lucide="check" style="width: 18px; height: 18px;"></i></div>
+                <div class="detail-text"><span>Vulnerable Sector Check (can be finalized during onboarding)</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top: 1.8rem; padding-top: 1.2rem; border-top: 1px solid rgba(11, 37, 69, 0.08);">
+            <p style="font-size: 0.84rem; color: #64748B; margin: 0;">
+              <strong>Need Immediate Shift Placement?</strong> Call our recruitment direct line at <a href="tel:+16472106463" style="color: var(--teal-green); font-weight: 700;">+1 (647) 210-6463</a>.
             </p>
-          </div>
-          <div style="background: var(--white); border: 2px solid #CBD5E1; border-left: 5px solid var(--cyan-turquoise); border-radius: 8px; padding: 1.6rem; box-shadow: var(--shadow-soft); margin-bottom: 1.8rem;">
-            <strong style="font-family: var(--font-heading); font-size: 1.05rem; color: var(--navy); display: block; margin-bottom: 0.4rem;">What Happens After You Apply?</strong>
-            <p style="font-size: 0.92rem; color: #475569; margin: 0; font-style: italic;">"Our recruitment team reviews your application, verifies credentials, and matches you to suitable placements — typically within 48 hours."</p>
-          </div>
-          <h3 style="font-family: var(--font-heading); font-size: 1.05rem; color: var(--navy); margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.5px;">Application Requirements:</h3>
-          <div class="roles-stagger-list" style="display: flex; flex-direction: column; gap: 0.75rem;">
-            <div class="service-offering-card roles-stagger-item" style="--delay: 0.1s; "><div class="service-icon-badge"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div><p class="service-offering-text">Valid provincial nursing registration or PSW certificate</p></div>
-            <div class="service-offering-card roles-stagger-item" style="--delay: 0.25s; "><div class="service-icon-badge"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div><p class="service-offering-text">Updated resume / CV (PDF, DOC or DOCX)</p></div>
-            <div class="service-offering-card roles-stagger-item" style="--delay: 0.4s; "><div class="service-icon-badge"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div><p class="service-offering-text">Current CPR / First Aid certification (where applicable)</p></div>
-            <div class="service-offering-card roles-stagger-item" style="--delay: 0.55s; "><div class="service-icon-badge"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div><p class="service-offering-text">Vulnerable Sector Check (VSC) — can be arranged post-application</p></div>
           </div>
         </div>
 
         <!-- Right: The Application Form -->
-        <div class="slide-from-right" style="width: 100%; max-width: 100%; box-sizing: border-box;">
-          <div class="form-card-container" style="margin-top: 0; width: 100%; max-width: 100%; box-sizing: border-box;">
-            <form class="custom-form" id="candidate-apply-form">
-              <!-- Brand Header -->
-              <div class="form-brand-header">
-                <img src="assets/images/logo.png" alt="Divine Fingers Healthcare Logo">
-                <div class="form-brand-header-text">
-                  <span class="form-brand-header-name">Divine Fingers Healthcare Services Inc.</span>
-                  <span class="form-brand-header-tagline">Candidate Application</span>
+        <div class="slide-from-right">
+          <form class="custom-form" id="candidate-apply-form">
+            <!-- Brand Header -->
+            <div class="form-brand-header">
+              <img src="assets/images/logo.png" alt="Divine Fingers Healthcare Logo">
+              <div class="form-brand-header-text">
+                <span class="form-brand-header-name">Divine Fingers Healthcare Services Inc.</span>
+                <span class="form-brand-header-tagline">Candidate Quick Application</span>
+              </div>
+            </div>
+            <!-- Watermark Logo -->
+            <img src="assets/images/logo.png" alt="" class="form-watermark-logo" aria-hidden="true">
+            <h3 class="form-title" style="font-family: var(--font-heading); font-weight: 800; color: var(--navy); margin-bottom: 1.25rem;">Candidate Quick Application Form</h3>
+            <div class="form-row-grid">
+              <input type="text" class="form-field" id="applicant-name" placeholder="FULL LEGAL NAME" required>
+              <input type="email" class="form-field" id="applicant-email" placeholder="EMAIL ADDRESS" required>
+            </div>
+            <div class="form-row-grid">
+              <input type="tel" class="form-field" id="applicant-phone" placeholder="PHONE NUMBER" required>
+              <select class="form-field" id="applicant-profession" required>
+                <option value="">YOUR PROFESSION / SPECIALTY...</option>
+                <option value="rn">Registered Nurse (RN)</option>
+                <option value="rpn">Registered Practical Nurse (RPN)</option>
+                <option value="psw">Personal Support Worker (PSW) / Health Care Aide</option>
+                <option value="travel">Travelling Nurse</option>
+                <option value="support">Support Staff</option>
+              </select>
+            </div>
+            <div class="form-row-grid">
+              <input type="text" class="form-field" id="license-num" placeholder="PROVINCIAL LICENSE / REGISTRATION #">
+              <input type="text" class="form-field" id="applicant-city" placeholder="CITY &amp; PROVINCE (e.g. Scarborough, ON)" required>
+            </div>
+
+            <!-- CUSTOM RESUME UPLOAD COMPONENT -->
+            <div class="custom-file-upload-box" style="margin-bottom: 1.5rem;">
+              <input type="file" id="applicant-resume" class="hidden-file-input" accept=".pdf,.doc,.docx" required>
+              <label for="applicant-resume" class="file-upload-label" style="border-radius: 14px;">
+                <div class="file-upload-icon-circle">
+                  <i data-lucide="upload-cloud" style="width: 24px; height: 24px;"></i>
                 </div>
-              </div>
-              <!-- Watermark Logo -->
-              <img src="assets/images/logo.png" alt="" class="form-watermark-logo" aria-hidden="true">
-              <h3 class="form-title">Candidate Quick Application Form</h3>
-              <div class="form-row-grid">
-                <input type="text" class="form-field" id="applicant-name" placeholder="FULL LEGAL NAME" required>
-                <input type="email" class="form-field" id="applicant-email" placeholder="EMAIL ADDRESS" required>
-              </div>
-              <div class="form-row-grid">
-                <input type="tel" class="form-field" id="applicant-phone" placeholder="PHONE NUMBER" required>
-                <select class="form-field" id="applicant-profession" required>
-                  <option value="">YOUR PROFESSION / SPECIALTY...</option>
-                  <option value="rn">Registered Nurse (RN)</option>
-                  <option value="rpn">Registered Practical Nurse (RPN)</option>
-                  <option value="psw">Personal Support Worker (PSW) / Health Care Aide</option>
-                  <option value="travel">Travelling Nurse</option>
-                  <option value="support">Support Staff</option>
-                </select>
-              </div>
-              <div class="form-row-grid">
-                <input type="text" class="form-field" id="license-num" placeholder="PROVINCIAL LICENSE / REGISTRATION #">
-                <input type="text" class="form-field" id="applicant-city" placeholder="CITY &amp; PROVINCE (e.g. Scarborough, ON)" required>
-              </div>
+                <div class="file-upload-text-group">
+                  <span class="file-upload-title">UPLOAD YOUR RESUME / CV *</span>
+                  <span class="file-upload-subtitle" id="file-chosen-name">Click to browse or drag &amp; drop file here (PDF, DOC, DOCX - Max 10MB)</span>
+                </div>
+                <span class="file-upload-btn-chip">BROWSE FILE</span>
+              </label>
+            </div>
 
-              <!-- CUSTOM RESUME UPLOAD COMPONENT -->
-              <div class="custom-file-upload-box">
-                <input type="file" id="applicant-resume" class="hidden-file-input" accept=".pdf,.doc,.docx" required>
-                <label for="applicant-resume" class="file-upload-label">
-                  <div class="file-upload-icon-circle">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                      <polyline points="17 8 12 3 7 8"></polyline>
-                      <line x1="12" y1="3" x2="12" y2="15"></line>
-                    </svg>
-                  </div>
-                  <div class="file-upload-text-group">
-                    <span class="file-upload-title">UPLOAD YOUR RESUME / CV *</span>
-                    <span class="file-upload-subtitle" id="file-chosen-name">Click to browse or drag &amp; drop file here (PDF, DOC, DOCX - Max 10MB)</span>
-                  </div>
-                  <span class="file-upload-btn-chip">BROWSE FILE</span>
-                </label>
-              </div>
-
-              <button type="submit" class="btn btn-pill-hero full-width-btn">SUBMIT APPLICATION WITH RESUME</button>
-              <div class="form-feedback-msg" id="candidate-form-feedback"></div>
-            </form>
-          </div>
+            <button type="submit" class="btn btn-pill-hero full-width-btn" style="padding: 1rem; font-size: 1rem; font-weight: 800; letter-spacing: 0.5px;">SUBMIT APPLICATION WITH RESUME</button>
+            <div class="form-feedback-msg" id="candidate-form-feedback"></div>
+          </form>
         </div>
 
       </div>
@@ -445,5 +479,8 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <script src="script.js?v=3.0.0"></script>
+  <script>
+    if (window.lucide) lucide.createIcons();
+  </script>
 </body>
 </html>

@@ -10,8 +10,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Open+Sans:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&family=Pacifico&display=swap" rel="stylesheet">
   
-  <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="prototype.css">
+  <link rel="stylesheet" href="style.css?v=5.0.0">
+  <link rel="stylesheet" href="prototype.css?v=5.0.0">
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
@@ -78,9 +78,12 @@
   <section class="ref-showcase-section sharp-top-slant-left">
     <div class="ref-showcase-container">
       
-      <!-- Center Section Eyebrow Header -->
-      <div class="ref-showcase-header">
-        <h2>Healthcare Services for Every Care Need</h2>
+      <!-- Section Eyebrow Header (Matches Homepage Architecture) -->
+      <div class="accent-heading-wrapper" style="margin-bottom: 4rem;">
+        <h2 class="welcome-title" style="margin-bottom: 0;">
+          Healthcare Services for <span class="brand-highlight">EVERY CARE NEED</span>
+        </h2>
+        <div class="welcome-accent-line"></div>
       </div>
 
       <!-- Alternating 2-Column Services List -->
@@ -92,7 +95,7 @@
         <article class="ref-service-row" id="personal-care">
           
           <!-- Image with Floating Circular Badge -->
-          <div class="ref-media-col">
+          <div class="ref-media-col slide-from-left">
             <div class="ref-circular-badge" title="Personal Care Support">
               <i data-lucide="heart-pulse"></i>
             </div>
@@ -102,7 +105,7 @@
           </div>
 
           <!-- Content Column with Micro-Pill Tag Cloud -->
-          <div class="ref-content-col">
+          <div class="ref-content-col slide-from-right">
             <h3 class="ref-service-title">Personal Care Support</h3>
             <p class="ref-service-desc">
               We provide comprehensive, person-centered support to promote independence, dignity, and overall well-being. Our focus is to deliver compassionate care tailored to meet unique needs in the comfort of home and community.
@@ -131,7 +134,7 @@
         <article class="ref-service-row reverse-row" id="travelling-nursing">
           
           <!-- Image with Floating Circular Badge -->
-          <div class="ref-media-col">
+          <div class="ref-media-col slide-from-right">
             <div class="ref-circular-badge" title="Travelling Nursing Program">
               <i data-lucide="map-pin"></i>
             </div>
@@ -141,7 +144,7 @@
           </div>
 
           <!-- Content Column with Micro-Pill Tag Cloud -->
-          <div class="ref-content-col">
+          <div class="ref-content-col slide-from-left">
             <h3 class="ref-service-title">Travelling Nursing Program</h3>
             <p class="ref-service-desc">
               Bringing expert nursing care directly to where it's needed most. High-quality, on-demand clinical care delivered in homes, retirement residences, long-term care facilities, and community settings across Canada.
@@ -170,7 +173,7 @@
         <article class="ref-service-row" id="companionship">
           
           <!-- Image with Floating Circular Badge -->
-          <div class="ref-media-col">
+          <div class="ref-media-col slide-from-left">
             <div class="ref-circular-badge" title="Support &amp; Companionship">
               <i data-lucide="heart-handshake"></i>
             </div>
@@ -180,7 +183,7 @@
           </div>
 
           <!-- Content Column with Micro-Pill Tag Cloud -->
-          <div class="ref-content-col">
+          <div class="ref-content-col slide-from-right">
             <h3 class="ref-service-title">Support &amp; Companionship</h3>
             <p class="ref-service-desc">
               Enhancing quality of life through meaningful social interaction, emotional support, and assistance with day-to-day community activities, promoting independence and reducing isolation.
@@ -207,7 +210,7 @@
         <article class="ref-service-row reverse-row" id="respite-care">
           
           <!-- Image with Floating Circular Badge -->
-          <div class="ref-media-col">
+          <div class="ref-media-col slide-from-right">
             <div class="ref-circular-badge" title="Respite Care Services">
               <i data-lucide="shield-check"></i>
             </div>
@@ -217,7 +220,7 @@
           </div>
 
           <!-- Content Column with Micro-Pill Tag Cloud -->
-          <div class="ref-content-col">
+          <div class="ref-content-col slide-from-left">
             <h3 class="ref-service-title">Respite Care Services</h3>
             <p class="ref-service-desc">
               Flexible and reliable respite care services designed to support primary caregivers while ensuring continuity of high-quality care for loved ones with dignity, safety, and individualized relief.
@@ -243,7 +246,7 @@
         <article class="ref-service-row" id="household-support">
           
           <!-- Image with Floating Circular Badge -->
-          <div class="ref-media-col">
+          <div class="ref-media-col slide-from-left">
             <div class="ref-circular-badge" title="Light Household Support">
               <i data-lucide="home"></i>
             </div>
@@ -253,7 +256,7 @@
           </div>
 
           <!-- Content Column with Micro-Pill Tag Cloud -->
-          <div class="ref-content-col">
+          <div class="ref-content-col slide-from-right">
             <h3 class="ref-service-title">Light Household Support</h3>
             <p class="ref-service-desc">
               Assistance with light household tasks to help maintain a clean, safe, and comfortable living environment while supporting independence, respect, and personal attention to detail.
@@ -279,7 +282,7 @@
         <article class="ref-service-row reverse-row" id="dementia-care">
           
           <!-- Image with Floating Circular Badge -->
-          <div class="ref-media-col">
+          <div class="ref-media-col slide-from-right">
             <div class="ref-circular-badge" title="Alzheimer's &amp; Dementia Care">
               <i data-lucide="brain"></i>
             </div>
@@ -289,7 +292,7 @@
           </div>
 
           <!-- Content Column with Micro-Pill Tag Cloud -->
-          <div class="ref-content-col">
+          <div class="ref-content-col slide-from-left">
             <h3 class="ref-service-title">Alzheimer’s &amp; Dementia Care</h3>
             <p class="ref-service-desc">
               Compassionate, person-centered support for individuals living with Alzheimer’s disease and other forms of dementia, focusing on dignity, safety, comfort, and structured daily routines.
@@ -318,12 +321,12 @@
        ========================================================================= -->
   <section class="callout-banner-section sharp-top-slant-right">
     <div class="container callout-banner-grid">
-      <div class="callout-text-block">
+      <div class="callout-text-block slide-from-left">
         <h3>Ready to Request Staffing or Community Care?</h3>
         <p>Our clinical coordination desk operates 24/7. Speak directly with our dispatch supervisors across Ontario.</p>
       </div>
 
-      <div class="callout-btn-group">
+      <div class="callout-btn-group slide-from-right">
         <a href="tel:+16472106463" class="btn btn-pill-hero">CALL +1 (647) 210-6463</a>
         <a href="contact.html" class="btn btn-pill-outline">CONTACT US PAGE</a>
       </div>

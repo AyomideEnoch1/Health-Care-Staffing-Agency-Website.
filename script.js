@@ -727,19 +727,47 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     };
 
-    animateAlternatingCards('.step-card, .sector-card, .product-card, .why-item, .team-card, .pillar-card, .service-card, .advantage-card, .perk-card, .contact-grid-row > div', 48);
+    // E. Staggered Slide-In from Bottom for Core Values Cards
+    const animateBottomCards = (selector, offsetDist = 55) => {
+      const cards = document.querySelectorAll(selector);
+      if (cards.length > 0) {
+        cards.forEach((card, index) => {
+          gsap.fromTo(card, 
+            { y: offsetDist, opacity: 0 }, 
+            { 
+              y: 0, 
+              opacity: 1, 
+              duration: 1.0, 
+              delay: (index % 3) * 0.14,
+              ease: 'power3.out',
+              clearProps: 'transform,opacity',
+              scrollTrigger: {
+                trigger: card,
+                start: 'top 88%',
+                toggleActions: 'play none none none'
+              }
+            }
+          );
+        });
+      }
+    };
+
+    animateAlternatingCards('.step-card, .sector-card, .product-card, .why-item, .team-card, .pillar-card, .service-card, .advantage-card, .perk-card, .proto-content-card, .proto-team-narrative-card', 55);
+    animateBottomCards('.proto-pillar-card, .proto-value-card-2x2, .slide-from-bottom', 60);
   }
 
-  // 5. Scroll-Triggered Slide-In Animations (Left, Right & Top)
+  // 5. Scroll-Triggered Slide-In Animations (Left, Right, Top & Bottom)
   // Pre-mark all slide elements as hidden so they start off-screen
   const slideLeftEls = document.querySelectorAll('.slide-from-left');
   const slideRightEls = document.querySelectorAll('.slide-from-right');
   const slideTopEls = document.querySelectorAll('.slide-from-top');
+  const slideBottomEls = document.querySelectorAll('.slide-from-bottom');
 
   // Add .slide-hidden to start them invisible (JS-gated to avoid no-JS issues)
   slideLeftEls.forEach(el => el.classList.add('slide-hidden'));
   slideRightEls.forEach(el => el.classList.add('slide-hidden'));
   slideTopEls.forEach(el => el.classList.add('slide-hidden'));
+  slideBottomEls.forEach(el => el.classList.add('slide-hidden'));
 
   // Responsive offset: smaller on mobile to prevent horizontal/vertical layout jump
   const getSlideOffset = () => {
@@ -762,6 +790,8 @@ document.addEventListener('DOMContentLoaded', () => {
           fromState.x = offset;
         } else if (direction === 'top') {
           fromState.y = -offset;
+        } else if (direction === 'bottom') {
+          fromState.y = offset;
         }
 
         gsap.fromTo(
@@ -808,6 +838,7 @@ document.addEventListener('DOMContentLoaded', () => {
   setupSlideAnimation(slideLeftEls, 'left');
   setupSlideAnimation(slideRightEls, 'right');
   setupSlideAnimation(slideTopEls, 'top');
+  setupSlideAnimation(slideBottomEls, 'bottom');
 
 
   // 6. Roles Stagger — queues list items one-by-one on scroll (10% threshold trigger)

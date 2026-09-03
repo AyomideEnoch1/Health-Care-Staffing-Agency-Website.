@@ -132,20 +132,31 @@
 
 /* Right: Mission Text Content */
 .proto-section-eyebrow {
-  display: inline-block;
-  font-size: 0.78rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 1px;
   color: var(--proto-teal);
   margin-bottom: 0.75rem;
 }
+.proto-section-eyebrow::after {
+  content: '';
+  display: inline-block;
+  width: 70px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--primary-cyan, #1BAECF) 0%, rgba(11, 197, 232, 0.05) 100%);
+  border-radius: 2px;
+}
 .proto-heading-lg {
   font-family: var(--font-heading);
-  font-size: 2.35rem;
-  font-weight: 900;
+  font-size: 2.25rem;
+  font-weight: 800;
   color: var(--proto-navy);
-  line-height: 1.25;
+  opacity: 0.82;
+  line-height: 1.3;
   margin-bottom: 1.25rem;
 }
 .proto-body-text {
@@ -352,14 +363,14 @@
 }
 
 .proto-mockup-phone {
-  background: var(--proto-navy);
+  background: var(--gradient-footer, linear-gradient(135deg, #1B4F8C 0%, #1A3A63 100%));
   color: #fff;
   border-radius: 20px;
   padding: 2.2rem 2rem;
   width: 100%;
   text-align: center;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 12px 30px rgba(27, 79, 140, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.15);
 }
 .proto-mockup-phone h5 {
   font-family: var(--font-heading);
@@ -370,7 +381,7 @@
 }
 .proto-mockup-phone p {
   font-size: 0.9rem;
-  color: #c9d6df;
+  color: #e2e8f0;
   margin-bottom: 1.5rem;
   line-height: 1.5;
 }
@@ -400,7 +411,7 @@
 }
 .proto-mockup-btn.btn-login {
   background: var(--proto-cyan);
-  color: var(--proto-navy-dark);
+  color: #0A192F;
 }
 .proto-mockup-btn.btn-login:hover {
   background: #ffffff;
@@ -409,11 +420,11 @@
 }
 .proto-mockup-btn.btn-signup {
   background: #ffffff;
-  color: var(--proto-navy);
+  color: #1A3A63;
 }
 .proto-mockup-btn.btn-signup:hover {
   background: var(--proto-cyan);
-  color: var(--proto-navy-dark);
+  color: #0A192F;
   transform: translateY(-2px);
   box-shadow: 0 4px 15px rgba(255, 255, 255, 0.3);
 }
@@ -442,13 +453,13 @@
 }
 
 .proto-action-badge.badge-facilities {
-  background: linear-gradient(135deg, #142C4C 0%, #1A3A63 100%);
+  background: var(--gradient-footer, linear-gradient(135deg, #1B4F8C 0%, #1A3A63 100%));
   border: 1.5px solid rgba(27, 174, 207, 0.4);
 }
 .proto-action-badge.badge-facilities:hover {
   transform: translateY(-3px);
   border-color: var(--cyan-turquoise);
-  box-shadow: 0 10px 28px rgba(26, 58, 99, 0.35), 0 0 15px rgba(27, 174, 207, 0.25);
+  box-shadow: 0 10px 28px rgba(27, 79, 140, 0.45), 0 0 15px rgba(27, 174, 207, 0.25);
 }
 
 .proto-action-badge.badge-hotline {
@@ -581,7 +592,8 @@
   box-shadow: 0 6px 18px rgba(27, 174, 207, 0.4);
 }
 .proto-exec-card.card-cyan .proto-exec-icon-box {
-  background: linear-gradient(135deg, var(--teal-green) 0%, var(--cyan-turquoise) 100%);
+  background: linear-gradient(135deg, var(--teal-green) 0%, var(--sky-blue) 100%);
+  color: #ffffff;
 }
 .proto-exec-card h4 {
   font-family: var(--font-heading);
@@ -644,7 +656,8 @@
   box-shadow: 0 8px 24px rgba(27, 174, 207, 0.45);
 }
 .proto-mv-icon-badge.icon-cyan {
-  background: linear-gradient(135deg, var(--teal-green) 0%, var(--cyan-turquoise) 100%);
+  background: linear-gradient(135deg, var(--teal-green) 0%, var(--sky-blue) 100%);
+  color: #ffffff;
 }
 .proto-mv-title {
   font-family: var(--font-heading);
@@ -687,8 +700,8 @@
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: rgba(60, 175, 138, 0.15);
-  color: var(--teal-green);
+  background: linear-gradient(135deg, var(--teal-green) 0%, var(--sky-blue) 100%);
+  color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -696,11 +709,12 @@
   font-weight: 800;
   font-size: 1.15rem;
   flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(60, 175, 138, 0.25);
   transition: transform 0.35s ease, background 0.35s ease;
 }
 .proto-benefit-card:hover .proto-benefit-icon {
   transform: scale(1.15) rotate(-4deg);
-  background: rgba(60, 175, 138, 0.25);
+  background: linear-gradient(135deg, var(--sky-blue) 0%, var(--teal-green) 100%);
 }
 .proto-benefit-content h4 {
   font-family: var(--font-heading);
@@ -790,7 +804,8 @@
   box-shadow: 0 8px 24px rgba(27, 174, 207, 0.45);
 }
 .proto-value-icon-box-2x2.icon-cyan {
-  background: linear-gradient(135deg, var(--teal-green) 0%, var(--cyan-turquoise) 100%);
+  background: linear-gradient(135deg, var(--teal-green) 0%, var(--sky-blue) 100%);
+  color: #ffffff;
 }
 
 .proto-value-title-2x2 {
@@ -1051,24 +1066,23 @@
   width: 86px;
   height: 86px;
   border-radius: 50%;
-  background: #ffffff;
-  border: 2.5px solid #2BA78F;
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(135deg, var(--teal-green) 0%, var(--sky-blue) 100%);
+  border: 3px solid #ffffff;
+  box-shadow: 0 10px 24px rgba(0, 168, 150, 0.28);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #2BA78F;
+  color: #ffffff;
   top: 15%;
   left: -38px;
   z-index: 3;
-  transition: transform 0.35s ease, background 0.35s ease, color 0.35s ease, border-color 0.35s ease;
+  transition: transform 0.35s ease, background 0.35s ease, box-shadow 0.35s ease;
 }
 
 .ref-media-col:hover .ref-circular-badge {
   transform: scale(1.1) rotate(-6deg);
-  border-color: var(--sky-blue);
-  background: linear-gradient(135deg, var(--teal-green) 0%, var(--sky-blue) 100%);
-  color: #ffffff;
+  background: linear-gradient(135deg, var(--sky-blue) 0%, var(--teal-green) 100%);
+  box-shadow: 0 14px 30px rgba(27, 174, 207, 0.42);
 }
 
 .ref-circular-badge svg,
@@ -1140,56 +1154,572 @@
   font-size: 0.92rem;
 }
 
-/* Soft Green Pill Button */
+/* Gradient Action Pill Button (matches site-wide action buttons) */
 .ref-pill-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background-color: #84C455;
-  color: #ffffff;
+  background: linear-gradient(135deg, var(--teal-green) 0%, var(--sky-blue) 100%);
+  color: #ffffff !important;
   font-family: var(--font-heading);
-  font-size: 1rem;
-  font-weight: 700;
-  padding: 0.85rem 2.4rem;
+  font-size: 0.92rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  padding: 0.75rem 2.2rem;
   border-radius: 50px;
   text-decoration: none;
-  box-shadow: 0 8px 22px rgba(132, 196, 85, 0.38);
-  transition: transform 0.25s ease, background-color 0.25s ease, box-shadow 0.25s ease;
+  box-shadow: 0 6px 18px rgba(0, 168, 150, 0.3);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
 }
 
 .ref-pill-btn:hover {
-  background-color: #72ab48;
-  color: #ffffff;
+  background: linear-gradient(135deg, #008f80 0%, #1598b5 100%);
+  color: #ffffff !important;
   transform: translateY(-2px);
-  box-shadow: 0 10px 26px rgba(132, 196, 85, 0.48);
+  box-shadow: 0 10px 24px rgba(0, 168, 150, 0.45);
 }
 
 /* Responsive */
-@media (max-width: 1024px) {
-  .ref-service-row,
-  .ref-service-row.reverse-row {
+/* ── Modernized Contact Section Alignment (Compact Sleek Heights) ───────── */
+.contact-section {
+  position: relative;
+  overflow: hidden;
+}
+
+.contact-grid-row {
+  display: grid;
+  grid-template-columns: 1fr 1.35fr;
+  gap: 2.5rem;
+  margin-top: 2rem;
+  align-items: stretch;
+}
+
+.contact-info-card {
+  background: #ffffff;
+  border: 1px solid var(--proto-border);
+  border-radius: var(--proto-radius-lg);
+  padding: 2rem 2.2rem;
+  box-shadow: 0 16px 40px rgba(11, 37, 69, 0.06);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.contact-info-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--proto-shadow-hover);
+}
+
+.contact-card-title {
+  font-family: var(--font-heading);
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--navy);
+  margin-bottom: 0.35rem;
+}
+
+.contact-card-subtitle {
+  font-size: 0.88rem;
+  color: #64748B;
+  line-height: 1.55;
+  margin-bottom: 1.1rem;
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.6rem 0.85rem;
+  border-radius: 10px;
+  background: var(--proto-bg-tint);
+  border: 1px solid rgba(11, 37, 69, 0.04);
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+.detail-item:hover {
+  transform: translateX(4px);
+  background: rgba(60, 175, 138, 0.08);
+}
+
+.detail-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--teal-green) 0%, var(--sky-blue) 100%);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 3px 10px rgba(60, 175, 138, 0.2);
+}
+
+.custom-form {
+  background: #ffffff;
+  border: 1px solid var(--proto-border);
+  border-radius: var(--proto-radius-lg);
+  padding: 2.4rem 2.6rem;
+  box-shadow: 0 16px 40px rgba(11, 37, 69, 0.06);
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.custom-form:hover {
+  box-shadow: var(--proto-shadow-hover);
+}
+
+.form-brand-header {
+  margin-bottom: 1.25rem !important;
+  padding-bottom: 0.85rem !important;
+}
+
+.form-title {
+  font-size: 1.3rem !important;
+  margin-bottom: 1.35rem !important;
+  padding-bottom: 0.6rem !important;
+}
+
+.form-row-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem !important;
+  margin-bottom: 1.35rem !important;
+}
+
+.form-field {
+  background: #F8FAFC;
+  border: 1.5px solid #E2E8F0;
+  border-radius: 12px;
+  padding: 0.88rem 1.15rem;
+  font-family: inherit;
+  font-size: 0.9rem;
+  color: #1E293B;
+  transition: all 0.2s ease;
+  width: 100%;
+  margin-bottom: 1.35rem;
+}
+.form-row-grid .form-field {
+  margin-bottom: 0 !important;
+}
+.form-field:focus {
+  outline: none;
+  background: #ffffff;
+  border-color: var(--teal-green);
+  box-shadow: 0 0 0 3px rgba(60, 175, 138, 0.15);
+}
+
+.textarea-field {
+  min-height: 115px !important;
+  margin-bottom: 1.35rem !important;
+}
+
+.custom-file-upload-box {
+  margin-bottom: 1.35rem !important;
+}
+.file-upload-label {
+  padding: 0.85rem 1.15rem !important;
+}
+
+/* ── Modern Form Submit Buttons ─────────────────────────────────────────── */
+.custom-form button[type="submit"],
+.custom-form .btn-pill-hero,
+.custom-form .btn {
+  background: linear-gradient(135deg, var(--teal-green) 0%, var(--sky-blue) 100%) !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 50px !important;
+  font-family: var(--font-heading) !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.5px !important;
+  padding: 0.95rem 2.2rem !important;
+  box-shadow: 0 6px 20px rgba(0, 168, 150, 0.35) !important;
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, filter 0.25s ease !important;
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.custom-form button[type="submit"]:hover,
+.custom-form .btn-pill-hero:hover,
+.custom-form .btn:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 10px 25px rgba(0, 168, 150, 0.48) !important;
+  filter: brightness(1.05);
+}
+
+/* ── Modern Universal Content & Commitment Cards ────────────────────────── */
+.proto-content-card {
+  background: #ffffff;
+  border: 1px solid var(--proto-border);
+  border-radius: var(--proto-radius-lg);
+  padding: 2.5rem 2.2rem;
+  box-shadow: 0 16px 40px rgba(11, 37, 69, 0.06);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+.proto-content-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--proto-shadow-hover);
+}
+
+.proto-card-header-icon-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid rgba(11, 37, 69, 0.08);
+}
+
+.proto-icon-box-md {
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--teal-green) 0%, var(--sky-blue) 100%);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(60, 175, 138, 0.25);
+}
+
+.proto-icon-box-md.icon-cyan {
+  background: linear-gradient(135deg, var(--teal-green) 0%, var(--sky-blue) 100%);
+  color: #ffffff;
+}
+
+.proto-grid-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2.5rem;
+  align-items: stretch;
+}
+@media (max-width: 900px) {
+  .proto-grid-2col {
     grid-template-columns: 1fr;
-    gap: 3.5rem;
-  }
-  .ref-service-row.reverse-row .ref-media-col {
-    order: 1;
-    justify-self: center;
-  }
-  .ref-service-row.reverse-row .ref-content-col {
-    order: 2;
-  }
-  .ref-media-col {
-    justify-self: center;
-    max-width: 420px;
-    height: 340px;
-  }
-  .ref-content-col {
-    max-width: 100%;
-  }
-  .ref-service-title {
-    font-size: 1.85rem;
+    gap: 2rem;
   }
 }
+
+/* ==========================================================================
+   GLOBAL RESPONSIVE ARCHITECTURE & MOBILE POLISH
+   ========================================================================== */
+
+/* ── Laptops (993px to 1200px) ── */
+@media (max-width: 1200px) {
+  .ref-service-row {
+    grid-template-columns: 380px 1fr !important;
+    gap: 3.5rem !important;
+  }
+  .ref-service-row.reverse-row {
+    grid-template-columns: 1fr 380px !important;
+    gap: 3.5rem !important;
+  }
+  .ref-media-col {
+    max-width: 380px !important;
+    height: 350px !important;
+  }
+  .contact-grid-row {
+    gap: 2rem !important;
+  }
+}
+
+/* ── Tablets & Laptops (up to 992px) ── */
+@media (max-width: 992px) {
+  .proto-heading-lg {
+    font-size: 2rem;
+  }
+  .proto-showcase-box {
+    grid-template-columns: 1fr;
+    gap: 2.2rem;
+    padding: 2.2rem;
+  }
+  .proto-staggered-collage {
+    max-width: 500px;
+    margin: 0 auto;
+  }
+  .proto-values-2x2-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  .proto-tricard-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  /* Services Showcase Responsiveness */
+  .ref-showcase-header {
+    margin-bottom: 3.5rem !important;
+  }
+  .ref-showcase-list {
+    gap: 4.5rem !important;
+  }
+  .ref-service-row,
+  .ref-service-row.reverse-row {
+    grid-template-columns: 1fr !important;
+    gap: 2.5rem !important;
+  }
+  .ref-service-row.reverse-row .ref-media-col {
+    order: 1 !important;
+    justify-self: center !important;
+  }
+  .ref-service-row.reverse-row .ref-content-col {
+    order: 2 !important;
+  }
+  .ref-media-col {
+    max-width: 100% !important;
+    width: 100% !important;
+    height: 320px !important;
+    justify-self: center !important;
+    margin: 0 auto !important;
+  }
+  .ref-circular-badge {
+    width: 64px !important;
+    height: 64px !important;
+    top: 15px !important;
+    left: 15px !important;
+  }
+  .ref-circular-badge svg,
+  .ref-circular-badge i {
+    width: 28px !important;
+    height: 28px !important;
+  }
+  .ref-service-title {
+    font-size: 1.85rem !important;
+  }
+  .ref-service-desc {
+    font-size: 1rem !important;
+    line-height: 1.75 !important;
+  }
+  .ref-content-col {
+    max-width: 100% !important;
+  }
+  .ref-pills-cloud {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.65rem !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-bottom: 1.8rem !important;
+  }
+  .ref-micro-pill {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    padding: 0.55rem 0.85rem !important;
+    font-size: 0.82rem !important;
+    border-radius: 12px !important;
+    white-space: normal !important;
+    line-height: 1.35 !important;
+    min-height: 42px !important;
+  }
+  .ref-pill-check {
+    flex-shrink: 0 !important;
+    font-size: 0.9rem !important;
+    margin-right: 0.35rem !important;
+  }
+
+  /* Contact Section Responsiveness */
+  .contact-grid-row {
+    grid-template-columns: 1fr !important;
+    gap: 2.2rem !important;
+  }
+  .contact-info-card,
+  .custom-form {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}
+
+/* ── Mobile Devices (up to 768px) ── */
+@media (max-width: 768px) {
+  .proto-heading-lg {
+    font-size: 1.7rem;
+    line-height: 1.32;
+  }
+  .proto-body-text {
+    font-size: 0.98rem;
+    line-height: 1.7;
+    margin-bottom: 1.4rem;
+  }
+  .proto-content-card {
+    padding: 1.8rem 1.4rem;
+    border-radius: 18px;
+  }
+  .proto-section-eyebrow {
+    font-size: 0.74rem;
+    letter-spacing: 0.75px;
+    gap: 0.65rem;
+  }
+  .proto-section-eyebrow::after {
+    width: 45px;
+  }
+  .proto-action-badges-group {
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+  .proto-action-badge {
+    min-width: 100%;
+    width: 100%;
+    padding: 0.75rem 1.1rem;
+  }
+  .proto-badge-title {
+    font-size: 0.98rem;
+  }
+  .contact-info-card,
+  .custom-form {
+    padding: 1.8rem 1.35rem;
+    border-radius: 18px;
+  }
+  .contact-detail-list .detail-item {
+    padding: 0.75rem 0.9rem;
+  }
+  .proto-mockup-phone {
+    padding: 1.75rem 1.25rem;
+  }
+  .proto-mockup-phone h5 {
+    font-size: 1.15rem;
+  }
+  .proto-mockup-phone p {
+    font-size: 0.85rem;
+    margin-bottom: 1.2rem;
+  }
+  .ref-pills-cloud {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.55rem !important;
+    width: 100% !important;
+  }
+  .ref-micro-pill {
+    font-size: 0.8rem !important;
+    padding: 0.5rem 0.7rem !important;
+    min-height: 40px !important;
+  }
+}
+
+/* ── Small Mobile Phones (up to 480px) ── */
+@media (max-width: 480px) {
+  .proto-heading-lg {
+    font-size: 1.42rem;
+  }
+  .proto-showcase-box {
+    padding: 1.4rem 1.1rem;
+    border-radius: 16px;
+  }
+  .proto-showcase-visual {
+    padding: 0.85rem;
+    border-radius: 14px;
+  }
+  .proto-mockup-phone {
+    padding: 1.4rem 1rem;
+    border-radius: 14px;
+  }
+  .proto-mockup-btn {
+    min-width: 100%;
+    padding: 0.6rem 1rem;
+    font-size: 0.82rem;
+  }
+  .proto-mockup-btn-row {
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+  .proto-content-card {
+    padding: 1.4rem 1.1rem;
+    border-radius: 14px;
+  }
+  .contact-info-card,
+  .custom-form {
+    padding: 1.4rem 1.1rem !important;
+    border-radius: 16px !important;
+  }
+  .form-title {
+    font-size: 1.2rem !important;
+  }
+  .form-row-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1.1rem !important;
+  }
+  .form-field {
+    font-size: 0.92rem !important;
+    padding: 0.8rem 1rem !important;
+  }
+  .proto-section-eyebrow {
+    font-size: 0.7rem;
+  }
+  .proto-section-eyebrow::after {
+    width: 32px;
+  }
+
+  /* Services Showcase on Mobile */
+  .ref-showcase-list {
+    gap: 3.5rem !important;
+  }
+  .ref-media-col {
+    height: 230px !important;
+  }
+  .ref-image-wrapper {
+    border-radius: 20px !important;
+  }
+  .ref-circular-badge {
+    width: 48px !important;
+    height: 48px !important;
+    top: 10px !important;
+    left: 10px !important;
+  }
+  .ref-circular-badge svg,
+  .ref-circular-badge i {
+    width: 22px !important;
+    height: 22px !important;
+  }
+  .ref-service-title {
+    font-size: 1.45rem !important;
+    margin-bottom: 0.75rem !important;
+  }
+  .ref-service-desc {
+    font-size: 0.94rem !important;
+    line-height: 1.65 !important;
+    margin-bottom: 1.2rem !important;
+  }
+  .ref-pills-cloud {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.5rem !important;
+    margin-bottom: 1.6rem !important;
+  }
+  .ref-micro-pill {
+    font-size: 0.76rem !important;
+    padding: 0.5rem 0.65rem !important;
+    border-radius: 10px !important;
+    min-height: 40px !important;
+  }
+  .ref-pill-btn {
+    width: 100% !important;
+    text-align: center !important;
+    justify-content: center !important;
+  }
+}
+
+/* ── Ultra Compact Mobile (< 380px) ── */
+@media (max-width: 380px) {
+  .ref-pills-cloud {
+    grid-template-columns: 1fr !important;
+    gap: 0.45rem !important;
+  }
+  .ref-micro-pill {
+    font-size: 0.82rem !important;
+    padding: 0.55rem 0.85rem !important;
+  }
+}
+
 
 
 

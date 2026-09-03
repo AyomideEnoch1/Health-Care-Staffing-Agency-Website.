@@ -10,7 +10,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Open+Sans:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&family=Pacifico&display=swap" rel="stylesheet">
   
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=5.0.0">
+  <link rel="stylesheet" href="prototype.css?v=5.0.0">
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
 
@@ -73,47 +75,75 @@
   <!-- CONTACT SECTION WITH SHARP TOP SLANT LEFT -->
   <section class="section-padding contact-section geometric-ribbon-section sharp-top-slant-left" id="contact">
     <div class="container">
-      <div class="accent-heading-wrapper" style="margin-bottom: 1.5rem;">
+      <div class="accent-heading-wrapper slide-from-top" style="margin-bottom: 1.5rem;">
         <h2 class="welcome-title" style="margin-bottom: 0;">Get In Touch With <span class="brand-highlight">OUR TEAM</span></h2>
         <div class="welcome-accent-line"></div>
       </div>
-      <p class="welcome-text">
+      <p class="welcome-text slide-from-bottom">
         Have staffing questions, emergency shift requests, or clinical education inquiries? Divine Fingers Healthcare Services Inc. (1592082-5) is here to assist you 24 hours a day, 7 days a week.
       </p>
 
       <div class="contact-grid-row">
-        <!-- Contact Info Card with Border Accent -->
-        <div class="contact-info-card border-accent-card">
-          <h3 class="contact-card-title">Official Corporate Details</h3>
-          <div class="roles-stagger-list" style="display: flex; flex-direction: column; gap: 0.8rem;">
-            <p class="contact-card-detail roles-stagger-item" style="--delay: 0.1s;"><strong>Corporation Name:</strong> Divine Fingers Healthcare Services Inc.</p>
-            <p class="contact-card-detail roles-stagger-item" style="--delay: 0.25s;"><strong>Corporation ID:</strong> 1592082-5</p>
-            <p class="contact-card-detail roles-stagger-item" style="--delay: 0.4s;"><strong>Office Address:</strong> 17-2 Dailing Gate, Scarborough, ON M1B 1Z8, Canada</p>
-            <p class="contact-card-detail roles-stagger-item" style="--delay: 0.55s;"><strong>Direct Lines:</strong> <a href="tel:+16472106463" class="highlight-link">+1 (647) 210-6463</a> | <a href="tel:+16477648522" class="highlight-link">+1 (647) 764-8522</a></p>
-            
-            <div class="contact-manager-box roles-stagger-item" style="--delay: 0.7s;">
-              <strong class="manager-name">Care Coordination &amp; Client Services Desk</strong>
-              <span class="manager-title">24/7 Shift Placement &amp; General Inquiries</span>
-              <a href="mailto:info@divinefingershealthcare.ca" class="manager-email">info@divinefingershealthcare.ca</a>
-            </div>
+        <!-- Contact Info Card -->
+        <div class="contact-info-card slide-from-left">
+          <div>
+            <span class="proto-card-badge" style="margin-bottom: 0.4rem;">DISPATCH &amp; HQ</span>
+            <h3 class="contact-card-title">Divine Fingers Healthcare Services Inc.</h3>
+            <p class="contact-card-subtitle">Serving Greater Toronto &amp; Healthcare Organizations Across Canada</p>
 
-            <p class="website-detail roles-stagger-item" style="--delay: 0.85s; margin-top: 0.5rem;">Website: <a href="http://www.divinefingershealthcare.com" target="_blank" class="highlight-link">www.divinefingershealthcare.com</a></p>
+            <div class="contact-detail-list">
+              <div class="detail-item">
+                <div class="detail-icon">
+                  <i data-lucide="map-pin" style="width: 22px; height: 22px;"></i>
+                </div>
+                <div class="detail-text">
+                  <strong>Scarborough Office HQ</strong>
+                  <span>17-2 Dailing Gate, Scarborough, ON M1B 1Z8, Canada</span>
+                </div>
+              </div>
+
+              <div class="detail-item">
+                <div class="detail-icon">
+                  <i data-lucide="phone-call" style="width: 22px; height: 22px;"></i>
+                </div>
+                <div class="detail-text">
+                  <strong>24/7 Dispatch Phone Lines</strong>
+                  <span>+1 (647) 210-6463 | +1 (647) 764-8522</span>
+                </div>
+              </div>
+
+              <div class="detail-item">
+                <div class="detail-icon">
+                  <i data-lucide="mail" style="width: 22px; height: 22px;"></i>
+                </div>
+                <div class="detail-text">
+                  <strong>Official Email Inquiry</strong>
+                  <span>info@divinefingershealthcare.ca</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid rgba(11, 37, 69, 0.08);">
+            <p style="font-size: 0.85rem; color: #64748B; margin: 0;">
+              <strong>Emergency Surge Staffing:</strong> Our on-call supervisors dispatch certified staff within 2 hours across Ontario.
+            </p>
           </div>
         </div>
 
         <!-- HIGH VISIBILITY CONTACT FORM -->
-        <form class="custom-form" id="general-contact-form">
+        <form class="custom-form slide-from-right" id="general-contact-form">
           <!-- Brand Header -->
           <div class="form-brand-header">
             <img src="assets/images/logo.png" alt="Divine Fingers Healthcare Logo">
             <div class="form-brand-header-text">
               <span class="form-brand-header-name">Divine Fingers Healthcare Services Inc.</span>
-              <span class="form-brand-header-tagline">General Enquiry</span>
+              <span class="form-brand-header-tagline">General &amp; Staffing Enquiry</span>
             </div>
           </div>
           <!-- Watermark Logo -->
           <img src="assets/images/logo.png" alt="" class="form-watermark-logo" aria-hidden="true">
-          <h3 class="form-title">Send Us a Direct Message</h3>
+          <h3 class="form-title" style="font-family: var(--font-heading); font-weight: 800; color: var(--navy); margin-bottom: 1.25rem;">Send Us a Direct Message</h3>
           <div class="form-row-grid">
             <input type="text" class="form-field" id="contact-name" placeholder="YOUR FULL NAME" required>
             <input type="email" class="form-field" id="contact-email" placeholder="YOUR EMAIL ADDRESS" required>
@@ -123,7 +153,7 @@
             <input type="text" class="form-field" id="contact-subject" placeholder="INQUIRY TYPE (Staffing / Travelling Nursing / Care)" required>
           </div>
           <textarea class="form-field textarea-field" id="contact-message" rows="4" placeholder="HOW CAN OUR HEALTHCARE TEAM ASSIST YOU TODAY?" required></textarea>
-          <button type="submit" class="btn btn-pill-hero full-width-btn">SEND MESSAGE</button>
+          <button type="submit" class="btn btn-pill-hero full-width-btn" style="padding: 1rem; font-size: 1rem; font-weight: 800; letter-spacing: 0.5px;">SEND MESSAGE</button>
           <div class="form-feedback-msg" id="contact-form-feedback"></div>
         </form>
       </div>
@@ -188,5 +218,8 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <script src="script.js?v=3.0.0"></script>
+  <script>
+    if (window.lucide) lucide.createIcons();
+  </script>
 </body>
 </html>

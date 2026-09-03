@@ -1,3 +1,5 @@
+@import url('prototype.css?v=5.0.0');
+
 /* ==========================================================================
    Labingá Homepage - Design System & Custom CSS
    ========================================================================== */
@@ -881,23 +883,23 @@ ul {
 .form-row-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1.8rem;
-  margin-bottom: 1.8rem;
+  gap: 1.25rem;
+  margin-bottom: 1.35rem;
 }
 
 .form-field {
   width: 100%;
-  padding: 1.05rem 1.4rem;
-  border: 2px solid #94A3B8;
-  border-radius: 20px !important;
-  font-family: var(--font-heading);
-  font-size: 0.88rem;
-  font-weight: 700;
+  padding: 0.88rem 1.15rem;
+  border: 1.5px solid #E2E8F0;
+  border-radius: 12px !important;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 500;
   color: #0A192F;
   outline: none;
   background-color: #F8FAFC;
   transition: var(--transition-fast);
-  margin-bottom: 1.8rem;
+  margin-bottom: 1.35rem;
 }
 
 .form-row-grid .form-field {
@@ -906,19 +908,20 @@ ul {
 
 .form-field::placeholder {
   color: #64748B;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .form-field:focus {
-  border-color: var(--cyan-turquoise);
+  border-color: var(--teal-green);
   background-color: var(--white);
-  box-shadow: 0 0 0 4px rgba(27, 174, 207, 0.2);
+  box-shadow: 0 0 0 3px rgba(60, 175, 138, 0.15);
 }
 
 .textarea-field {
-  border-radius: 20px !important;
+  border-radius: 12px !important;
   resize: vertical;
-  margin-bottom: 1.8rem;
+  min-height: 115px;
+  margin-bottom: 1.35rem;
 }
 
 .full-width-btn {
@@ -2088,16 +2091,24 @@ ul {
   will-change: transform, opacity;
 }
 
+.slide-from-bottom.slide-hidden {
+  opacity: 0;
+  transform: translateY(60px);
+  will-change: transform, opacity;
+}
+
 /* IntersectionObserver fallback: smooth CSS transition when .active-slide is toggled */
 .slide-from-left.slide-hidden,
 .slide-from-right.slide-hidden,
-.slide-from-top.slide-hidden {
+.slide-from-top.slide-hidden,
+.slide-from-bottom.slide-hidden {
   transition: transform 1s cubic-bezier(0.16, 1, 0.3, 1), opacity 1s ease;
 }
 
 .slide-from-left.active-slide,
 .slide-from-right.active-slide,
-.slide-from-top.active-slide {
+.slide-from-top.active-slide,
+.slide-from-bottom.active-slide {
   opacity: 1 !important;
   transform: translate(0, 0) !important;
 }
