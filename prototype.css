@@ -956,13 +956,200 @@
   flex-shrink: 0;
   margin-top: 1px;
 }
-.proto-service-item-text {
-  font-size: 0.96rem;
-  line-height: 1.6;
-  color: #334155;
-  margin: 0;
-  font-weight: 500;
+/* ═══════════════════════════════════════════════════════════════════════════
+   REFERENCE SHOWCASE LAYOUT (PIXEL-PERFECT REPLICA OF REFERENCE IMAGE)
+   ═══════════════════════════════════════════════════════════════════════════ */
+.ref-showcase-section {
+  padding: 5.5rem 0 7.5rem 0;
+  background-color: #F8FAFC;
 }
+
+.ref-showcase-container {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.ref-showcase-header {
+  text-align: center;
+  margin-bottom: 4.5rem;
+}
+
+.ref-showcase-header h2 {
+  font-family: var(--font-heading);
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--navy);
+  margin: 0;
+  letter-spacing: 0.2px;
+}
+
+.ref-showcase-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4.5rem;
+}
+
+.ref-service-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 3.5rem;
+}
+
+/* Reverse alignment for even rows */
+.ref-service-row.reverse-row .ref-media-col {
+  order: 2;
+  justify-self: end;
+}
+.ref-service-row.reverse-row .ref-content-col {
+  order: 1;
+  text-align: left;
+}
+
+/* Media Column & Image Frame */
+.ref-media-col {
+  position: relative;
+  width: 320px;
+  height: 320px;
+  justify-self: start;
+}
+
+.ref-image-wrapper {
+  width: 100%;
+  height: 100%;
+  border-radius: 28px;
+  overflow: hidden;
+  box-shadow: 0 14px 32px rgba(11, 37, 69, 0.1);
+  background: #ffffff;
+}
+
+.ref-image-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+  transition: transform 0.5s ease;
+}
+
+.ref-media-col:hover .ref-image-wrapper img {
+  transform: scale(1.04);
+}
+
+/* Floating Overlapping Circular Badge on Left of Image */
+.ref-circular-badge {
+  position: absolute;
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2px solid #2BA78F;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #2BA78F;
+  top: 16%;
+  left: -32px;
+  z-index: 3;
+  transition: transform 0.3s ease, background 0.3s ease, color 0.3s ease;
+}
+
+.ref-media-col:hover .ref-circular-badge {
+  transform: scale(1.08);
+  background: #2BA78F;
+  color: #ffffff;
+}
+
+.ref-circular-badge svg,
+.ref-circular-badge i {
+  width: 34px;
+  height: 34px;
+  stroke-width: 1.8;
+}
+
+/* Content Column */
+.ref-content-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.ref-service-title {
+  font-family: var(--font-heading);
+  font-size: 1.85rem;
+  font-weight: 800;
+  color: #163654;
+  margin: 0 0 0.85rem 0;
+  line-height: 1.25;
+}
+
+.ref-service-desc {
+  font-size: 0.98rem;
+  line-height: 1.65;
+  color: #4B5563;
+  margin: 0 0 1.4rem 0;
+  max-width: 420px;
+}
+
+/* Soft Green Pill Button */
+.ref-pill-btn {
+  display: inline-block;
+  background-color: #84C455;
+  color: #ffffff;
+  font-family: var(--font-heading);
+  font-size: 0.92rem;
+  font-weight: 700;
+  padding: 0.65rem 1.85rem;
+  border-radius: 50px;
+  text-decoration: none;
+  box-shadow: 0 6px 16px rgba(132, 196, 85, 0.35);
+  transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ref-pill-btn:hover {
+  background-color: #72ab48;
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(132, 196, 85, 0.45);
+}
+
+/* Responsive */
+@media (max-width: 820px) {
+  .ref-service-row,
+  .ref-service-row.reverse-row {
+    grid-template-columns: 1fr;
+    gap: 2.2rem;
+  }
+  .ref-service-row.reverse-row .ref-media-col {
+    order: 1;
+    justify-self: center;
+  }
+  .ref-service-row.reverse-row .ref-content-col {
+    order: 2;
+  }
+  .ref-media-col {
+    justify-self: center;
+    width: 280px;
+    height: 280px;
+  }
+  .ref-circular-badge {
+    width: 64px;
+    height: 64px;
+    left: -22px;
+  }
+  .ref-circular-badge svg,
+  .ref-circular-badge i {
+    width: 28px;
+    height: 28px;
+  }
+  .ref-service-title {
+    font-size: 1.6rem;
+  }
+}
+
 
 
 
