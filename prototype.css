@@ -550,20 +550,17 @@
 .proto-exec-card {
   background: var(--proto-gray-light);
   border: 1px solid var(--proto-border);
-  border-left: 4px solid var(--teal-green);
   border-radius: var(--proto-radius-md);
   padding: 1.25rem 1.4rem;
   display: flex;
   align-items: flex-start;
   gap: 1rem;
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
 }
 .proto-exec-card:hover {
   transform: translateY(-3px);
+  border-color: var(--teal-green);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
-}
-.proto-exec-card.card-cyan {
-  border-left-color: var(--cyan-turquoise);
 }
 .proto-exec-icon-box {
   width: 44px;
@@ -621,12 +618,6 @@
   transform: translateY(-4px);
   border-color: var(--teal-green);
   box-shadow: var(--proto-shadow-hover);
-}
-.proto-stacked-mv-card.mission-card {
-  border-left: 5px solid var(--teal-green);
-}
-.proto-stacked-mv-card.vision-card {
-  border-left: 5px solid var(--cyan-turquoise);
 }
 
 .proto-mv-badge-row {
