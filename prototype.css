@@ -442,23 +442,24 @@
 }
 
 .proto-action-badge.badge-facilities {
-  background: linear-gradient(135deg, #0B2545 0%, #051622 100%);
-  border: 1.5px solid rgba(0, 245, 212, 0.3);
+  background: linear-gradient(135deg, #142C4C 0%, #1A3A63 100%);
+  border: 1.5px solid rgba(27, 174, 207, 0.4);
 }
 .proto-action-badge.badge-facilities:hover {
   transform: translateY(-3px);
-  border-color: #00F5D4;
-  box-shadow: 0 10px 28px rgba(11, 37, 69, 0.3), 0 0 15px rgba(0, 245, 212, 0.2);
+  border-color: var(--cyan-turquoise);
+  box-shadow: 0 10px 28px rgba(26, 58, 99, 0.35), 0 0 15px rgba(27, 174, 207, 0.25);
 }
 
 .proto-action-badge.badge-hotline {
-  background: linear-gradient(135deg, #00A896 0%, #028090 100%);
-  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  background: linear-gradient(135deg, var(--teal-green) 0%, var(--sky-blue) 100%);
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
 }
 .proto-action-badge.badge-hotline:hover {
   transform: translateY(-3px);
   border-color: #ffffff;
-  box-shadow: 0 10px 28px rgba(0, 168, 150, 0.4);
+  background: linear-gradient(135deg, var(--sky-blue) 0%, var(--teal-green) 100%);
+  box-shadow: 0 10px 28px rgba(46, 155, 214, 0.45);
 }
 
 .proto-badge-icon-box {
@@ -472,11 +473,11 @@
   transition: transform 0.25s ease;
 }
 .proto-action-badge.badge-facilities .proto-badge-icon-box {
-  background: rgba(0, 245, 212, 0.12);
-  color: #00F5D4;
+  background: rgba(27, 174, 207, 0.18);
+  color: var(--cyan-turquoise);
 }
 .proto-action-badge.badge-hotline .proto-badge-icon-box {
-  background: rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.22);
   color: #ffffff;
 }
 
@@ -549,7 +550,7 @@
 .proto-exec-card {
   background: var(--proto-gray-light);
   border: 1px solid var(--proto-border);
-  border-left: 4px solid var(--proto-teal);
+  border-left: 4px solid var(--teal-green);
   border-radius: var(--proto-radius-md);
   padding: 1.25rem 1.4rem;
   display: flex;
@@ -562,22 +563,28 @@
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
 }
 .proto-exec-card.card-cyan {
-  border-left-color: var(--proto-cyan);
+  border-left-color: var(--cyan-turquoise);
 }
 .proto-exec-icon-box {
-  width: 42px;
-  height: 42px;
-  border-radius: 10px;
-  background: rgba(0, 168, 150, 0.1);
-  color: var(--proto-teal);
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--teal-green) 0%, var(--sky-blue) 100%);
+  color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  box-shadow: 0 4px 14px rgba(60, 175, 138, 0.25);
+  transition: transform 0.3s ease, background 0.3s ease;
+}
+.proto-exec-card:hover .proto-exec-icon-box {
+  transform: scale(1.1) rotate(-3deg);
+  background: linear-gradient(135deg, var(--sky-blue) 0%, var(--teal-green) 100%);
+  box-shadow: 0 6px 18px rgba(27, 174, 207, 0.4);
 }
 .proto-exec-card.card-cyan .proto-exec-icon-box {
-  background: rgba(0, 245, 212, 0.15);
-  color: #008f7d;
+  background: linear-gradient(135deg, var(--teal-green) 0%, var(--cyan-turquoise) 100%);
 }
 .proto-exec-card h4 {
   font-family: var(--font-heading);
@@ -612,14 +619,14 @@
 }
 .proto-stacked-mv-card:hover {
   transform: translateY(-4px);
-  border-color: var(--proto-teal);
+  border-color: var(--teal-green);
   box-shadow: var(--proto-shadow-hover);
 }
 .proto-stacked-mv-card.mission-card {
-  border-left: 5px solid var(--proto-teal);
+  border-left: 5px solid var(--teal-green);
 }
 .proto-stacked-mv-card.vision-card {
-  border-left: 5px solid var(--proto-cyan);
+  border-left: 5px solid var(--cyan-turquoise);
 }
 
 .proto-mv-badge-row {
@@ -631,17 +638,22 @@
   width: 48px;
   height: 48px;
   border-radius: 12px;
-  background: linear-gradient(135deg, var(--proto-navy) 0%, var(--proto-teal) 100%);
+  background: linear-gradient(135deg, var(--teal-green) 0%, var(--sky-blue) 100%);
   color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  box-shadow: 0 6px 16px rgba(0, 168, 150, 0.25);
+  box-shadow: 0 4px 14px rgba(60, 175, 138, 0.28);
+  transition: transform 0.35s ease, background 0.35s ease, box-shadow 0.35s ease;
+}
+.proto-stacked-mv-card:hover .proto-mv-icon-badge {
+  transform: scale(1.12) rotate(-3deg);
+  background: linear-gradient(135deg, var(--sky-blue) 0%, var(--teal-green) 100%);
+  box-shadow: 0 8px 24px rgba(27, 174, 207, 0.45);
 }
 .proto-mv-icon-badge.icon-cyan {
-  background: linear-gradient(135deg, #007769 0%, #00F5D4 100%);
-  color: #051622;
+  background: linear-gradient(135deg, var(--teal-green) 0%, var(--cyan-turquoise) 100%);
 }
 .proto-mv-title {
   font-family: var(--font-heading);
@@ -673,18 +685,29 @@
   align-items: flex-start;
   gap: 1rem;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+.proto-benefit-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--teal-green);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
 }
 .proto-benefit-icon {
   width: 32px;
   height: 32px;
   border-radius: 8px;
-  background: rgba(0, 168, 150, 0.12);
-  color: var(--proto-teal);
+  background: linear-gradient(135deg, var(--teal-green) 0%, var(--sky-blue) 100%);
+  color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
   margin-top: 2px;
+  box-shadow: 0 3px 10px rgba(60, 175, 138, 0.25);
+  transition: transform 0.3s ease;
+}
+.proto-benefit-card:hover .proto-benefit-icon {
+  transform: scale(1.1);
 }
 .proto-benefit-content h4 {
   font-family: var(--font-heading);
@@ -727,7 +750,7 @@
 }
 .proto-value-card-2x2:hover {
   transform: translateY(-5px);
-  border-color: var(--proto-teal);
+  border-color: var(--teal-green);
   box-shadow: var(--proto-shadow-hover);
 }
 
@@ -745,7 +768,7 @@
   user-select: none;
 }
 .proto-value-card-2x2:hover .proto-card-num-watermark {
-  color: rgba(0, 168, 150, 0.15);
+  color: rgba(60, 175, 138, 0.2);
 }
 
 .proto-value-header-row {
@@ -759,17 +782,22 @@
   width: 48px;
   height: 48px;
   border-radius: 12px;
-  background: linear-gradient(135deg, var(--proto-navy) 0%, var(--proto-teal) 100%);
+  background: linear-gradient(135deg, var(--teal-green) 0%, var(--sky-blue) 100%);
   color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  box-shadow: 0 4px 14px rgba(0, 168, 150, 0.25);
+  box-shadow: 0 4px 14px rgba(60, 175, 138, 0.28);
+  transition: transform 0.35s ease, background 0.35s ease, box-shadow 0.35s ease;
+}
+.proto-value-card-2x2:hover .proto-value-icon-box-2x2 {
+  transform: scale(1.12) rotate(-3deg);
+  background: linear-gradient(135deg, var(--sky-blue) 0%, var(--teal-green) 100%);
+  box-shadow: 0 8px 24px rgba(27, 174, 207, 0.45);
 }
 .proto-value-icon-box-2x2.icon-cyan {
-  background: linear-gradient(135deg, #007769 0%, #00F5D4 100%);
-  color: #051622;
+  background: linear-gradient(135deg, var(--teal-green) 0%, var(--cyan-turquoise) 100%);
 }
 
 .proto-value-title-2x2 {
