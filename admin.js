@@ -258,40 +258,47 @@
     const perms = Array.isArray(permissions) ? permissions : [];
     const hasPerm = (key) => isSuper || perms.includes(key);
 
-    const navMap = [
-      { id: 'nav-shifts',       perm: 'requests:view' },
-      { id: 'nav-roster',       perm: 'roster:view' },
-      { id: 'nav-applicants',   perm: 'applications:view' },
-      { id: 'nav-reports',      perm: 'reports:view' },
-      { id: 'nav-subscribers',  perm: 'newsletter:manage' },
-      { id: 'nav-audit',        perm: 'audit:view' },
-      { id: 'nav-admin-users',  perm: 'admins:manage' }
+    const tabPermMap = [
+      { tab: 'overview-tab',    perm: null },
+      { tab: 'requests-tab',    perm: 'requests:view' },
+      { tab: 'scheduler-tab',   perm: 'requests:view' },
+      { tab: 'roster-tab',      perm: 'roster:view' },
+      { tab: 'compliance-tab',  perm: 'roster:view' },
+      { tab: 'applicants-tab',  perm: 'applications:view' },
+      { tab: 'reports-tab',     perm: 'reports:view' },
+      { tab: 'admin-users-tab', perm: 'admins:manage' },
+      { tab: 'settings-tab',    perm: null }
     ];
 
-    navMap.forEach(({ id, perm }) => {
-      const btn = document.getElementById(id);
-      if (btn) {
-        if (hasPerm(perm)) {
-          btn.style.display = '';
-          btn.removeAttribute('disabled');
-        } else {
-          btn.style.display = 'none';
+    tabPermMap.forEach(({ tab, perm }) => {
+      const allowed = !perm || hasPerm(perm);
+
+      // 1. Sidebar Nav Buttons
+      document.querySelectorAll(`.sidebar-nav .nav-item-btn[data-tab="${tab}"]`).forEach(btn => {
+        btn.style.display = allowed ? '' : 'none';
+      });
+
+      // 2. Mobile Bottom Nav Items
+      document.querySelectorAll(`.bottom-nav-item[data-tab="${tab}"]`).forEach(btn => {
+        btn.style.display = allowed ? '' : 'none';
+      });
+
+      // 3. Quick Action Buttons on Overview Dashboard
+      document.querySelectorAll(`button[onclick*="'${tab}'"]`).forEach(btn => {
+        if (!btn.classList.contains('nav-item-btn') && !btn.classList.contains('bottom-nav-item')) {
+          btn.style.display = allowed ? '' : 'none';
         }
-      }
-      const bottomBtn = document.querySelector(`.bottom-nav-item[data-tab="${id.replace('nav-', '')}-tab"]`);
-      if (bottomBtn) {
-        bottomBtn.style.display = hasPerm(perm) ? '' : 'none';
-      }
+      });
     });
 
-    const activeTabEl = document.querySelector('.admin-view-tab.active');
+    // If currently active tab is not allowed, switch back to overview-tab
+    const activeTabEl = document.querySelector('.admin-view-tab.active, .admin-view-tab.active-tab');
     if (activeTabEl) {
       const activeTabId = activeTabEl.id;
-      const matched = navMap.find(item => item.id.replace('nav-', '') + '-tab' === activeTabId);
-      if (matched && !hasPerm(matched.perm)) {
-        const firstPermitted = navMap.find(item => hasPerm(item.perm));
-        if (firstPermitted && window.switchAdminTab) {
-          window.switchAdminTab(firstPermitted.id.replace('nav-', '') + '-tab');
+      const matched = tabPermMap.find(item => item.tab === activeTabId);
+      if (matched && matched.perm && !hasPerm(matched.perm)) {
+        if (window.switchAdminTab) {
+          window.switchAdminTab('overview-tab', 'Dashboard Overview');
         }
       }
     }
@@ -1500,6 +1507,23 @@
 
       showToast(res.message || 'Permissions updated successfully.', 'success');
       window.closeAdminPermissionsModal();
+
+      if (window._loadedAdmins) {
+        const found = window._loadedAdmins.find(a => a.id === adminId);
+        if (found) {
+          found.role = res.data.role;
+          found.permissions = res.data.permissions;
+        }
+      }
+
+      const currentUser = JSON.parse(sessionStorage.getItem('df_admin_user') || '{}');
+      if (currentUser.id === adminId) {
+        currentUser.role = res.data.role;
+        currentUser.permissions = res.data.permissions;
+        sessionStorage.setItem('df_admin_user', JSON.stringify(currentUser));
+        updateUserHeader();
+      }
+
       await fetchAndRenderAdminAccounts();
       await fetchAndRenderAudit();
     } catch (err) {
@@ -3445,8 +3469,28 @@
   const viewHeading   = document.getElementById('view-heading-text');
   const breadcrumbTitle = document.getElementById('breadcrumb-title');
 
+  const TAB_PERMISSION_REQUIREMENTS = {
+    'requests-tab': 'requests:view',
+    'scheduler-tab': 'requests:view',
+    'roster-tab': 'roster:view',
+    'compliance-tab': 'roster:view',
+    'applicants-tab': 'applications:view',
+    'reports-tab': 'reports:view',
+    'admin-users-tab': 'admins:manage'
+  };
+
   function switchTab(targetTab, title) {
     if (!targetTab) return;
+
+    const user = JSON.parse(sessionStorage.getItem('df_admin_user') || '{}');
+    const reqPerm = TAB_PERMISSION_REQUIREMENTS[targetTab];
+    if (reqPerm && user.role !== 'super-admin') {
+      const perms = Array.isArray(user.permissions) ? user.permissions : [];
+      if (!perms.includes(reqPerm)) {
+        showToast('Access restricted: You do not have permission to view this module.', 'warning');
+        return;
+      }
+    }
 
     // Ensure all modals/drawers are closed when switching tabs so nothing blocks the screen
     if (modalAddStaff) modalAddStaff.classList.remove('open');
