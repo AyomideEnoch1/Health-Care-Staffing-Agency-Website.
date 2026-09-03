@@ -808,4 +808,19 @@
   margin: 0;
 }
 
+/* ── Collage Images Border Radius Harmonization ──────────────────────────── */
+.photo-collage-3 .collage-item {
+  border-radius: var(--proto-radius-lg); /* 24px - exact same as Executive Overview */
+  border: 4px solid #ffffff;
+  box-shadow: var(--proto-shadow);
+  overflow: hidden;
+}
+.photo-collage-3 .collage-item-main {
+  border-radius: var(--proto-radius-lg);
+}
+.photo-collage-3 .collage-item-sub {
+  border-radius: var(--proto-radius-lg);
+}
+
+
 
