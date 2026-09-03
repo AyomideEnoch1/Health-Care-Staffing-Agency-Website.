@@ -426,36 +426,117 @@
   box-shadow: 0 4px 15px rgba(255, 255, 255, 0.3);
 }
 
-.proto-app-badges {
+.proto-action-badges-group {
   display: flex;
-  gap: 0.85rem;
-  margin-top: 1.5rem;
+  gap: 1.15rem;
+  margin-top: 1.75rem;
   flex-wrap: wrap;
+  align-items: stretch;
 }
-.proto-store-btn {
-  background: #000000;
-  color: #ffffff;
-  border-radius: 8px;
-  padding: 0.55rem 1rem;
+
+.proto-action-badge {
+  flex: 1;
+  min-width: 240px;
+  border-radius: 14px;
+  padding: 0.85rem 1.25rem;
   display: inline-flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: 0.95rem;
   text-decoration: none;
-  font-size: 0.75rem;
-  transition: transform 0.2s ease;
+  transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
 }
-.proto-store-btn:hover {
-  transform: translateY(-2px);
-  background: var(--proto-navy);
+
+.proto-action-badge.badge-facilities {
+  background: linear-gradient(135deg, #0B2545 0%, #051622 100%);
+  border: 1.5px solid rgba(0, 245, 212, 0.3);
 }
-.proto-store-text span {
+.proto-action-badge.badge-facilities:hover {
+  transform: translateY(-3px);
+  border-color: #00F5D4;
+  box-shadow: 0 10px 28px rgba(11, 37, 69, 0.3), 0 0 15px rgba(0, 245, 212, 0.2);
+}
+
+.proto-action-badge.badge-hotline {
+  background: linear-gradient(135deg, #00A896 0%, #028090 100%);
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+}
+.proto-action-badge.badge-hotline:hover {
+  transform: translateY(-3px);
+  border-color: #ffffff;
+  box-shadow: 0 10px 28px rgba(0, 168, 150, 0.4);
+}
+
+.proto-badge-icon-box {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: transform 0.25s ease;
+}
+.proto-action-badge.badge-facilities .proto-badge-icon-box {
+  background: rgba(0, 245, 212, 0.12);
+  color: #00F5D4;
+}
+.proto-action-badge.badge-hotline .proto-badge-icon-box {
+  background: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+}
+
+.proto-action-badge:hover .proto-badge-icon-box {
+  transform: scale(1.08);
+}
+
+.proto-badge-icon-box i {
+  width: 20px;
+  height: 20px;
+}
+
+.proto-badge-content {
+  flex-grow: 1;
+  text-align: left;
+}
+
+.proto-badge-eyebrow {
   display: block;
-  font-size: 0.62rem;
+  font-size: 0.68rem;
+  font-weight: 800;
   text-transform: uppercase;
-  color: #aaa;
+  letter-spacing: 0.8px;
+  margin-bottom: 0.15rem;
 }
-.proto-store-text strong {
+.proto-action-badge.badge-facilities .proto-badge-eyebrow {
+  color: #00F5D4;
+}
+.proto-action-badge.badge-hotline .proto-badge-eyebrow {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.proto-badge-title {
   display: block;
-  font-size: 0.82rem;
-  color: #fff;
+  font-family: var(--font-heading);
+  font-size: 0.98rem;
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1.25;
+}
+
+.proto-badge-arrow {
+  color: rgba(255, 255, 255, 0.6);
+  display: flex;
+  align-items: center;
+  transition: transform 0.25s ease, color 0.25s ease;
+}
+.proto-badge-arrow i {
+  width: 16px;
+  height: 16px;
+}
+.proto-action-badge:hover .proto-badge-arrow {
+  transform: translateX(3px);
+  color: #ffffff;
 }
