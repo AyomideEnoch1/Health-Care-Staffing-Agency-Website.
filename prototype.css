@@ -49,10 +49,11 @@
   text-transform: uppercase;
 }
 
-/* ── Section 1: Team Media Grid + Mission Split ──────────────────────────── */
-.proto-mission-section {
-  padding: 5rem 0 3.5rem 0;
-  background: #ffffff;
+/* ── Slanted Sections & Geometry Integration ────────────────────────────── */
+.proto-mission-section,
+.proto-workforce-section,
+.proto-tricard-section,
+.proto-soft-tint-section {
   position: relative;
   overflow: hidden;
 }
@@ -169,11 +170,6 @@
 }
 
 /* ── Section 2: Workforce Solutions & Staggered Collage ───────────────────── */
-.proto-workforce-section {
-  padding: 4.5rem 0 5rem 0;
-  background: #ffffff;
-}
-
 .proto-staggered-collage {
   position: relative;
   display: flex;
@@ -206,10 +202,6 @@
 }
 
 /* ── Section 3: Tri-Card Pillars (Client, Compliance, Professionals) ───────── */
-.proto-tricard-section {
-  padding: 2rem 0 5.5rem 0;
-  background: #ffffff;
-}
 .proto-tricard-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
