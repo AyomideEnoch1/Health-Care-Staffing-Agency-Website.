@@ -1280,6 +1280,25 @@ body {
 .table-responsive-container {
   width: 100%;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.table-responsive-container::-webkit-scrollbar {
+  height: 6px;
+}
+
+.table-responsive-container::-webkit-scrollbar-track {
+  background: var(--bg-subtle);
+  border-radius: 99px;
+}
+
+.table-responsive-container::-webkit-scrollbar-thumb {
+  background: rgba(0, 245, 212, 0.3);
+  border-radius: 99px;
+}
+
+.table-responsive-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 245, 212, 0.6);
 }
 
 .data-table {
@@ -1847,45 +1866,196 @@ body {
     display: none;
   }
 
-  /* Data Table stacked mobile card view */
+  .table-toolbar {
+    padding: 1rem !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.85rem !important;
+  }
+
+  .table-filter-group {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    width: 100% !important;
+    gap: 0.65rem !important;
+  }
+
+  .filter-search-box,
+  .filter-select {
+    width: 100% !important;
+    min-width: 100% !important;
+  }
+
+  .bulk-actions-toolbar {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.65rem !important;
+  }
+
+  .bulk-actions-toolbar .btn-secondary-action {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  /* ==========================================================================
+     MOBILE DATA TABLE ARCHITECTURE (EXECUTIVE CARD PRESENTATION)
+     ========================================================================== */
+  .table-responsive-container {
+    overflow-x: visible !important;
+    width: 100%;
+  }
+
+  .mobile-stacked-table {
+    display: block !important;
+    width: 100% !important;
+    border: none !important;
+  }
+
   .mobile-stacked-table thead {
-    display: none;
+    display: none !important;
   }
 
   .mobile-stacked-table tbody,
   .mobile-stacked-table tr,
   .mobile-stacked-table td {
-    display: block;
-    width: 100%;
+    display: block !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
   }
 
   .mobile-stacked-table tr {
     background: var(--bg-card);
     border: 1px solid var(--border-color);
-    border-radius: var(--radius-md);
-    margin-bottom: 0.85rem;
-    padding: 0.85rem;
+    border-left: 4px solid var(--brand-turquoise);
+    border-radius: var(--radius-lg);
+    margin-bottom: 1.25rem;
+    padding: 1.15rem 1.25rem;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
+    position: relative;
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  [data-theme="dark"] .mobile-stacked-table tr {
+    background: linear-gradient(180deg, rgba(17, 34, 64, 0.85) 0%, rgba(10, 25, 47, 0.95) 100%);
+    border-color: rgba(0, 245, 212, 0.18);
+    border-left: 4px solid var(--brand-cyan);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+  }
+
+  .mobile-stacked-table tr:hover {
+    border-color: var(--brand-cyan);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 26px rgba(0, 0, 0, 0.12);
   }
 
   .mobile-stacked-table td {
-    padding: 0.4rem 0;
+    padding: 0.6rem 0;
     border-bottom: 1px solid var(--border-subtle);
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 0.85rem;
+    text-align: right;
+    font-size: 0.85rem;
+  }
+
+  .mobile-stacked-table td:first-child {
+    padding-top: 0.1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1.5px solid var(--border-color);
+    margin-bottom: 0.35rem;
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: var(--text-primary);
   }
 
   .mobile-stacked-table td:last-child {
     border-bottom: none;
-    padding-top: 0.6rem;
+    padding-top: 0.95rem;
+    margin-top: 0.35rem;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: center;
+    gap: 0.5rem;
   }
 
   .mobile-stacked-table td::before {
     content: attr(data-label);
     font-size: 0.72rem;
-    font-weight: 700;
+    font-weight: 800;
     text-transform: uppercase;
+    letter-spacing: 0.05em;
     color: var(--text-muted);
+    background: var(--bg-subtle);
+    padding: 0.22rem 0.55rem;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    flex-shrink: 0;
+    text-align: left;
+  }
+
+  [data-theme="dark"] .mobile-stacked-table td::before {
+    background: rgba(255, 255, 255, 0.05);
+    color: #94A3B8;
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .mobile-stacked-table td:first-child::before {
+    background: rgba(0, 168, 150, 0.12);
+    color: var(--brand-turquoise);
+    border-color: rgba(0, 168, 150, 0.3);
+  }
+
+  [data-theme="dark"] .mobile-stacked-table td:first-child::before {
+    background: rgba(0, 245, 212, 0.15);
+    color: var(--brand-cyan);
+    border-color: rgba(0, 245, 212, 0.4);
+  }
+
+  .mobile-stacked-table td:last-child::before {
+    display: none !important;
+  }
+
+  /* Toolbar buttons inside mobile card view */
+  .admin-action-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    width: 100%;
+  }
+
+  .admin-action-toolbar .admin-action-btn,
+  .admin-action-toolbar .btn-secondary-action,
+  .admin-action-toolbar .btn-primary-action {
+    flex: 1 1 calc(50% - 0.5rem);
+    min-width: 120px;
+    height: 38px;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 700;
+    border-radius: var(--radius-md);
+  }
+
+  .admin-action-badge-self {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-md);
+    background: rgba(0, 168, 150, 0.1);
+    color: var(--brand-turquoise);
+    font-size: 0.82rem;
+    font-weight: 700;
+    border: 1px solid rgba(0, 168, 150, 0.25);
+  }
+
+  .admin-action-btn.btn-delete-admin {
+    flex: 1 1 100% !important;
+    color: #ef4444 !important;
+    border-color: rgba(239, 68, 68, 0.35) !important;
+    background: rgba(239, 68, 68, 0.08) !important;
   }
 }
 

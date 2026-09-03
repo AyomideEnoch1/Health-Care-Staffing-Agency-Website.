@@ -899,10 +899,10 @@
       const isSelected = LiveStore.selectedStaffIds.has(s.id);
       return `
         <tr data-id="${s.id}" onclick="window.openStaffDrawer('${s.id}')" style="cursor:pointer;" class="${isSelected ? 'selected-row' : ''}">
-          <td onclick="event.stopPropagation()">
+          <td data-label="Select" onclick="event.stopPropagation()">
             <input type="checkbox" class="roster-check" data-id="${s.id}" ${isSelected ? 'checked' : ''} onchange="window.toggleStaffSelection('${s.id}', this.checked)">
           </td>
-          <td>
+          <td data-label="Staff Member">
             <div class="table-user-cell">
               <img src="${s.avatar_url || 'assets/images/logo_icon.png'}" alt="${s.name}" class="table-user-avatar" onerror="this.src='assets/images/logo_icon.png'">
               <div class="table-user-info">
@@ -911,12 +911,12 @@
               </div>
             </div>
           </td>
-          <td><span class="status-pill ${s.role === 'RN' ? 'verified' : 'off-duty'}">${s.role}</span></td>
-          <td><span class="status-pill ${s.status}">${(s.status || '').replace('-', ' ')}</span></td>
-          <td><span class="status-pill ${s.credential_status || 'verified'}">${s.credential_status || 'Verified'}</span></td>
-          <td class="tabular-nums">★ ${parseFloat(s.rating || 5).toFixed(2)} (${s.shifts_completed || 0})</td>
-          <td>${s.region || 'Scarborough'}</td>
-          <td onclick="event.stopPropagation()" style="text-align:right;">
+          <td data-label="Role"><span class="status-pill ${s.role === 'RN' ? 'verified' : 'off-duty'}">${s.role}</span></td>
+          <td data-label="Status"><span class="status-pill ${s.status}">${(s.status || '').replace('-', ' ')}</span></td>
+          <td data-label="Compliance"><span class="status-pill ${s.credential_status || 'verified'}">${s.credential_status || 'Verified'}</span></td>
+          <td data-label="Rating & Shifts" class="tabular-nums">★ ${parseFloat(s.rating || 5).toFixed(2)} (${s.shifts_completed || 0})</td>
+          <td data-label="Region">${s.region || 'Scarborough'}</td>
+          <td data-label="Actions" onclick="event.stopPropagation()" style="text-align:right;">
             <button type="button" class="btn-secondary-action" style="padding:.35rem .65rem;font-size:.75rem;display:inline-flex;align-items:center;gap:4px;" onclick="window.openStaffDrawer('${s.id}')">
               <i data-lucide="eye" style="width:12px;height:12px;"></i> View Profile
             </button>
@@ -999,17 +999,17 @@
       } else {
         tableBody.innerHTML = filtered.map(r => `
           <tr onclick="window.openRequestDrawer('${r.id}')" style="cursor:pointer;">
-            <td>
+            <td data-label="Request Code">
               <strong>${r.request_code}</strong>
               ${r.batch_code ? `<br><span class="badge" style="background:rgba(0,245,212,0.12);color:var(--brand-cyan);font-size:0.68rem;padding:2px 5px;border-radius:4px;border:1px solid rgba(0,245,212,0.3);display:inline-block;margin-top:2px;">📦 ${r.batch_code}</span>` : ''}
             </td>
-            <td>${r.facility_name}<br><span style="font-size:.72rem;color:var(--text-muted);">${r.unit_department || 'General Care'}</span></td>
-            <td><span class="status-pill verified">${r.role_requested}</span></td>
-            <td>${r.shift_type || 'Day Shift'}</td>
-            <td><span class="status-pill ${r.urgency_level === 'emergency_surge' || r.urgency_level === 'urgent' ? 'urgent' : 'verified'}">${(r.urgency_level || 'routine').toUpperCase()}</span></td>
-            <td>${r.assigned_staff_name ? `<span style="font-weight:700;color:var(--brand-cyan);">${r.assigned_staff_name}</span>` : '<span style="color:var(--text-muted);">Unassigned</span>'}</td>
-            <td><span class="status-pill ${r.status}">${(r.status || 'new').toUpperCase()}</span></td>
-            <td style="text-align:right;">
+            <td data-label="Facility & Unit">${r.facility_name}<br><span style="font-size:.72rem;color:var(--text-muted);">${r.unit_department || 'General Care'}</span></td>
+            <td data-label="Role Requested"><span class="status-pill verified">${r.role_requested}</span></td>
+            <td data-label="Shift Type">${r.shift_type || 'Day Shift'}</td>
+            <td data-label="Urgency"><span class="status-pill ${r.urgency_level === 'emergency_surge' || r.urgency_level === 'urgent' ? 'urgent' : 'verified'}">${(r.urgency_level || 'routine').toUpperCase()}</span></td>
+            <td data-label="Assigned Clinician">${r.assigned_staff_name ? `<span style="font-weight:700;color:var(--brand-cyan);">${r.assigned_staff_name}</span>` : '<span style="color:var(--text-muted);">Unassigned</span>'}</td>
+            <td data-label="Status"><span class="status-pill ${r.status}">${(r.status || 'new').toUpperCase()}</span></td>
+            <td data-label="Action" style="text-align:right;">
               <button type="button" class="btn-secondary-action" style="font-size:.75rem;padding:.3rem .6rem;display:inline-flex;align-items:center;gap:4px;" onclick="event.stopPropagation();window.openRequestDrawer('${r.id}')">
                 <i data-lucide="user-check" style="width:12px;height:12px;"></i> Dispatch &amp; Manage
               </button>
@@ -1055,17 +1055,17 @@
 
     tbody.innerHTML = filtered.map(a => `
       <tr>
-        <td><strong>${a.full_name}</strong><br><span style="font-size:.72rem;color:var(--text-muted);">${a.phone || ''} &bull; ${a.email}</span></td>
-        <td><span class="status-pill verified">${a.role_applied}</span></td>
-        <td>${a.license_registration || 'Pending Verification'}</td>
-        <td>${a.created_at ? a.created_at.slice(0,10) : '—'}</td>
-        <td>
+        <td data-label="Candidate"><strong>${a.full_name}</strong><br><span style="font-size:.72rem;color:var(--text-muted);">${a.phone || ''} &bull; ${a.email}</span></td>
+        <td data-label="Role Applied"><span class="status-pill verified">${a.role_applied}</span></td>
+        <td data-label="License / Reg">${a.license_registration || 'Pending Verification'}</td>
+        <td data-label="Date Applied">${a.created_at ? a.created_at.slice(0,10) : '—'}</td>
+        <td data-label="Resume / CV">
           ${a.resume_original_name
             ? `<a href="${API_BASE}/admin/applications/${a.id}/resume" target="_blank" style="color:var(--brand-cyan);font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:4px;"><i data-lucide="download" style="width:14px;height:14px;"></i> ${a.resume_original_name}</a>`
             : '<span style="color:var(--text-muted);">No CV Uploaded</span>'}
         </td>
-        <td><span class="status-pill ${a.stage}">${(a.stage || '').replace('_', ' ').toUpperCase()}</span></td>
-        <td>
+        <td data-label="Onboarding Stage"><span class="status-pill ${a.stage}">${(a.stage || '').replace('_', ' ').toUpperCase()}</span></td>
+        <td data-label="Stage Selector">
           <select class="filter-select" style="font-size:.75rem;padding:.3rem .5rem;" onchange="window.updateApplicantStage('${a.id}', this.value)">
             <option value="new"              ${a.stage==='new'              ? 'selected':''}>New Inbound</option>
             <option value="review"           ${a.stage==='review'           ? 'selected':''}>Under Review</option>
@@ -1075,7 +1075,7 @@
             <option value="rejected"         ${a.stage==='rejected'         ? 'selected':''}>Rejected</option>
           </select>
         </td>
-        <td style="text-align:right;">
+        <td data-label="Enroll Action" style="text-align:right;">
           <button type="button" class="btn-primary-action" style="font-size:.75rem;padding:.35rem .65rem;height:28px;display:inline-flex;align-items:center;gap:4px;" onclick="window.openAddStaffModal({ full_name: '${(a.full_name || '').replace(/'/g, "\\'")}', role_applied: '${a.role_applied || 'RN'}', email: '${a.email || ''}', phone: '${a.phone || ''}', license_registration: '${a.license_registration || ''}' })">
             <i data-lucide="user-plus" style="width:12px;height:12px;"></i> Enroll
           </button>
@@ -1193,13 +1193,13 @@
         } else {
           tbody.innerHTML = LiveStore.auditLogs.map(l => `
             <tr>
-              <td class="tabular-nums"><strong>${l.id ? l.id.slice(0,8) : '—'}…</strong></td>
-              <td>${l.created_at ? l.created_at.replace('T',' ').slice(0,19) : '—'}</td>
-              <td><strong>${l.actor_name}</strong></td>
-              <td><span class="status-pill verified">${l.action}</span></td>
-              <td>${l.target_entity}</td>
-              <td>${l.details || '—'}</td>
-              <td><span class="status-pill ${l.severity === 'warning' || l.severity === 'critical' ? 'urgent' : 'verified'}">${l.severity.toUpperCase()}</span></td>
+              <td data-label="Log ID" class="tabular-nums"><strong>${l.id ? l.id.slice(0,8) : '—'}…</strong></td>
+              <td data-label="Timestamp">${l.created_at ? l.created_at.replace('T',' ').slice(0,19) : '—'}</td>
+              <td data-label="Operator Actor"><strong>${l.actor_name}</strong></td>
+              <td data-label="Security Action"><span class="status-pill verified">${l.action}</span></td>
+              <td data-label="Target Entity">${l.target_entity}</td>
+              <td data-label="Event Details">${l.details || '—'}</td>
+              <td data-label="Severity"><span class="status-pill ${l.severity === 'warning' || l.severity === 'critical' ? 'urgent' : 'verified'}">${l.severity.toUpperCase()}</span></td>
             </tr>`).join('');
         }
       }
@@ -1339,17 +1339,17 @@
 
         return `
           <tr>
-            <td>
+            <td data-label="Administrator">
               <div style="font-weight: 700; color: var(--text-primary);">${escapeHTML(a.full_name)}</div>
               <div style="font-size: 0.75rem; color: var(--text-muted);">${isSelf ? '⭐️ You' : 'Staff Admin'}</div>
             </td>
-            <td class="tabular-nums">${escapeHTML(a.email)}</td>
-            <td><span class="status-pill ${a.role === 'super-admin' ? 'role-rn' : (a.role === 'dispatch' ? 'role-rpn' : 'role-psw')}">${roleLabel}</span></td>
-            <td>${emailVerifiedBadge}</td>
-            <td>${mfaBadge}</td>
-            <td>${lastLoginText}</td>
-            <td>${statusBadge}</td>
-            <td>${actionBtn}</td>
+            <td data-label="Email Address" class="tabular-nums">${escapeHTML(a.email)}</td>
+            <td data-label="Role"><span class="status-pill ${a.role === 'super-admin' ? 'role-rn' : (a.role === 'dispatch' ? 'role-rpn' : 'role-psw')}">${roleLabel}</span></td>
+            <td data-label="Email Verification">${emailVerifiedBadge}</td>
+            <td data-label="2FA Security">${mfaBadge}</td>
+            <td data-label="Last Login">${lastLoginText}</td>
+            <td data-label="Status">${statusBadge}</td>
+            <td data-label="Action">${actionBtn}</td>
           </tr>
         `;
       }).join('');
@@ -1725,14 +1725,14 @@
 
       return `
         <tr>
-          <td><strong>${s.name}</strong><br><span style="font-size:.72rem;color:var(--text-muted);">${s.staff_code}</span></td>
-          <td><span class="status-pill verified">${s.role}</span></td>
-          <td>${s.cno_registration_num || '<span style="color:var(--text-muted)">—</span>'}</td>
-          <td>${s.cpr_expiry_date ? s.cpr_expiry_date.slice(0,10) : '<span style="color:var(--status-warning)">Not Set</span>'}</td>
-          <td>${s.vss_status || 'Clear'}</td>
-          <td>${s.n95_fit_test || '3M Valid'}</td>
-          <td>${expiryBadge}</td>
-          <td style="text-align:right;">
+          <td data-label="Clinician"><strong>${s.name}</strong><br><span style="font-size:.72rem;color:var(--text-muted);">${s.staff_code}</span></td>
+          <td data-label="Role"><span class="status-pill verified">${s.role}</span></td>
+          <td data-label="CNO Registration">${s.cno_registration_num || '<span style="color:var(--text-muted)">—</span>'}</td>
+          <td data-label="BLS / CPR Expiry">${s.cpr_expiry_date ? s.cpr_expiry_date.slice(0,10) : '<span style="color:var(--status-warning)">Not Set</span>'}</td>
+          <td data-label="VSS Check">${s.vss_status || 'Clear'}</td>
+          <td data-label="N95 Fit Test">${s.n95_fit_test || '3M Valid'}</td>
+          <td data-label="Overall Status">${expiryBadge}</td>
+          <td data-label="Action" style="text-align:right;">
             <button class="btn-secondary-action" style="padding:.25rem .55rem;font-size:.75rem;" onclick="window.openStaffDrawer('${s.id}', 'tab-profile-docs')">Docs</button>
           </td>
         </tr>`;
@@ -1826,25 +1826,25 @@
       } else {
         tbody.innerHTML = list.map(r => `
           <tr onclick="window.openRequestDrawer('${r.id}')" style="cursor: pointer;">
-            <td><strong style="color: var(--brand-cyan); font-family: monospace;">${escapeHTML(r.request_code || 'REQ-')}</strong></td>
-            <td>
+            <td data-label="Request Code"><strong style="color: var(--brand-cyan); font-family: monospace;">${escapeHTML(r.request_code || 'REQ-')}</strong></td>
+            <td data-label="Facility & Unit">
               <div style="font-weight: 700; color: var(--text-primary);">${escapeHTML(r.facility_name)}</div>
               <div style="font-size: 0.73rem; color: var(--text-muted);">📍 ${escapeHTML(r.unit_department || 'General Care')}</div>
             </td>
-            <td><span class="status-pill ${r.role_requested === 'RN' ? 'verified' : 'off-duty'}">${escapeHTML(r.role_requested)}</span></td>
-            <td>
+            <td data-label="Role Requested"><span class="status-pill ${r.role_requested === 'RN' ? 'verified' : 'off-duty'}">${escapeHTML(r.role_requested)}</span></td>
+            <td data-label="Shift Date & Time">
               <div style="font-size: 0.82rem; font-weight: 600;">${r.start_date ? r.start_date.slice(0, 10) : (r.created_at ? r.created_at.slice(0, 10) : '—')}</div>
               <div style="font-size: 0.72rem; color: var(--text-muted);">🕒 ${escapeHTML(r.shift_type || 'Day')}</div>
             </td>
-            <td>
+            <td data-label="Assigned Clinician">
               ${r.assigned_staff_name 
                 ? `<span style="font-weight: 700; color: var(--text-primary);">👤 ${escapeHTML(r.assigned_staff_name)}</span>`
                 : '<span style="color: #f59e0b; font-size: 0.78rem;">⚠️ Unassigned</span>'
               }
             </td>
-            <td><span class="status-pill ${r.urgency_level === 'emergency_surge' ? 'off-duty' : 'verified'}">${(r.urgency_level || 'routine').toUpperCase()}</span></td>
-            <td><span class="status-pill ${r.status}">${(r.status || 'pending').replace('_', ' ').toUpperCase()}</span></td>
-            <td style="text-align: right;">
+            <td data-label="Urgency Level"><span class="status-pill ${r.urgency_level === 'emergency_surge' ? 'off-duty' : 'verified'}">${(r.urgency_level || 'routine').toUpperCase()}</span></td>
+            <td data-label="Shift Status"><span class="status-pill ${r.status}">${(r.status || 'pending').replace('_', ' ').toUpperCase()}</span></td>
+            <td data-label="Action" style="text-align: right;">
               <button type="button" class="btn-secondary-action" style="font-size: 0.72rem; padding: 0.2rem 0.5rem;" onclick="event.stopPropagation(); window.openRequestDrawer('${r.id}')">
                 View
               </button>
@@ -1888,7 +1888,7 @@
       } else {
         tbody.innerHTML = list.map(s => `
           <tr onclick="window.openStaffDrawer('${s.id}')" style="cursor: pointer;">
-            <td>
+            <td data-label="Caregiver">
               <div style="display: flex; align-items: center; gap: 0.6rem;">
                 <img src="${s.avatar_url || 'assets/images/logo_icon.png'}" alt="${s.name}" class="table-user-avatar" onerror="this.src='assets/images/logo_icon.png'">
                 <div>
@@ -1897,13 +1897,13 @@
                 </div>
               </div>
             </td>
-            <td><span class="status-pill ${s.role === 'RN' ? 'verified' : 'off-duty'}">${escapeHTML(s.role)}</span></td>
-            <td><span class="status-pill ${s.status}">${(s.status || '').replace('-', ' ').toUpperCase()}</span></td>
-            <td><code style="font-weight: 700; color: var(--brand-cyan);">${escapeHTML(s.cno_registration_number || 'CNO-VERIFIED')}</code></td>
-            <td>${escapeHTML(s.assigned_region || 'Greater Toronto Area')}</td>
-            <td>⭐ ${s.rating || '5.0'}</td>
-            <td>${s.expiring_docs_count > 0 ? `<span class="status-pill off-duty">⚠️ ${s.expiring_docs_count} Expiring</span>` : '<span class="status-pill verified">✅ 100% Valid</span>'}</td>
-            <td style="text-align: right;">
+            <td data-label="Role"><span class="status-pill ${s.role === 'RN' ? 'verified' : 'off-duty'}">${escapeHTML(s.role)}</span></td>
+            <td data-label="Status"><span class="status-pill ${s.status}">${(s.status || '').replace('-', ' ').toUpperCase()}</span></td>
+            <td data-label="CNO / License #"><code style="font-weight: 700; color: var(--brand-cyan);">${escapeHTML(s.cno_registration_number || 'CNO-VERIFIED')}</code></td>
+            <td data-label="Ontario Region">${escapeHTML(s.assigned_region || 'Greater Toronto Area')}</td>
+            <td data-label="Rating">⭐ ${s.rating || '5.0'}</td>
+            <td data-label="Expiring Credentials">${s.expiring_docs_count > 0 ? `<span class="status-pill off-duty">⚠️ ${s.expiring_docs_count} Expiring</span>` : '<span class="status-pill verified">✅ 100% Valid</span>'}</td>
+            <td data-label="Action" style="text-align: right;">
               <button type="button" class="btn-secondary-action" style="font-size: 0.72rem; padding: 0.2rem 0.5rem;" onclick="event.stopPropagation(); window.openStaffDrawer('${s.id}')">
                 Profile
               </button>
@@ -1947,17 +1947,17 @@
       } else {
         tbody.innerHTML = list.map(a => `
           <tr onclick="window.openApplicantDrawer('${a.id}')" style="cursor: pointer;">
-            <td><strong style="color: var(--brand-cyan); font-family: monospace;">${escapeHTML(a.application_code || 'APP-')}</strong></td>
-            <td><div style="font-weight: 700; color: var(--text-primary);">${escapeHTML(a.full_name)}</div></td>
-            <td><span class="status-pill verified">${escapeHTML(a.role_applied)}</span></td>
-            <td><span class="status-pill ${a.stage || 'new'}">${(a.stage || 'new').toUpperCase()}</span></td>
-            <td><code>${escapeHTML(a.license_registration || 'Provided')}</code></td>
-            <td>
+            <td data-label="Applicant Code"><strong style="color: var(--brand-cyan); font-family: monospace;">${escapeHTML(a.application_code || 'APP-')}</strong></td>
+            <td data-label="Full Name"><div style="font-weight: 700; color: var(--text-primary);">${escapeHTML(a.full_name)}</div></td>
+            <td data-label="Role Applied"><span class="status-pill verified">${escapeHTML(a.role_applied)}</span></td>
+            <td data-label="Onboarding Stage"><span class="status-pill ${a.stage || 'new'}">${(a.stage || 'new').toUpperCase()}</span></td>
+            <td data-label="License / Reg"><code>${escapeHTML(a.license_registration || 'Provided')}</code></td>
+            <td data-label="Contact Email & Phone">
               <div style="font-size: 0.8rem;">${escapeHTML(a.email)}</div>
               <div style="font-size: 0.72rem; color: var(--text-muted);">${escapeHTML(a.phone || '—')}</div>
             </td>
-            <td>${a.created_at ? a.created_at.slice(0, 10) : '—'}</td>
-            <td style="text-align: right;">
+            <td data-label="Date Applied">${a.created_at ? a.created_at.slice(0, 10) : '—'}</td>
+            <td data-label="Action" style="text-align: right;">
               <button type="button" class="btn-secondary-action" style="font-size: 0.72rem; padding: 0.2rem 0.5rem;" onclick="event.stopPropagation(); window.openApplicantDrawer('${a.id}')">
                 Review
               </button>
@@ -2004,12 +2004,12 @@
       } else {
         tbody.innerHTML = list.map(s => `
           <tr>
-            <td><strong style="color: var(--text-primary); font-size: 0.88rem;">${escapeHTML(s.email)}</strong></td>
-            <td><span class="status-pill ${s.status === 'active' ? 'verified' : 'off-duty'}">${(s.status || 'active').toUpperCase()}</span></td>
-            <td><span class="status-pill verified" style="font-size: 0.72rem;">🌐 ${escapeHTML(s.source || 'homepage_strip')}</span></td>
-            <td><code style="color: var(--text-muted); font-size: 0.75rem;">${escapeHTML(s.ip_address || '127.0.0.1')}</code></td>
-            <td>${s.created_at ? s.created_at.slice(0, 10) : '—'}</td>
-            <td style="text-align: right;">
+            <td data-label="Subscriber Email"><strong style="color: var(--text-primary); font-size: 0.88rem;">${escapeHTML(s.email)}</strong></td>
+            <td data-label="Status"><span class="status-pill ${s.status === 'active' ? 'verified' : 'off-duty'}">${(s.status || 'active').toUpperCase()}</span></td>
+            <td data-label="Source Channel"><span class="status-pill verified" style="font-size: 0.72rem;">🌐 ${escapeHTML(s.source || 'homepage_strip')}</span></td>
+            <td data-label="IP Subnet"><code style="color: var(--text-muted); font-size: 0.75rem;">${escapeHTML(s.ip_address || '127.0.0.1')}</code></td>
+            <td data-label="Date Subscribed">${s.created_at ? s.created_at.slice(0, 10) : '—'}</td>
+            <td data-label="Action" style="text-align: right;">
               <button type="button" class="btn-secondary-action" style="font-size: 0.72rem; padding: 0.2rem 0.5rem; color: #ef4444; border-color: rgba(239,68,68,0.3);" onclick="window.deleteNewsletterSubscriber('${s.id}')">
                 Remove
               </button>
