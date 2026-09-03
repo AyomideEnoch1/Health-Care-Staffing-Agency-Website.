@@ -22,7 +22,7 @@ const qrcode = require('qrcode');
 const { z } = require('zod');
 const pool = require('../db');
 const { authLoginLimiter } = require('../middleware/rateLimiter');
-const { requireAdminAuth } = require('../middleware/auth');
+const { requireAdminAuth, normalizePermissions } = require('../middleware/auth');
 const { sendAdminEmailVerificationOtp } = require('../utils/mailer');
 const JWT_SECRET = process.env.JWT_SECRET || 'divine_fingers_default_secure_jwt_secret_key_2026_production_fallback';
 
@@ -219,6 +219,7 @@ router.post('/login', authLoginLimiter, async (req, res, next) => {
         email: admin.email,
         full_name: admin.full_name,
         role: admin.role,
+        permissions: normalizePermissions(admin.role, admin.permissions),
         totp_enabled: Boolean(admin.totp_enabled),
         email_verified: true
       }
@@ -351,6 +352,7 @@ router.post('/email/verify', authLoginLimiter, async (req, res, next) => {
         email: admin.email,
         full_name: admin.full_name,
         role: admin.role,
+        permissions: normalizePermissions(admin.role, admin.permissions),
         totp_enabled: false,
         email_verified: true
       }
@@ -478,6 +480,7 @@ router.post('/mfa/verify', authLoginLimiter, async (req, res, next) => {
         email: admin.email,
         full_name: admin.full_name,
         role: admin.role,
+        permissions: normalizePermissions(admin.role, admin.permissions),
         totp_enabled: true
       }
     });
@@ -547,7 +550,7 @@ router.post('/mfa/confirm', requireAdminAuth(), async (req, res, next) => {
 router.get('/me', requireAdminAuth(), async (req, res, next) => {
   try {
     const [rows] = await pool.query(
-      'SELECT id, email, full_name, role, is_active, email_verified, totp_enabled, last_login, last_login_ip FROM admins WHERE id = ?',
+      'SELECT id, email, full_name, role, permissions, is_active, email_verified, totp_enabled, last_login, last_login_ip FROM admins WHERE id = ?',
       [req.admin.id]
     );
     if (!rows.length || !rows[0].is_active) {
@@ -561,6 +564,7 @@ router.get('/me', requireAdminAuth(), async (req, res, next) => {
         email: admin.email,
         full_name: admin.full_name,
         role: admin.role,
+        permissions: normalizePermissions(admin.role, admin.permissions),
         totp_enabled: Boolean(admin.totp_enabled),
         email_verified: Boolean(admin.email_verified),
         last_login: admin.last_login,

@@ -253,6 +253,50 @@
     }
   }
 
+  function applyRolePermissionsToUI(permissions = [], role = '') {
+    const isSuper = role === 'super-admin';
+    const perms = Array.isArray(permissions) ? permissions : [];
+    const hasPerm = (key) => isSuper || perms.includes(key);
+
+    const navMap = [
+      { id: 'nav-shifts',       perm: 'requests:view' },
+      { id: 'nav-roster',       perm: 'roster:view' },
+      { id: 'nav-applicants',   perm: 'applications:view' },
+      { id: 'nav-reports',      perm: 'reports:view' },
+      { id: 'nav-subscribers',  perm: 'newsletter:manage' },
+      { id: 'nav-audit',        perm: 'audit:view' },
+      { id: 'nav-admin-users',  perm: 'admins:manage' }
+    ];
+
+    navMap.forEach(({ id, perm }) => {
+      const btn = document.getElementById(id);
+      if (btn) {
+        if (hasPerm(perm)) {
+          btn.style.display = '';
+          btn.removeAttribute('disabled');
+        } else {
+          btn.style.display = 'none';
+        }
+      }
+      const bottomBtn = document.querySelector(`.bottom-nav-item[data-tab="${id.replace('nav-', '')}-tab"]`);
+      if (bottomBtn) {
+        bottomBtn.style.display = hasPerm(perm) ? '' : 'none';
+      }
+    });
+
+    const activeTabEl = document.querySelector('.admin-view-tab.active');
+    if (activeTabEl) {
+      const activeTabId = activeTabEl.id;
+      const matched = navMap.find(item => item.id.replace('nav-', '') + '-tab' === activeTabId);
+      if (matched && !hasPerm(matched.perm)) {
+        const firstPermitted = navMap.find(item => hasPerm(item.perm));
+        if (firstPermitted && window.switchAdminTab) {
+          window.switchAdminTab(firstPermitted.id.replace('nav-', '') + '-tab');
+        }
+      }
+    }
+  }
+
   function updateUserHeader() {
     try {
       const user = JSON.parse(sessionStorage.getItem('df_admin_user') || '{}');
@@ -260,7 +304,16 @@
       const clearanceEl = document.getElementById('sidebar-user-clearance');
       const avatarEl    = document.getElementById('sidebar-avatar-initials');
       if (nameEl)      nameEl.textContent = user.full_name || 'Care Coordinator';
-      if (clearanceEl) clearanceEl.textContent = user.role === 'super-admin' ? 'Super Admin (Level 5)' : (user.role || 'Coordinator');
+      
+      const roleBadgeTitles = {
+        'super-admin': 'Super Admin (Level 5)',
+        'dispatch': 'Dispatch Officer',
+        'care-coordinator': 'Care Coordinator',
+        'recruiter': 'Recruiter / HR',
+        'auditor': 'Compliance Auditor',
+        'custom': 'Custom Operator'
+      };
+      if (clearanceEl) clearanceEl.textContent = roleBadgeTitles[user.role] || (user.role || 'Coordinator');
       if (avatarEl) {
         const initials = (user.full_name || 'SA').split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
         avatarEl.textContent = initials;
@@ -271,6 +324,7 @@
           ? '<span class="status-pill verified">🔒 2FA Active</span>'
           : '<span class="status-pill" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b;">⚠️ 2FA Not Enrolled</span>';
       }
+      applyRolePermissionsToUI(user.permissions, user.role);
     } catch { /* Display fallback */ }
   }
 
@@ -1197,6 +1251,7 @@
     try {
       const res = await apiRequest('/admin/admins');
       const admins = res.data || [];
+      window._loadedAdmins = admins;
 
       if (badge) {
         badge.textContent = admins.length;
@@ -1211,14 +1266,21 @@
         return;
       }
 
+      const roleLabelsMap = {
+        'super-admin': '👑 Super Admin',
+        'dispatch': '⚡ Dispatch Officer',
+        'care-coordinator': '🩺 Care Coordinator',
+        'recruiter': '🎯 Recruiter / HR',
+        'auditor': '📋 Compliance Auditor',
+        'custom': '⚙️ Custom Access'
+      };
+
       const rowsHtml = admins.map(a => {
         const isSelf = a.id === user.id;
         const statusBadge = a.is_active
           ? '<span class="status-pill verified"><span class="pulse-dot"></span> Active</span>'
           : '<span class="status-pill urgent">Deactivated</span>';
-        const roleLabel = a.role === 'super-admin'
-          ? 'Super Admin (Level 5)'
-          : (a.role === 'dispatch' ? 'Dispatch Officer' : 'Care Coordinator');
+        const roleLabel = roleLabelsMap[a.role] || a.role;
 
         const emailVerifiedBadge = a.email_verified
           ? '<span class="status-pill verified"><i data-lucide="check" style="width:12px;height:12px;vertical-align:middle;margin-right:2px;"></i> Verified</span>'
@@ -1236,6 +1298,12 @@
         const btnText = a.is_active ? 'Deactivate' : 'Reactivate';
         const btnIcon = a.is_active ? 'user-x' : 'user-check';
 
+        const permBtn = (!isSelf && (user.role === 'super-admin' || user.permissions?.includes('admins:manage')))
+          ? `<button type="button" class="admin-action-btn btn-perm-edit" onclick="window.openAdminPermissionsModal('${a.id}')" title="Configure role & access permissions">
+               <i data-lucide="sliders" style="width:13px;height:13px;"></i> Permissions
+             </button>`
+          : '';
+
         const resendEmailBtn = (!a.email_verified && !isSelf)
           ? `<button type="button" class="admin-action-btn btn-resend-mail" onclick="window.resendAdminVerification('${a.id}', '${a.email.replace(/'/g, "\\'")}')" title="Resend email verification code">
                <i data-lucide="mail" style="width:13px;height:13px;"></i> Resend Code
@@ -1251,6 +1319,7 @@
         const actionBtn = isSelf
           ? `<span class="admin-action-badge-self"><i data-lucide="shield-check" style="width:13px;height:13px;"></i> Active Session</span>`
           : `<div class="admin-action-toolbar">
+               ${permBtn}
                <button type="button" class="admin-action-btn btn-status-toggle" onclick="window.toggleAdminStatus('${a.id}', '${a.full_name.replace(/'/g, "\\'")}', ${a.is_active})">
                  <i data-lucide="${btnIcon}" style="width:13px;height:13px;"></i> ${btnText}
                </button>
@@ -1295,6 +1364,152 @@
       await fetchAndRenderAudit();
     } catch (err) {
       showToast(`Failed to resend verification: ${err.message}`, 'warning');
+    }
+  };
+
+  // ── RBAC Role & Permissions Configuration Controls ───────────────────────
+  const ROLE_PERMISSIONS_PRESETS = {
+    'super-admin': [
+      'requests:view', 'requests:dispatch',
+      'roster:view', 'roster:manage',
+      'applications:view', 'applications:manage',
+      'inquiries:manage',
+      'reports:view', 'reports:export',
+      'newsletter:manage',
+      'audit:view',
+      'admins:manage'
+    ],
+    'dispatch': [
+      'requests:view', 'requests:dispatch',
+      'roster:view',
+      'reports:view'
+    ],
+    'care-coordinator': [
+      'requests:view', 'requests:dispatch',
+      'roster:view'
+    ],
+    'recruiter': [
+      'applications:view', 'applications:manage',
+      'roster:view'
+    ],
+    'auditor': [
+      'audit:view',
+      'reports:view', 'reports:export',
+      'requests:view',
+      'roster:view'
+    ],
+    'custom': []
+  };
+
+  window.openAdminPermissionsModal = function(adminId) {
+    const admin = (window._loadedAdmins || []).find(a => a.id === adminId);
+    if (!admin) {
+      showToast('Administrator details not found. Please refresh roster.', 'warning');
+      return;
+    }
+
+    const modal = document.getElementById('admin-permissions-modal');
+    const idInput = document.getElementById('perm-modal-admin-id');
+    const subtitle = document.getElementById('perm-modal-subtitle');
+    const roleSelect = document.getElementById('perm-modal-role-select');
+
+    if (idInput) idInput.value = admin.id;
+    if (subtitle) subtitle.innerHTML = `Configuring role & privileges for <strong>${escapeHTML(admin.full_name)}</strong> (${escapeHTML(admin.email)})`;
+    if (roleSelect) roleSelect.value = admin.role || 'custom';
+
+    const userPerms = Array.isArray(admin.permissions) ? admin.permissions : [];
+    document.querySelectorAll('#admin-permissions-modal .perm-chk').forEach(chk => {
+      chk.checked = admin.role === 'super-admin' || userPerms.includes(chk.value);
+    });
+
+    if (modal) {
+      modal.classList.add('open');
+      modal.style.display = 'flex';
+    }
+    if (window.lucide) lucide.createIcons();
+  };
+
+  window.closeAdminPermissionsModal = function() {
+    const modal = document.getElementById('admin-permissions-modal');
+    if (modal) {
+      modal.classList.remove('open');
+      modal.style.display = 'none';
+    }
+  };
+
+  window.handleRolePresetChange = function(roleKey) {
+    if (roleKey === 'custom') return;
+    const targetPerms = ROLE_PERMISSIONS_PRESETS[roleKey] || [];
+    const isSuper = roleKey === 'super-admin';
+    document.querySelectorAll('#admin-permissions-modal .perm-chk').forEach(chk => {
+      chk.checked = isSuper || targetPerms.includes(chk.value);
+    });
+  };
+
+  window.toggleAllPermissions = function(checked) {
+    document.querySelectorAll('#admin-permissions-modal .perm-chk').forEach(chk => {
+      chk.checked = Boolean(checked);
+    });
+    const roleSelect = document.getElementById('perm-modal-role-select');
+    if (roleSelect) roleSelect.value = checked ? 'super-admin' : 'custom';
+  };
+
+  window.onIndividualPermChange = function() {
+    const roleSelect = document.getElementById('perm-modal-role-select');
+    if (!roleSelect) return;
+    const selected = Array.from(document.querySelectorAll('#admin-permissions-modal .perm-chk:checked')).map(c => c.value);
+    if (selected.length === 12) {
+      roleSelect.value = 'super-admin';
+    } else {
+      let matched = 'custom';
+      for (const [r, list] of Object.entries(ROLE_PERMISSIONS_PRESETS)) {
+        if (r !== 'super-admin' && r !== 'custom') {
+          if (list.length === selected.length && list.every(p => selected.includes(p))) {
+            matched = r;
+            break;
+          }
+        }
+      }
+      roleSelect.value = matched;
+    }
+  };
+
+  window.saveAdminPermissions = async function(e) {
+    if (e && e.preventDefault) e.preventDefault();
+    const adminId = document.getElementById('perm-modal-admin-id')?.value;
+    const role = document.getElementById('perm-modal-role-select')?.value;
+    const submitBtn = document.getElementById('perm-save-submit-btn');
+
+    if (!adminId) return;
+
+    const checkedPerms = Array.from(document.querySelectorAll('#admin-permissions-modal .perm-chk:checked')).map(c => c.value);
+
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = 'Updating permissions...';
+    }
+
+    try {
+      const res = await apiRequest(`/admin/admins/${adminId}/permissions`, {
+        method: 'PATCH',
+        body: JSON.stringify({
+          role,
+          permissions: role === 'super-admin' ? ROLE_PERMISSIONS_PRESETS['super-admin'] : checkedPerms
+        })
+      });
+
+      showToast(res.message || 'Permissions updated successfully.', 'success');
+      window.closeAdminPermissionsModal();
+      await fetchAndRenderAdminAccounts();
+      await fetchAndRenderAudit();
+    } catch (err) {
+      showToast(`Failed to update permissions: ${err.message}`, 'warning');
+    } finally {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i data-lucide="save" style="width:16px;height:16px;"></i> Save Access Configuration';
+        if (window.lucide) lucide.createIcons();
+      }
     }
   };
 

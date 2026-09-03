@@ -927,9 +927,11 @@
                 <div>
                   <label style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.35rem;">ASSIGNED ROLE *</label>
                   <select id="dedicated-new-admin-role" required style="width: 100%; padding: 0.6rem 0.8rem; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-surface); color: var(--text-primary); font-size: 0.85rem;">
-                    <option value="care-coordinator">Care Coordinator (Read & Shift View)</option>
-                    <option value="dispatch">Dispatch Officer (Roster & Shifts)</option>
-                    <option value="super-admin">Super Admin (Full RBAC Privileges)</option>
+                    <option value="care-coordinator">🩺 Care Coordinator (Read & Shift View)</option>
+                    <option value="dispatch">⚡ Dispatch Officer (Roster & Shifts)</option>
+                    <option value="recruiter">🎯 Recruitment Specialist / HR (Job ATS & Roster)</option>
+                    <option value="auditor">📋 Compliance Auditor (Audit Trail & Reports)</option>
+                    <option value="super-admin">👑 Super Admin (Full RBAC Privileges)</option>
                   </select>
                 </div>
                 <div>
@@ -1356,8 +1358,167 @@
     </div>
   </div>
 
+  <!-- 11. RBAC PERMISSIONS & ROLE CONFIGURATION MODAL -->
+  <div class="admin-modal-overlay" id="admin-permissions-modal">
+    <div class="admin-modal-card" style="max-width: 620px;">
+      <div class="modal-header" style="margin-bottom: 1rem;">
+        <div>
+          <h3 class="modal-title" style="display: flex; align-items: center; gap: 0.5rem;">
+            <i data-lucide="shield-check" style="width: 20px; height: 20px; color: var(--brand-turquoise);"></i>
+            Configure Operator Access &amp; Permissions
+          </h3>
+          <p id="perm-modal-subtitle" style="font-size: 0.8rem; color: var(--text-muted); margin: 0.25rem 0 0 0;">Managing role privileges for operator</p>
+        </div>
+        <button type="button" class="modal-close-btn" onclick="window.closeAdminPermissionsModal()" aria-label="Close modal">
+          <i data-lucide="x" style="width: 20px; height: 20px;"></i>
+        </button>
+      </div>
+
+      <form id="admin-permissions-form" onsubmit="window.saveAdminPermissions(event)">
+        <input type="hidden" id="perm-modal-admin-id">
+
+        <!-- Role Template Selector -->
+        <div class="modal-form-group" style="margin-bottom: 1.25rem;">
+          <label for="perm-modal-role-select" style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 0.4rem;">PRIMARY OPERATIONAL ROLE PRESET</label>
+          <select id="perm-modal-role-select" class="modal-input" onchange="window.handleRolePresetChange(this.value)" style="width: 100%; font-weight: 600;">
+            <option value="super-admin">👑 Super-Admin (Full Unrestricted Access)</option>
+            <option value="dispatch">⚡ Dispatch Officer (Shift Orders &amp; Roster)</option>
+            <option value="care-coordinator">🩺 Care Coordinator (Shift View &amp; Staffing)</option>
+            <option value="recruiter">🎯 Recruitment Specialist / HR (Job ATS &amp; Roster)</option>
+            <option value="auditor">📋 Compliance Auditor (Audit Trail &amp; Reports)</option>
+            <option value="custom">⚙️ Custom Granular Access</option>
+          </select>
+        </div>
+
+        <!-- Granular Permissions Grid -->
+        <div style="margin-bottom: 1.25rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem;">
+            <label style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted);">GRANULAR MODULE PRIVILEGES</label>
+            <div style="display: flex; gap: 0.5rem;">
+              <button type="button" class="btn-table-action" onclick="window.toggleAllPermissions(true)" style="font-size: 0.7rem; padding: 0.2rem 0.5rem;">Select All</button>
+              <button type="button" class="btn-table-action" onclick="window.toggleAllPermissions(false)" style="font-size: 0.7rem; padding: 0.2rem 0.5rem;">Clear All</button>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 0.6rem; background: var(--bg-surface-elevated); padding: 1rem; border-radius: 8px; border: 1px solid var(--border-subtle);">
+            <!-- Shift Requests -->
+            <label style="display: flex; align-items: flex-start; gap: 0.5rem; font-size: 0.82rem; cursor: pointer;">
+              <input type="checkbox" name="perm-checkbox" value="requests:view" class="perm-chk" onchange="window.onIndividualPermChange()">
+              <div>
+                <strong>View Shift Requests</strong>
+                <div style="font-size: 0.72rem; color: var(--text-muted);">Access shift board &amp; calendar</div>
+              </div>
+            </label>
+
+            <label style="display: flex; align-items: flex-start; gap: 0.5rem; font-size: 0.82rem; cursor: pointer;">
+              <input type="checkbox" name="perm-checkbox" value="requests:dispatch" class="perm-chk" onchange="window.onIndividualPermChange()">
+              <div>
+                <strong>Dispatch &amp; Fulfill Shifts</strong>
+                <div style="font-size: 0.72rem; color: var(--text-muted);">Assign caregivers &amp; update status</div>
+              </div>
+            </label>
+
+            <!-- Staff Roster -->
+            <label style="display: flex; align-items: flex-start; gap: 0.5rem; font-size: 0.82rem; cursor: pointer;">
+              <input type="checkbox" name="perm-checkbox" value="roster:view" class="perm-chk" onchange="window.onIndividualPermChange()">
+              <div>
+                <strong>View Staff Roster</strong>
+                <div style="font-size: 0.72rem; color: var(--text-muted);">Browse caregiver profiles</div>
+              </div>
+            </label>
+
+            <label style="display: flex; align-items: flex-start; gap: 0.5rem; font-size: 0.82rem; cursor: pointer;">
+              <input type="checkbox" name="perm-checkbox" value="roster:manage" class="perm-chk" onchange="window.onIndividualPermChange()">
+              <div>
+                <strong>Manage Staff &amp; Docs</strong>
+                <div style="font-size: 0.72rem; color: var(--text-muted);">Add/edit staff &amp; credentials</div>
+              </div>
+            </label>
+
+            <!-- Recruitment ATS -->
+            <label style="display: flex; align-items: flex-start; gap: 0.5rem; font-size: 0.82rem; cursor: pointer;">
+              <input type="checkbox" name="perm-checkbox" value="applications:view" class="perm-chk" onchange="window.onIndividualPermChange()">
+              <div>
+                <strong>View Job Applicants</strong>
+                <div style="font-size: 0.72rem; color: var(--text-muted);">Access ATS candidates &amp; resumes</div>
+              </div>
+            </label>
+
+            <label style="display: flex; align-items: flex-start; gap: 0.5rem; font-size: 0.82rem; cursor: pointer;">
+              <input type="checkbox" name="perm-checkbox" value="applications:manage" class="perm-chk" onchange="window.onIndividualPermChange()">
+              <div>
+                <strong>Manage Candidate ATS</strong>
+                <div style="font-size: 0.72rem; color: var(--text-muted);">Change stages &amp; recruit staff</div>
+              </div>
+            </label>
+
+            <!-- Inquiries -->
+            <label style="display: flex; align-items: flex-start; gap: 0.5rem; font-size: 0.82rem; cursor: pointer;">
+              <input type="checkbox" name="perm-checkbox" value="inquiries:manage" class="perm-chk" onchange="window.onIndividualPermChange()">
+              <div>
+                <strong>Manage Client Inquiries</strong>
+                <div style="font-size: 0.72rem; color: var(--text-muted);">Read &amp; dispatch replies</div>
+              </div>
+            </label>
+
+            <!-- Reports -->
+            <label style="display: flex; align-items: flex-start; gap: 0.5rem; font-size: 0.82rem; cursor: pointer;">
+              <input type="checkbox" name="perm-checkbox" value="reports:view" class="perm-chk" onchange="window.onIndividualPermChange()">
+              <div>
+                <strong>View Report Studio</strong>
+                <div style="font-size: 0.72rem; color: var(--text-muted);">Operational &amp; financial data</div>
+              </div>
+            </label>
+
+            <label style="display: flex; align-items: flex-start; gap: 0.5rem; font-size: 0.82rem; cursor: pointer;">
+              <input type="checkbox" name="perm-checkbox" value="reports:export" class="perm-chk" onchange="window.onIndividualPermChange()">
+              <div>
+                <strong>Export &amp; Print Reports</strong>
+                <div style="font-size: 0.72rem; color: var(--text-muted);">Download CSV &amp; print dossiers</div>
+              </div>
+            </label>
+
+            <!-- Newsletter -->
+            <label style="display: flex; align-items: flex-start; gap: 0.5rem; font-size: 0.82rem; cursor: pointer;">
+              <input type="checkbox" name="perm-checkbox" value="newsletter:manage" class="perm-chk" onchange="window.onIndividualPermChange()">
+              <div>
+                <strong>Manage Subscribers</strong>
+                <div style="font-size: 0.72rem; color: var(--text-muted);">Shift alert newsletter list</div>
+              </div>
+            </label>
+
+            <!-- Audit Logs -->
+            <label style="display: flex; align-items: flex-start; gap: 0.5rem; font-size: 0.82rem; cursor: pointer;">
+              <input type="checkbox" name="perm-checkbox" value="audit:view" class="perm-chk" onchange="window.onIndividualPermChange()">
+              <div>
+                <strong>View Audit Logs</strong>
+                <div style="font-size: 0.72rem; color: var(--text-muted);">Security ledger &amp; compliance trail</div>
+              </div>
+            </label>
+
+            <!-- Admin Operators -->
+            <label style="display: flex; align-items: flex-start; gap: 0.5rem; font-size: 0.82rem; cursor: pointer;">
+              <input type="checkbox" name="perm-checkbox" value="admins:manage" class="perm-chk" onchange="window.onIndividualPermChange()">
+              <div>
+                <strong>Manage Administrators</strong>
+                <div style="font-size: 0.72rem; color: var(--text-muted);">Create admins &amp; edit roles</div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <div class="modal-actions" style="justify-content: flex-end; gap: 0.75rem;">
+          <button type="button" class="btn-secondary-action" onclick="window.closeAdminPermissionsModal()">Cancel</button>
+          <button type="submit" class="btn-primary-action" id="perm-save-submit-btn">
+            <i data-lucide="save" style="width: 16px; height: 16px;"></i> Save Access Configuration
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- Core Dashboard Application Script -->
-  <script src="admin.js?v=4.8.0"></script>
+  <script src="admin.js?v=4.9.0"></script>
 
 </body>
 </html>

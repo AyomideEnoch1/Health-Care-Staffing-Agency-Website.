@@ -4,7 +4,7 @@ const crypto = require('crypto');
 const { z } = require('zod');
 const pool = require('../db');
 const { publicFormLimiter } = require('../middleware/rateLimiter');
-const { requireAdminAuth } = require('../middleware/auth');
+const { requireAdminAuth, requirePermission } = require('../middleware/auth');
 const { sendNewsletterWelcomeEmail } = require('../utils/mailer');
 const adminEvents = require('../utils/events');
 
@@ -73,7 +73,7 @@ router.post('/subscribe', publicFormLimiter, async (req, res, next) => {
 });
 
 // GET /api/newsletter/subscribers (Admin)
-router.get('/subscribers', requireAdminAuth(), async (req, res, next) => {
+router.get('/subscribers', requirePermission('newsletter:manage'), async (req, res, next) => {
   try {
     const [rows] = await pool.query(
       'SELECT id, email, status, source, ip_address, created_at FROM newsletter_subscribers ORDER BY created_at DESC'
@@ -83,7 +83,7 @@ router.get('/subscribers', requireAdminAuth(), async (req, res, next) => {
 });
 
 // DELETE /api/newsletter/subscribers/:id (Admin)
-router.delete('/subscribers/:id', requireAdminAuth(), async (req, res, next) => {
+router.delete('/subscribers/:id', requirePermission('newsletter:manage'), async (req, res, next) => {
   try {
     const { id } = req.params;
     await pool.query('DELETE FROM newsletter_subscribers WHERE id = ?', [id]);
@@ -92,7 +92,7 @@ router.delete('/subscribers/:id', requireAdminAuth(), async (req, res, next) => 
 });
 
 // GET /api/newsletter/export (Admin CSV)
-router.get('/export', requireAdminAuth(), async (req, res, next) => {
+router.get('/export', requirePermission('reports:export'), async (req, res, next) => {
   try {
     const [rows] = await pool.query(
       'SELECT email, status, source, created_at FROM newsletter_subscribers ORDER BY created_at DESC'

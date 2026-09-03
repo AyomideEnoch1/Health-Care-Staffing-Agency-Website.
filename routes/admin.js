@@ -31,7 +31,7 @@ const pool = require('../db');
 const bcrypt = require('bcryptjs');
 const { z } = require('zod');
 const { uploadCredential } = require('../middleware/uploadCredentials');
-const { requireAdminAuth } = require('../middleware/auth');
+const { requireAdminAuth, requirePermission, normalizePermissions, ALL_PERMISSIONS } = require('../middleware/auth');
 const adminEvents = require('../utils/events');
 const { sendAdminEmailVerificationOtp } = require('../utils/mailer');
 
@@ -153,7 +153,7 @@ router.get('/kpis', async (req, res, next) => {
 // STAFFING REQUESTS
 // GET /api/admin/requests
 // ============================================================================
-router.get('/requests', async (req, res, next) => {
+router.get('/requests', requirePermission('requests:view'), async (req, res, next) => {
   try {
     const [rows] = await pool.query(`
       SELECT r.*,
@@ -168,7 +168,7 @@ router.get('/requests', async (req, res, next) => {
 });
 
 // PATCH /api/admin/requests/:id/status
-router.patch('/requests/:id/status', async (req, res, next) => {
+router.patch('/requests/:id/status', requirePermission('requests:dispatch'), async (req, res, next) => {
   try {
     const { status, assigned_staff_id, confirm_override, start_date, shift_type, unit_department } = req.body;
     const { id } = req.params;
@@ -267,7 +267,7 @@ router.patch('/requests/:id/status', async (req, res, next) => {
 // JOB APPLICATIONS (ATS)
 // GET /api/admin/applications
 // ============================================================================
-router.get('/applications', async (req, res, next) => {
+router.get('/applications', requirePermission('applications:view'), async (req, res, next) => {
   try {
     const [rows] = await pool.query(
       'SELECT id, application_code, full_name, role_applied, email, phone, license_registration, stage, resume_original_name, resume_stored_name, experience_summary, created_at FROM job_applications ORDER BY created_at DESC'
@@ -277,7 +277,7 @@ router.get('/applications', async (req, res, next) => {
 });
 
 // PATCH /api/admin/applications/:id/stage
-router.patch('/applications/:id/stage', async (req, res, next) => {
+router.patch('/applications/:id/stage', requirePermission('applications:manage'), async (req, res, next) => {
   try {
     const { stage } = req.body;
     const { id } = req.params;
@@ -304,7 +304,7 @@ router.patch('/applications/:id/stage', async (req, res, next) => {
 });
 
 // GET /api/admin/applications/:id/resume — Secure file download
-router.get('/applications/:id/resume', async (req, res, next) => {
+router.get('/applications/:id/resume', requirePermission('applications:view'), async (req, res, next) => {
   try {
     const [rows] = await pool.query(
       'SELECT resume_stored_name, resume_original_name, resume_mime_type, resume_storage_path FROM job_applications WHERE id = ?',
@@ -335,7 +335,7 @@ router.get('/applications/:id/resume', async (req, res, next) => {
 // STAFF ROSTER (CRUD)
 // ============================================================================
 // GET /api/admin/roster
-router.get('/roster', async (req, res, next) => {
+router.get('/roster', requirePermission('roster:view'), async (req, res, next) => {
   try {
     const [rows] = await pool.query(
       `SELECT id, staff_code, name, role, specialty, cno_registration_num, status,
@@ -348,7 +348,7 @@ router.get('/roster', async (req, res, next) => {
 });
 
 // POST /api/admin/roster — Add new staff member
-router.post('/roster', async (req, res, next) => {
+router.post('/roster', requirePermission('roster:manage'), async (req, res, next) => {
   try {
     const {
       name, role, specialty, region, phone, email,
@@ -403,7 +403,7 @@ router.post('/roster', async (req, res, next) => {
 });
 
 // PATCH /api/admin/roster/:id — Update existing staff member
-router.patch('/roster/:id', async (req, res, next) => {
+router.patch('/roster/:id', requirePermission('roster:manage'), async (req, res, next) => {
   try {
     const { id } = req.params;
     const {
@@ -657,7 +657,7 @@ router.post('/requests', async (req, res, next) => {
 // AUDIT LOGS LEDGER
 // GET /api/admin/audit-logs & GET /api/admin/audit
 // ============================================================================
-router.get(['/audit-logs', '/audit'], async (req, res, next) => {
+router.get(['/audit-logs', '/audit'], requirePermission('audit:view'), async (req, res, next) => {
   try {
     const [logs] = await pool.query(`
       SELECT id, admin_id, actor_name, action, target_entity, target_id, details, severity, ip_address, created_at
@@ -673,7 +673,7 @@ router.get(['/audit-logs', '/audit'], async (req, res, next) => {
 // COMPLIANCE AUDIT ENGINE
 // POST /api/admin/compliance/audit
 // ============================================================================
-router.post('/compliance/audit', async (req, res, next) => {
+router.post('/compliance/audit', requirePermission('roster:manage'), async (req, res, next) => {
   try {
     const [roster] = await pool.query('SELECT id, name, staff_code, cpr_expiry_date FROM staff_roster');
     const today = new Date();
@@ -724,7 +724,7 @@ router.post('/compliance/audit', async (req, res, next) => {
 // CONTACT INQUIRIES & DISPATCH MESSAGES
 // ============================================================================
 // GET /api/admin/inquiries
-router.get('/inquiries', async (req, res, next) => {
+router.get('/inquiries', requirePermission('inquiries:manage'), async (req, res, next) => {
   try {
     const [rows] = await pool.query(
       'SELECT id, inquiry_code, name, email, phone, inquiry_type, message, status, created_at FROM contact_inquiries ORDER BY created_at DESC'
@@ -734,7 +734,7 @@ router.get('/inquiries', async (req, res, next) => {
 });
 
 // POST /api/admin/inquiries/:id/reply
-router.post('/inquiries/:id/reply', async (req, res, next) => {
+router.post('/inquiries/:id/reply', requirePermission('inquiries:manage'), async (req, res, next) => {
   try {
     const { id } = req.params;
     const { replyMessage } = req.body;
@@ -787,38 +787,100 @@ router.post('/inquiries/:id/reply', async (req, res, next) => {
 const createAdminSchema = z.object({
   email: z.string().email().max(191),
   full_name: z.string().min(2).max(100),
-  role: z.enum(['super-admin', 'dispatch', 'care-coordinator']),
+  role: z.enum(['super-admin', 'dispatch', 'care-coordinator', 'recruiter', 'auditor', 'custom']),
   password: z.string().min(8, 'Password must be at least 8 characters long')
 });
 
 // GET /api/admin/admins — list all admin accounts (super-admin only)
-router.get('/admins', async (req, res, next) => {
+router.get('/admins', requirePermission('admins:manage'), async (req, res, next) => {
   try {
-    if (req.admin.role !== 'super-admin') {
-      return res.status(403).json({
+    const [rows] = await pool.query(
+      'SELECT id, email, full_name, role, permissions, is_active, totp_enabled, email_verified, last_login, last_login_ip, failed_login_attempts, lock_until, created_at, updated_at FROM admins ORDER BY created_at ASC'
+    );
+
+    const formatted = rows.map(a => ({
+      ...a,
+      permissions: normalizePermissions(a.role, a.permissions)
+    }));
+
+    res.json({ success: true, data: formatted });
+  } catch (err) { next(err); }
+});
+
+// PATCH /api/admin/admins/:id/permissions — configure role and granular permissions (super-admin only)
+router.patch('/admins/:id/permissions', requirePermission('admins:manage'), async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { role, permissions } = req.body;
+
+    const VALID_ROLES = ['super-admin', 'dispatch', 'care-coordinator', 'recruiter', 'auditor', 'custom'];
+    if (role && !VALID_ROLES.includes(role)) {
+      return res.status(400).json({
         success: false,
-        error: 'Forbidden: Super-Admin privileges required to view admin accounts.'
+        error: `Invalid role. Must be one of: ${VALID_ROLES.join(', ')}`
       });
     }
 
-    const [rows] = await pool.query(
-      'SELECT id, email, full_name, role, is_active, totp_enabled, email_verified, last_login, last_login_ip, failed_login_attempts, lock_until, created_at, updated_at FROM admins ORDER BY created_at ASC'
+    const [rows] = await pool.query('SELECT id, email, full_name, role, permissions FROM admins WHERE id = ?', [id]);
+    if (!rows.length) {
+      return res.status(404).json({ success: false, error: 'Administrator account not found.' });
+    }
+
+    const targetAdmin = rows[0];
+
+    // Self-demotion guard
+    if (req.admin.id === id && role && role !== 'super-admin') {
+      return res.status(400).json({
+        success: false,
+        error: 'Self-demotion prohibited: You cannot remove your own Super-Admin role.'
+      });
+    }
+
+    const targetRole = role || targetAdmin.role;
+    let targetPermissions = normalizePermissions(targetRole, permissions);
+
+    if (targetRole === 'super-admin') {
+      targetPermissions = ALL_PERMISSIONS;
+    }
+
+    await pool.query(
+      'UPDATE admins SET role = ?, permissions = ? WHERE id = ?',
+      [targetRole, JSON.stringify(targetPermissions), id]
     );
 
-    res.json({ success: true, data: rows });
+    const logDetails = `Super-admin ${req.admin.full_name} updated role to '${targetRole}' and configured ${targetPermissions.length} permissions for ${targetAdmin.full_name} (${targetAdmin.email})`;
+
+    await pool.query(
+      `INSERT INTO audit_logs (id, admin_id, actor_name, action, target_entity, target_id, details, severity, ip_address)
+       VALUES (?, ?, ?, 'ADMIN_PERMISSIONS_MODIFIED', 'admins', ?, ?, 'info', ?)`,
+      [crypto.randomUUID(), req.admin.id, req.admin.full_name, id, logDetails, req.ip]
+    );
+
+    adminEvents.emit('admin:permissions_updated', {
+      id,
+      email: targetAdmin.email,
+      role: targetRole,
+      permissions: targetPermissions,
+      modified_by: req.admin.full_name
+    });
+
+    res.json({
+      success: true,
+      message: `Permissions and role updated successfully for ${targetAdmin.full_name}.`,
+      data: {
+        id,
+        email: targetAdmin.email,
+        full_name: targetAdmin.full_name,
+        role: targetRole,
+        permissions: targetPermissions
+      }
+    });
   } catch (err) { next(err); }
 });
 
 // POST /api/admin/admins/:id/reset-mfa — reset 2FA for an admin user (super-admin only)
-router.post('/admins/:id/reset-mfa', async (req, res, next) => {
+router.post('/admins/:id/reset-mfa', requirePermission('admins:manage'), async (req, res, next) => {
   try {
-    if (req.admin.role !== 'super-admin') {
-      return res.status(403).json({
-        success: false,
-        error: 'Forbidden: Super-Admin privileges required.'
-      });
-    }
-
     const { id } = req.params;
     const [rows] = await pool.query('SELECT id, email, full_name, role FROM admins WHERE id = ?', [id]);
     if (!rows.length) {
@@ -844,12 +906,8 @@ router.post('/admins/:id/reset-mfa', async (req, res, next) => {
 });
 
 // POST /api/admin/admins/:id/resend-verification — resend email verification OTP (super-admin only)
-router.post('/admins/:id/resend-verification', async (req, res, next) => {
+router.post('/admins/:id/resend-verification', requirePermission('admins:manage'), async (req, res, next) => {
   try {
-    if (req.admin.role !== 'super-admin') {
-      return res.status(403).json({ success: false, error: 'Forbidden: Super-Admin privileges required.' });
-    }
-
     const { id } = req.params;
     const [rows] = await pool.query('SELECT id, email, full_name, role, email_verified FROM admins WHERE id = ?', [id]);
     if (!rows.length) {
@@ -883,15 +941,8 @@ router.post('/admins/:id/resend-verification', async (req, res, next) => {
 });
 
 // POST /api/admin/admins — create a new admin account (super-admin only)
-router.post('/admins', async (req, res, next) => {
+router.post('/admins', requirePermission('admins:manage'), async (req, res, next) => {
   try {
-    if (req.admin.role !== 'super-admin') {
-      return res.status(403).json({
-        success: false,
-        error: 'Forbidden: Super-Admin privileges required to create admin accounts.'
-      });
-    }
-
     const validated = createAdminSchema.parse(req.body);
     const emailLower = validated.email.toLowerCase().trim();
 
@@ -908,11 +959,12 @@ router.post('/admins', async (req, res, next) => {
     const passwordHash = await bcrypt.hash(validated.password, 12);
     const emailOtp = crypto.randomInt(100000, 999999).toString();
     const hashedOtp = crypto.createHash('sha256').update(emailOtp).digest('hex');
+    const initialPermissions = normalizePermissions(validated.role, req.body.permissions);
 
     await pool.query(
-      `INSERT INTO admins (id, email, password_hash, full_name, role, is_active, failed_login_attempts, email_verified, email_verification_token, email_verification_expires)
-       VALUES (?, ?, ?, ?, ?, 1, 0, 0, ?, DATE_ADD(NOW(), INTERVAL 24 HOUR))`,
-      [newId, emailLower, passwordHash, validated.full_name.trim(), validated.role, hashedOtp]
+      `INSERT INTO admins (id, email, password_hash, full_name, role, permissions, is_active, failed_login_attempts, email_verified, email_verification_token, email_verification_expires)
+       VALUES (?, ?, ?, ?, ?, ?, 1, 0, 0, ?, DATE_ADD(NOW(), INTERVAL 24 HOUR))`,
+      [newId, emailLower, passwordHash, validated.full_name.trim(), validated.role, JSON.stringify(initialPermissions), hashedOtp]
     );
 
     // Send verification OTP to new administrator's corporate email
@@ -932,6 +984,7 @@ router.post('/admins', async (req, res, next) => {
       email: emailLower,
       full_name: validated.full_name.trim(),
       role: validated.role,
+      permissions: initialPermissions,
       created_by: req.admin.full_name
     });
 
@@ -943,6 +996,7 @@ router.post('/admins', async (req, res, next) => {
         email: emailLower,
         full_name: validated.full_name.trim(),
         role: validated.role,
+        permissions: initialPermissions,
         is_active: 1,
         email_verified: 0
       }
@@ -956,15 +1010,8 @@ router.post('/admins', async (req, res, next) => {
 });
 
 // PATCH /api/admin/admins/:id — toggle active status on an admin account (super-admin only)
-router.patch('/admins/:id', async (req, res, next) => {
+router.patch('/admins/:id', requirePermission('admins:manage'), async (req, res, next) => {
   try {
-    if (req.admin.role !== 'super-admin') {
-      return res.status(403).json({
-        success: false,
-        error: 'Forbidden: Super-Admin privileges required to modify admin accounts.'
-      });
-    }
-
     const { id } = req.params;
 
     // Self-deactivation guard
@@ -1021,15 +1068,8 @@ router.patch('/admins/:id', async (req, res, next) => {
 });
 
 // DELETE /api/admin/admins/:id — permanently delete an admin account (super-admin only)
-router.delete('/admins/:id', async (req, res, next) => {
+router.delete('/admins/:id', requirePermission('admins:manage'), async (req, res, next) => {
   try {
-    if (req.admin.role !== 'super-admin') {
-      return res.status(403).json({
-        success: false,
-        error: 'Forbidden: Super-Admin privileges required to delete admin accounts.'
-      });
-    }
-
     const { id } = req.params;
 
     // 1. Self-deletion guard
