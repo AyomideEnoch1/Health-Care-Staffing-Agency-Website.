@@ -861,37 +861,77 @@ document.addEventListener('DOMContentLoaded', () => {
   // 7. Custom Resume File Input Indicator & Client-Side Validation
   const resumeInput = document.getElementById('applicant-resume');
   const fileChosenLabel = document.getElementById('file-chosen-name');
+  const resumeDropZone = document.querySelector('#candidate-apply-form .custom-file-upload-box');
+  const resumeUploadLabel = resumeDropZone ? resumeDropZone.querySelector('.file-upload-label') : null;
+
+  function handleResumeFileSelected(file) {
+    if (!file || !fileChosenLabel) return;
+    const validExtensions = ['.pdf', '.doc', '.docx'];
+    const fileExt = '.' + (file.name || '').split('.').pop().toLowerCase();
+
+    if (!validExtensions.includes(fileExt)) {
+      fileChosenLabel.textContent = `❌ Invalid file type (${fileExt}). Please select a PDF, DOC, or DOCX file.`;
+      fileChosenLabel.style.color = '#E63946';
+      fileChosenLabel.style.fontWeight = '700';
+      if (resumeInput) resumeInput.value = '';
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      fileChosenLabel.textContent = `❌ File too large (${(file.size / (1024*1024)).toFixed(1)}MB). Max limit is 10MB.`;
+      fileChosenLabel.style.color = '#E63946';
+      fileChosenLabel.style.fontWeight = '700';
+      if (resumeInput) resumeInput.value = '';
+      return;
+    }
+
+    const sizeKb = Math.round(file.size / 1024);
+    fileChosenLabel.textContent = `Selected: ${file.name} (${sizeKb} KB - Ready to upload)`;
+    fileChosenLabel.style.color = '#00A896';
+    fileChosenLabel.style.fontWeight = '700';
+  }
+
   if (resumeInput && fileChosenLabel) {
     resumeInput.addEventListener('change', function () {
       if (this.files && this.files.length > 0) {
-        const file = this.files[0];
-        const validExtensions = ['.pdf', '.doc', '.docx'];
-        const fileExt = '.' + file.name.split('.').pop().toLowerCase();
-
-        if (!validExtensions.includes(fileExt)) {
-          fileChosenLabel.textContent = `❌ Invalid file type (${fileExt}). Please select a PDF, DOC, or DOCX file.`;
-          fileChosenLabel.style.color = '#E63946';
-          fileChosenLabel.style.fontWeight = '700';
-          this.value = ''; // Reset input
-          return;
-        }
-
-        if (file.size > 10 * 1024 * 1024) {
-          fileChosenLabel.textContent = `❌ File too large (${(file.size / (1024*1024)).toFixed(1)}MB). Max limit is 10MB.`;
-          fileChosenLabel.style.color = '#E63946';
-          fileChosenLabel.style.fontWeight = '700';
-          this.value = ''; // Reset input
-          return;
-        }
-
-        const sizeKb = Math.round(file.size / 1024);
-        fileChosenLabel.textContent = `Selected: ${file.name} (${sizeKb} KB - Ready to upload)`;
-        fileChosenLabel.style.color = '#00A896';
-        fileChosenLabel.style.fontWeight = '700';
+        handleResumeFileSelected(this.files[0]);
       } else {
         fileChosenLabel.textContent = 'Click to browse or drag & drop file here (PDF, DOC, DOCX - Max 10MB)';
         fileChosenLabel.style.color = '#475569';
         fileChosenLabel.style.fontWeight = 'normal';
+      }
+    });
+  }
+
+  // Resume drag & drop support
+  if (resumeDropZone && resumeUploadLabel && resumeInput) {
+    ['dragenter', 'dragover'].forEach(evName => {
+      resumeDropZone.addEventListener(evName, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        resumeUploadLabel.classList.add('drag-over');
+      });
+    });
+
+    ['dragleave', 'dragend'].forEach(evName => {
+      resumeDropZone.addEventListener(evName, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        resumeUploadLabel.classList.remove('drag-over');
+      });
+    });
+
+    resumeDropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      resumeUploadLabel.classList.remove('drag-over');
+
+      const dt = e.dataTransfer;
+      if (dt && dt.files && dt.files.length > 0) {
+        try {
+          resumeInput.files = dt.files;
+        } catch (_) {}
+        handleResumeFileSelected(dt.files[0]);
       }
     });
   }
@@ -1005,18 +1045,28 @@ document.addEventListener('DOMContentLoaded', () => {
     return 'RN';
   }
 
-  window.handleCsvFileSelected = function(input) {
-    if (!input.files || !input.files[0]) return;
-    const file = input.files[0];
+  window.processCsvFile = function(file) {
+    if (!file) return;
+
+    const fileName = file.name || '';
+    if (!fileName.toLowerCase().endsWith('.csv')) {
+      alert('⚠️ Invalid File Type: Please select or drag & drop a valid .csv file.');
+      return;
+    }
+
     const label = document.getElementById('csv-chosen-name');
-    if (label) label.textContent = `Selected: ${file.name} (${Math.round(file.size/1024)} KB)`;
+    if (label) {
+      label.textContent = `Selected: ${file.name} (${Math.round(file.size / 1024)} KB - Loaded)`;
+      label.style.color = '#00A896';
+      label.style.fontWeight = '700';
+    }
 
     const reader = new FileReader();
     reader.onload = function(e) {
       const text = e.target.result;
       const lines = text.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
       if (lines.length < 2) {
-        alert('CSV file is empty or missing data rows.');
+        alert('⚠️ The selected CSV file is empty or missing data rows.');
         return;
       }
 
@@ -1034,6 +1084,11 @@ document.addEventListener('DOMContentLoaded', () => {
             special_notes: parts[5] || ''
           });
         }
+      }
+
+      if (rows.length === 0) {
+        alert('⚠️ Could not parse any valid shift rows from this CSV. Please check the column layout or use our sample template.');
+        return;
       }
 
       window.bulkState.parsedCsvShifts = rows;
@@ -1057,9 +1112,64 @@ document.addEventListener('DOMContentLoaded', () => {
           </tr>
         `).join('');
       }
+
+      const feedback = document.getElementById('bulk-form-feedback');
+      if (feedback && feedback.textContent.includes('Hospital Schedule Missing')) {
+        feedback.style.display = 'none';
+      }
     };
+
+    reader.onerror = function() {
+      alert('❌ Error reading file from your local device. Please try again.');
+    };
+
     reader.readAsText(file);
   };
+
+  window.handleCsvFileSelected = function(input) {
+    if (!input || !input.files || !input.files[0]) return;
+    window.processCsvFile(input.files[0]);
+  };
+
+  // Wire up drag & drop for Mode 2 CSV upload box
+  const csvDropZone = document.querySelector('#section-csv-mode .custom-file-upload-box');
+  const csvFileInput = document.getElementById('hospital-csv-file');
+  const csvUploadLabel = csvDropZone ? csvDropZone.querySelector('.file-upload-label') : null;
+
+  if (csvDropZone && csvUploadLabel) {
+    ['dragenter', 'dragover'].forEach(evName => {
+      csvDropZone.addEventListener(evName, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        csvUploadLabel.classList.add('drag-over');
+      });
+    });
+
+    ['dragleave', 'dragend'].forEach(evName => {
+      csvDropZone.addEventListener(evName, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        csvUploadLabel.classList.remove('drag-over');
+      });
+    });
+
+    csvDropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      csvUploadLabel.classList.remove('drag-over');
+
+      const dt = e.dataTransfer;
+      if (dt && dt.files && dt.files.length > 0) {
+        const droppedFile = dt.files[0];
+        try {
+          if (csvFileInput) {
+            csvFileInput.files = dt.files;
+          }
+        } catch (_) {}
+        window.processCsvFile(droppedFile);
+      }
+    });
+  }
 
   window.handleBulkFormSubmit = async function(e) {
     if (e) e.preventDefault();

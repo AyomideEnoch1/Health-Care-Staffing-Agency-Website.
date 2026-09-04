@@ -375,6 +375,14 @@ ul {
   box-shadow: 0 8px 20px rgba(0, 168, 150, 0.15);
 }
 
+.file-upload-label.drag-over {
+  background: rgba(0, 168, 150, 0.18) !important;
+  border-color: var(--teal-green) !important;
+  border-style: solid !important;
+  transform: scale(1.02);
+  box-shadow: 0 10px 25px rgba(0, 168, 150, 0.25);
+}
+
 .file-upload-icon-circle {
   width: 44px;
   height: 44px;
