@@ -1147,6 +1147,9 @@ document.addEventListener('DOMContentLoaded', () => {
         submitBtn.disabled = false;
         submitBtn.textContent = '🚀 SUBMIT BULK CLINICAL STAFFING REQUEST';
       }
+    }
+  };
+
   // ── See More / See Less Toggle for Our Team Section ───────────────────
   window.toggleTeamContent = function(btn) {
     if (!btn) return;
@@ -1172,5 +1175,30 @@ document.addEventListener('DOMContentLoaded', () => {
     if (window.lucide) lucide.createIcons();
   };
 });
+
+// Also define toggleTeamContent globally on window immediately
+window.toggleTeamContent = function(btn) {
+  if (!btn) return;
+  const targetId = btn.getAttribute('aria-controls');
+  const targetEl = document.getElementById(targetId);
+  if (!targetEl) return;
+
+  const isExpanded = btn.classList.contains('expanded');
+  const labelSpan = btn.querySelector('.btn-toggle-label');
+
+  if (isExpanded) {
+    targetEl.style.display = 'none';
+    btn.classList.remove('expanded');
+    btn.setAttribute('aria-expanded', 'false');
+    if (labelSpan) labelSpan.textContent = 'See More';
+  } else {
+    targetEl.style.display = 'block';
+    btn.classList.add('expanded');
+    btn.setAttribute('aria-expanded', 'true');
+    if (labelSpan) labelSpan.textContent = 'See Less';
+  }
+
+  if (window.lucide) lucide.createIcons();
+};
 
 
