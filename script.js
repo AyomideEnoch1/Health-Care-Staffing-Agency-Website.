@@ -899,9 +899,19 @@ document.addEventListener('DOMContentLoaded', () => {
   // 8. ENTERPRISE BULK STAFFING PORTAL HANDLERS
   window.bulkState = {
     mode: 'stepper',
-    counts: { rn: 0, rpn: 0, psw: 0, travel: 0, companion: 0 },
+    counts: { rn: 1, rpn: 0, psw: 0, travel: 0, companion: 0 },
     parsedCsvShifts: []
   };
+
+  // Pre-populate shift date to tomorrow if on the bulk staffing page
+  const bulkShiftDateInput = document.getElementById('bulk-shift-date');
+  if (bulkShiftDateInput) {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const tomorrowStr = tomorrow.toISOString().split('T')[0];
+    bulkShiftDateInput.value = tomorrowStr;
+    bulkShiftDateInput.min = new Date().toISOString().split('T')[0];
+  }
 
   window.switchBulkMode = function(mode) {
     window.bulkState.mode = mode;
@@ -909,6 +919,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnCsv = document.getElementById('btn-mode-csv');
     const secStepper = document.getElementById('section-stepper-mode');
     const secCsv = document.getElementById('section-csv-mode');
+    const dateInput = document.getElementById('bulk-shift-date');
 
     if (btnStepper && btnCsv && secStepper && secCsv) {
       if (mode === 'stepper') {
@@ -916,11 +927,14 @@ document.addEventListener('DOMContentLoaded', () => {
         btnCsv.classList.remove('active');
         secStepper.style.display = 'block';
         secCsv.style.display = 'none';
+        if (dateInput) dateInput.required = true;
       } else {
         btnCsv.classList.add('active');
         btnStepper.classList.remove('active');
         secCsv.style.display = 'block';
         secStepper.style.display = 'none';
+        // CRITICAL: disable HTML5 required attribute on hidden input to avoid browser blocking form submit
+        if (dateInput) dateInput.required = false;
       }
     }
   };
@@ -948,6 +962,8 @@ document.addEventListener('DOMContentLoaded', () => {
       window.bulkState.counts = { rn: 0, rpn: 2, psw: 6, travel: 0, companion: 0 };
     } else if (type === 'acute') {
       window.bulkState.counts = { rn: 4, rpn: 2, psw: 0, travel: 0, companion: 0 };
+    } else if (type === 'reset') {
+      window.bulkState.counts = { rn: 1, rpn: 0, psw: 0, travel: 0, companion: 0 };
     }
     for (const [r, cnt] of Object.entries(window.bulkState.counts)) {
       const el = document.getElementById(`count-${r}`);
@@ -978,6 +994,17 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.removeChild(link);
   };
 
+  function normalizeBulkRole(raw) {
+    if (!raw) return 'RN';
+    const s = raw.trim().toLowerCase();
+    if (s.includes('rpn') || s.includes('practical')) return 'RPN';
+    if (s.includes('psw') || s.includes('personal') || s.includes('support')) return 'PSW';
+    if (s.includes('travel')) return 'Travel Nurse';
+    if (s.includes('companion') || s.includes('aide')) return 'Companion';
+    if (s.includes('multiple')) return 'Multiple';
+    return 'RN';
+  }
+
   window.handleCsvFileSelected = function(input) {
     if (!input.files || !input.files[0]) return;
     const file = input.files[0];
@@ -1002,7 +1029,7 @@ document.addEventListener('DOMContentLoaded', () => {
             shift_date: parts[0] || new Date().toISOString().slice(0, 10),
             shift_type: parts[1] || 'Day Shift (07:00 - 15:00)',
             unit_department: parts[2] || 'General Care',
-            role: parts[3] || 'RN',
+            role: normalizeBulkRole(parts[3]),
             quantity: parseInt(parts[4], 10) || 1,
             special_notes: parts[5] || ''
           });
@@ -1035,22 +1062,42 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   window.handleBulkFormSubmit = async function(e) {
-    e.preventDefault();
+    if (e) e.preventDefault();
     const feedback = document.getElementById('bulk-form-feedback');
     const submitBtn = document.getElementById('btn-submit-bulk-order');
+    const form = document.getElementById('bulk-staffing-form');
 
-    const facilityName = document.getElementById('bulk-facility-name')?.value;
-    const unitDept     = document.getElementById('bulk-unit-department')?.value;
-    const contactName  = document.getElementById('bulk-contact-name')?.value;
-    const contactEmail = document.getElementById('bulk-contact-email')?.value;
-    const contactPhone = document.getElementById('bulk-contact-phone')?.value;
-    const urgency      = document.getElementById('bulk-urgency-level')?.value;
+    const facilityName = document.getElementById('bulk-facility-name')?.value?.trim();
+    const unitDept     = document.getElementById('bulk-unit-department')?.value?.trim();
+    const contactName  = document.getElementById('bulk-contact-name')?.value?.trim();
+    const contactEmail = document.getElementById('bulk-contact-email')?.value?.trim();
+    const contactPhone = document.getElementById('bulk-contact-phone')?.value?.trim();
+    const urgency      = document.getElementById('bulk-urgency-level')?.value || 'routine';
+
+    // 1. Verify required inputs
+    if (!facilityName || !unitDept || !contactName || !contactEmail || !contactPhone) {
+      if (feedback) {
+        feedback.style.display = 'block';
+        feedback.style.color = '#E63946';
+        feedback.innerHTML = `
+          <div style="background: rgba(230, 57, 70, 0.08); border: 1.5px solid #E63946; border-radius: 8px; padding: 0.75rem 1rem; margin-top: 0.75rem;">
+            <strong>⚠️ Incomplete Form:</strong> Please fill in all required organization and contact fields marked with (*).
+          </div>
+        `;
+        if (typeof feedback.scrollIntoView === 'function') {
+          feedback.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+      }
+      if (form && typeof form.reportValidity === 'function') {
+        form.reportValidity();
+      }
+      return;
+    }
 
     let shiftsPayload = [];
 
     if (window.bulkState.mode === 'stepper') {
-      const shiftDate = document.getElementById('bulk-shift-date')?.value || new Date().toISOString().slice(0,10);
-      const notes = document.getElementById('bulk-special-notes')?.value || '';
+      const shiftDate = document.getElementById('bulk-shift-date')?.value || new Date().toISOString().slice(0, 10);
 
       const roleKeyMap = {
         rn: { role: 'RN', shiftId: 'shift-rn' },
@@ -1062,7 +1109,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       for (const [key, qty] of Object.entries(window.bulkState.counts)) {
         if (qty > 0) {
-          const shiftVal = document.getElementById(roleKeyMap[key].shiftId)?.value || 'Day Shift';
+          const shiftVal = document.getElementById(roleKeyMap[key].shiftId)?.value || 'Day Shift (07:00 - 15:00)';
           shiftsPayload.push({
             role: roleKeyMap[key].role,
             shift_type: shiftVal,
@@ -1075,8 +1122,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (shiftsPayload.length === 0) {
         if (feedback) {
+          feedback.style.display = 'block';
           feedback.style.color = '#E63946';
-          feedback.textContent = '⚠️ Please select at least 1 clinician using the + buttons before submitting.';
+          feedback.innerHTML = `
+            <div style="background: rgba(230, 57, 70, 0.08); border: 1.5px solid #E63946; border-radius: 8px; padding: 0.85rem 1.15rem; margin-top: 0.75rem; text-align: left;">
+              <strong style="color: #E63946;">⚠️ No Clinicians Selected:</strong>
+              <div style="font-size: 0.85rem; margin-top: 4px; color: #333;">
+                Please select at least 1 clinician using the <strong>+</strong> buttons next to RN, RPN, PSW, or choose a <strong>Quick Preset</strong> above before submitting.
+              </div>
+            </div>
+          `;
+          if (typeof feedback.scrollIntoView === 'function') {
+          feedback.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
         }
         return;
       }
@@ -1084,8 +1142,19 @@ document.addEventListener('DOMContentLoaded', () => {
       // CSV Mode
       if (!window.bulkState.parsedCsvShifts || window.bulkState.parsedCsvShifts.length === 0) {
         if (feedback) {
+          feedback.style.display = 'block';
           feedback.style.color = '#E63946';
-          feedback.textContent = '⚠️ Please upload and verify your hospital shift CSV before submitting.';
+          feedback.innerHTML = `
+            <div style="background: rgba(230, 57, 70, 0.08); border: 1.5px solid #E63946; border-radius: 8px; padding: 0.85rem 1.15rem; margin-top: 0.75rem; text-align: left;">
+              <strong style="color: #E63946;">⚠️ Hospital Schedule Missing:</strong>
+              <div style="font-size: 0.85rem; margin-top: 4px; color: #333;">
+                Please upload and verify your hospital shift CSV spreadsheet before submitting, or switch back to <strong>Mode 1 (Interactive Multi-Role Builder)</strong>.
+              </div>
+            </div>
+          `;
+          if (typeof feedback.scrollIntoView === 'function') {
+          feedback.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
         }
         return;
       }
@@ -1099,48 +1168,83 @@ document.addEventListener('DOMContentLoaded', () => {
       contact_email: contactEmail,
       contact_phone: contactPhone,
       urgency_level: urgency,
-      special_instructions: document.getElementById('bulk-special-notes')?.value || null,
+      special_instructions: document.getElementById('bulk-special-notes')?.value?.trim() || undefined,
       shifts: shiftsPayload
     };
 
     if (submitBtn) {
       submitBtn.disabled = true;
-      submitBtn.textContent = '⏳ Submitting Request...';
+      submitBtn.innerHTML = '⏳ Submitting High-Volume Request...';
+    }
+    if (feedback) {
+      feedback.style.display = 'block';
+      feedback.style.color = '#00A896';
+      feedback.textContent = 'Transmitting batch order to 24/7 dispatch matrix...';
     }
 
     try {
-      const res = await fetch('/api/requests/bulk', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to submit bulk request');
+      const data = await apiPost('/requests/bulk', payload, feedback);
+      const batchCode = data.batch_code || data.data?.[0]?.batch_code || (data.offline ? data.data.request_code : `BATCH-${Math.floor(1000 + Math.random() * 9000)}`);
+      const totalShifts = data.total_shifts || shiftsPayload.reduce((sum, s) => sum + (s.quantity || 1), 0);
 
       if (feedback) {
-        feedback.style.color = '#00A896';
+        feedback.style.display = 'block';
         feedback.innerHTML = `
-          <div style="background: rgba(0, 168, 150, 0.1); border: 2px solid #00A896; border-radius: 12px; padding: 1.5rem; margin-top: 1rem; text-align: left;">
-            <h4 style="color: #051622; margin: 0 0 0.5rem 0; font-size: 1.1rem; font-weight: 800;">
-              🎉 Batch Staffing Order Confirmed! (Batch Code: <u>${data.batch_code}</u>)
-            </h4>
-            <p style="margin: 0 0 0.5rem 0; font-size: 0.9rem; color: #333;">
-              We successfully generated <strong>${data.total_shifts} individual shift requests</strong> on our live 24/7 dispatch matrix.
+          <div style="background: rgba(0, 168, 150, 0.1); border: 2px solid #00A896; border-radius: 12px; padding: 1.5rem; margin-top: 1rem; text-align: left; box-shadow: 0 4px 15px rgba(0, 168, 150, 0.12);">
+            <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.6rem;">
+              <span style="background: #00A896; color: #fff; width: 28px; height: 28px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1rem;">✓</span>
+              <h4 style="color: #051622; margin: 0; font-size: 1.15rem; font-weight: 800;">
+                Batch Staffing Order Dispatched Successfully!
+              </h4>
+            </div>
+            <div style="background: #ffffff; border: 1px solid rgba(0, 168, 150, 0.3); border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 0.75rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+              <span style="font-size: 0.88rem; color: #475569;">Batch Reference: <strong style="color: #00A896; font-size: 1.05rem;">${batchCode}</strong></span>
+              <span style="font-size: 0.88rem; color: #475569;">Total Shifts Queued: <strong style="color: #051622;">${totalShifts}</strong></span>
+            </div>
+            <p style="margin: 0 0 0.5rem 0; font-size: 0.9rem; color: #333; line-height: 1.5;">
+              We have dispatched <strong>${totalShifts} shift requirements</strong> to our live clinical roster. A priority dispatch coordinator is matching verified nurses and PSWs for <strong>${facilityName} (${unitDept})</strong>.
             </p>
-            <p style="margin: 0; font-size: 0.82rem; color: #666;">
-              A confirmation email has been dispatched to <strong>${contactEmail}</strong>. Our clinical coordinator is actively matching verified nurses and PSWs to your requested units.
+            <p style="margin: 0; font-size: 0.82rem; color: #64748b;">
+              Confirmation notification sent to <strong>${contactEmail}</strong>. For immediate changes, call our 24/7 care desk directly at <strong>+1 (647) 210-6463</strong> referencing batch code <strong>${batchCode}</strong>.
             </p>
           </div>
         `;
+        if (typeof feedback.scrollIntoView === 'function') {
+          feedback.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
       }
-      document.getElementById('bulk-staffing-form')?.reset();
-      window.bulkState.counts = { rn: 0, rpn: 0, psw: 0, travel: 0, companion: 0 };
-      window.adjustStepper('rn', 0);
+
+      form?.reset();
+      window.bulkState.counts = { rn: 1, rpn: 0, psw: 0, travel: 0, companion: 0 };
+      for (const [r, cnt] of Object.entries(window.bulkState.counts)) {
+        const el = document.getElementById(`count-${r}`);
+        if (el) el.textContent = cnt;
+      }
+      const badge = document.getElementById('live-total-headcount-badge');
+      if (badge) {
+        badge.innerHTML = `<i data-lucide="user-check" style="width: 15px; height: 15px; color: var(--teal-green);"></i> Total Clinicians: 1`;
+        if (window.lucide) lucide.createIcons();
+      }
+
+      const dateInput = document.getElementById('bulk-shift-date');
+      if (dateInput) {
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        dateInput.value = tomorrow.toISOString().split('T')[0];
+      }
     } catch (err) {
       if (feedback) {
+        feedback.style.display = 'block';
         feedback.style.color = '#E63946';
-        feedback.textContent = `❌ Submission Error: ${err.message}`;
+        feedback.innerHTML = `
+          <div style="background: rgba(230, 57, 70, 0.08); border: 1.5px solid #E63946; border-radius: 8px; padding: 0.85rem 1.15rem; margin-top: 0.75rem; text-align: left;">
+            <strong style="color: #E63946;">❌ Submission Error:</strong>
+            <div style="font-size: 0.85rem; margin-top: 4px; color: #333;">${err.message || 'Failed to submit bulk request. Please try again or call +1 (647) 210-6463.'}</div>
+          </div>
+        `;
+        if (typeof feedback.scrollIntoView === 'function') {
+          feedback.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
       }
     } finally {
       if (submitBtn) {

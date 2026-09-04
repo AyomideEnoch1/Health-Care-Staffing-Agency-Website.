@@ -33,6 +33,25 @@
     .bulk-mode-btn.active i {
       color: #00F5D4;
     }
+    .btn-surge-preset {
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 0.4rem 0.85rem;
+      background: #ffffff;
+      border: 1.5px solid var(--teal-green);
+      color: var(--navy);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .btn-surge-preset:hover {
+      background: rgba(0, 168, 150, 0.12);
+      border-color: var(--teal-green);
+      transform: translateY(-1px);
+    }
     .stepper-role-icon {
       width: 42px;
       height: 42px;
@@ -404,9 +423,18 @@
             </div>
             <div style="background: rgba(0, 168, 150, 0.1); border: 1px solid var(--teal-green); padding: 0.4rem 0.85rem; border-radius: 8px;">
               <span style="font-size: 0.85rem; font-weight: 800; color: var(--navy); display: inline-flex; align-items: center; gap: 5px;" id="live-total-headcount-badge">
-                <i data-lucide="user-check" style="width: 15px; height: 15px; color: var(--teal-green);"></i> Total Clinicians: 0
+                <i data-lucide="user-check" style="width: 15px; height: 15px; color: var(--teal-green);"></i> Total Clinicians: 1
               </span>
             </div>
+          </div>
+
+          <!-- PRESET SURGE SHORTCUTS -->
+          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; margin-bottom: 1.25rem; background: #f8fafc; padding: 0.75rem 1rem; border-radius: 10px; border: 1px solid #e2e8f0;">
+            <span style="font-size: 0.75rem; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">Quick Presets:</span>
+            <button type="button" class="btn-surge-preset" onclick="window.applySurgePreset('outbreak')"><i data-lucide="zap" style="width:13px;height:13px;color:var(--teal-green);"></i> Outbreak Surge (4 RN + 8 PSW)</button>
+            <button type="button" class="btn-surge-preset" onclick="window.applySurgePreset('weekend')"><i data-lucide="calendar" style="width:13px;height:13px;color:var(--teal-green);"></i> Weekend Ward (2 RPN + 6 PSW)</button>
+            <button type="button" class="btn-surge-preset" onclick="window.applySurgePreset('acute')"><i data-lucide="activity" style="width:13px;height:13px;color:var(--teal-green);"></i> Acute Care (4 RN + 2 RPN)</button>
+            <button type="button" class="btn-surge-preset" onclick="window.applySurgePreset('reset')" style="border-color: #cbd5e1; color: #64748b;"><i data-lucide="rotate-ccw" style="width:13px;height:13px;"></i> Reset to 1 RN</button>
           </div>
 
           <!-- RN Stepper Card -->
@@ -429,7 +457,7 @@
             </select>
             <div class="stepper-controls">
               <button type="button" class="stepper-btn" onclick="window.adjustStepper('rn', -1)" aria-label="Decrease RN Count"><i data-lucide="minus"></i></button>
-              <span class="stepper-count" id="count-rn">0</span>
+              <span class="stepper-count" id="count-rn">1</span>
               <button type="button" class="stepper-btn" onclick="window.adjustStepper('rn', 1)" aria-label="Increase RN Count"><i data-lucide="plus"></i></button>
             </div>
           </div>
@@ -652,7 +680,7 @@
     </div>
   </footer>
 
-  <script src="script.js?v=5.3.0"></script>
+  <script src="script.js?v=5.4.0"></script>
   <script>
     if (window.lucide) lucide.createIcons();
   </script>

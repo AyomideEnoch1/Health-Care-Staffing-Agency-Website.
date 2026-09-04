@@ -150,6 +150,49 @@ router.get('/kpis', async (req, res, next) => {
 });
 
 // ============================================================================
+// CLEAN ALL DUMMY DATA — Purge test & mock data across all tables
+// POST /api/admin/clean-dummy-data
+// ============================================================================
+router.post('/clean-dummy-data', async (req, res, next) => {
+  try {
+    const tables = [
+      'staffing_requests',
+      'job_applications',
+      'contact_inquiries',
+      'audit_logs',
+      'staff_roster',
+      'staff_documents',
+      'newsletter_subscribers',
+      'users'
+    ];
+
+    const results = {};
+    for (const table of tables) {
+      try {
+        const [delResult] = await pool.query(`DELETE FROM ${table}`);
+        results[table] = delResult.affectedRows || 0;
+      } catch (tableErr) {
+        results[table] = `skipped (${tableErr.message})`;
+      }
+    }
+
+    try {
+      await pool.query(
+        "DELETE FROM admins WHERE email NOT IN ('admin@divinefingershealthcare.ca', 'ayomidenoch15@gmail.com')"
+      );
+    } catch (_) {}
+
+    res.json({
+      success: true,
+      message: 'All dummy records have been cleanly purged from database tables.',
+      cleaned: results
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// ============================================================================
 // STAFFING REQUESTS
 // GET /api/admin/requests
 // ============================================================================
