@@ -1664,6 +1664,12 @@
   .collage-row-sub {
     gap: 0.65rem !important;
   }
+
+  /* Core Values Card Header on Mobile */
+  .proto-value-title-2x2 {
+    font-size: 1.08rem !important;
+    line-height: 1.35 !important;
+  }
 }
 
 /* ── Small Mobile Phones (up to 480px) ── */
@@ -1784,6 +1790,11 @@
   .collage-row-sub {
     gap: 0.45rem !important;
   }
+
+  /* Core Values Card Header on Small Mobile */
+  .proto-value-title-2x2 {
+    font-size: 1.02rem !important;
+  }
 }
 
 /* ── Ultra Compact Mobile (< 380px) ── */
@@ -1811,6 +1822,11 @@
   }
   .collage-row-sub {
     gap: 0.35rem !important;
+  }
+
+  /* Core Values Card Header on Ultra Compact Mobile */
+  .proto-value-title-2x2 {
+    font-size: 0.96rem !important;
   }
 }
 
