@@ -1261,14 +1261,6 @@ async function initHeaderAuthSync() {
       ctaBtn.innerHTML = 'SIGN IN';
       ctaBtn.title = 'Sign In to Divine Fingers Portal';
     }
-
-    // Mobile Nav List
-    if (navList) {
-      const signinLi = document.createElement('li');
-      signinLi.className = 'nav-item nav-auth-item injected-auth-elem';
-      signinLi.innerHTML = `<a href="login.html" class="nav-link" style="color: var(--teal-green) !important; font-weight: 800;">SIGN IN / REGISTER</a>`;
-      navList.appendChild(signinLi);
-    }
   }
 
   if (window.lucide) {
