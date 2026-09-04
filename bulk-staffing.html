@@ -10,8 +10,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Open+Sans:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&family=Pacifico&display=swap" rel="stylesheet">
   
-  <link rel="stylesheet" href="style.css?v=5.0.0">
-  <link rel="stylesheet" href="prototype.css?v=5.0.0">
+  <link rel="stylesheet" href="style.css?v=5.2.0">
+  <link rel="stylesheet" href="prototype.css?v=5.2.0">
   
   <!-- Lucide Icons CDN -->
   <script src="https://unpkg.com/lucide@latest"></script>
@@ -23,38 +23,6 @@
       padding: 4.5rem 0 3.5rem 0;
       position: relative;
       overflow: hidden;
-    }
-    .surge-preset-pill {
-      background: rgba(255, 255, 255, 0.12);
-      border: 1.5px solid rgba(0, 245, 212, 0.7);
-      padding: 0.5rem 1.15rem;
-      border-radius: 24px;
-      font-size: 0.85rem;
-      font-weight: 700;
-      color: #ffffff !important;
-      cursor: pointer;
-      transition: all 0.25s ease;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.45rem;
-      backdrop-filter: blur(6px);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-    }
-    .surge-preset-pill i {
-      width: 15px;
-      height: 15px;
-      color: #00F5D4;
-      transition: color 0.25s ease;
-    }
-    .surge-preset-pill:hover {
-      background: #00F5D4;
-      color: #051622 !important;
-      border-color: #00F5D4;
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(0, 245, 212, 0.4);
-    }
-    .surge-preset-pill:hover i {
-      color: #051622;
     }
     .bulk-mode-btn i {
       width: 18px;
@@ -277,25 +245,9 @@
       <h1 style="font-family: var(--font-heading); font-size: 2.2rem; font-weight: 900; margin-bottom: 0.6rem;">
         Enterprise Bulk Staffing &amp; Hospital Schedule Portal
       </h1>
-      <p style="max-width: 750px; margin: 0 auto 1.5rem auto; font-size: 1.02rem; opacity: 0.9; line-height: 1.5;">
+      <p style="max-width: 750px; margin: 0 auto; font-size: 1.02rem; opacity: 0.9; line-height: 1.6;">
         Rapid multi-role clinical staffing for Ontario hospitals, Long-Term Care facilities, retirement communities, and clinic networks. Order 5 to 50+ clinicians in a single submission.
       </p>
-
-      <!-- Quick Presets in a clean horizontal row -->
-      <div style="display: flex; flex-direction: row; gap: 0.75rem; justify-content: center; flex-wrap: wrap; align-items: center; margin-top: 1.5rem;">
-        <span style="font-size: 0.82rem; font-weight: 800; color: #00F5D4; text-transform: uppercase; letter-spacing: 0.6px; display: inline-flex; align-items: center; gap: 6px;">
-          <i data-lucide="zap" style="width: 15px; height: 15px; color: #00F5D4;"></i> Quick Surge Presets:
-        </span>
-        <button type="button" class="surge-preset-pill" onclick="window.applySurgePreset('outbreak')">
-          <i data-lucide="alert-triangle"></i> Code Green Outbreak (4 RNs + 8 PSWs)
-        </button>
-        <button type="button" class="surge-preset-pill" onclick="window.applySurgePreset('weekend')">
-          <i data-lucide="calendar"></i> Weekend Block (2 RPNs + 6 PSWs)
-        </button>
-        <button type="button" class="surge-preset-pill" onclick="window.applySurgePreset('acute')">
-          <i data-lucide="activity"></i> Acute Surge (4 RNs ICU/ER)
-        </button>
-      </div>
     </div>
   </section>
 
