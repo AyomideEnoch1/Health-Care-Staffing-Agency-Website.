@@ -1602,6 +1602,22 @@
     width: fit-content !important;
     min-height: auto !important;
   }
+
+  /* Workforce Management Staggered Images Spacing on Mobile */
+  .proto-staggered-collage {
+    gap: 0.65rem !important;
+  }
+  .proto-collage-card.card-2 {
+    margin-top: 1rem !important;
+  }
+
+  /* Our Dedicated Clinical Team Collage Spacing on Mobile */
+  .photo-collage-3 {
+    gap: 0.65rem !important;
+  }
+  .collage-row-sub {
+    gap: 0.65rem !important;
+  }
 }
 
 /* ── Small Mobile Phones (up to 480px) ── */
@@ -1706,6 +1722,22 @@
     text-align: center !important;
     justify-content: center !important;
   }
+
+  /* Workforce Management Staggered Images Spacing on Small Mobile */
+  .proto-staggered-collage {
+    gap: 0.45rem !important;
+  }
+  .proto-collage-card.card-2 {
+    margin-top: 0.75rem !important;
+  }
+
+  /* Our Dedicated Clinical Team Collage Spacing on Small Mobile */
+  .photo-collage-3 {
+    gap: 0.45rem !important;
+  }
+  .collage-row-sub {
+    gap: 0.45rem !important;
+  }
 }
 
 /* ── Ultra Compact Mobile (< 380px) ── */
@@ -1721,6 +1753,18 @@
     padding: 0.45rem 0.8rem !important;
     border-radius: 50px !important;
     width: fit-content !important;
+  }
+  .proto-staggered-collage {
+    gap: 0.35rem !important;
+  }
+  .proto-collage-card.card-2 {
+    margin-top: 0.5rem !important;
+  }
+  .photo-collage-3 {
+    gap: 0.35rem !important;
+  }
+  .collage-row-sub {
+    gap: 0.35rem !important;
   }
 }
 
