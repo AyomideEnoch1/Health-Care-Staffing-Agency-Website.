@@ -122,19 +122,32 @@ router.post('/login', authLoginLimiter, async (req, res, next) => {
     const { email, password } = loginSchema.parse(req.body);
     const emailClean = email.toLowerCase().trim();
 
-    const [rows] = await pool.query(
+    let [rows] = await pool.query(
       'SELECT id, email, password_hash, full_name, role, organization_name, phone, is_active FROM users WHERE email = ? LIMIT 1',
       [emailClean]
     );
 
-    if (!rows || rows.length === 0) {
+    let user = rows && rows.length > 0 ? rows[0] : null;
+    let isAdminAccount = false;
+
+    // If not found in users table, check if this is an Administrator account logging in from the website sign-in page
+    if (!user) {
+      const [adminRows] = await pool.query(
+        'SELECT id, email, password_hash, full_name, role, is_active FROM admins WHERE email = ? LIMIT 1',
+        [emailClean]
+      );
+      if (adminRows && adminRows.length > 0) {
+        user = adminRows[0];
+        isAdminAccount = true;
+      }
+    }
+
+    if (!user) {
       return res.status(401).json({
         success: false,
         error: 'Invalid email or password.'
       });
     }
-
-    const user = rows[0];
 
     if (!user.is_active) {
       return res.status(403).json({
@@ -151,8 +164,49 @@ router.post('/login', authLoginLimiter, async (req, res, next) => {
       });
     }
 
-    // Update last login
-    await pool.query('UPDATE users SET last_login = NOW() WHERE id = ?', [user.id]);
+    if (isAdminAccount) {
+      // 1. Issue Admin JWT Session Token
+      const adminPayload = {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        full_name: user.full_name
+      };
+      const adminToken = jwt.sign(adminPayload, JWT_SECRET, { expiresIn: '8h' });
+      const isProd = process.env.NODE_ENV === 'production';
+      res.cookie('df_admin_session', adminToken, {
+        httpOnly: true,
+        secure: isProd,
+        sameSite: isProd ? 'Strict' : 'Lax',
+        maxAge: 8 * 60 * 60 * 1000,
+        path: '/'
+      });
+
+      // 2. Also issue User Cookie for seamless cross-navigation
+      res.cookie(USER_COOKIE_NAME, adminToken, buildUserCookieOptions());
+
+      try {
+        await pool.query('UPDATE admins SET failed_login_attempts = 0, lock_until = NULL, last_login = NOW() WHERE id = ?', [user.id]);
+      } catch {}
+
+      return res.json({
+        success: true,
+        isAdmin: true,
+        redirectTo: 'admin.html',
+        message: 'Administrator verified. Redirecting to Admin Dashboard...',
+        user: {
+          id: user.id,
+          email: user.email,
+          full_name: user.full_name,
+          role: user.role
+        }
+      });
+    }
+
+    // Standard client or healthcare worker
+    try {
+      await pool.query('UPDATE users SET last_login = NOW() WHERE id = ?', [user.id]);
+    } catch {}
 
     // Issue JWT session token
     const tokenPayload = {
@@ -168,6 +222,8 @@ router.post('/login', authLoginLimiter, async (req, res, next) => {
 
     return res.json({
       success: true,
+      isAdmin: false,
+      redirectTo: 'portal.html',
       message: 'Logged in successfully.',
       user: {
         id: user.id,

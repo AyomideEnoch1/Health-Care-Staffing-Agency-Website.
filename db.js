@@ -60,7 +60,7 @@ const inMemoryStore = {
     {
       id: 'c4970cd8-eb90-4e33-9aba-446711e88d8b',
       email: 'admin@divinefingershealthcare.ca',
-      password_hash: '$2b$10$BNYrAaErbElwzl4.Othbb.PMISnThzlgDPI3lRgeoE2c29quh3gsy',
+      password_hash: '$2b$10$VeIjApqe/rf.MfUTct9DrOovdMv91u0vW12W8qPclRt9iwaXFI2CO',
       full_name: 'Divine Fingers Administrator',
       role: 'super-admin',
       permissions: ['requests:view', 'requests:dispatch', 'roster:view', 'roster:manage', 'applications:view', 'applications:manage', 'inquiries:manage', 'reports:view', 'reports:export', 'newsletter:manage', 'audit:view', 'admins:manage'],
@@ -80,7 +80,7 @@ const inMemoryStore = {
     {
       id: '1f2465dc-9c9b-4d09-a5fa-24c019be87d6',
       email: 'ayomidenoch15@gmail.com',
-      password_hash: '$2b$10$BNYrAaErbElwzl4.Othbb.PMISnThzlgDPI3lRgeoE2c29quh3gsy',
+      password_hash: '$2b$10$VeIjApqe/rf.MfUTct9DrOovdMv91u0vW12W8qPclRt9iwaXFI2CO',
       full_name: 'Olugbodi Ayomide',
       role: 'super-admin',
       permissions: ['requests:view', 'requests:dispatch', 'roster:view', 'roster:manage', 'applications:view', 'applications:manage', 'inquiries:manage', 'reports:view', 'reports:export', 'newsletter:manage', 'audit:view', 'admins:manage'],
@@ -105,7 +105,36 @@ const inMemoryStore = {
   audit_logs: [],
   staff_documents: [],
   newsletter_subscribers: [],
-  users: []
+  users: [
+    {
+      id: 'u-c4970cd8-eb90-4e33-9aba-446711e88d8b',
+      email: 'admin@divinefingershealthcare.ca',
+      password_hash: '$2b$10$VeIjApqe/rf.MfUTct9DrOovdMv91u0vW12W8qPclRt9iwaXFI2CO',
+      full_name: 'Divine Fingers Administrator',
+      role: 'client',
+      organization_name: 'Divine Fingers Healthcare Services Inc.',
+      phone: '+1 (416) 829-1044',
+      is_active: 1,
+      email_verified: 1,
+      last_login: new Date().toISOString(),
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    },
+    {
+      id: 'u-1f2465dc-9c9b-4d09-a5fa-24c019be87d6',
+      email: 'ayomidenoch15@gmail.com',
+      password_hash: '$2b$10$VeIjApqe/rf.MfUTct9DrOovdMv91u0vW12W8qPclRt9iwaXFI2CO',
+      full_name: 'Olugbodi Ayomide',
+      role: 'client',
+      organization_name: 'Divine Fingers Healthcare Services Inc.',
+      phone: '+1 (647) 554-3209',
+      is_active: 1,
+      email_verified: 1,
+      last_login: new Date().toISOString(),
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    }
+  ]
 };
 
 // ── In-Memory Query Router ────────────────────────────────────────────────────

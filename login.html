@@ -577,8 +577,15 @@
             </div>
 
             <button type="submit" class="btn-submit-auth" id="btn-login-submit">
-              <i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i> Sign In to Portal
+              <i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i> Sign In
             </button>
+
+            <div style="margin-top: 1.35rem; padding-top: 1.1rem; border-top: 1px dashed #E2E8F0; text-align: center;">
+              <span style="font-size: 0.8rem; color: #64748B;">Staff Coordinator or Agency Administrator?</span><br>
+              <a href="admin.html" style="font-size: 0.85rem; font-weight: 700; color: #1B4F8C; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; margin-top: 5px;">
+                <i data-lucide="shield-check" style="width: 15px; height: 15px; color: #1BAECF;"></i> Go to Staff &amp; Administrator Login &rarr;
+              </a>
+            </div>
           </form>
         </div>
 
@@ -817,22 +824,30 @@
         const result = await response.json();
 
         if (response.ok && result.success) {
-          showAlert('success', 'Sign in successful! Redirecting to your portal...');
-          const params = new URLSearchParams(window.location.search);
-          const redirectUrl = params.get('redirect') || 'portal.html';
-          setTimeout(() => {
-            window.location.href = redirectUrl;
-          }, 500);
+          if (result.isAdmin || result.redirectTo === 'admin.html') {
+            showAlert('success', 'Administrator credentials verified! Redirecting to Admin Dashboard...');
+            sessionStorage.setItem('df_admin_user', JSON.stringify(result.user || {}));
+            setTimeout(() => {
+              window.location.href = 'admin.html';
+            }, 600);
+          } else {
+            showAlert('success', 'Sign in successful! Redirecting to your portal...');
+            const params = new URLSearchParams(window.location.search);
+            const redirectUrl = params.get('redirect') || (result.redirectTo || 'portal.html');
+            setTimeout(() => {
+              window.location.href = redirectUrl;
+            }, 600);
+          }
         } else {
           showAlert('error', result.error || 'Invalid email or password. Please verify your credentials.');
           submitBtn.disabled = false;
-          submitBtn.innerHTML = '<i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i> Sign In to Portal';
+          submitBtn.innerHTML = '<i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i> Sign In';
           if (window.lucide) lucide.createIcons();
         }
       } catch (err) {
         showAlert('error', 'Network error connecting to authentication service. Please check your connection.');
         submitBtn.disabled = false;
-        submitBtn.innerHTML = '<i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i> Sign In to Portal';
+        submitBtn.innerHTML = '<i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i> Sign In';
         if (window.lucide) lucide.createIcons();
       }
     }
