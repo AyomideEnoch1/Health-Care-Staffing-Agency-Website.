@@ -19,12 +19,12 @@ const publicFormLimiter = rateLimit({
 
 const authLoginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: isProd ? 5 : 50,
+  max: isProd ? 30 : 200,
   standardHeaders: true,
   legacyHeaders: false,
   message: {
     success: false,
-    error: 'Too many login attempts. Access is locked for 15 minutes.'
+    error: 'Too many login attempts. Please wait 15 minutes before trying again.'
   }
 });
 

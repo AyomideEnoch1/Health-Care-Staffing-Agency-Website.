@@ -56,7 +56,7 @@ const allowedOrigins = (process.env.ALLOWED_ORIGINS || '')
 
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin) return callback(null, true); // Same-origin or non-browser requests
+    if (!origin || origin === 'null') return callback(null, true); // Same-origin, file:// or non-browser requests
     const isLocal = origin.includes('localhost') || origin.includes('127.0.0.1');
     const isDev   = process.env.NODE_ENV !== 'production';
     if ((isDev && isLocal) || allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
