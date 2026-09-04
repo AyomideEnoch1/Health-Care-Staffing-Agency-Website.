@@ -896,12 +896,13 @@
 
       // Fallback to local session storage for preview / offline resiliency
       if (!verifiedUser) {
-        const stored = sessionStorage.getItem('df_portal_user');
+        const stored = sessionStorage.getItem('df_portal_user') || localStorage.getItem('df_portal_user');
         if (stored) {
           try {
             const parsed = JSON.parse(stored);
             if (parsed && (parsed.email || parsed.id)) {
               verifiedUser = parsed;
+              sessionStorage.setItem('df_portal_user', stored);
             }
           } catch (e) {}
         }
@@ -1189,6 +1190,7 @@
         // Proceed anyway
       }
       sessionStorage.removeItem('df_portal_user');
+      try { localStorage.removeItem('df_portal_user'); } catch (e) {}
       window.location.href = 'login.html';
     }
 

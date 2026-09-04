@@ -858,7 +858,10 @@
             }, 600);
           } else {
             showAlert('success', 'Sign in successful! Redirecting to your portal...');
-            if (result.user) sessionStorage.setItem('df_portal_user', JSON.stringify(result.user));
+            if (result.user) {
+              sessionStorage.setItem('df_portal_user', JSON.stringify(result.user));
+              try { localStorage.setItem('df_portal_user', JSON.stringify(result.user)); } catch (e) {}
+            }
             const params = new URLSearchParams(window.location.search);
             const redirectUrl = params.get('redirect') || (result.redirectTo || 'portal.html');
             setTimeout(() => {
@@ -951,6 +954,10 @@
         const result = await response.json();
 
         if (response.ok && result.success) {
+          if (result.user) {
+            sessionStorage.setItem('df_portal_user', JSON.stringify(result.user));
+            try { localStorage.setItem('df_portal_user', JSON.stringify(result.user)); } catch (e) {}
+          }
           showAlert('success', 'Account created successfully! Redirecting to your portal...');
           const params = new URLSearchParams(window.location.search);
           const redirectUrl = params.get('redirect') || 'portal.html';

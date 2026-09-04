@@ -70,6 +70,53 @@ router.post('/login', authLoginLimiter, async (req, res, next) => {
     );
 
     if (rows.length === 0) {
+      // Check if this is a healthcare worker or client attempting to log in via admin gate
+      const cleanEmail = email.toLowerCase().trim();
+      const [userRows] = await pool.query(
+        'SELECT id, email, password_hash, full_name, role, organization_name, phone, is_active FROM users WHERE email = ? LIMIT 1',
+        [cleanEmail]
+      );
+
+      if (userRows && userRows.length > 0) {
+        const staffUser = userRows[0];
+        if (!staffUser.is_active) {
+          return res.status(403).json({ success: false, error: 'Your account is currently inactive. Please contact clinical dispatch.' });
+        }
+        const match = await bcrypt.compare(password, staffUser.password_hash);
+        if (match) {
+          const tokenPayload = {
+            id: staffUser.id,
+            email: staffUser.email,
+            full_name: staffUser.full_name,
+            role: staffUser.role,
+            organization_name: staffUser.organization_name
+          };
+          const isProd = process.env.NODE_ENV === 'production';
+          const token = jwt.sign(tokenPayload, JWT_SECRET, { expiresIn: '7d' });
+          res.cookie('df_user_session', token, {
+            httpOnly: true,
+            secure: isProd,
+            sameSite: 'Lax',
+            maxAge: 7 * 24 * 60 * 60 * 1000,
+            path: '/'
+          });
+          return res.json({
+            success: true,
+            isUser: true,
+            redirectTo: 'portal.html',
+            message: 'Healthcare Staff credentials verified! Redirecting to Member Portal...',
+            user: {
+              id: staffUser.id,
+              email: staffUser.email,
+              full_name: staffUser.full_name,
+              role: staffUser.role,
+              organization_name: staffUser.organization_name,
+              phone: staffUser.phone
+            }
+          });
+        }
+      }
+
       return res.status(401).json({ success: false, error: 'Invalid email or password.' });
     }
 

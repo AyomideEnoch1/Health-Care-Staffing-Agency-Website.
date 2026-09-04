@@ -24,7 +24,7 @@ function buildUserCookieOptions() {
   return {
     httpOnly: true,
     secure: isProd,
-    sameSite: isProd ? 'Strict' : 'Lax',
+    sameSite: 'Lax',
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     path: '/'
   };
@@ -83,6 +83,31 @@ router.post('/register', async (req, res, next) => {
         data.phone ? data.phone.trim() : null
       ]
     );
+
+    // If registering as a healthcare professional, also populate staff_roster so the admin dispatch team sees them
+    if (data.role === 'healthcare_worker') {
+      try {
+        const countRes = await pool.query('SELECT COUNT(*) AS total FROM staff_roster');
+        const nextNum = ((countRes[0] && countRes[0][0] && countRes[0][0].total) || 0) + 1;
+        const staffCode = `STF-${String(nextNum).padStart(3, '0')}`;
+        await pool.query(
+          `INSERT INTO staff_roster (id, staff_code, name, role, specialty, region, phone, email, status, credential_status)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'available', 'pending')`,
+          [
+            userId,
+            staffCode,
+            data.full_name.trim(),
+            'RN / PSW',
+            'General Care',
+            'Greater Toronto Area',
+            data.phone ? data.phone.trim() : null,
+            emailClean
+          ]
+        );
+      } catch (rosterErr) {
+        console.warn('[Staff Roster Mirror Warning]:', rosterErr.message);
+      }
+    }
 
     // Issue JWT session token
     const tokenPayload = {
@@ -257,10 +282,20 @@ router.get('/me', async (req, res) => {
       return res.json({ success: false, user: null });
     }
 
-    const [rows] = await pool.query(
+    let [rows] = await pool.query(
       'SELECT id, email, full_name, role, organization_name, phone, is_active, created_at FROM users WHERE id = ? LIMIT 1',
       [decoded.id]
     );
+
+    if (!rows || rows.length === 0) {
+      const [adminRows] = await pool.query(
+        'SELECT id, email, full_name, role, is_active, created_at FROM admins WHERE id = ? LIMIT 1',
+        [decoded.id]
+      );
+      if (adminRows && adminRows.length > 0) {
+        rows = adminRows;
+      }
+    }
 
     if (!rows || rows.length === 0 || !rows[0].is_active) {
       res.clearCookie(USER_COOKIE_NAME, { path: '/' });

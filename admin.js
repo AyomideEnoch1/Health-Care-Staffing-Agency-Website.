@@ -553,6 +553,17 @@
         }
 
         if (res.success) {
+          if (res.redirectTo === 'portal.html' || res.isUser) {
+            if (res.user) {
+              sessionStorage.setItem('df_portal_user', JSON.stringify(res.user));
+              try { localStorage.setItem('df_portal_user', JSON.stringify(res.user)); } catch (e) {}
+            }
+            showToast('Healthcare Staff credentials verified! Redirecting to Member Portal...', 'success');
+            setTimeout(() => {
+              window.location.href = 'portal.html';
+            }, 600);
+            return;
+          }
           if (res.csrfToken) sessionStorage.setItem('df_csrf_token', res.csrfToken);
           sessionStorage.setItem('df_admin_user', JSON.stringify(res.admin));
           hideAuthGate();
