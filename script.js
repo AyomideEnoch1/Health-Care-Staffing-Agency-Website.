@@ -1206,12 +1206,12 @@ window.toggleTeamContent = function(btn) {
 // User Authentication State Sync (Public Site Header & Mobile Navigation)
 // ==========================================================================
 async function initHeaderAuthSync() {
-  const headerCta = document.querySelector('.header-cta-right');
+  const ctaBtn = document.querySelector('.header-cta-right .nav-cta-btn');
   const navList = document.querySelector('.nav-list');
-  if (!headerCta && !navList) return;
+  if (!ctaBtn && !navList) return;
 
   const currentPath = window.location.pathname.toLowerCase();
-  if (currentPath.endsWith('login.html') || currentPath.endsWith('portal.html') || currentPath.endsWith('admin.html')) {
+  if (currentPath.endsWith('portal.html') || currentPath.endsWith('admin.html')) {
     return;
   }
 
@@ -1228,44 +1228,41 @@ async function initHeaderAuthSync() {
     // Offline or network error: defaults to unauthenticated
   }
 
+  // Remove any previously injected elements in navList
   document.querySelectorAll('.injected-auth-elem').forEach(el => el.remove());
 
   if (user) {
     const firstName = (user.full_name || 'Member').split(' ')[0];
 
-    // 1. Desktop CTA Area
-    if (headerCta) {
-      const portalBtn = document.createElement('a');
-      portalBtn.href = 'portal.html';
-      portalBtn.className = 'btn nav-portal-btn injected-auth-elem';
-      portalBtn.title = `Access Portal as ${user.full_name}`;
-      portalBtn.innerHTML = `<i data-lucide="user" style="width: 15px; height: 15px;"></i> PORTAL (${firstName})`;
-      headerCta.insertBefore(portalBtn, headerCta.firstChild);
+    // 1. Update header CTA button to PORTAL
+    if (ctaBtn) {
+      ctaBtn.href = 'portal.html';
+      ctaBtn.innerHTML = `<i data-lucide="user" style="width: 14px; height: 14px; vertical-align: -1px; margin-right: 4px;"></i>PORTAL (${firstName.toUpperCase()})`;
+      ctaBtn.title = `Access Portal as ${user.full_name}`;
     }
 
     // 2. Mobile Nav List
     if (navList) {
       const portalLi = document.createElement('li');
       portalLi.className = 'nav-item nav-auth-item portal-item injected-auth-elem';
-      portalLi.innerHTML = `<a href="portal.html" class="nav-link">PORTAL (${firstName.toUpperCase()})</a>`;
+      portalLi.innerHTML = `<a href="portal.html" class="nav-link" style="color: var(--teal-green) !important; font-weight: 800;">PORTAL (${firstName.toUpperCase()})</a>`;
 
       const logoutLi = document.createElement('li');
       logoutLi.className = 'nav-item nav-auth-item logout-item injected-auth-elem';
-      logoutLi.innerHTML = `<a href="#" class="nav-link" onclick="fetch('/api/users/logout',{method:'POST'}).then(()=>window.location.reload());return false;">SIGN OUT</a>`;
+      logoutLi.innerHTML = `<a href="#" class="nav-link" onclick="fetch('/api/users/logout',{method:'POST'}).then(()=>window.location.reload());return false;" style="color: #EF4444 !important; font-weight: 800;">SIGN OUT</a>`;
 
       navList.appendChild(portalLi);
       navList.appendChild(logoutLi);
     }
   } else {
-    // Unauthenticated: Show Sign In
-    if (headerCta) {
-      const signinBtn = document.createElement('a');
-      signinBtn.href = 'login.html';
-      signinBtn.className = 'btn nav-signin-btn injected-auth-elem';
-      signinBtn.innerHTML = `<i data-lucide="log-in" style="width: 14px; height: 14px;"></i> SIGN IN`;
-      headerCta.insertBefore(signinBtn, headerCta.firstChild);
+    // Unauthenticated: Keep/set header CTA button to SIGN IN
+    if (ctaBtn) {
+      ctaBtn.href = 'login.html';
+      ctaBtn.innerHTML = 'SIGN IN';
+      ctaBtn.title = 'Sign In to Divine Fingers Portal';
     }
 
+    // Mobile Nav List
     if (navList) {
       const signinLi = document.createElement('li');
       signinLi.className = 'nav-item nav-auth-item injected-auth-elem';

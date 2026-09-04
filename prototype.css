@@ -1858,62 +1858,38 @@
 }
 
 /* ==========================================================================
-   Client & Healthcare Worker Auth Navigation Controls
+   Header Action Button (SIGN IN / PORTAL)
    ========================================================================== */
 .header-cta-right {
   display: flex !important;
   align-items: center !important;
-  gap: 0.65rem !important;
 }
 
-.nav-signin-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.65rem 1.15rem;
-  font-family: var(--font-heading);
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.4px;
-  color: var(--navy) !important;
-  background: rgba(27, 174, 207, 0.08);
-  border: 1.5px solid rgba(27, 174, 207, 0.35);
-  border-radius: var(--radius-pill);
-  text-decoration: none;
-  transition: all 0.2s ease;
-  white-space: nowrap;
-}
-
-.nav-signin-btn:hover {
-  background: rgba(27, 174, 207, 0.18);
-  border-color: var(--cyan-turquoise);
-  color: var(--navy) !important;
-  transform: translateY(-1px);
-}
-
-.nav-portal-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  padding: 0.65rem 1.15rem;
-  font-family: var(--font-heading);
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.4px;
+.header-cta-right .nav-cta-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.35rem !important;
+  padding: 0.68rem 1.65rem !important;
+  font-family: var(--font-heading) !important;
+  font-size: 0.8rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.5px !important;
+  background: linear-gradient(135deg, #3CAF8A 0%, #1BAECF 100%) !important;
   color: #FFFFFF !important;
-  background: linear-gradient(135deg, #1B4F8C 0%, #0B2545 100%);
-  border: 1.5px solid #1BAECF;
-  border-radius: var(--radius-pill);
-  text-decoration: none;
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 12px rgba(11, 37, 69, 0.18);
-  white-space: nowrap;
+  border: 1.5px solid #3CAF8A !important;
+  border-radius: var(--radius-pill) !important;
+  box-shadow: 0 4px 15px rgba(60, 175, 138, 0.35) !important;
+  white-space: nowrap !important;
+  text-decoration: none !important;
+  transition: all 0.25s ease !important;
 }
 
-.nav-portal-btn:hover {
-  background: linear-gradient(135deg, #1BAECF 0%, #1B4F8C 100%);
-  border-color: #3CAF8A;
-  transform: translateY(-1px);
+.header-cta-right .nav-cta-btn:hover {
+  background: linear-gradient(135deg, #7CC242 0%, #3CAF8A 100%) !important;
+  border-color: var(--lime-green) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 22px rgba(124, 194, 66, 0.45) !important;
 }
 
 .nav-auth-item a {
@@ -1930,15 +1906,9 @@
 }
 
 @media (max-width: 860px) {
-  .nav-signin-btn, .nav-portal-btn {
-    padding: 0.5rem 0.85rem;
-    font-size: 0.74rem;
-  }
-}
-
-@media (max-width: 540px) {
-  .header-cta-right .nav-signin-btn {
-    display: none !important; /* Accessible inside mobile drawer menu */
+  .header-cta-right .nav-cta-btn {
+    padding: 0.55rem 1.15rem !important;
+    font-size: 0.75rem !important;
   }
 }
 
