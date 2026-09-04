@@ -1121,8 +1121,7 @@
 /* Micro-Pill Tag Cloud */
 .ref-pills-cloud {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+  flex-wrap: wrap;
   gap: 0.65rem;
   margin-bottom: 2rem;
   max-width: 620px;
@@ -1134,14 +1133,13 @@
   gap: 0.5rem;
   background: #ffffff;
   border: 1px solid rgba(27, 79, 140, 0.12);
-  padding: 0.5rem 1.15rem;
+  padding: 0.45rem 1rem;
   border-radius: 50px;
-  font-size: 0.88rem;
+  font-size: 0.85rem;
   font-weight: 600;
   color: #1A3A63;
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.03);
   transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-  width: fit-content;
 }
 
 .ref-micro-pill:hover {
@@ -1505,8 +1503,7 @@
   }
   .ref-pills-cloud {
     display: flex !important;
-    flex-direction: column !important;
-    align-items: flex-start !important;
+    flex-wrap: wrap !important;
     gap: 0.65rem !important;
     width: 100% !important;
     max-width: 100% !important;
@@ -1515,15 +1512,10 @@
   .ref-micro-pill {
     display: inline-flex !important;
     align-items: center !important;
-    justify-content: flex-start !important;
-    width: fit-content !important;
-    box-sizing: border-box !important;
-    padding: 0.5rem 1rem !important;
+    gap: 0.45rem !important;
+    padding: 0.45rem 1rem !important;
     font-size: 0.85rem !important;
     border-radius: 50px !important;
-    white-space: normal !important;
-    line-height: 1.35 !important;
-    min-height: auto !important;
   }
   .ref-pill-check {
     flex-shrink: 0 !important;
