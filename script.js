@@ -1202,4 +1202,88 @@ window.toggleTeamContent = function(btn) {
   if (window.lucide) lucide.createIcons();
 };
 
+// ==========================================================================
+// User Authentication State Sync (Public Site Header & Mobile Navigation)
+// ==========================================================================
+async function initHeaderAuthSync() {
+  const headerCta = document.querySelector('.header-cta-right');
+  const navList = document.querySelector('.nav-list');
+  if (!headerCta && !navList) return;
+
+  const currentPath = window.location.pathname.toLowerCase();
+  if (currentPath.endsWith('login.html') || currentPath.endsWith('portal.html') || currentPath.endsWith('admin.html')) {
+    return;
+  }
+
+  let user = null;
+  try {
+    const res = await fetch('/api/users/me');
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.success && data.user) {
+        user = data.user;
+      }
+    }
+  } catch (_) {
+    // Offline or network error: defaults to unauthenticated
+  }
+
+  document.querySelectorAll('.injected-auth-elem').forEach(el => el.remove());
+
+  if (user) {
+    const firstName = (user.full_name || 'Member').split(' ')[0];
+
+    // 1. Desktop CTA Area
+    if (headerCta) {
+      const portalBtn = document.createElement('a');
+      portalBtn.href = 'portal.html';
+      portalBtn.className = 'btn nav-portal-btn injected-auth-elem';
+      portalBtn.title = `Access Portal as ${user.full_name}`;
+      portalBtn.innerHTML = `<i data-lucide="user" style="width: 15px; height: 15px;"></i> PORTAL (${firstName})`;
+      headerCta.insertBefore(portalBtn, headerCta.firstChild);
+    }
+
+    // 2. Mobile Nav List
+    if (navList) {
+      const portalLi = document.createElement('li');
+      portalLi.className = 'nav-item nav-auth-item portal-item injected-auth-elem';
+      portalLi.innerHTML = `<a href="portal.html" class="nav-link">PORTAL (${firstName.toUpperCase()})</a>`;
+
+      const logoutLi = document.createElement('li');
+      logoutLi.className = 'nav-item nav-auth-item logout-item injected-auth-elem';
+      logoutLi.innerHTML = `<a href="#" class="nav-link" onclick="fetch('/api/users/logout',{method:'POST'}).then(()=>window.location.reload());return false;">SIGN OUT</a>`;
+
+      navList.appendChild(portalLi);
+      navList.appendChild(logoutLi);
+    }
+  } else {
+    // Unauthenticated: Show Sign In
+    if (headerCta) {
+      const signinBtn = document.createElement('a');
+      signinBtn.href = 'login.html';
+      signinBtn.className = 'btn nav-signin-btn injected-auth-elem';
+      signinBtn.innerHTML = `<i data-lucide="log-in" style="width: 14px; height: 14px;"></i> SIGN IN`;
+      headerCta.insertBefore(signinBtn, headerCta.firstChild);
+    }
+
+    if (navList) {
+      const signinLi = document.createElement('li');
+      signinLi.className = 'nav-item nav-auth-item injected-auth-elem';
+      signinLi.innerHTML = `<a href="login.html" class="nav-link" style="color: var(--teal-green) !important; font-weight: 800;">SIGN IN / REGISTER</a>`;
+      navList.appendChild(signinLi);
+    }
+  }
+
+  if (window.lucide) {
+    lucide.createIcons();
+  }
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initHeaderAuthSync);
+} else {
+  initHeaderAuthSync();
+}
+
+
 

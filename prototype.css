@@ -1857,6 +1857,92 @@
   }
 }
 
+/* ==========================================================================
+   Client & Healthcare Worker Auth Navigation Controls
+   ========================================================================== */
+.header-cta-right {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.65rem !important;
+}
+
+.nav-signin-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.65rem 1.15rem;
+  font-family: var(--font-heading);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  color: var(--navy) !important;
+  background: rgba(27, 174, 207, 0.08);
+  border: 1.5px solid rgba(27, 174, 207, 0.35);
+  border-radius: var(--radius-pill);
+  text-decoration: none;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.nav-signin-btn:hover {
+  background: rgba(27, 174, 207, 0.18);
+  border-color: var(--cyan-turquoise);
+  color: var(--navy) !important;
+  transform: translateY(-1px);
+}
+
+.nav-portal-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.65rem 1.15rem;
+  font-family: var(--font-heading);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  color: #FFFFFF !important;
+  background: linear-gradient(135deg, #1B4F8C 0%, #0B2545 100%);
+  border: 1.5px solid #1BAECF;
+  border-radius: var(--radius-pill);
+  text-decoration: none;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(11, 37, 69, 0.18);
+  white-space: nowrap;
+}
+
+.nav-portal-btn:hover {
+  background: linear-gradient(135deg, #1BAECF 0%, #1B4F8C 100%);
+  border-color: #3CAF8A;
+  transform: translateY(-1px);
+}
+
+.nav-auth-item a {
+  font-weight: 800 !important;
+  letter-spacing: 0.5px;
+}
+
+.nav-auth-item.portal-item a {
+  color: #1BAECF !important;
+}
+
+.nav-auth-item.logout-item a {
+  color: #EF4444 !important;
+}
+
+@media (max-width: 860px) {
+  .nav-signin-btn, .nav-portal-btn {
+    padding: 0.5rem 0.85rem;
+    font-size: 0.74rem;
+  }
+}
+
+@media (max-width: 540px) {
+  .header-cta-right .nav-signin-btn {
+    display: none !important; /* Accessible inside mobile drawer menu */
+  }
+}
+
+
 
 
 

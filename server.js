@@ -35,6 +35,7 @@ const authRoute         = require('./routes/auth');
 const adminRoute        = require('./routes/admin');
 const shiftsRoute       = require('./routes/shifts');
 const newsletterRoute   = require('./routes/newsletter');
+const usersAuthRoute    = require('./routes/usersAuth');
 const { startShiftLifecycleDaemon } = require('./utils/shiftLifecycle');
 const errorHandler      = require('./middleware/errorHandler');
 
@@ -121,6 +122,7 @@ app.use('/api/admin', (req, res, next) => {
 app.use('/api/admin', adminRoute);
 app.use('/api/shifts', shiftsRoute);
 app.use('/api/newsletter', newsletterRoute);
+app.use('/api/users', usersAuthRoute);
 
 // ── Health Check ──────────────────────────────────────────────────────────────
 // Checks both API liveness AND active DB connection.

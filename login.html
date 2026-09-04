@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In &amp; Sign Up | Divine Fingers Healthcare Services Inc.</title>
+  <meta name="description" content="Sign in to your Divine Fingers Healthcare portal to coordinate staffing requests, shifts, and clinical dispatch.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Open+Sans:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css?v=5.2.0">
+  <link rel="stylesheet" href="prototype.css?v=5.2.0">
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    .auth-page-wrapper {
+      min-height: calc(100vh - 80px);
+      background: linear-gradient(180deg, #F8FAFC 0%, #EEF4F8 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3.5rem 1.25rem 4.5rem;
+      position: relative;
+    }
+
+    .auth-page-wrapper::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 320px;
+      background: linear-gradient(135deg, #1A3A63 0%, #1B4F8C 45%, #1BAECF 100%);
+      clip-path: polygon(0 0, 100% 0, 100% 70%, 0 100%);
+      z-index: 0;
+      opacity: 0.95;
+    }
+
+    .auth-card-container {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 500px;
+      background: #FFFFFF;
+      border-radius: 16px;
+      box-shadow: 0 20px 45px rgba(11, 37, 69, 0.15), 0 0 0 1px rgba(27, 174, 207, 0.18);
+      overflow: hidden;
+      animation: authCardIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes authCardIn {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .auth-card-header {
+      padding: 2.2rem 2.2rem 1.2rem;
+      text-align: center;
+      background: #FFFFFF;
+    }
+
+    .auth-brand-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-bottom: 0.85rem;
+      text-decoration: none;
+    }
+
+    .auth-brand-badge img {
+      width: 42px;
+      height: auto;
+    }
+
+    .auth-brand-badge span.name {
+      font-family: var(--font-heading);
+      font-weight: 800;
+      font-size: 1.12rem;
+      color: var(--navy);
+      letter-spacing: -0.3px;
+    }
+
+    .auth-title {
+      font-family: var(--font-heading);
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--navy);
+      margin-bottom: 0.35rem;
+      letter-spacing: -0.3px;
+    }
+
+    .auth-subtitle {
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      line-height: 1.45;
+    }
+
+    /* Tabs */
+    .auth-tabs-nav {
+      display: flex;
+      margin: 1rem 2.2rem 0;
+      background: #F1F5F9;
+      border-radius: 10px;
+      padding: 4px;
+      gap: 4px;
+    }
+
+    .auth-tab-btn {
+      flex: 1;
+      border: none;
+      background: transparent;
+      padding: 0.72rem 1rem;
+      font-family: var(--font-heading);
+      font-size: 0.86rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+    }
+
+    .auth-tab-btn.active {
+      background: #FFFFFF;
+      color: var(--navy);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .auth-tab-btn:hover:not(.active) {
+      color: var(--cyan-turquoise);
+    }
+
+    /* Card Body */
+    .auth-card-body {
+      padding: 1.6rem 2.2rem 2.2rem;
+    }
+
+    .auth-tab-content {
+      display: none;
+    }
+
+    .auth-tab-content.active {
+      display: block;
+    }
+
+    /* Role Picker */
+    .role-picker-container {
+      margin-bottom: 1.25rem;
+    }
+
+    .role-picker-label {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+
+    .role-selector-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+
+    .role-option-card {
+      border: 2px solid #E2E8F0;
+      border-radius: 10px;
+      padding: 0.85rem 0.7rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: #FFFFFF;
+      user-select: none;
+    }
+
+    .role-option-card:hover {
+      border-color: #CBD5E1;
+      background: #F8FAFC;
+    }
+
+    .role-option-card.selected {
+      border-color: #1BAECF;
+      background: rgba(27, 174, 207, 0.07);
+      box-shadow: 0 0 0 1px #1BAECF;
+    }
+
+    .role-option-card i {
+      display: block;
+      margin: 0 auto 0.35rem;
+      width: 22px;
+      height: 22px;
+      color: var(--navy);
+      transition: color 0.2s ease;
+    }
+
+    .role-option-card.selected i {
+      color: #1BAECF;
+    }
+
+    .role-option-title {
+      font-weight: 700;
+      font-size: 0.82rem;
+      color: var(--navy);
+      line-height: 1.25;
+    }
+
+    .role-option-desc {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* Forms */
+    .form-group {
+      margin-bottom: 1.15rem;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 0.4rem;
+    }
+
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-wrapper i.field-icon {
+      position: absolute;
+      left: 14px;
+      width: 17px;
+      height: 17px;
+      color: #94A3B8;
+      pointer-events: none;
+      transition: color 0.2s ease;
+    }
+
+    .auth-input {
+      width: 100%;
+      padding: 0.75rem 1rem 0.75rem 2.55rem;
+      font-family: var(--font-body);
+      font-size: 0.92rem;
+      color: var(--navy);
+      background: #F8FAFC;
+      border: 1.5px solid #E2E8F0;
+      border-radius: 8px;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .auth-input:focus {
+      background: #FFFFFF;
+      border-color: #1BAECF;
+      box-shadow: 0 0 0 3px rgba(27, 174, 207, 0.15);
+    }
+
+    .auth-input:focus ~ i.field-icon,
+    .input-wrapper:focus-within i.field-icon {
+      color: #1BAECF;
+    }
+
+    .pwd-toggle-btn {
+      position: absolute;
+      right: 12px;
+      background: transparent;
+      border: none;
+      color: #94A3B8;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      padding: 4px;
+    }
+
+    .pwd-toggle-btn:hover {
+      color: var(--navy);
+    }
+
+    .form-extras {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.25rem;
+      font-size: 0.82rem;
+    }
+
+    .checkbox-container {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      cursor: pointer;
+      color: var(--navy);
+    }
+
+    .checkbox-container input {
+      accent-color: #1BAECF;
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+    }
+
+    .forgot-link {
+      color: #1BAECF;
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.2s ease;
+    }
+
+    .forgot-link:hover {
+      color: #1B4F8C;
+      text-decoration: underline;
+    }
+
+    .btn-submit-auth {
+      width: 100%;
+      padding: 0.85rem;
+      background: linear-gradient(135deg, #3CAF8A 0%, #1BAECF 100%);
+      color: #FFFFFF;
+      border: none;
+      border-radius: 8px;
+      font-family: var(--font-heading);
+      font-size: 0.94rem;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      box-shadow: 0 6px 18px rgba(27, 174, 207, 0.35);
+      transition: all 0.25s ease;
+    }
+
+    .btn-submit-auth:hover {
+      transform: translateY(-1.5px);
+      box-shadow: 0 8px 24px rgba(27, 174, 207, 0.45);
+      background: linear-gradient(135deg, #369c7b 0%, #179ab8 100%);
+    }
+
+    .btn-submit-auth:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Alert Boxes */
+    .auth-alert {
+      display: none;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      font-size: 0.84rem;
+      margin-bottom: 1.15rem;
+      line-height: 1.4;
+      align-items: flex-start;
+      gap: 0.6rem;
+    }
+
+    .auth-alert.error {
+      background: #FEF2F2;
+      border: 1px solid #FCA5A5;
+      color: #991B1B;
+      display: flex;
+    }
+
+    .auth-alert.success {
+      background: #ECFDF5;
+      border: 1px solid #A7F3D0;
+      color: #065F46;
+      display: flex;
+    }
+
+    /* 1-Click Quick Demo Login */
+    .demo-login-box {
+      margin-top: 1.8rem;
+      padding-top: 1.35rem;
+      border-top: 1px dashed #E2E8F0;
+      text-align: center;
+    }
+
+    .demo-login-label {
+      font-size: 0.74rem;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      font-weight: 800;
+      color: #64748B;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+    }
+
+    .demo-buttons-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.65rem;
+    }
+
+    .btn-demo-pill {
+      background: #F8FAFC;
+      border: 1.5px solid #CBD5E1;
+      border-radius: 8px;
+      padding: 0.65rem 0.5rem;
+      font-family: var(--font-heading);
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--navy);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.2rem;
+    }
+
+    .btn-demo-pill:hover {
+      background: #F1F5F9;
+      border-color: #94A3B8;
+      transform: translateY(-1px);
+    }
+
+    .btn-demo-pill span.subtext {
+      font-size: 0.68rem;
+      font-weight: 500;
+      color: #64748B;
+    }
+
+    .btn-demo-pill.client-demo:hover {
+      border-color: #1BAECF;
+      color: #1B4F8C;
+    }
+
+    .btn-demo-pill.worker-demo:hover {
+      border-color: #3CAF8A;
+      color: #2e8b6d;
+    }
+
+    /* Admin link */
+    .admin-redirect-hint {
+      margin-top: 1.25rem;
+      text-align: center;
+      font-size: 0.78rem;
+      color: #64748B;
+    }
+
+    .admin-redirect-hint a {
+      color: var(--navy);
+      font-weight: 700;
+      text-decoration: underline;
+    }
+
+    @media (max-width: 580px) {
+      .auth-page-wrapper {
+        padding: 1.75rem 1rem 3rem;
+      }
+      .auth-card-header {
+        padding: 1.8rem 1.3rem 1rem;
+      }
+      .auth-tabs-nav {
+        margin: 0.8rem 1.3rem 0;
+      }
+      .auth-card-body {
+        padding: 1.25rem 1.3rem 1.8rem;
+      }
+      .demo-buttons-row {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SITE HEADER / NAVIGATION -->
+  <header class="site-header" id="site-header">
+    <div class="header-container container">
+      <a href="index.html" class="brand-logo">
+        <div class="logo-wrapper">
+          <img src="assets/images/logo.png" alt="Divine Fingers Logo" class="brand-logo-img">
+          <div class="logo-text">
+            <span class="brand-name">Divine Fingers</span>
+            <span class="brand-tagline">HEALTHCARE SERVICES INC.</span>
+          </div>
+        </div>
+      </a>
+
+      <nav class="main-nav" aria-label="Main Navigation">
+        <ul class="nav-list">
+          <li class="nav-item"><a href="index.html" class="nav-link">HOME</a></li>
+          <li class="nav-item"><a href="about.html" class="nav-link">ABOUT US</a></li>
+          <li class="nav-item"><a href="services.html" class="nav-link">SERVICES</a></li>
+          <li class="nav-item"><a href="clients.html" class="nav-link">FOR CLIENTS</a></li>
+          <li class="nav-item"><a href="jobseekers.html" class="nav-link">FOR JOB SEEKERS</a></li>
+          <li class="nav-item"><a href="blog.html" class="nav-link">BLOG/NEWS</a></li>
+          <li class="nav-item"><a href="contact.html" class="nav-link">CONTACT</a></li>
+        </ul>
+      </nav>
+
+      <div class="header-cta-right">
+        <a href="clients.html" class="btn nav-cta-btn">REQUEST STAFF</a>
+      </div>
+
+      <button class="mobile-toggle" id="mobile-toggle" aria-label="Open menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN AUTH CONTAINER -->
+  <main class="auth-page-wrapper">
+    <div class="auth-card-container">
+      
+      <div class="auth-card-header">
+        <a href="index.html" class="auth-brand-badge">
+          <img src="assets/images/brand_emblem.png" alt="Divine Fingers Healthcare">
+          <span class="name">Divine Fingers Portal</span>
+        </a>
+        <h1 class="auth-title" id="auth-main-title">Welcome Back</h1>
+        <p class="auth-subtitle" id="auth-main-subtitle">Sign in to coordinate shifts, manage staffing requests, or view healthcare assignments.</p>
+      </div>
+
+      <!-- TABS SWITCHER -->
+      <div class="auth-tabs-nav" role="tablist">
+        <button type="button" class="auth-tab-btn active" id="tab-btn-login" onclick="switchAuthTab('login')">
+          <i data-lucide="log-in" style="width: 17px; height: 17px;"></i> Sign In
+        </button>
+        <button type="button" class="auth-tab-btn" id="tab-btn-register" onclick="switchAuthTab('register')">
+          <i data-lucide="user-plus" style="width: 17px; height: 17px;"></i> Create Account
+        </button>
+      </div>
+
+      <div class="auth-card-body">
+        
+        <!-- Status / Error Alert -->
+        <div class="auth-alert error" id="auth-error-alert" style="display: none;">
+          <i data-lucide="alert-circle" style="width: 18px; height: 18px; flex-shrink: 0;"></i>
+          <span id="auth-error-text"></span>
+        </div>
+
+        <div class="auth-alert success" id="auth-success-alert" style="display: none;">
+          <i data-lucide="check-circle-2" style="width: 18px; height: 18px; flex-shrink: 0;"></i>
+          <span id="auth-success-text"></span>
+        </div>
+
+        <!-- TAB 1: SIGN IN -->
+        <div class="auth-tab-content active" id="tab-content-login">
+          <form id="form-login" onsubmit="handleLogin(event)">
+            <div class="form-group">
+              <label class="form-label" for="login-email">Email Address</label>
+              <div class="input-wrapper">
+                <i data-lucide="mail" class="field-icon"></i>
+                <input type="email" id="login-email" class="auth-input" placeholder="e.g. name@hospital.ca" required autocomplete="email">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="login-password">Password</label>
+              <div class="input-wrapper">
+                <i data-lucide="lock" class="field-icon"></i>
+                <input type="password" id="login-password" class="auth-input" placeholder="Enter your password" required autocomplete="current-password">
+                <button type="button" class="pwd-toggle-btn" onclick="togglePwdVisibility('login-password', this)" aria-label="Toggle password">
+                  <i data-lucide="eye" style="width: 18px; height: 18px;"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="form-extras">
+              <label class="checkbox-container">
+                <input type="checkbox" id="login-remember" checked>
+                <span>Remember me</span>
+              </label>
+              <a href="#" class="forgot-link" onclick="alert('Password recovery: Please contact Divine Fingers Support at dispatch@divinefingershealthcare.ca or (647) 555-0100 for identity verification.'); return false;">Forgot password?</a>
+            </div>
+
+            <button type="submit" class="btn-submit-auth" id="btn-login-submit">
+              <i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i> Sign In to Portal
+            </button>
+          </form>
+
+          <!-- 1-Click Instant Demo Credentials -->
+          <div class="demo-login-box">
+            <div class="demo-login-label">
+              <i data-lucide="zap" style="width: 13px; height: 13px; color: #1BAECF;"></i> Instant Demo Access
+            </div>
+            <div class="demo-buttons-row">
+              <button type="button" class="btn-demo-pill client-demo" onclick="fillDemoAccount('client')">
+                <span>🏢 Facility / Client Demo</span>
+                <span class="subtext">client@demo.com</span>
+              </button>
+              <button type="button" class="btn-demo-pill worker-demo" onclick="fillDemoAccount('worker')">
+                <span>🩺 Healthcare Worker Demo</span>
+                <span class="subtext">worker@demo.com</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 2: CREATE ACCOUNT -->
+        <div class="auth-tab-content" id="tab-content-register">
+          <form id="form-register" onsubmit="handleRegister(event)">
+            
+            <!-- Account Type Role Selector -->
+            <div class="role-picker-container">
+              <label class="role-picker-label">I am registering as:</label>
+              <div class="role-selector-grid">
+                <div class="role-option-card selected" id="role-client-card" onclick="selectRole('client')">
+                  <i data-lucide="building-2"></i>
+                  <div class="role-option-title">Healthcare Facility</div>
+                  <div class="role-option-desc">Hospital, LTC, or Clinic</div>
+                </div>
+                <div class="role-option-card" id="role-worker-card" onclick="selectRole('healthcare_worker')">
+                  <i data-lucide="stethoscope"></i>
+                  <div class="role-option-title">Healthcare Professional</div>
+                  <div class="role-option-desc">RN, RPN, PSW, Caregiver</div>
+                </div>
+              </div>
+              <input type="hidden" id="reg-role" value="client">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="reg-fullname">Full Name / Primary Contact</label>
+              <div class="input-wrapper">
+                <i data-lucide="user" class="field-icon"></i>
+                <input type="text" id="reg-fullname" class="auth-input" placeholder="e.g. Dr. Sarah Jenkins" required autocomplete="name">
+              </div>
+            </div>
+
+            <!-- Organization Name (Shown for Client) -->
+            <div class="form-group" id="group-org-name">
+              <label class="form-label" for="reg-orgname">Facility or Organization Name</label>
+              <div class="input-wrapper">
+                <i data-lucide="building" class="field-icon"></i>
+                <input type="text" id="reg-orgname" class="auth-input" placeholder="e.g. Toronto Central Hospital" autocomplete="organization">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="reg-email">Email Address</label>
+              <div class="input-wrapper">
+                <i data-lucide="mail" class="field-icon"></i>
+                <input type="email" id="reg-email" class="auth-input" placeholder="e.g. sjenkins@torontocentral.ca" required autocomplete="email">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="reg-phone">Phone Number</label>
+              <div class="input-wrapper">
+                <i data-lucide="phone" class="field-icon"></i>
+                <input type="tel" id="reg-phone" class="auth-input" placeholder="e.g. (647) 555-0144" autocomplete="tel">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="reg-password">Password (Min. 6 characters)</label>
+              <div class="input-wrapper">
+                <i data-lucide="lock" class="field-icon"></i>
+                <input type="password" id="reg-password" class="auth-input" placeholder="Create a secure password" minlength="6" required autocomplete="new-password">
+                <button type="button" class="pwd-toggle-btn" onclick="togglePwdVisibility('reg-password', this)" aria-label="Toggle password">
+                  <i data-lucide="eye" style="width: 18px; height: 18px;"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="form-extras">
+              <label class="checkbox-container">
+                <input type="checkbox" id="reg-terms" required>
+                <span>I agree to the Terms of Service &amp; Privacy Policy</span>
+              </label>
+            </div>
+
+            <button type="submit" class="btn-submit-auth" id="btn-register-submit">
+              <i data-lucide="user-check" style="width: 18px; height: 18px;"></i> Create My Account
+            </button>
+          </form>
+        </div>
+
+        <!-- Internal Admin Portal Link -->
+        <div class="admin-redirect-hint">
+          Internal Operations &amp; Dispatch Coordinator? <a href="admin.html">Sign in to Admin Dashboard</a>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // Initialize icons
+    if (window.lucide) {
+      lucide.createIcons();
+    }
+
+    // Mobile nav toggle
+    const mobileToggle = document.getElementById('mobile-toggle');
+    const navList = document.querySelector('.nav-list');
+    if (mobileToggle && navList) {
+      mobileToggle.addEventListener('click', () => {
+        navList.classList.toggle('open');
+        mobileToggle.classList.toggle('active');
+      });
+    }
+
+    // Check if user is already authenticated
+    async function checkCurrentSession() {
+      try {
+        const res = await fetch('/api/users/me');
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.success && data.user) {
+            const params = new URLSearchParams(window.location.search);
+            const redirectUrl = params.get('redirect') || 'portal.html';
+            window.location.href = redirectUrl;
+          }
+        }
+      } catch (e) {
+        // Not logged in or network error, stay on page
+      }
+    }
+    checkCurrentSession();
+
+    // Tab Switcher
+    function switchAuthTab(tab) {
+      clearAlerts();
+      const loginTabBtn = document.getElementById('tab-btn-login');
+      const regTabBtn = document.getElementById('tab-btn-register');
+      const loginContent = document.getElementById('tab-content-login');
+      const regContent = document.getElementById('tab-content-register');
+      const title = document.getElementById('auth-main-title');
+      const subtitle = document.getElementById('auth-main-subtitle');
+
+      if (tab === 'login') {
+        loginTabBtn.classList.add('active');
+        regTabBtn.classList.remove('active');
+        loginContent.classList.add('active');
+        regContent.classList.remove('active');
+        title.textContent = 'Welcome Back';
+        subtitle.textContent = 'Sign in to coordinate shifts, manage staffing requests, or view healthcare assignments.';
+      } else {
+        loginTabBtn.classList.remove('active');
+        regTabBtn.classList.add('active');
+        loginContent.classList.remove('active');
+        regContent.classList.add('active');
+        title.textContent = 'Create an Account';
+        subtitle.textContent = 'Register your facility for rapid staffing or join our network of premier healthcare professionals.';
+      }
+      if (window.lucide) lucide.createIcons();
+    }
+
+    // Role Selection in Registration
+    function selectRole(role) {
+      document.getElementById('reg-role').value = role;
+      const clientCard = document.getElementById('role-client-card');
+      const workerCard = document.getElementById('role-worker-card');
+      const orgGroup = document.getElementById('group-org-name');
+
+      if (role === 'client') {
+        clientCard.classList.add('selected');
+        workerCard.classList.remove('selected');
+        orgGroup.style.display = 'block';
+      } else {
+        clientCard.classList.remove('selected');
+        workerCard.classList.add('selected');
+        orgGroup.style.display = 'none';
+      }
+    }
+
+    // Toggle Password Visibility
+    function togglePwdVisibility(inputId, btn) {
+      const input = document.getElementById(inputId);
+      const isPassword = input.type === 'password';
+      input.type = isPassword ? 'text' : 'password';
+      btn.innerHTML = isPassword 
+        ? '<i data-lucide="eye-off" style="width: 18px; height: 18px;"></i>' 
+        : '<i data-lucide="eye" style="width: 18px; height: 18px;"></i>';
+      if (window.lucide) lucide.createIcons();
+    }
+
+    // Fill Demo Accounts
+    function fillDemoAccount(type) {
+      clearAlerts();
+      switchAuthTab('login');
+      const emailInput = document.getElementById('login-email');
+      const pwdInput = document.getElementById('login-password');
+
+      if (type === 'client') {
+        emailInput.value = 'client@demo.com';
+        pwdInput.value = 'Password123!';
+      } else {
+        emailInput.value = 'worker@demo.com';
+        pwdInput.value = 'Password123!';
+      }
+
+      handleLogin(new Event('submit'));
+    }
+
+    function showAlert(type, message) {
+      const errorBox = document.getElementById('auth-error-alert');
+      const successBox = document.getElementById('auth-success-alert');
+      const errorText = document.getElementById('auth-error-text');
+      const successText = document.getElementById('auth-success-text');
+
+      if (type === 'error') {
+        successBox.style.display = 'none';
+        errorText.textContent = message;
+        errorBox.style.display = 'flex';
+      } else {
+        errorBox.style.display = 'none';
+        successText.textContent = message;
+        successBox.style.display = 'flex';
+      }
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function clearAlerts() {
+      document.getElementById('auth-error-alert').style.display = 'none';
+      document.getElementById('auth-success-alert').style.display = 'none';
+    }
+
+    // Handle Login
+    async function handleLogin(e) {
+      if (e) e.preventDefault();
+      clearAlerts();
+
+      const email = document.getElementById('login-email').value.trim();
+      const password = document.getElementById('login-password').value;
+      const submitBtn = document.getElementById('btn-login-submit');
+
+      if (!email || !password) {
+        showAlert('error', 'Please provide both email address and password.');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="spinner-border"></span> Authenticating...';
+
+      try {
+        const response = await fetch('/api/users/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+
+        const result = await response.json();
+
+        if (response.ok && result.success) {
+          showAlert('success', 'Sign in successful! Redirecting to your portal...');
+          const params = new URLSearchParams(window.location.search);
+          const redirectUrl = params.get('redirect') || 'portal.html';
+          setTimeout(() => {
+            window.location.href = redirectUrl;
+          }, 500);
+        } else {
+          showAlert('error', result.error || 'Invalid email or password. Please verify your credentials.');
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i> Sign In to Portal';
+          if (window.lucide) lucide.createIcons();
+        }
+      } catch (err) {
+        showAlert('error', 'Network error connecting to authentication service. Please check your connection.');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i> Sign In to Portal';
+        if (window.lucide) lucide.createIcons();
+      }
+    }
+
+    // Handle Register
+    async function handleRegister(e) {
+      if (e) e.preventDefault();
+      clearAlerts();
+
+      const role = document.getElementById('reg-role').value;
+      const full_name = document.getElementById('reg-fullname').value.trim();
+      const email = document.getElementById('reg-email').value.trim();
+      const phone = document.getElementById('reg-phone').value.trim();
+      const password = document.getElementById('reg-password').value;
+      const organization_name = role === 'client' ? document.getElementById('reg-orgname').value.trim() : null;
+      const submitBtn = document.getElementById('btn-register-submit');
+
+      if (!full_name || !email || !password) {
+        showAlert('error', 'Please fill out all required fields.');
+        return;
+      }
+
+      if (password.length < 6) {
+        showAlert('error', 'Password must be at least 6 characters.');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="spinner-border"></span> Creating Account...';
+
+      try {
+        const response = await fetch('/api/users/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            role,
+            full_name,
+            email,
+            phone,
+            password,
+            organization_name
+          })
+        });
+
+        const result = await response.json();
+
+        if (response.ok && result.success) {
+          showAlert('success', 'Account created successfully! Redirecting to your portal...');
+          const params = new URLSearchParams(window.location.search);
+          const redirectUrl = params.get('redirect') || 'portal.html';
+          setTimeout(() => {
+            window.location.href = redirectUrl;
+          }, 600);
+        } else {
+          showAlert('error', result.error || 'Failed to create account. Please check your information.');
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<i data-lucide="user-check" style="width: 18px; height: 18px;"></i> Create My Account';
+          if (window.lucide) lucide.createIcons();
+        }
+      } catch (err) {
+        showAlert('error', 'Network error. Please try again.');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i data-lucide="user-check" style="width: 18px; height: 18px;"></i> Create My Account';
+        if (window.lucide) lucide.createIcons();
+      }
+    }
+  </script>
+</body>
+</html>

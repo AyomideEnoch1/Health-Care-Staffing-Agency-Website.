@@ -161,3 +161,24 @@ CREATE TABLE IF NOT EXISTS `audit_logs` (
     FOREIGN KEY (`admin_id`) REFERENCES `admins` (`id`)
     ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 7. USERS TABLE
+-- Purpose: Public website accounts for Healthcare Facilities (Clients) and Healthcare Workers.
+CREATE TABLE IF NOT EXISTS `users` (
+  `id` VARCHAR(36) NOT NULL,
+  `email` VARCHAR(191) NOT NULL,
+  `password_hash` VARCHAR(255) NOT NULL,
+  `full_name` VARCHAR(120) NOT NULL,
+  `role` ENUM('client', 'healthcare_worker') NOT NULL DEFAULT 'client',
+  `organization_name` VARCHAR(150) NULL,
+  `phone` VARCHAR(30) NULL,
+  `is_active` TINYINT(1) NOT NULL DEFAULT 1,
+  `email_verified` TINYINT(1) NOT NULL DEFAULT 0,
+  `last_login` TIMESTAMP NULL DEFAULT NULL,
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_users_email` (`email`),
+  INDEX `idx_users_role` (`role`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+

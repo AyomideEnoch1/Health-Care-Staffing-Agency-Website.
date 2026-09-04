@@ -104,7 +104,37 @@ const inMemoryStore = {
   contact_inquiries: [],
   audit_logs: [],
   staff_documents: [],
-  newsletter_subscribers: []
+  newsletter_subscribers: [],
+  users: [
+    {
+      id: 'u-client-demo-1',
+      email: 'client@demo.com',
+      password_hash: '$2b$10$kai6WXzqOfAaf8cTYYZRm.N6mVU3d7ad6T8297IWdpi73eMY0lGdq', // Password123!
+      full_name: 'Dr. Sarah Jenkins',
+      role: 'client',
+      organization_name: 'Toronto Central General Hospital',
+      phone: '+1 (647) 555-0144',
+      is_active: 1,
+      email_verified: 1,
+      last_login: new Date().toISOString(),
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    },
+    {
+      id: 'u-worker-demo-2',
+      email: 'worker@demo.com',
+      password_hash: '$2b$10$kai6WXzqOfAaf8cTYYZRm.N6mVU3d7ad6T8297IWdpi73eMY0lGdq', // Password123!
+      full_name: 'David Miller, RN',
+      role: 'healthcare_worker',
+      organization_name: null,
+      phone: '+1 (647) 555-0199',
+      is_active: 1,
+      email_verified: 1,
+      last_login: new Date().toISOString(),
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    }
+  ]
 };
 
 // ── In-Memory Query Router ────────────────────────────────────────────────────
@@ -338,6 +368,50 @@ function handleInMemoryQuery(sql, params = []) {
     }
     if (normalized.startsWith('delete')) {
       inMemoryStore.newsletter_subscribers = inMemoryStore.newsletter_subscribers.filter(s => s.id !== params[0] && s.email !== params[0]);
+      return [{ affectedRows: 1 }];
+    }
+  }
+
+  // 12. USERS
+  if (normalized.includes('users') || normalized.includes('`users`')) {
+    if (normalized.startsWith('select')) {
+      if (normalized.includes('where email = ?') || normalized.includes('where lower(email) = ?')) {
+        const emailParam = (params[0] || '').toLowerCase().trim();
+        const found = inMemoryStore.users.filter(u => u.email.toLowerCase() === emailParam);
+        return [found];
+      }
+      if (normalized.includes('where id = ?')) {
+        const idParam = params[0];
+        const found = inMemoryStore.users.filter(u => u.id === idParam);
+        return [found];
+      }
+      return [inMemoryStore.users];
+    }
+    if (normalized.startsWith('insert')) {
+      const newUser = {
+        id: params[0] || crypto.randomUUID(),
+        email: (params[1] || '').toLowerCase().trim(),
+        password_hash: params[2],
+        full_name: params[3],
+        role: params[4] || 'client',
+        organization_name: params[5] || null,
+        phone: params[6] || null,
+        is_active: 1,
+        email_verified: 1,
+        last_login: new Date().toISOString(),
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+      inMemoryStore.users.push(newUser);
+      return [{ affectedRows: 1, insertId: newUser.id }];
+    }
+    if (normalized.startsWith('update')) {
+      if (normalized.includes('last_login = now()') && normalized.includes('where id = ?')) {
+        const idParam = params[params.length - 1];
+        const user = inMemoryStore.users.find(u => u.id === idParam);
+        if (user) user.last_login = new Date().toISOString();
+        return [{ affectedRows: 1 }];
+      }
       return [{ affectedRows: 1 }];
     }
   }
