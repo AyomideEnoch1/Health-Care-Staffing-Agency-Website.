@@ -105,36 +105,7 @@ const inMemoryStore = {
   audit_logs: [],
   staff_documents: [],
   newsletter_subscribers: [],
-  users: [
-    {
-      id: 'u-client-demo-1',
-      email: 'client@demo.com',
-      password_hash: '$2b$10$kai6WXzqOfAaf8cTYYZRm.N6mVU3d7ad6T8297IWdpi73eMY0lGdq', // Password123!
-      full_name: 'Dr. Sarah Jenkins',
-      role: 'client',
-      organization_name: 'Toronto Central General Hospital',
-      phone: '+1 (647) 555-0144',
-      is_active: 1,
-      email_verified: 1,
-      last_login: new Date().toISOString(),
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    },
-    {
-      id: 'u-worker-demo-2',
-      email: 'worker@demo.com',
-      password_hash: '$2b$10$kai6WXzqOfAaf8cTYYZRm.N6mVU3d7ad6T8297IWdpi73eMY0lGdq', // Password123!
-      full_name: 'David Miller, RN',
-      role: 'healthcare_worker',
-      organization_name: null,
-      phone: '+1 (647) 555-0199',
-      is_active: 1,
-      email_verified: 1,
-      last_login: new Date().toISOString(),
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    }
-  ]
+  users: []
 };
 
 // ── In-Memory Query Router ────────────────────────────────────────────────────

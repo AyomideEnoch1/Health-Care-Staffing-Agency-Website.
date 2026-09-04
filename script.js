@@ -1202,61 +1202,6 @@ window.toggleTeamContent = function(btn) {
   if (window.lucide) lucide.createIcons();
 };
 
-// ==========================================================================
-// User Authentication State Sync (Public Site Header & Mobile Navigation)
-// ==========================================================================
-async function initHeaderAuthSync() {
-  const ctaBtn = document.querySelector('.header-cta-right .nav-cta-btn');
-  const navList = document.querySelector('.nav-list');
-  if (!ctaBtn && !navList) return;
-
-  const currentPath = window.location.pathname.toLowerCase();
-  if (currentPath.endsWith('portal.html') || currentPath.endsWith('admin.html')) {
-    return;
-  }
-
-  let user = null;
-  try {
-    const res = await fetch('/api/users/me');
-    if (res.ok) {
-      const data = await res.json();
-      if (data && data.success && data.user) {
-        user = data.user;
-      }
-    }
-  } catch (_) {
-    // Offline or network error: defaults to unauthenticated
-  }
-
-  // Ensure no injected auth elements exist in the DOM / nav-list
-  document.querySelectorAll('.injected-auth-elem, .nav-auth-item').forEach(el => el.remove());
-
-  if (user) {
-    // Update header CTA button to PORTAL
-    if (ctaBtn) {
-      ctaBtn.href = 'portal.html';
-      ctaBtn.innerHTML = `<i data-lucide="user" style="width: 14px; height: 14px; vertical-align: -1px; margin-right: 4px;"></i>PORTAL`;
-      ctaBtn.title = `Access Portal as ${user.full_name}`;
-    }
-  } else {
-    // Unauthenticated: Keep/set header CTA button to SIGN IN
-    if (ctaBtn) {
-      ctaBtn.href = 'login.html';
-      ctaBtn.innerHTML = 'SIGN IN';
-      ctaBtn.title = 'Sign In to Divine Fingers Portal';
-    }
-  }
-
-  if (window.lucide) {
-    lucide.createIcons();
-  }
-}
-
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initHeaderAuthSync);
-} else {
-  initHeaderAuthSync();
-}
 
 
 

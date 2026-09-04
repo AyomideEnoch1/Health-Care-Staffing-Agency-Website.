@@ -860,22 +860,6 @@
 
     </div>
 
-    <!-- INSTANT DEMO ROLE SWITCHER (For Testing convenience) -->
-    <div class="demo-role-switcher">
-      <div class="demo-switcher-text">
-        <i data-lucide="sliders" style="width: 15px; height: 15px; display: inline-block; vertical-align: middle;"></i>
-        Testing Accounts: Easily preview both Client and Healthcare Worker portal views.
-      </div>
-      <div class="demo-switch-btns">
-        <button type="button" class="btn-switch-account" onclick="switchDemoAccount('client')">
-          🏢 View as Facility (Client)
-        </button>
-        <button type="button" class="btn-switch-account" onclick="switchDemoAccount('worker')">
-          🩺 View as Nurse / PSW (Worker)
-        </button>
-      </div>
-    </div>
-
   </main>
 
   <script>
@@ -967,7 +951,7 @@
               <i data-lucide="users" style="width: 24px; height: 24px;"></i>
             </div>
             <div class="metric-data-group">
-              <span class="metric-val">12</span>
+              <span class="metric-val">0</span>
               <span class="metric-label">Active Staff Dispatched</span>
             </div>
           </div>
@@ -976,7 +960,7 @@
               <i data-lucide="clock" style="width: 24px; height: 24px;"></i>
             </div>
             <div class="metric-data-group">
-              <span class="metric-val">14m</span>
+              <span class="metric-val">On-Demand</span>
               <span class="metric-label">Average Match SLA</span>
             </div>
           </div>
@@ -985,7 +969,7 @@
               <i data-lucide="calendar" style="width: 24px; height: 24px;"></i>
             </div>
             <div class="metric-data-group">
-              <span class="metric-val">98.6%</span>
+              <span class="metric-val">100%</span>
               <span class="metric-label">Shift Fulfillment Rate</span>
             </div>
           </div>
@@ -994,7 +978,7 @@
               <i data-lucide="shield-check" style="width: 24px; height: 24px;"></i>
             </div>
             <div class="metric-data-group">
-              <span class="metric-val">100%</span>
+              <span class="metric-val">Active</span>
               <span class="metric-label">CNO Verified Roster</span>
             </div>
           </div>
@@ -1025,7 +1009,7 @@
               <i data-lucide="check-circle" style="width: 24px; height: 24px;"></i>
             </div>
             <div class="metric-data-group">
-              <span class="metric-val">4</span>
+              <span class="metric-val">0</span>
               <span class="metric-label">Upcoming Shifts Confirmed</span>
             </div>
           </div>
@@ -1034,7 +1018,7 @@
               <i data-lucide="hourglass" style="width: 24px; height: 24px;"></i>
             </div>
             <div class="metric-data-group">
-              <span class="metric-val">38.5h</span>
+              <span class="metric-val">0h</span>
               <span class="metric-label">Logged Hours This Week</span>
             </div>
           </div>
@@ -1052,8 +1036,8 @@
               <i data-lucide="wallet" style="width: 24px; height: 24px;"></i>
             </div>
             <div class="metric-data-group">
-              <span class="metric-val">$52.00</span>
-              <span class="metric-label">Avg. Hourly Rate</span>
+              <span class="metric-val">Active</span>
+              <span class="metric-label">Dispatch Standing</span>
             </div>
           </div>
         `;
@@ -1080,16 +1064,12 @@
           requests = Array.isArray(data) ? data : (data.requests || []);
         }
 
-        // Fallback demo requests if empty
         if (!requests || requests.length === 0) {
-          requests = [
-            { id: 'REQ-9102', role_requested: 'RN', shift_type: 'Day Shift (07:00 - 15:00)', urgency_level: 'routine', status: 'confirmed', created_at: new Date().toISOString() },
-            { id: 'REQ-9088', role_requested: 'PSW', shift_type: 'Night Shift (23:00 - 07:00)', urgency_level: 'urgent', status: 'dispatched', created_at: new Date(Date.now() - 86400000).toISOString() },
-            { id: 'REQ-9045', role_requested: 'RPN', shift_type: 'Evening Shift (15:00 - 23:00)', urgency_level: 'routine', status: 'pending', created_at: new Date(Date.now() - 172800000).toISOString() }
-          ];
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #64748B; padding: 2.5rem 1rem;">No active staffing requests found.<br><a href="clients.html" style="color: #0284C7; font-weight: 700; display: inline-block; margin-top: 0.6rem;">+ Submit a New Staffing Request</a></td></tr>';
+          return;
         }
 
-        tbody.innerHTML = requests.slice(0, 6).map(req => {
+        tbody.innerHTML = requests.map(req => {
           const dateStr = req.created_at ? new Date(req.created_at).toLocaleDateString('en-CA', { month: 'short', day: 'numeric' }) : 'Today';
           const status = req.status || 'pending';
           const urgency = req.urgency_level || 'routine';
@@ -1107,6 +1087,7 @@
 
       } catch (e) {
         console.error('Failed to load requests:', e);
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #64748B; padding: 2rem;">No active staffing requests found.</td></tr>';
       }
     }
 
@@ -1126,12 +1107,9 @@
         } catch (_) {}
 
         if (!shifts || shifts.length === 0) {
-          shifts = [
-            { id: 'S-101', facility: 'Scarborough Health Network - General Hospital', role: 'Registered Nurse (RN) - Med/Surg', time: 'Tomorrow • 07:00 - 15:30', rate: '$54.00/hr', urgency: 'Urgent Surge' },
-            { id: 'S-102', facility: 'Toronto Rehabilitation Institute', role: 'Personal Support Worker (PSW)', time: 'Fri, Sep 5 • 15:00 - 23:00', rate: '$28.50/hr', urgency: 'Routine' },
-            { id: 'S-103', facility: 'North York Senior Care Community', role: 'Registered Practical Nurse (RPN)', time: 'Sat, Sep 6 • 19:00 - 07:00', rate: '$42.00/hr', urgency: 'Immediate' },
-            { id: 'S-104', facility: 'Michael Garron Hospital - Acute Care', role: 'Registered Nurse (RN) - ICU', time: 'Sun, Sep 7 • 07:00 - 19:00', rate: '$62.00/hr', urgency: 'Priority Surge' }
-          ];
+          container.innerHTML = '<div style="text-align: center; color: #64748B; padding: 2.5rem 1rem; background: #F8FAFC; border-radius: 10px; border: 1.5px dashed #CBD5E1;"><i data-lucide="calendar" style="width: 28px; height: 28px; color: #94A3B8; margin-bottom: 0.5rem; display: block; margin: 0 auto 0.5rem;"></i>No open shifts currently available. New shifts posted by hospitals and LTC facilities will appear here in real-time.</div>';
+          if (window.lucide) lucide.createIcons();
+          return;
         }
 
         container.innerHTML = shifts.map(shift => {
@@ -1162,6 +1140,7 @@
 
       } catch (e) {
         console.error('Failed to load shifts:', e);
+        container.innerHTML = '<div style="text-align: center; color: #64748B; padding: 2rem;">No open shifts currently available.</div>';
       }
     }
 
@@ -1172,23 +1151,6 @@
       btn.disabled = true;
       if (window.lucide) lucide.createIcons();
       alert(`Shift #${shiftId} has been successfully requested! The Divine Fingers Clinical Dispatch Coordinator will confirm placement within 15 minutes.`);
-    }
-
-    // Quick switch demo account
-    async function switchDemoAccount(role) {
-      const email = role === 'client' ? 'client@demo.com' : 'worker@demo.com';
-      try {
-        const res = await fetch('/api/users/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password: 'Password123!' })
-        });
-        if (res.ok) {
-          window.location.reload();
-        }
-      } catch (e) {
-        console.error('Error switching demo account:', e);
-      }
     }
 
     // Handle logout

@@ -580,23 +580,6 @@
               <i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i> Sign In to Portal
             </button>
           </form>
-
-          <!-- 1-Click Instant Demo Credentials -->
-          <div class="demo-login-box">
-            <div class="demo-login-label">
-              <i data-lucide="zap" style="width: 13px; height: 13px; color: #1BAECF;"></i> Instant Demo Access
-            </div>
-            <div class="demo-buttons-row">
-              <button type="button" class="btn-demo-pill client-demo" onclick="fillDemoAccount('client')">
-                <span>🏢 Facility / Client Demo</span>
-                <span class="subtext">client@demo.com</span>
-              </button>
-              <button type="button" class="btn-demo-pill worker-demo" onclick="fillDemoAccount('worker')">
-                <span>🩺 Healthcare Worker Demo</span>
-                <span class="subtext">worker@demo.com</span>
-              </button>
-            </div>
-          </div>
         </div>
 
         <!-- TAB 2: CREATE ACCOUNT -->
@@ -778,22 +761,10 @@
       if (window.lucide) lucide.createIcons();
     }
 
-    // Fill Demo Accounts
-    function fillDemoAccount(type) {
-      clearAlerts();
-      switchAuthTab('login');
-      const emailInput = document.getElementById('login-email');
-      const pwdInput = document.getElementById('login-password');
-
-      if (type === 'client') {
-        emailInput.value = 'client@demo.com';
-        pwdInput.value = 'Password123!';
-      } else {
-        emailInput.value = 'worker@demo.com';
-        pwdInput.value = 'Password123!';
-      }
-
-      handleLogin(new Event('submit'));
+    // Check URL parameters for tab selection (e.g. ?tab=register)
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('tab') === 'register') {
+      switchAuthTab('register');
     }
 
     function showAlert(type, message) {
