@@ -833,6 +833,52 @@
 .photo-collage-3 .collage-item-main {
   border-radius: var(--proto-radius-lg);
 }
+
+/* ── See More / See Less Toggle Feature ─────────────────────────────────── */
+.btn-see-more-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(0, 168, 150, 0.08);
+  border: 1.5px solid #00A896;
+  color: #007769;
+  padding: 0.42rem 1.1rem;
+  border-radius: 50px;
+  font-family: var(--font-heading, 'Montserrat', sans-serif);
+  font-size: 0.84rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  margin-top: 0.2rem;
+  margin-bottom: 0.85rem;
+}
+
+.btn-see-more-toggle:hover {
+  background: #00A896;
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(0, 168, 150, 0.25);
+}
+
+.btn-see-more-toggle .btn-toggle-icon {
+  width: 15px;
+  height: 15px;
+  transition: transform 0.3s ease;
+}
+
+.btn-see-more-toggle.expanded .btn-toggle-icon {
+  transform: rotate(180deg);
+}
+
+.team-text-collapse {
+  animation: fadeIn 0.35s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 /* ── Services Prototype Component Styles ─────────────────────────────────── */
 .proto-service-image-box {
   border-radius: var(--proto-radius-lg);

@@ -383,12 +383,29 @@
         <div>
           <span class="proto-section-eyebrow">OUR DEDICATED CLINICAL TEAM</span>
           <h2 class="proto-heading-lg">Connecting people to care that matters.</h2>
-          <p class="proto-body-text">
-            At Divine Fingers, our greatest asset is the dedicated team behind our mission. We bring together experienced healthcare professionals, support staff and certified Registered Nurses, Registered Practical Nurses, and Personal Support Workers/Health Care Aids from various cultural backgrounds, who share a common purpose: enhancing healthcare experiences for providers, patients, and communities.
-          </p>
-          <a href="about.html" class="proto-arrow-link">
-            Learn more about our team <i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i>
-          </a>
+          
+          <div class="team-text-wrapper">
+            <p class="proto-body-text">
+              At Divine Fingers, our greatest asset is the dedicated team behind our mission. We bring together experienced healthcare professionals, support staff and certified Registered Nurses, Registered Practical Nurses, and Personal Support Workers/Health Care Aids from various cultural backgrounds, who share a common purpose: enhancing healthcare experiences for providers, patients, and communities.
+            </p>
+            
+            <div class="team-text-collapse" id="team-text-collapse-proto" style="display: none;">
+              <p class="proto-body-text">
+                Guided by expertise and driven by compassion, we collaborate closely with healthcare organizations to address complex challenges and deliver meaningful solutions. Our approach combines deep industry insight with a thorough understanding of the evolving needs of both patients and care providers. Every member of our team is committed to supporting healthcare organizations in achieving greater efficiency, improving care delivery, and creating lasting positive impacts. Together, we are helping shape a more connected, responsive, and patient-focused future for healthcare.
+              </p>
+            </div>
+
+            <button type="button" class="btn-see-more-toggle" id="btn-team-proto-see-more" onclick="toggleTeamContent(this)" aria-expanded="false" aria-controls="team-text-collapse-proto">
+              <span class="btn-toggle-label">See More</span>
+              <i data-lucide="chevron-down" class="btn-toggle-icon"></i>
+            </button>
+          </div>
+
+          <div style="margin-top: 1rem;">
+            <a href="about.html" class="proto-arrow-link">
+              Learn more about our team <i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i>
+            </a>
+          </div>
         </div>
 
       </div>
