@@ -2209,12 +2209,13 @@ select optgroup,
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: 38px;
-  padding: 0 1.15rem;
+  height: 40px;
+  padding: 0 1.25rem;
   border-radius: var(--radius-md);
-  background: rgba(0, 168, 150, 0.1);
-  border: 1px solid rgba(0, 168, 150, 0.25);
-  color: var(--brand-turquoise);
+  background: #FFFFFF !important;
+  border: 1.5px solid #CBD5E1 !important;
+  color: #0F172A !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05) !important;
   font-family: var(--font-heading);
   font-size: 0.88rem;
   font-weight: 800;
@@ -2223,9 +2224,10 @@ select optgroup,
 }
 
 [data-theme="dark"] .scheduler-week-banner {
-  background: rgba(0, 245, 212, 0.12);
-  border-color: rgba(0, 245, 212, 0.3);
-  color: var(--brand-cyan);
+  background: rgba(0, 245, 212, 0.08) !important;
+  border: 1px solid rgba(0, 245, 212, 0.25) !important;
+  color: var(--brand-cyan) !important;
+  box-shadow: none !important;
 }
 
 .scheduler-create-btn {
@@ -2354,59 +2356,66 @@ select optgroup,
 
 /* Scheduler Shift Mini Card */
 .scheduler-shift-card {
-  background: var(--bg-card);
-  border: 1.5px solid var(--border-color);
-  border-radius: 8px;
-  padding: 0.6rem 0.7rem;
-  margin-bottom: 0.55rem;
+  background: #FFFFFF !important;
+  border: 1.5px solid #CBD5E1 !important;
+  border-radius: 10px;
+  padding: 0.85rem 0.95rem;
+  margin-bottom: 0.75rem;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
   position: relative;
+  min-height: 85px;
+  box-sizing: border-box;
 }
 
 [data-theme="dark"] .scheduler-shift-card {
-  background: rgba(255, 255, 255, 0.035);
-  border-color: rgba(255, 255, 255, 0.1);
+  background: #17243D !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
 }
 
 .scheduler-shift-card:hover {
   transform: translateY(-2px);
-  border-color: var(--brand-cyan);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.12);
+  border-color: var(--brand-cyan) !important;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
 }
 
 [data-theme="dark"] .scheduler-shift-card:hover {
-  background: rgba(255, 255, 255, 0.07);
-  border-color: rgba(255, 255, 255, 0.2);
+  background: #1E2D4A !important;
+  border-color: rgba(0, 245, 212, 0.5) !important;
   box-shadow: var(--shadow-md);
 }
 
 .scheduler-shift-card.status-in_session {
-  border-left: 3px solid var(--status-success);
+  border-left: 4px solid var(--status-success) !important;
 }
 
 .scheduler-shift-card.status-dispatched {
-  border-left: 3px solid var(--brand-cyan);
+  border-left: 4px solid #0EA5E9 !important;
 }
 
 .scheduler-shift-card.status-pending {
-  border-left: 3px solid var(--status-warning);
+  border-left: 4px solid #D97706 !important;
+}
+
+.scheduler-shift-card.status-completed {
+  border-left: 4px solid #64748B !important;
 }
 
 .scheduler-shift-top {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 4px;
-  margin-bottom: 0.4rem;
+  gap: 6px;
+  margin-bottom: 0.5rem;
 }
 
 .scheduler-micro-badge {
-  font-size: 0.65rem;
+  font-size: 0.72rem;
   font-weight: 800;
-  padding: 0.12rem 0.45rem;
-  border-radius: 4px;
+  padding: 0.2rem 0.55rem;
+  border-radius: 6px;
   letter-spacing: 0.03em;
   text-transform: uppercase;
   white-space: nowrap;
@@ -2433,28 +2442,28 @@ select optgroup,
 }
 
 .scheduler-micro-status {
-  font-size: 0.64rem;
-  font-weight: 700;
+  font-size: 0.72rem;
+  font-weight: 800;
   display: inline-flex;
   align-items: center;
-  gap: 3px;
+  gap: 4px;
   text-transform: uppercase;
 }
 
 .scheduler-micro-status.status-in_session {
-  color: #10B981;
+  color: #047857;
 }
 
 .scheduler-micro-status.status-dispatched {
-  color: #0EA5E9;
+  color: #0284C7;
 }
 
 .scheduler-micro-status.status-pending {
-  color: #F59E0B;
+  color: #B45309;
 }
 
 .scheduler-micro-status.status-completed {
-  color: #64748B;
+  color: #475569;
 }
 
 [data-theme="dark"] .scheduler-micro-status.status-in_session {
@@ -2469,42 +2478,48 @@ select optgroup,
   color: #FBBF24;
 }
 
+[data-theme="dark"] .scheduler-micro-status.status-completed {
+  color: #94A3B8;
+}
+
 .scheduler-staff-assigned {
-  font-size: 0.76rem;
-  font-weight: 700;
+  font-size: 0.86rem;
+  font-weight: 800;
   color: var(--text-primary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  margin-bottom: 0.25rem;
+  white-space: normal;
+  word-break: break-word;
+  margin-bottom: 0.4rem;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
+  line-height: 1.35;
 }
 
 .scheduler-shift-time {
-  font-size: 0.7rem;
-  color: var(--text-muted);
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--text-secondary);
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
 }
 
 .scheduler-add-shift-btn {
   width: 100%;
-  padding: 0.4rem;
-  border: 1px dashed var(--border-color);
-  border-radius: 6px;
+  padding: 0.5rem 0.6rem;
+  border: 1.5px dashed var(--border-color);
+  border-radius: 8px;
   background: transparent;
   color: var(--text-muted);
-  font-size: 0.72rem;
-  font-weight: 600;
+  font-size: 0.76rem;
+  font-weight: 700;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 5px;
   transition: all 0.2s ease;
+  margin-top: 0.35rem;
 }
 
 .scheduler-add-shift-btn:hover {
@@ -2625,24 +2640,42 @@ select optgroup,
 }
 
 .detail-item-box {
-  background: var(--bg-subtle);
-  padding: 0.85rem;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border-color);
+  background: #FFFFFF !important;
+  padding: 1.15rem 1.25rem !important;
+  border-radius: 10px !important;
+  border: 1.5px solid #E2E8F0 !important;
+  margin-bottom: 0.85rem !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.35rem !important;
+  transition: all 0.2s ease;
 }
 
-.detail-label {
-  font-size: 0.7rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  margin-bottom: 0.2rem;
+[data-theme="dark"] .detail-item-box {
+  background: rgba(255, 255, 255, 0.035) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2) !important;
 }
 
-.detail-value {
-  font-size: 0.9rem;
-  font-weight: 700;
-  color: var(--text-primary);
+.detail-label,
+.detail-item-box label {
+  font-size: 0.72rem !important;
+  font-weight: 800 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.06em !important;
+  color: var(--text-muted) !important;
+  margin-bottom: 0.25rem !important;
+  display: block !important;
+}
+
+.detail-value,
+.detail-item-box span,
+.detail-item-box strong {
+  font-size: 0.95rem !important;
+  font-weight: 700 !important;
+  color: var(--text-primary) !important;
+  line-height: 1.4 !important;
 }
 
 /* ==========================================================================

@@ -2462,17 +2462,17 @@
                       </span>
                     </div>
                     <div class="scheduler-staff-assigned">
-                      <i data-lucide="user" style="width: 12px; height: 12px; flex-shrink: 0; color: ${s.assigned_staff_name ? 'var(--brand-cyan)' : '#F59E0B'};"></i>
-                      <span>${s.assigned_staff_name ? s.assigned_staff_name : '<span style="color: #F59E0B;">Unassigned</span>'}</span>
+                      <i data-lucide="user" style="width: 13px; height: 13px; flex-shrink: 0; color: ${s.assigned_staff_name ? 'var(--brand-cyan)' : '#D97706'};"></i>
+                      <span>${s.assigned_staff_name ? s.assigned_staff_name : '<span style="color: #D97706; font-weight: 800;">Unassigned</span>'}</span>
                     </div>
                     <div class="scheduler-shift-time">
-                      <i data-lucide="clock" style="width: 11px; height: 11px; flex-shrink: 0;"></i>
+                      <i data-lucide="clock" style="width: 12px; height: 12px; flex-shrink: 0;"></i>
                       <span>${s.shift_type || 'Day Shift'}</span>
                     </div>
                   </div>
                 `).join('')}
                 <button type="button" class="scheduler-add-shift-btn" onclick="window.openNewRequestModal('${fac.facility.replace(/'/g, "\\'")}', '${fac.unit.replace(/'/g, "\\'")}', '${d.isoDate}')" title="Add another shift on ${d.monthDay}">
-                  <i data-lucide="plus" style="width: 12px; height: 12px;"></i> Add
+                  <i data-lucide="plus" style="width: 13px; height: 13px;"></i> Add
                 </button>
               </td>`;
           }).join('')}
@@ -2919,6 +2919,10 @@
 
     if (drawerHeadline) drawerHeadline.textContent = `Staff Profile: ${staff.name}`;
 
+    // Ensure Drawer Tab Switcher is visible for Staff Profiles
+    const drawerTabsNav = document.querySelector('.drawer-tabs-nav');
+    if (drawerTabsNav) drawerTabsNav.style.display = 'flex';
+
     // Setup Drawer Tab Switcher
     const drawerTabs = document.querySelectorAll('.drawer-tab-btn');
     drawerTabs.forEach(tab => {
@@ -3239,6 +3243,10 @@
     if (!req || !drawerBackdrop) return;
     if (drawerHeadline) drawerHeadline.textContent = `Shift Request: ${req.request_code}`;
 
+    // Hide staff tabs when opening shift request drawer
+    const drawerTabsNav = document.querySelector('.drawer-tabs-nav');
+    if (drawerTabsNav) drawerTabsNav.style.display = 'none';
+
     const staffOptions = LiveStore.staff.map(s => {
       const activeShift = LiveStore.requests.find(r => r.assigned_staff_id === s.id && r.status === 'dispatched' && r.id !== req.id);
       const conflictTag = activeShift ? ` [⚠️ ON SHIFT: ${activeShift.request_code}]` : ' [Available]';
@@ -3249,62 +3257,70 @@
     const clockOutDisplay = req.clock_out_time ? new Date(req.clock_out_time).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : '—';
 
     drawerContent.innerHTML = `
-      <div class="detail-item-box"><label>Healthcare Facility</label><span>${req.facility_name}</span></div>
-      <div class="detail-item-box"><label>Department / Unit</label><span>${req.unit_department || 'General Care'}</span></div>
-      <div class="detail-item-box"><label>Contact Person</label><span>${req.contact_name} &bull; ${req.contact_email}</span></div>
-      <div class="detail-item-box"><label>Direct Phone</label><span>${req.contact_phone}</span></div>
-      <div class="detail-item-box"><label>Role Requested</label><span>${req.role_requested}</span></div>
-      <div class="detail-item-box"><label>Shift Duration</label><span>${req.shift_type}</span></div>
-      <div class="detail-item-box"><label>Urgency Level</label><span class="status-pill ${req.urgency_level === 'emergency_surge' ? 'urgent' : 'verified'}">${req.urgency_level.toUpperCase()}</span></div>
-      ${req.special_instructions ? `<div class="detail-item-box"><label>Special Instructions</label><span>${req.special_instructions}</span></div>` : ''}
+      <div style="display: flex; flex-direction: column; gap: 0.85rem; margin-bottom: 1.5rem;">
+        <div class="detail-item-box"><label>Healthcare Facility</label><span>${req.facility_name}</span></div>
+        <div class="detail-item-box"><label>Department / Unit</label><span>${req.unit_department || 'General Care'}</span></div>
+        <div class="detail-item-box"><label>Contact Person</label><span>${req.contact_name} &bull; ${req.contact_email}</span></div>
+        <div class="detail-item-box"><label>Direct Phone</label><span>${req.contact_phone}</span></div>
+        <div class="detail-item-box"><label>Role Requested</label><span>${req.role_requested}</span></div>
+        <div class="detail-item-box"><label>Shift Duration</label><span>${req.shift_type}</span></div>
+        <div class="detail-item-box"><label>Urgency Level</label><span class="status-pill ${req.urgency_level === 'emergency_surge' ? 'urgent' : 'verified'}" style="width: fit-content;">${req.urgency_level.toUpperCase()}</span></div>
+        ${req.special_instructions ? `<div class="detail-item-box"><label>Special Instructions</label><span>${req.special_instructions}</span></div>` : ''}
+      </div>
       
-      <div style="background: var(--bg-surface); padding: 0.85rem; border-radius: 8px; margin: 1rem 0; border: 1px solid var(--border-subtle);">
-        <div style="font-size: 0.78rem; font-weight: 800; color: var(--brand-cyan); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.5px;">
-          ⏱️ Shift Tracking &amp; Clock Timestamps
+      <div style="background: var(--bg-surface); padding: 1.25rem 1.35rem; border-radius: 10px; margin: 1.5rem 0; border: 1.5px solid var(--border-subtle); box-shadow: 0 2px 6px rgba(0,0,0,0.03);">
+        <div style="font-size: 0.82rem; font-weight: 800; color: var(--brand-cyan); margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 6px;">
+          <i data-lucide="clock" style="width: 14px; height: 14px;"></i> Shift Tracking &amp; Clock Timestamps
         </div>
-        <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 0.35rem;">
-          <span style="color: var(--text-muted);">Clock-In:</span>
-          <strong>${clockInDisplay}</strong>
+        <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.5rem; padding-bottom: 0.4rem; border-bottom: 1px dashed var(--border-subtle);">
+          <span style="color: var(--text-muted); font-weight: 600;">Clock-In:</span>
+          <strong style="color: var(--text-primary); font-weight: 700;">${clockInDisplay}</strong>
         </div>
-        <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 0.65rem;">
-          <span style="color: var(--text-muted);">Clock-Out:</span>
-          <strong>${clockOutDisplay}</strong>
+        <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 1rem;">
+          <span style="color: var(--text-muted); font-weight: 600;">Clock-Out:</span>
+          <strong style="color: var(--text-primary); font-weight: 700;">${clockOutDisplay}</strong>
         </div>
-        <div style="display: flex; gap: 0.5rem;">
-          <button type="button" class="btn-secondary-action" style="flex: 1; font-size: 0.72rem; padding: 0.25rem 0.4rem; justify-content: center;" onclick="window.triggerCaregiverClock('${req.id}', 'clock-in')">
-            ▶ Clock In
+        <div style="display: flex; gap: 0.75rem;">
+          <button type="button" class="btn-secondary-action" style="flex: 1; font-size: 0.8rem; font-weight: 700; height: 38px; justify-content: center;" onclick="window.triggerCaregiverClock('${req.id}', 'clock-in')">
+            <i data-lucide="play" style="width: 13px; height: 13px;"></i> Clock In
           </button>
-          <button type="button" class="btn-secondary-action" style="flex: 1; font-size: 0.72rem; padding: 0.25rem 0.4rem; justify-content: center;" onclick="window.triggerCaregiverClock('${req.id}', 'clock-out')">
-            ■ Clock Out
+          <button type="button" class="btn-secondary-action" style="flex: 1; font-size: 0.8rem; font-weight: 700; height: 38px; justify-content: center;" onclick="window.triggerCaregiverClock('${req.id}', 'clock-out')">
+            <i data-lucide="square" style="width: 13px; height: 13px;"></i> Clock Out
           </button>
         </div>
       </div>
 
-      <hr style="margin:1rem 0;border-color:var(--border-color);">
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem;">
-        <div>
-          <label style="font-weight:700;font-size:.78rem;display:block;margin-bottom:.3rem;text-transform:uppercase;color:var(--text-muted);">Shift Date</label>
-          <input type="date" id="drawer-shift-date" class="filter-select" style="width: 100%; padding: 0.55rem;" value="${(req.start_date || req.shift_date || req.created_at || '').slice(0, 10)}">
+      <div style="margin: 1.75rem 0 1.25rem 0; padding-top: 1.25rem; border-top: 1.5px solid var(--border-color);">
+        <div style="font-size: 0.82rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 1rem;">
+          Dispatch Configuration
         </div>
-        <div>
-          <label style="font-weight:700;font-size:.78rem;display:block;margin-bottom:.3rem;text-transform:uppercase;color:var(--text-muted);">Change Status</label>
-          <select id="drawer-status-select" class="filter-select" style="width:100%;padding:0.55rem;">
-            <option value="pending"    ${req.status==='pending'    ?'selected':''}>Pending</option>
-            <option value="dispatched" ${req.status==='dispatched' ?'selected':''}>Dispatched</option>
-            <option value="in_session" ${req.status==='in_session' ?'selected':''}>In Session</option>
-            <option value="completed"  ${req.status==='completed'  ?'selected':''}>Completed</option>
-            <option value="cancelled"  ${req.status==='cancelled'  ?'selected':''}>Cancelled</option>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.25rem;">
+          <div>
+            <label style="font-weight: 700; font-size: 0.78rem; display: block; margin-bottom: 0.4rem; text-transform: uppercase; color: var(--text-muted);">Shift Date</label>
+            <input type="date" id="drawer-shift-date" class="filter-select" style="width: 100%; height: 44px; padding: 0.55rem 0.75rem; font-weight: 600;" value="${(req.start_date || req.shift_date || req.created_at || '').slice(0, 10)}">
+          </div>
+          <div>
+            <label style="font-weight: 700; font-size: 0.78rem; display: block; margin-bottom: 0.4rem; text-transform: uppercase; color: var(--text-muted);">Change Status</label>
+            <select id="drawer-status-select" class="filter-select" style="width: 100%; height: 44px; padding: 0.55rem 0.75rem; font-weight: 600;">
+              <option value="pending"    ${req.status==='pending'    ?'selected':''}>Pending</option>
+              <option value="dispatched" ${req.status==='dispatched' ?'selected':''}>Dispatched</option>
+              <option value="in_session" ${req.status==='in_session' ?'selected':''}>In Session</option>
+              <option value="completed"  ${req.status==='completed'  ?'selected':''}>Completed</option>
+              <option value="cancelled"  ${req.status==='cancelled'  ?'selected':''}>Cancelled</option>
+            </select>
+          </div>
+        </div>
+        <div style="margin-bottom: 1.5rem;">
+          <label style="font-weight: 700; font-size: 0.78rem; display: block; margin-bottom: 0.4rem; text-transform: uppercase; color: var(--text-muted);">Assign Healthcare Staff</label>
+          <select id="drawer-staff-select" class="filter-select" style="width: 100%; height: 44px; padding: 0.55rem 0.75rem; font-weight: 600;">
+            <option value="">— Unassigned (Pending) —</option>
+            ${staffOptions}
           </select>
         </div>
-      </div>
-      <label style="font-weight:700;font-size:.82rem;display:block;margin-bottom:.4rem;text-transform:uppercase;color:var(--text-muted);">Assign Healthcare Staff</label>
-      <select id="drawer-staff-select" class="filter-select" style="margin-bottom:1.5rem;width:100%;padding:0.6rem;">
-        <option value="">— Unassigned (Pending) —</option>
-        ${staffOptions}
-      </select>
-      <button class="btn-primary-action" onclick="window.saveRequestUpdate('${req.id}')" style="width:100%;justify-content:center;">
-        <i data-lucide="check"></i> Save Shift Dispatch Changes
-      </button>`;
+        <button class="btn-primary-action" onclick="window.saveRequestUpdate('${req.id}')" style="width: 100%; height: 48px; font-size: 0.9rem; font-weight: 800; justify-content: center; margin-bottom: 2rem;">
+          <i data-lucide="check" style="width: 16px; height: 16px;"></i> Save Shift Dispatch Changes
+        </button>
+      </div>`;
 
     drawerBackdrop.classList.add('open');
     if (window.lucide) lucide.createIcons();
