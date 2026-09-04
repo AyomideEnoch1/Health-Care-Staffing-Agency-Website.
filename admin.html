@@ -12,7 +12,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
 
   <!-- Core Dashboard Design System -->
-  <link rel="stylesheet" href="admin.css?v=5.2.0">
+  <link rel="stylesheet" href="admin.css?v=5.7.4">
 
   <!-- Chart.js CDN for Gradient Visualizations -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -650,9 +650,8 @@
           </div>
         </div>
 
-        <!-- TAB 5: SHIFT & DISPATCH SCHEDULER -->
         <div class="admin-view-tab" id="scheduler-tab">
-          <div class="table-card">
+          <div class="table-card" id="scheduler-card" style="padding: 1.75rem;">
             
             <!-- Modern Responsive Scheduler Date Navigator Toolbar -->
             <div class="scheduler-top-toolbar">
@@ -710,13 +709,13 @@
                 <option value="">All Statuses</option>
                 <option value="pending">Pending Dispatch</option>
                 <option value="dispatched">Dispatched</option>
-                <option value="in_session">🟢 In Session</option>
+                <option value="in_session">In Session</option>
                 <option value="completed">Completed</option>
               </select>
             </div>
 
             <div class="table-responsive-container" style="margin-top: 1rem;">
-              <table class="data-table" style="min-width: 850px;">
+              <table class="scheduler-table">
                 <thead id="schedule-calendar-head">
                   <tr>
                     <th>Facility &amp; Unit</th>
@@ -772,90 +771,105 @@
 
         <!-- TAB 8: REPORTS & ANALYTICS EXPORT -->
         <div class="admin-view-tab" id="reports-tab">
-          <!-- Report Selector Cards -->
-          <div class="table-card" style="padding: 1.75rem; margin-bottom: 1.5rem;">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem;">
+          <!-- Report Selector Cards (Spacious Modern Grid) -->
+          <div class="table-card" id="reports-hub-card" style="padding: 1.75rem; margin-bottom: 1.75rem;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem;">
               <div>
-                <h2 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 0.35rem;">Agency Analytics &amp; Operational Reports</h2>
-                <p style="color: var(--text-muted); font-size: 0.85rem;">
-                  View live standardized Canadian healthcare staffing reports directly on-screen or download CSV exports.
+                <h2 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.5rem;">
+                  <i data-lucide="bar-chart-3" style="width: 20px; height: 20px; color: var(--brand-cyan);"></i>
+                  <span>Agency Analytics &amp; Operational Reports</span>
+                </h2>
+                <p style="color: var(--text-muted); font-size: 0.85rem; line-height: 1.45; margin: 0;">
+                  Generate and inspect live standardized Ontario healthcare staffing reports on-screen or download compliance-ready CSV spreadsheets.
                 </p>
               </div>
             </div>
 
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 1.25rem;">
+            <div class="report-selector-grid">
               <!-- Report Card 1: Shift Fill Rate -->
-              <div class="detail-item-box" style="display: flex; flex-direction: column; justify-content: space-between;">
+              <div class="report-meta-card">
                 <div>
-                  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.4rem;">
-                    <h4 style="font-size: 0.95rem; font-weight: 700; margin: 0;">Shift Fill Rate Audit</h4>
+                  <div class="report-card-top">
+                    <div class="report-icon-box icon-shifts">
+                      <i data-lucide="calendar-check" style="width: 22px; height: 22px;"></i>
+                    </div>
                     <span class="status-pill verified" style="font-size: 0.68rem;">Live Matrix</span>
                   </div>
-                  <p style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.4;">Breakdown of shifts requested, assigned, and completed across Ontario healthcare facilities.</p>
+                  <h4 class="report-card-title">Shift Fill Rate Audit</h4>
+                  <p class="report-card-desc">Comprehensive breakdown of shifts requested, dispatched, and completed across Ontario acute care, LTC, and retirement facilities.</p>
                 </div>
-                <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
-                  <button type="button" class="btn-primary-action" style="flex: 1; font-size: 0.78rem; padding: 0.4rem 0.6rem;" onclick="window.switchReportViewer('shifts')">
-                    <i data-lucide="eye" style="width: 13px; height: 13px;"></i> View Report
+                <div class="report-card-actions">
+                  <button type="button" class="btn-primary-action" onclick="window.switchReportViewer('shifts')">
+                    <i data-lucide="eye" style="width: 14px; height: 14px;"></i> View Report
                   </button>
-                  <button type="button" class="btn-secondary-action" style="font-size: 0.78rem; padding: 0.4rem 0.6rem;" onclick="window.exportActiveReportCSV('shifts')">
-                    <i data-lucide="download" style="width: 13px; height: 13px;"></i> CSV
+                  <button type="button" class="btn-secondary-action" onclick="window.exportActiveReportCSV('shifts')" title="Download CSV">
+                    <i data-lucide="download" style="width: 14px; height: 14px;"></i> CSV
                   </button>
                 </div>
               </div>
 
               <!-- Report Card 2: Caregiver Roster -->
-              <div class="detail-item-box" style="display: flex; flex-direction: column; justify-content: space-between;">
+              <div class="report-meta-card">
                 <div>
-                  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.4rem;">
-                    <h4 style="font-size: 0.95rem; font-weight: 700; margin: 0;">Caregiver &amp; CNO Registry</h4>
+                  <div class="report-card-top">
+                    <div class="report-icon-box icon-roster">
+                      <i data-lucide="users" style="width: 22px; height: 22px;"></i>
+                    </div>
                     <span class="status-pill verified" style="font-size: 0.68rem;">Live Roster</span>
                   </div>
-                  <p style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.4;">Current roster with license status, assigned region, rating, and contact details.</p>
+                  <h4 class="report-card-title">Caregiver &amp; CNO Registry</h4>
+                  <p class="report-card-desc">Active registry covering professional licensure status, assigned GTA region, performance ratings, and verified contact records.</p>
                 </div>
-                <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
-                  <button type="button" class="btn-primary-action" style="flex: 1; font-size: 0.78rem; padding: 0.4rem 0.6rem;" onclick="window.switchReportViewer('roster')">
-                    <i data-lucide="eye" style="width: 13px; height: 13px;"></i> View Report
+                <div class="report-card-actions">
+                  <button type="button" class="btn-primary-action" onclick="window.switchReportViewer('roster')">
+                    <i data-lucide="eye" style="width: 14px; height: 14px;"></i> View Report
                   </button>
-                  <button type="button" class="btn-secondary-action" style="font-size: 0.78rem; padding: 0.4rem 0.6rem;" onclick="window.exportActiveReportCSV('roster')">
-                    <i data-lucide="download" style="width: 13px; height: 13px;"></i> CSV
+                  <button type="button" class="btn-secondary-action" onclick="window.exportActiveReportCSV('roster')" title="Download CSV">
+                    <i data-lucide="download" style="width: 14px; height: 14px;"></i> CSV
                   </button>
                 </div>
               </div>
 
               <!-- Report Card 3: ATS Candidate Pipeline -->
-              <div class="detail-item-box" style="display: flex; flex-direction: column; justify-content: space-between;">
+              <div class="report-meta-card">
                 <div>
-                  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.4rem;">
-                    <h4 style="font-size: 0.95rem; font-weight: 700; margin: 0;">ATS Candidate Pipeline</h4>
+                  <div class="report-card-top">
+                    <div class="report-icon-box icon-ats">
+                      <i data-lucide="briefcase" style="width: 22px; height: 22px;"></i>
+                    </div>
                     <span class="status-pill verified" style="font-size: 0.68rem;">Live ATS</span>
                   </div>
-                  <p style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.4;">All candidate applications, onboarding stage, role applied, and contact numbers.</p>
+                  <h4 class="report-card-title">ATS Candidate Pipeline</h4>
+                  <p class="report-card-desc">Complete candidate tracking report including pipeline stages, applied healthcare roles, resume attachments, and interview statuses.</p>
                 </div>
-                <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
-                  <button type="button" class="btn-primary-action" style="flex: 1; font-size: 0.78rem; padding: 0.4rem 0.6rem;" onclick="window.switchReportViewer('applicants')">
-                    <i data-lucide="eye" style="width: 13px; height: 13px;"></i> View Report
+                <div class="report-card-actions">
+                  <button type="button" class="btn-primary-action" onclick="window.switchReportViewer('applicants')">
+                    <i data-lucide="eye" style="width: 14px; height: 14px;"></i> View Report
                   </button>
-                  <button type="button" class="btn-secondary-action" style="font-size: 0.78rem; padding: 0.4rem 0.6rem;" onclick="window.exportActiveReportCSV('applicants')">
-                    <i data-lucide="download" style="width: 13px; height: 13px;"></i> CSV
+                  <button type="button" class="btn-secondary-action" onclick="window.exportActiveReportCSV('applicants')" title="Download CSV">
+                    <i data-lucide="download" style="width: 14px; height: 14px;"></i> CSV
                   </button>
                 </div>
               </div>
 
               <!-- Report Card 4: Newsletter Subscribers -->
-              <div class="detail-item-box" style="display: flex; flex-direction: column; justify-content: space-between;">
+              <div class="report-meta-card">
                 <div>
-                  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.4rem;">
-                    <h4 style="font-size: 0.95rem; font-weight: 700; margin: 0;">Newsletter Subscribers</h4>
+                  <div class="report-card-top">
+                    <div class="report-icon-box icon-leads">
+                      <i data-lucide="mail" style="width: 22px; height: 22px;"></i>
+                    </div>
                     <span class="status-pill verified" style="font-size: 0.68rem;">Live Leads</span>
                   </div>
-                  <p style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.4;">Active email subscribers captured from website strip and clinical alert forms.</p>
+                  <h4 class="report-card-title">Newsletter Subscribers</h4>
+                  <p class="report-card-desc">Verified email subscribers captured from website quick-alert strips, clinical update forms, and job seeker notification feeds.</p>
                 </div>
-                <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
-                  <button type="button" class="btn-primary-action" style="flex: 1; font-size: 0.78rem; padding: 0.4rem 0.6rem;" onclick="window.switchReportViewer('subscribers')">
-                    <i data-lucide="eye" style="width: 13px; height: 13px;"></i> View Report
+                <div class="report-card-actions">
+                  <button type="button" class="btn-primary-action" onclick="window.switchReportViewer('subscribers')">
+                    <i data-lucide="eye" style="width: 14px; height: 14px;"></i> View Report
                   </button>
-                  <button type="button" class="btn-secondary-action" style="font-size: 0.78rem; padding: 0.4rem 0.6rem;" onclick="window.exportActiveReportCSV('subscribers')">
-                    <i data-lucide="download" style="width: 13px; height: 13px;"></i> CSV
+                  <button type="button" class="btn-secondary-action" onclick="window.exportActiveReportCSV('subscribers')" title="Download CSV">
+                    <i data-lucide="download" style="width: 14px; height: 14px;"></i> CSV
                   </button>
                 </div>
               </div>
@@ -888,23 +902,23 @@
               </div>
             </div>
 
-            <!-- Report Filter & Search Toolbar -->
-            <div class="table-filter-group" style="margin-bottom: 1.25rem;">
+            <!-- Report Filter & Search Toolbar with Clean Segmented Switcher -->
+            <div class="table-filter-group" style="margin-bottom: 1.25rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.85rem;">
               <input type="text" class="search-input filter-search-box" id="report-viewer-search-input" placeholder="Search within this live report...">
               
-              <!-- Quick Switcher Pills -->
-              <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-left: auto;">
-                <button type="button" class="status-pill verified" id="btn-report-tab-shifts" onclick="window.switchReportViewer('shifts')" style="cursor: pointer; padding: 0.4rem 0.8rem; font-size: 0.78rem;">
-                  📊 Shift Fill Rate
+              <!-- Quick Switcher Segmented Control -->
+              <div class="report-segmented-nav">
+                <button type="button" class="report-tab-btn active" id="btn-report-tab-shifts" onclick="window.switchReportViewer('shifts')">
+                  <i data-lucide="calendar" style="width: 13px; height: 13px;"></i> Shift Fill Rate
                 </button>
-                <button type="button" class="status-pill off-duty" id="btn-report-tab-roster" onclick="window.switchReportViewer('roster')" style="cursor: pointer; padding: 0.4rem 0.8rem; font-size: 0.78rem;">
-                  👩‍⚕️ Caregiver Roster
+                <button type="button" class="report-tab-btn" id="btn-report-tab-roster" onclick="window.switchReportViewer('roster')">
+                  <i data-lucide="users" style="width: 13px; height: 13px;"></i> Caregiver Roster
                 </button>
-                <button type="button" class="status-pill off-duty" id="btn-report-tab-applicants" onclick="window.switchReportViewer('applicants')" style="cursor: pointer; padding: 0.4rem 0.8rem; font-size: 0.78rem;">
-                  📑 ATS Candidates
+                <button type="button" class="report-tab-btn" id="btn-report-tab-applicants" onclick="window.switchReportViewer('applicants')">
+                  <i data-lucide="file-text" style="width: 13px; height: 13px;"></i> ATS Pipeline
                 </button>
-                <button type="button" class="status-pill off-duty" id="btn-report-tab-subscribers" onclick="window.switchReportViewer('subscribers')" style="cursor: pointer; padding: 0.4rem 0.8rem; font-size: 0.78rem;">
-                  📧 Subscribers
+                <button type="button" class="report-tab-btn" id="btn-report-tab-subscribers" onclick="window.switchReportViewer('subscribers')">
+                  <i data-lucide="mail" style="width: 13px; height: 13px;"></i> Subscribers
                 </button>
               </div>
             </div>
@@ -949,12 +963,12 @@
                 </div>
                 <div>
                   <label style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.35rem;">ASSIGNED ROLE *</label>
-                  <select id="dedicated-new-admin-role" required style="width: 100%; padding: 0.6rem 0.8rem; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-surface); color: var(--text-primary); font-size: 0.85rem;">
-                    <option value="care-coordinator">🩺 Care Coordinator (Read & Shift View)</option>
-                    <option value="dispatch">⚡ Dispatch Officer (Roster & Shifts)</option>
-                    <option value="recruiter">🎯 Recruitment Specialist / HR (Job ATS & Roster)</option>
-                    <option value="auditor">📋 Compliance Auditor (Audit Trail & Reports)</option>
-                    <option value="super-admin">👑 Super Admin (Full RBAC Privileges)</option>
+                  <select id="dedicated-new-admin-role" class="filter-select" required style="width: 100%; height: 38px;">
+                    <option value="care-coordinator">Care Coordinator (Read & Shift View)</option>
+                    <option value="dispatch">Dispatch Officer (Roster & Shifts)</option>
+                    <option value="recruiter">Recruitment Specialist / HR (Job ATS & Roster)</option>
+                    <option value="auditor">Compliance Auditor (Audit Trail & Reports)</option>
+                    <option value="super-admin">Super Admin (Full RBAC Privileges)</option>
                   </select>
                 </div>
                 <div>
@@ -994,9 +1008,9 @@
         <div class="admin-view-tab" id="settings-tab">
           
           <!-- 1. Operator Self-Security & Two-Factor Authentication -->
-          <div class="table-card" style="padding: 1.5rem; margin-bottom: 1.5rem; background: var(--bg-surface-elevated); border: 1px solid var(--border-subtle); border-radius: 8px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-              <div>
+          <div class="table-card mfa-banner-card" style="padding: 1.5rem; margin-bottom: 1.5rem; background: var(--bg-surface-elevated); border: 1px solid var(--border-subtle); border-radius: 8px;">
+            <div class="mfa-banner-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+              <div class="mfa-banner-text">
                 <h2 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.5rem;">
                   <i data-lucide="shield-check" style="width: 20px; height: 20px; color: var(--brand-turquoise);"></i>
                   Two-Factor Authentication (TOTP 2FA)
@@ -1005,9 +1019,9 @@
                   Protect your operator session with Google Authenticator or Microsoft Authenticator (RFC 6238).
                 </p>
               </div>
-              <div style="display: flex; align-items: center; gap: 1rem;">
+              <div class="mfa-banner-actions" style="display: flex; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
                 <div id="mfa-current-status-badge">
-                  <span class="status-pill" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b;">⚠️ 2FA Not Enrolled</span>
+                  <span class="status-pill expiring"><i data-lucide="shield-alert" style="width:12px;height:12px;vertical-align:middle;margin-right:3px;"></i> 2FA Not Enrolled</span>
                 </div>
                 <button type="button" class="btn-primary-action" id="btn-configure-mfa" style="padding: 0.5rem 1rem; font-size: 0.85rem;" onclick="window.openMfaSetupModal()">
                   <i data-lucide="qr-code" style="width: 15px; height: 15px;"></i> Configure 2FA
@@ -1044,9 +1058,11 @@
                 </div>
                 <div>
                   <label style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.35rem;">ASSIGNED ROLE *</label>
-                  <select id="new-admin-role" required style="width: 100%; padding: 0.6rem 0.8rem; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-surface); color: var(--text-primary); font-size: 0.85rem;">
+                  <select id="new-admin-role" class="filter-select" required style="width: 100%; height: 38px;">
                     <option value="care-coordinator">Care Coordinator (Read & Shift View)</option>
                     <option value="dispatch">Dispatch Officer (Roster & Shifts)</option>
+                    <option value="recruiter">Recruitment Specialist / HR (Job ATS & Roster)</option>
+                    <option value="auditor">Compliance Auditor (Audit Trail & Reports)</option>
                     <option value="super-admin">Super Admin (Full RBAC Privileges)</option>
                   </select>
                 </div>
@@ -1387,7 +1403,7 @@
       <div class="modal-header" style="margin-bottom: 1rem;">
         <div>
           <h3 class="modal-title" style="display: flex; align-items: center; gap: 0.5rem;">
-            <i data-lucide="shield-check" style="width: 20px; height: 20px; color: var(--brand-turquoise);"></i>
+            <i data-lucide="shield-check" style="width: 20px; height: 20px; color: var(--brand-cyan);"></i>
             Configure Operator Access &amp; Permissions
           </h3>
           <p id="perm-modal-subtitle" style="font-size: 0.8rem; color: var(--text-muted); margin: 0.25rem 0 0 0;">Managing role privileges for operator</p>
@@ -1404,25 +1420,25 @@
         <div class="modal-form-group" style="margin-bottom: 1.25rem;">
           <label for="perm-modal-role-select" style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 0.4rem;">PRIMARY OPERATIONAL ROLE PRESET</label>
           <select id="perm-modal-role-select" class="modal-input" onchange="window.handleRolePresetChange(this.value)" style="width: 100%; font-weight: 600;">
-            <option value="super-admin">👑 Super-Admin (Full Unrestricted Access)</option>
-            <option value="dispatch">⚡ Dispatch Officer (Shift Orders &amp; Roster)</option>
-            <option value="care-coordinator">🩺 Care Coordinator (Shift View &amp; Staffing)</option>
-            <option value="recruiter">🎯 Recruitment Specialist / HR (Job ATS &amp; Roster)</option>
-            <option value="auditor">📋 Compliance Auditor (Audit Trail &amp; Reports)</option>
-            <option value="custom">⚙️ Custom Granular Access</option>
+            <option value="super-admin">Super-Admin (Full Unrestricted Access)</option>
+            <option value="dispatch">Dispatch Officer (Shift Orders &amp; Roster)</option>
+            <option value="care-coordinator">Care Coordinator (Shift View &amp; Staffing)</option>
+            <option value="recruiter">Recruitment Specialist / HR (Job ATS &amp; Roster)</option>
+            <option value="auditor">Compliance Auditor (Audit Trail &amp; Reports)</option>
+            <option value="custom">Custom Granular Access</option>
           </select>
         </div>
 
         <!-- Granular Permissions Grid -->
         <div style="margin-bottom: 1.25rem;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
             <label style="font-size: 0.78rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted);">GRANULAR MODULE PRIVILEGES</label>
-            <div style="display: flex; gap: 0.5rem;">
-              <button type="button" class="btn-perm-toggle perm-select-all" onclick="window.toggleAllPermissions(true)">
-                <i data-lucide="check-square" style="width: 13px; height: 13px;"></i> Select All
+            <div class="perm-toolbar-actions">
+              <button type="button" class="btn-perm-toggle perm-select-all" onclick="window.toggleAllPermissions(true)" title="Grant all module permissions">
+                <i data-lucide="check-check" style="width: 13px; height: 13px;"></i> Select All
               </button>
-              <button type="button" class="btn-perm-toggle perm-clear-all" onclick="window.toggleAllPermissions(false)">
-                <i data-lucide="square" style="width: 13px; height: 13px;"></i> Clear All
+              <button type="button" class="btn-perm-toggle perm-clear-all" onclick="window.toggleAllPermissions(false)" title="Revoke all module permissions">
+                <i data-lucide="rotate-ccw" style="width: 12px; height: 12px;"></i> Clear All
               </button>
             </div>
           </div>
@@ -1547,7 +1563,7 @@
   </div>
 
   <!-- Core Dashboard Application Script -->
-  <script src="admin.js?v=5.2.0"></script>
+  <script src="admin.js?v=5.7.4"></script>
 
 </body>
 </html>

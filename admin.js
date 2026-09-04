@@ -328,8 +328,9 @@
       const mfaBadge = document.getElementById('mfa-current-status-badge');
       if (mfaBadge) {
         mfaBadge.innerHTML = user.totp_enabled
-          ? '<span class="status-pill verified">🔒 2FA Active</span>'
-          : '<span class="status-pill" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b;">⚠️ 2FA Not Enrolled</span>';
+          ? '<span class="status-pill verified"><i data-lucide="shield-check" style="width:12px;height:12px;vertical-align:middle;margin-right:3px;"></i> 2FA Active</span>'
+          : '<span class="status-pill expiring"><i data-lucide="shield-alert" style="width:12px;height:12px;vertical-align:middle;margin-right:3px;"></i> 2FA Not Enrolled</span>';
+        if (window.lucide) lucide.createIcons();
       }
       applyRolePermissionsToUI(user.permissions, user.role);
     } catch { /* Display fallback */ }
@@ -776,13 +777,32 @@
     }, 4500);
   }
 
-  function emptyState(icon, title, sub) {
+  function emptyState(iconName, title, sub) {
+    const lucideMap = {
+      '📋': 'clipboard-list',
+      '📄': 'file-text',
+      '👥': 'users',
+      '👤': 'user',
+      '🔒': 'shield',
+      '⚡': 'activity',
+      '🩺': 'stethoscope',
+      '🚑': 'truck',
+      '✅': 'check-circle-2',
+      '❌': 'x-circle',
+      '⏳': 'clock'
+    };
+    const mappedIcon = lucideMap[iconName] || iconName;
+    const isLucideIcon = /^[a-z0-9-]+$/.test(mappedIcon);
+    const iconMarkup = isLucideIcon
+      ? `<div style="width:52px;height:52px;border-radius:14px;background:var(--status-info-bg);border:1px solid var(--border-accent);display:inline-flex;align-items:center;justify-content:center;color:var(--brand-cyan);box-shadow:var(--shadow-sm);"><i data-lucide="${mappedIcon}" style="width:26px;height:26px;"></i></div>`
+      : `<span style="font-size:2.4rem;">${iconName}</span>`;
+
     return `
       <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;
-                  padding:3.5rem 2rem;gap:0.75rem;color:var(--text-muted);text-align:center;">
-        <span style="font-size:2.6rem;">${icon}</span>
-        <span style="font-weight:700;font-size:1.05rem;color:var(--text-secondary);">${title}</span>
-        <span style="font-size:0.84rem;max-width:360px;line-height:1.4;">${sub}</span>
+                  padding:3.5rem 2rem;gap:0.85rem;color:var(--text-muted);text-align:center;">
+        ${iconMarkup}
+        <span style="font-weight:800;font-size:1.05rem;color:var(--text-primary);letter-spacing:-0.01em;">${title}</span>
+        <span style="font-size:0.84rem;max-width:380px;line-height:1.45;color:var(--text-secondary);">${sub}</span>
       </div>`;
   }
 
@@ -982,28 +1002,35 @@
       filtered.forEach(r => { if (cols[r.status]) cols[r.status].push(r); });
 
       const colDef = [
-        { key: 'pending',    label: '⏳ Pending Assignment', color: '#f59e0b' },
-        { key: 'dispatched', label: '🚑 Dispatched &amp; Active', color: '#00a896' },
-        { key: 'completed',  label: '✅ Completed Shift',      color: '#10b981' },
-        { key: 'cancelled',  label: '❌ Cancelled / Void',    color: '#64748b' }
+        { key: 'pending',    label: '⏳ Pending Assignment', color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.08)' },
+        { key: 'dispatched', label: '🚑 Dispatched &amp; Active', color: '#00a896', bg: 'rgba(0, 168, 150, 0.08)' },
+        { key: 'completed',  label: '✅ Completed Shifts',     color: '#10b981', bg: 'rgba(16, 185, 129, 0.08)' },
+        { key: 'cancelled',  label: '❌ Cancelled / Void',    color: '#64748b', bg: 'rgba(100, 116, 139, 0.08)' }
       ];
 
       kanban.innerHTML = colDef.map(col => `
         <div class="kanban-col">
-          <div class="kanban-col-header" style="border-top:3px solid ${col.color};">
-            <span>${col.label}</span>
-            <span class="kanban-count">${cols[col.key].length}</span>
+          <div class="kanban-col-header" style="border-left: 4px solid ${col.color}; background: ${col.bg};">
+            <div class="kanban-header-title" style="color: ${col.color};">
+              <span>${col.label}</span>
+            </div>
+            <span class="kanban-count-pill" style="background: ${col.color}; color: #ffffff;">${cols[col.key].length}</span>
           </div>
           <div class="kanban-cards">
             ${cols[col.key].length === 0
-              ? `<div style="padding:1.5rem 1rem;text-align:center;color:var(--text-muted);font-size:0.8rem;">No ${col.key} shifts</div>`
+              ? `<div style="padding:2.5rem 1rem;text-align:center;color:var(--text-muted);font-size:0.82rem;font-weight:600;">✨ No ${col.key} requests</div>`
               : cols[col.key].map(r => `
                   <div class="kanban-card" onclick="window.openRequestDrawer('${r.id}')">
-                    <div style="font-weight:700;font-size:.88rem;margin-bottom:.25rem;">${r.facility_name}</div>
-                    <div style="font-size:.78rem;color:var(--text-muted);">${r.role_requested} &bull; ${r.shift_type}</div>
-                    ${r.urgency_level === 'emergency_surge' ? '<span class="status-pill urgent" style="font-size:.68rem;margin-top:.4rem;">EMERGENCY SURGE</span>' : ''}
-                    <div style="font-size:.72rem;color:var(--text-muted);margin-top:.6rem;">${r.created_at ? r.created_at.slice(0,10) : ''} &bull; ${r.request_code}</div>
-                    ${r.assigned_staff_name ? `<div style="font-size:.75rem;color:var(--brand-cyan);font-weight:700;margin-top:.35rem;">→ Nurse: ${r.assigned_staff_name}</div>` : ''}
+                    <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:0.35rem;">
+                      <strong style="font-size:0.88rem;color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${r.facility_name}</strong>
+                      <span class="status-pill role-${r.role_requested?.toLowerCase().includes('rpn') ? 'rpn' : r.role_requested?.toLowerCase().includes('psw') ? 'psw' : 'rn'}" style="font-size:0.65rem;padding:0.15rem 0.45rem;">${r.role_requested}</span>
+                    </div>
+                    <div style="font-size:0.78rem;color:var(--text-secondary);margin-bottom:0.4rem;">${r.unit_department || 'General Care'} &bull; ${r.shift_type || 'Day Shift'}</div>
+                    ${r.urgency_level === 'emergency_surge' || r.urgency_level === 'urgent' ? `<div style="margin-bottom:0.4rem;"><span class="status-pill urgent" style="font-size:0.65rem;padding:0.15rem 0.5rem;"><i data-lucide="alert-triangle" style="width:10px;height:10px;"></i> EMERGENCY SURGE</span></div>` : ''}
+                    <div style="display:flex;align-items:center;justify-content:space-between;padding-top:0.4rem;border-top:1px solid var(--border-subtle);font-size:0.72rem;color:var(--text-muted);margin-top:0.35rem;">
+                      <span>${r.request_code}</span>
+                      ${r.assigned_staff_name ? `<span style="font-weight:700;color:var(--brand-cyan);display:inline-flex;align-items:center;gap:3px;"><i data-lucide="user-check" style="width:11px;height:11px;"></i> ${r.assigned_staff_name}</span>` : '<span style="color:#B45309;font-weight:700;">Unassigned</span>'}
+                    </div>
                   </div>`).join('')
             }
           </div>
@@ -1021,18 +1048,18 @@
               <div class="row-header-wrapper">
                 <div>
                   <strong class="user-display-name" style="color:var(--brand-cyan);">${r.request_code}</strong>
-                  ${r.batch_code ? `<span class="badge" style="background:rgba(0,245,212,0.12);color:var(--brand-cyan);font-size:0.68rem;padding:2px 5px;border-radius:4px;border:1px solid rgba(0,245,212,0.3);display:inline-block;margin-top:2px;">📦 ${r.batch_code}</span>` : ''}
+                  ${r.batch_code ? `<span class="badge" style="background:rgba(2,132,199,0.12);color:var(--brand-cyan);font-size:0.68rem;padding:2px 5px;border-radius:4px;border:1px solid rgba(2,132,199,0.3);display:inline-block;margin-top:2px;">📦 ${r.batch_code}</span>` : ''}
                 </div>
                 <div class="row-status-top"><span class="status-pill ${r.status}">${(r.status || 'new').toUpperCase()}</span></div>
               </div>
             </td>
             <td class="cell-subtitle" data-label="Facility & Unit">
-              <div class="meta-label">Facility & Unit</div>
+              <div class="meta-label">Facility &amp; Unit</div>
               <div class="meta-value"><strong>${r.facility_name}</strong> &bull; <span style="font-size:.78rem;color:var(--text-muted);">${r.unit_department || 'General Care'}</span></div>
             </td>
             <td class="cell-grid-item" data-label="Role Requested">
               <div class="meta-label">Role Requested</div>
-              <div class="meta-value"><span class="status-pill verified">${r.role_requested}</span></div>
+              <div class="meta-value"><span class="status-pill role-${r.role_requested?.toLowerCase().includes('rpn') ? 'rpn' : r.role_requested?.toLowerCase().includes('psw') ? 'psw' : 'rn'}">${r.role_requested}</span></div>
             </td>
             <td class="cell-grid-item" data-label="Shift Type">
               <div class="meta-label">Shift Type</div>
@@ -1044,15 +1071,15 @@
             </td>
             <td class="cell-grid-item" data-label="Assigned Clinician">
               <div class="meta-label">Assigned Clinician</div>
-              <div class="meta-value">${r.assigned_staff_name ? `<span style="font-weight:700;color:var(--brand-cyan);">👤 ${r.assigned_staff_name}</span>` : '<span style="color:#f59e0b;font-size:0.78rem;">⚠️ Unassigned</span>'}</div>
+              <div class="meta-value">${r.assigned_staff_name ? `<span style="font-weight:700;color:var(--brand-cyan);"><i data-lucide="user" style="width:12px;height:12px;vertical-align:middle;margin-right:2px;"></i>${r.assigned_staff_name}</span>` : '<span class="status-pill expiring" style="font-size:0.68rem;"><i data-lucide="clock" style="width:10px;height:10px;vertical-align:middle;margin-right:2px;"></i>Unassigned</span>'}</div>
             </td>
             <td class="cell-status-desktop" data-label="Status">
               <div class="meta-label">Status</div>
               <div class="meta-value"><span class="status-pill ${r.status}">${(r.status || 'new').toUpperCase()}</span></div>
             </td>
             <td class="cell-actions" data-label="Action">
-              <button type="button" class="btn-secondary-action" style="font-size:.75rem;padding:.35rem .65rem;display:inline-flex;align-items:center;gap:4px;width:100%;justify-content:center;" onclick="event.stopPropagation();window.openRequestDrawer('${r.id}')">
-                <i data-lucide="user-check" style="width:12px;height:12px;"></i> Dispatch &amp; Manage
+              <button type="button" class="btn-primary-action" style="font-size:.82rem;padding:.5rem .85rem;display:inline-flex;align-items:center;gap:6px;width:100%;justify-content:center;height:42px;" onclick="event.stopPropagation();window.openRequestDrawer('${r.id}')">
+                <i data-lucide="user-check" style="width:15px;height:15px;"></i> Dispatch &amp; Manage
               </button>
             </td>
           </tr>`).join('');
@@ -1359,12 +1386,12 @@
       }
 
       const roleLabelsMap = {
-        'super-admin': '👑 Super Admin',
-        'dispatch': '⚡ Dispatch Officer',
-        'care-coordinator': '🩺 Care Coordinator',
-        'recruiter': '🎯 Recruiter / HR',
-        'auditor': '📋 Compliance Auditor',
-        'custom': '⚙️ Custom Access'
+        'super-admin': '<i data-lucide="shield-check" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;color:#0284C7;stroke-width:2.2px;"></i> Super Admin',
+        'dispatch': '<i data-lucide="radio" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;color:#D97706;stroke-width:2.2px;"></i> Dispatch Officer',
+        'care-coordinator': '<i data-lucide="stethoscope" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;color:#0D9488;stroke-width:2.2px;"></i> Care Coordinator',
+        'recruiter': '<i data-lucide="user-plus" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;color:#4F46E5;stroke-width:2.2px;"></i> Recruiter / HR',
+        'auditor': '<i data-lucide="file-check-2" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;color:#059669;stroke-width:2.2px;"></i> Compliance Auditor',
+        'custom': '<i data-lucide="sliders" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;color:#0284C7;stroke-width:2.2px;"></i> Custom Access'
       };
 
       const rowsHtml = admins.map(a => {
@@ -1373,14 +1400,28 @@
           ? '<span class="status-pill verified"><span class="pulse-dot"></span> Active</span>'
           : '<span class="status-pill urgent">Deactivated</span>';
         const roleLabel = roleLabelsMap[a.role] || a.role;
+        const roleBadgeClass = a.role === 'super-admin' ? 'role-super-admin'
+          : (a.role === 'dispatch' ? 'role-dispatch'
+          : (a.role === 'care-coordinator' ? 'role-care-coordinator'
+          : (a.role === 'recruiter' ? 'role-recruiter'
+          : (a.role === 'auditor' ? 'role-auditor' : 'role-custom'))));
+        const roleBadgeIcons = {
+          'super-admin': 'shield-check',
+          'dispatch': 'send',
+          'care-coordinator': 'user-check',
+          'recruiter': 'briefcase',
+          'auditor': 'clipboard-check',
+          'custom': 'sliders'
+        };
+        const roleIcon = roleBadgeIcons[a.role] || 'shield';
 
         const emailVerifiedBadge = a.email_verified
           ? '<span class="status-pill verified"><i data-lucide="check" style="width:12px;height:12px;vertical-align:middle;margin-right:2px;"></i> Verified</span>'
           : '<span class="status-pill urgent"><i data-lucide="alert-circle" style="width:12px;height:12px;vertical-align:middle;margin-right:2px;"></i> Unverified</span>';
 
         const mfaBadge = a.totp_enabled
-          ? '<span class="status-pill verified"><i data-lucide="shield-check" style="width:12px;height:12px;vertical-align:middle;margin-right:2px;"></i> 🔒 Active</span>'
-          : '<span class="status-pill" style="background:rgba(245,158,11,0.15);color:#f59e0b;">⚠️ None</span>';
+          ? '<span class="status-pill verified"><i data-lucide="shield-check" style="width:12px;height:12px;vertical-align:middle;margin-right:2px;"></i> 2FA Enrolled</span>'
+          : '<span class="status-pill expiring"><i data-lucide="shield-alert" style="width:12px;height:12px;vertical-align:middle;margin-right:2px;"></i> Not Enrolled</span>';
 
         const lastLoginText = a.last_login
           ? `<div style="font-size:0.75rem;font-weight:600;">${a.last_login.slice(0, 16).replace('T', ' ')}</div><div style="font-size:0.68rem;color:var(--text-muted);">${a.last_login_ip || ''}</div>`
@@ -1439,7 +1480,7 @@
             </td>
             <td class="cell-grid-item" data-label="Role">
               <div class="meta-label">Role Clearance</div>
-              <div class="meta-value"><span class="status-pill ${a.role === 'super-admin' ? 'role-rn' : (a.role === 'dispatch' ? 'role-rpn' : 'role-psw')}">${roleLabel}</span></div>
+              <div class="meta-value"><span class="status-pill ${roleBadgeClass}"><i data-lucide="${roleIcon}" style="width:13.5px;height:13.5px;vertical-align:middle;margin-right:4px;"></i> ${roleLabel}</span></div>
             </td>
             <td class="cell-grid-item" data-label="Email Verification">
               <div class="meta-label">Verification</div>
@@ -1829,7 +1870,7 @@
         if (exp < today) {
           expiryBadge = '<span class="status-pill urgent">EXPIRED</span>';
         } else if (exp <= thirtyDays) {
-          expiryBadge = '<span class="status-pill" style="background:#fef3c7;color:#b45309;">EXPIRING &lt;30D</span>';
+          expiryBadge = '<span class="status-pill expiring"><i data-lucide="alert-triangle" style="width:12px;height:12px;vertical-align:middle;margin-right:3px;"></i> EXPIRING &lt;30D</span>';
         }
       }
 
@@ -1920,11 +1961,9 @@
       const btn = document.getElementById(`btn-report-tab-${t}`);
       if (btn) {
         if (t === activeType) {
-          btn.className = 'status-pill verified';
-          btn.style.borderColor = 'var(--brand-cyan)';
+          btn.className = 'report-tab-btn active';
         } else {
-          btn.className = 'status-pill off-duty';
-          btn.style.borderColor = 'var(--border-subtle)';
+          btn.className = 'report-tab-btn';
         }
       }
     });
@@ -2072,7 +2111,7 @@
             </td>
             <td class="cell-grid-item" data-label="Expiring Credentials">
               <div class="meta-label">Credentials</div>
-              <div class="meta-value">${s.expiring_docs_count > 0 ? `<span class="status-pill off-duty">⚠️ ${s.expiring_docs_count} Expiring</span>` : '<span class="status-pill verified">✅ 100% Valid</span>'}</div>
+              <div class="meta-value">${s.expiring_docs_count > 0 ? `<span class="status-pill expiring"><i data-lucide="alert-triangle" style="width:11px;height:11px;vertical-align:middle;margin-right:2px;"></i> ${s.expiring_docs_count} Expiring</span>` : '<span class="status-pill verified"><i data-lucide="check-circle-2" style="width:11px;height:11px;vertical-align:middle;margin-right:2px;"></i> 100% Valid</span>'}</div>
             </td>
             <td class="cell-actions" data-label="Action">
               <button type="button" class="btn-secondary-action" style="font-size: 0.75rem; padding: 0.35rem 0.65rem; width: 100%; justify-content: center;" onclick="event.stopPropagation(); window.openStaffDrawer('${s.id}')">
@@ -2203,7 +2242,7 @@
             </td>
             <td class="cell-grid-item" data-label="Source Channel">
               <div class="meta-label">Source Channel</div>
-              <div class="meta-value"><span class="status-pill verified" style="font-size: 0.72rem;">🌐 ${escapeHTML(s.source || 'homepage_strip')}</span></div>
+              <div class="meta-value"><span class="status-pill verified" style="font-size: 0.72rem;"><i data-lucide="globe" style="width:11px;height:11px;vertical-align:middle;margin-right:2px;"></i> ${escapeHTML(s.source || 'homepage_strip')}</span></div>
             </td>
             <td class="cell-grid-item" data-label="IP Subnet">
               <div class="meta-label">IP Address</div>
@@ -2310,11 +2349,11 @@
     if (thead) {
       thead.innerHTML = `
         <tr>
-          <th style="min-width: 190px;">Facility &amp; Unit</th>
+          <th class="fac-col-header">Facility &amp; Unit</th>
           ${weekDays.map(d => `
-            <th style="text-align: center; min-width: 110px; ${d.isToday ? 'background: rgba(0, 245, 212, 0.08); border-top: 2px solid var(--brand-cyan);' : ''}">
-              <div style="font-weight: 800; font-size: 0.82rem; ${d.isToday ? 'color: var(--brand-cyan);' : ''}">${d.dayName}</div>
-              <div style="font-size: 0.72rem; color: var(--text-muted);">${d.monthDay}</div>
+            <th style="min-width: 145px; ${d.isToday ? 'background: rgba(0, 245, 212, 0.08); border-top: 2px solid var(--brand-cyan);' : ''}">
+              <div style="font-weight: 800; font-size: 0.84rem; ${d.isToday ? 'color: var(--brand-cyan);' : 'color: var(--text-primary);'}">${d.dayName}</div>
+              <div style="font-size: 0.72rem; color: var(--text-muted); font-weight: 600;">${d.monthDay}</div>
             </th>
           `).join('')}
         </tr>
@@ -2347,7 +2386,7 @@
     }
 
     if (visibleRequests.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="8">${emptyState('🔍', 'No Matching Shifts Found', 'Try adjusting your search keywords or filter criteria.')}</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="8">${emptyState('clipboard-list', 'No Matching Shifts Found', 'Try adjusting your search keywords or filter criteria.')}</td></tr>`;
       return;
     }
 
@@ -2365,15 +2404,33 @@
       facilityMap.get(facKey).shifts.push(r);
     });
 
+    const getRoleBadgeClass = (role) => {
+      const r = (role || '').toLowerCase();
+      if (r.includes('rpn')) return 'role-rpn';
+      if (r.includes('rn')) return 'role-rn';
+      if (r.includes('psw')) return 'role-psw';
+      return 'role-travel';
+    };
+
+    const getStatusText = (status) => {
+      if (status === 'in_session') return 'In Session';
+      if (status === 'dispatched') return 'Dispatched';
+      if (status === 'completed') return 'Completed';
+      return 'Pending';
+    };
+
     // 4. Render Facility Matrix Rows
     tbody.innerHTML = Array.from(facilityMap.values()).map(fac => {
       return `
         <tr>
-          <td style="vertical-align: top; padding: 0.85rem 0.75rem;">
-            <div style="font-weight: 800; font-size: 0.88rem; color: var(--text-primary);">${fac.facility}</div>
-            <div style="font-size: 0.73rem; color: var(--brand-cyan); margin-top: 2px; font-weight: 600;">📍 ${fac.unit}</div>
-            <button type="button" class="btn-secondary-action" style="font-size: 0.7rem; padding: 0.2rem 0.5rem; margin-top: 0.4rem; height: 24px; display: inline-flex; align-items: center; gap: 3px;" onclick="window.openNewRequestModal('${fac.facility.replace(/'/g, "\\'")}', '${fac.unit.replace(/'/g, "\\'")}', '${weekDays[0].isoDate}')">
-              <i data-lucide="plus" style="width: 10px; height: 10px;"></i> Dispatch
+          <td class="fac-col-cell">
+            <div class="scheduler-fac-name">${fac.facility}</div>
+            <div class="scheduler-fac-unit">
+              <i data-lucide="map-pin" style="width: 12px; height: 12px; flex-shrink: 0;"></i>
+              <span>${fac.unit}</span>
+            </div>
+            <button type="button" class="btn-secondary-action scheduler-fac-dispatch-btn" onclick="window.openNewRequestModal('${fac.facility.replace(/'/g, "\\'")}', '${fac.unit.replace(/'/g, "\\'")}', '${weekDays[0].isoDate}')">
+              <i data-lucide="plus" style="width: 12px; height: 12px;"></i> Dispatch
             </button>
           </td>
           ${weekDays.map((d, dayIndex) => {
@@ -2386,34 +2443,37 @@
 
             if (dayShifts.length === 0) {
               return `
-                <td style="vertical-align: top; text-align: center; padding: 0.6rem 0.4rem; ${d.isToday ? 'background: rgba(0, 245, 212, 0.03);' : ''}">
-                  <button type="button" class="btn-secondary-action" onclick="window.openNewRequestModal('${fac.facility.replace(/'/g, "\\'")}', '${fac.unit.replace(/'/g, "\\'")}', '${d.isoDate}')" title="Schedule shift on ${d.monthDay}" style="font-size: 0.68rem; padding: 0.2rem 0.45rem; border-radius: 4px; border: 1px dashed var(--border-subtle); background: transparent; color: var(--text-muted); cursor: pointer; display: inline-flex; align-items: center; gap: 2px;">
-                    <i data-lucide="plus" style="width: 10px; height: 10px;"></i> Add
+                <td style="text-align: center; ${d.isToday ? 'background: rgba(0, 245, 212, 0.03);' : ''}">
+                  <button type="button" class="scheduler-add-shift-btn" onclick="window.openNewRequestModal('${fac.facility.replace(/'/g, "\\'")}', '${fac.unit.replace(/'/g, "\\'")}', '${d.isoDate}')" title="Schedule shift on ${d.monthDay}">
+                    <i data-lucide="plus" style="width: 12px; height: 12px;"></i> Add
                   </button>
                 </td>`;
             }
 
             return `
-              <td style="vertical-align: top; padding: 0.45rem; ${d.isToday ? 'background: rgba(0, 245, 212, 0.05);' : ''}">
+              <td style="${d.isToday ? 'background: rgba(0, 245, 212, 0.04);' : ''}">
                 ${dayShifts.map(s => `
-                  <div onclick="window.openRequestDrawer('${s.id}')" style="cursor: pointer; background: var(--bg-card); border: 1px solid ${s.status === 'dispatched' || s.status === 'completed' ? 'rgba(0, 245, 212, 0.4)' : 'var(--border-color)'}; border-radius: 6px; padding: 0.45rem; margin-bottom: 0.4rem; box-shadow: 0 2px 5px rgba(0,0,0,0.18);">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px;">
-                      <span class="status-pill ${s.role_requested === 'RN' ? 'verified' : 'off-duty'}" style="font-size: 0.62rem; padding: 0.1rem 0.3rem;">${s.role_requested}</span>
-                      <span class="status-pill ${s.status}" style="font-size: 0.6rem; padding: 0.1rem 0.3rem;">${(s.status || 'new').toUpperCase()}</span>
+                  <div class="scheduler-shift-card status-${s.status || 'pending'}" onclick="window.openRequestDrawer('${s.id}')" title="Click to inspect shift details">
+                    <div class="scheduler-shift-top">
+                      <span class="scheduler-micro-badge ${getRoleBadgeClass(s.role_requested)}">${s.role_requested || 'RN'}</span>
+                      <span class="scheduler-micro-status status-${s.status || 'pending'}">
+                        ${s.status === 'in_session' ? '🟢' : s.status === 'dispatched' ? '⚡' : s.status === 'completed' ? '✓' : '⏳'}
+                        ${getStatusText(s.status)}
+                      </span>
                     </div>
-                    <div style="font-size: 0.74rem; font-weight: 700; color: var(--text-primary); margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                      ${s.assigned_staff_name ? `👤 ${s.assigned_staff_name}` : '<span style="color: #f59e0b;">⚠️ Unassigned</span>'}
+                    <div class="scheduler-staff-assigned">
+                      <i data-lucide="user" style="width: 12px; height: 12px; flex-shrink: 0; color: ${s.assigned_staff_name ? 'var(--brand-cyan)' : '#F59E0B'};"></i>
+                      <span>${s.assigned_staff_name ? s.assigned_staff_name : '<span style="color: #F59E0B;">Unassigned</span>'}</span>
                     </div>
-                    <div style="font-size: 0.68rem; color: var(--text-muted); margin-top: 2px;">
-                      🕒 ${s.shift_type || 'Day Shift'}
+                    <div class="scheduler-shift-time">
+                      <i data-lucide="clock" style="width: 11px; height: 11px; flex-shrink: 0;"></i>
+                      <span>${s.shift_type || 'Day Shift'}</span>
                     </div>
                   </div>
                 `).join('')}
-                <div style="text-align: center; margin-top: 0.25rem;">
-                  <button type="button" onclick="window.openNewRequestModal('${fac.facility.replace(/'/g, "\\'")}', '${fac.unit.replace(/'/g, "\\'")}', '${d.isoDate}')" title="Add another shift on ${d.monthDay}" style="font-size: 0.65rem; padding: 0.15rem 0.4rem; border-radius: 4px; border: 1px dashed var(--border-subtle); background: transparent; color: var(--text-muted); cursor: pointer;">
-                    + Add
-                  </button>
-                </div>
+                <button type="button" class="scheduler-add-shift-btn" onclick="window.openNewRequestModal('${fac.facility.replace(/'/g, "\\'")}', '${fac.unit.replace(/'/g, "\\'")}', '${d.isoDate}')" title="Add another shift on ${d.monthDay}">
+                  <i data-lucide="plus" style="width: 12px; height: 12px;"></i> Add
+                </button>
               </td>`;
           }).join('')}
         </tr>`;
@@ -3231,8 +3291,8 @@
           <select id="drawer-status-select" class="filter-select" style="width:100%;padding:0.55rem;">
             <option value="pending"    ${req.status==='pending'    ?'selected':''}>Pending</option>
             <option value="dispatched" ${req.status==='dispatched' ?'selected':''}>Dispatched</option>
-            <option value="in_session" ${req.status==='in_session' ?'selected':''}>🟢 In Session</option>
-            <option value="completed"  ${req.status==='completed'  ?'selected':''}>✅ Completed</option>
+            <option value="in_session" ${req.status==='in_session' ?'selected':''}>In Session</option>
+            <option value="completed"  ${req.status==='completed'  ?'selected':''}>Completed</option>
             <option value="cancelled"  ${req.status==='cancelled'  ?'selected':''}>Cancelled</option>
           </select>
         </div>

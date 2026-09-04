@@ -118,30 +118,30 @@ router.get('/kpis', async (req, res, next) => {
     `);
 
     // Shift fill rate: completed / total * 100 (0 if no requests yet)
-    const total = parseInt(requestCounts.total_requests) || 0;
-    const completed = parseInt(requestCounts.completed_requests) || 0;
+    const total = parseInt(requestCounts?.total_requests) || 0;
+    const completed = parseInt(requestCounts?.completed_requests) || 0;
     const fillRate = total > 0 ? ((completed / total) * 100).toFixed(1) : null;
 
     res.json({
       success: true,
       data: {
         requests: {
-          total:      parseInt(requestCounts.total_requests)      || 0,
-          pending:    parseInt(requestCounts.pending_requests)    || 0,
-          dispatched: parseInt(requestCounts.dispatched_requests) || 0,
-          completed:  parseInt(requestCounts.completed_requests)  || 0,
-          urgent:     parseInt(requestCounts.urgent_pending)      || 0
+          total:      parseInt(requestCounts?.total_requests)      || 0,
+          pending:    parseInt(requestCounts?.pending_requests)    || 0,
+          dispatched: parseInt(requestCounts?.dispatched_requests) || 0,
+          completed:  parseInt(requestCounts?.completed_requests)  || 0,
+          urgent:     parseInt(requestCounts?.urgent_pending)      || 0
         },
         applications: {
-          total:     parseInt(appCounts.total_applications) || 0,
-          new:       parseInt(appCounts.new_applications)   || 0,
-          interview: parseInt(appCounts.interview_stage)    || 0,
-          hired:     parseInt(appCounts.hired)              || 0
+          total:      parseInt(appCounts?.total_applications) || 0,
+          new:        parseInt(appCounts?.new_applications)   || 0,
+          interview:  parseInt(appCounts?.interview_stage)    || 0,
+          hired:      parseInt(appCounts?.hired)              || 0
         },
         roster: {
-          total:               parseInt(rosterCounts.total_staff)           || 0,
-          available:           parseInt(rosterCounts.available_staff)       || 0,
-          credentials_expiring:parseInt(rosterCounts.credentials_expiring)  || 0
+          total:     parseInt(rosterCounts?.total_staff)          || 0,
+          available: parseInt(rosterCounts?.available_staff)      || 0,
+          expiring:  parseInt(rosterCounts?.credentials_expiring) || 0
         },
         shift_fill_rate: fillRate // null if no data yet — UI shows "N/A"
       }

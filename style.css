@@ -4336,6 +4336,21 @@ ul {
   font-size: 0.82rem;
   outline: none;
   cursor: pointer;
+  color-scheme: dark;
+}
+
+select option,
+.form-field option,
+.admin-filter-select option {
+  background-color: #0A0F1D;
+  color: #F8FAFC;
+}
+
+body.light-theme select option,
+body.light-theme .form-field option,
+body.light-theme .admin-filter-select option {
+  background-color: #FFFFFF;
+  color: #0A0F1D;
 }
 
 .table-responsive {
