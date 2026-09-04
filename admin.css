@@ -702,6 +702,40 @@ body {
   font-weight: 700;
 }
 
+.live-clock-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: var(--radius-full);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  font-size: 0.75rem;
+  font-weight: 700;
+  font-family: var(--font-body);
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.live-clock-chip:hover {
+  border-color: var(--brand-cyan);
+  background: rgba(0, 245, 212, 0.06);
+  transform: translateY(-1px);
+}
+
+.live-tz-badge {
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  background: rgba(0, 168, 150, 0.15);
+  color: var(--brand-cyan);
+  letter-spacing: 0.5px;
+}
+
 .pulse-dot {
   display: inline-block;
   position: relative;

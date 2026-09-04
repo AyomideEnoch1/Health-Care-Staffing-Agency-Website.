@@ -1070,7 +1070,8 @@
         }
 
         tbody.innerHTML = requests.map(req => {
-          const dateStr = req.created_at ? new Date(req.created_at).toLocaleDateString('en-CA', { month: 'short', day: 'numeric' }) : 'Today';
+          const d = req.created_at ? new Date(req.created_at.includes('T') || req.created_at.endsWith('Z') ? req.created_at : req.created_at.replace(' ', 'T') + 'Z') : null;
+          const dateStr = d && !isNaN(d.getTime()) ? d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : 'Today';
           const status = req.status || 'pending';
           const urgency = req.urgency_level || 'routine';
           return `

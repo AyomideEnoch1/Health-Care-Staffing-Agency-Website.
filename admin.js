@@ -55,6 +55,157 @@
       .replace(/'/g, '&#039;');
   }
 
+  // ── 2B. User Device Local Datetime & Dual-Time Presentation Engine ───────────
+  const USER_TIMEZONE = (() => {
+    try {
+      return Intl.DateTimeFormat().resolvedOptions().timeZone || 'America/Toronto';
+    } catch {
+      return 'America/Toronto';
+    }
+  })();
+
+  const TORONTO_TIMEZONE = 'America/Toronto';
+
+  function parseUtcDate(dateStr) {
+    if (!dateStr) return null;
+    if (dateStr instanceof Date) return isNaN(dateStr.getTime()) ? null : dateStr;
+    let s = String(dateStr).trim();
+    if (!s) return null;
+    if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}/.test(s)) {
+      s = s.replace(' ', 'T');
+    }
+    if (!s.endsWith('Z') && !/[+-]\d{2}:\d{2}$/.test(s)) {
+      s += 'Z';
+    }
+    const d = new Date(s);
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  function formatUserDateTime(dateStr, showSeconds = false) {
+    const d = parseUtcDate(dateStr);
+    if (!d) return dateStr || '—';
+    try {
+      return d.toLocaleString(undefined, {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        second: showSeconds ? '2-digit' : undefined,
+        hour12: true
+      });
+    } catch {
+      return d.toLocaleString();
+    }
+  }
+
+  function formatUserDate(dateStr) {
+    if (!dateStr) return '—';
+    if (/^\d{4}-\d{2}-\d{2}$/.test(String(dateStr).trim())) {
+      const [y, m, d] = String(dateStr).trim().split('-').map(Number);
+      const localDate = new Date(y, m - 1, d);
+      return localDate.toLocaleDateString(undefined, {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
+    }
+    const d = parseUtcDate(dateStr);
+    if (!d) return dateStr || '—';
+    return d.toLocaleDateString(undefined, {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  }
+
+  function formatUserTime(dateStr, showSeconds = false) {
+    const d = parseUtcDate(dateStr);
+    if (!d) return dateStr || '—';
+    return d.toLocaleTimeString(undefined, {
+      hour: 'numeric',
+      minute: '2-digit',
+      second: showSeconds ? '2-digit' : undefined,
+      hour12: true
+    });
+  }
+
+  function formatRelativeTime(dateStr) {
+    const d = parseUtcDate(dateStr);
+    if (!d) return dateStr || '—';
+    const now = new Date();
+    const diffSec = Math.floor((now.getTime() - d.getTime()) / 1000);
+    if (diffSec < 0) return 'In the future';
+    if (diffSec < 45) return 'Just now';
+    if (diffSec < 3600) return `${Math.floor(diffSec / 60)}m ago`;
+    if (diffSec < 86400) return `${Math.floor(diffSec / 3600)}h ago`;
+    if (diffSec < 172800) return `Yesterday at ${formatUserTime(d)}`;
+    if (diffSec < 604800) return `${Math.floor(diffSec / 86400)}d ago`;
+    return formatUserDate(d);
+  }
+
+  function getLocalDateIsoString(dateObj = new Date()) {
+    const year = dateObj.getFullYear();
+    const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+    const day = String(dateObj.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  let activeClockMode = 'device'; // 'device' or 'toronto'
+
+  function initLiveTopbarClock() {
+    const clockEl = document.getElementById('topbar-live-clock');
+    const displayEl = document.getElementById('live-clock-display');
+    const tzBadge = document.getElementById('live-tz-display');
+    if (!displayEl) return;
+
+    function updateClock() {
+      const now = new Date();
+      if (activeClockMode === 'device') {
+        const timeStr = now.toLocaleTimeString(undefined, {
+          hour: 'numeric',
+          minute: '2-digit',
+          second: '2-digit',
+          hour12: true
+        });
+        displayEl.textContent = timeStr;
+        let tzShort = 'DEVICE';
+        try {
+          const parts = new Intl.DateTimeFormat(undefined, { timeZoneName: 'short' }).formatToParts(now);
+          const tzPart = parts.find(p => p.type === 'timeZoneName');
+          if (tzPart) tzShort = tzPart.value;
+        } catch {}
+        if (tzBadge) tzBadge.textContent = tzShort;
+        if (clockEl) clockEl.title = `Device Time (${USER_TIMEZONE}) • Click to switch to Ontario HQ Time`;
+      } else {
+        const timeStr = now.toLocaleTimeString('en-US', {
+          timeZone: TORONTO_TIMEZONE,
+          hour: 'numeric',
+          minute: '2-digit',
+          second: '2-digit',
+          hour12: true
+        });
+        displayEl.textContent = timeStr;
+        if (tzBadge) tzBadge.textContent = 'TORONTO HQ';
+        if (clockEl) clockEl.title = `Ontario Facility HQ Time (${TORONTO_TIMEZONE}) • Click to switch to Device Time`;
+      }
+    }
+
+    updateClock();
+    setInterval(updateClock, 1000);
+
+    if (clockEl) {
+      clockEl.addEventListener('click', () => {
+        activeClockMode = (activeClockMode === 'device') ? 'toronto' : 'device';
+        updateClock();
+        const modeLabel = activeClockMode === 'device' ? `Device Time (${USER_TIMEZONE})` : 'Ontario HQ Time (Toronto EDT/EST)';
+        if (typeof showToast === 'function') {
+          showToast(`Clock toggled to: ${modeLabel}`, 'info');
+        }
+      });
+    }
+  }
+
   // Client-side fallback handler for preview mode / serverless hosting
   function handleClientDemoApi(endpoint, options = {}) {
     const method = (options.method || 'GET').toUpperCase();
@@ -1142,7 +1293,10 @@
         </td>
         <td class="cell-grid-item" data-label="Date Applied">
           <div class="meta-label">Date Applied</div>
-          <div class="meta-value">${a.created_at ? a.created_at.slice(0,10) : '—'}</div>
+          <div class="meta-value" title="${a.created_at ? formatUserDateTime(a.created_at) + ' (' + USER_TIMEZONE + ')' : ''}">
+            <strong>${a.created_at ? formatUserDate(a.created_at) : '—'}</strong>
+            ${a.created_at ? `<span style="font-size:0.72rem;color:var(--text-muted);display:block;">${formatRelativeTime(a.created_at)}</span>` : ''}
+          </div>
         </td>
         <td class="cell-grid-item" data-label="Resume / CV">
           <div class="meta-label">Resume / CV</div>
@@ -1208,7 +1362,7 @@
         <div style="padding:.85rem 1rem;background:${isActive ? 'var(--bg-surface)' : 'transparent'};border-bottom:1px solid var(--border-subtle);cursor:pointer;${isActive ? 'border-left:3px solid var(--brand-cyan);' : ''}"
              onclick="window.selectInquiryThread('${inq.id}')">
           <div style="font-weight:700;font-size:0.88rem;color:var(--text-primary);">${inq.name}</div>
-          <div style="font-size:.74rem;color:var(--text-muted);margin-top:2px;">${inq.inquiry_type || 'General'} &bull; ${inq.created_at ? inq.created_at.slice(0,10) : ''}</div>
+          <div style="font-size:.74rem;color:var(--text-muted);margin-top:2px;">${inq.inquiry_type || 'General'} &bull; ${inq.created_at ? formatRelativeTime(inq.created_at) : ''}</div>
           <div style="font-size:.78rem;color:var(--text-secondary);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${inq.message}</div>
         </div>`;
     }).join('');
@@ -1220,7 +1374,7 @@
           <div style="background:var(--bg-surface);padding:1.25rem;border-radius:10px;border:1px solid var(--border-color);max-width:90%;">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;">
               <span style="font-size:.85rem;color:var(--brand-cyan);font-weight:800;">${activeInq.name} &lt;${activeInq.email}&gt;</span>
-              <span style="font-size:.72rem;color:var(--text-muted);">${activeInq.created_at ? activeInq.created_at.replace('T',' ').slice(0,16) : ''}</span>
+              <span style="font-size:.72rem;color:var(--text-muted);" title="${activeInq.created_at ? formatUserDateTime(activeInq.created_at, true) + ' (' + USER_TIMEZONE + ')' : ''}">${activeInq.created_at ? formatUserDateTime(activeInq.created_at) + ' (' + formatRelativeTime(activeInq.created_at) + ')' : ''}</span>
             </div>
             <p style="font-size:.9rem;color:var(--text-primary);line-height:1.5;">${activeInq.message}</p>
             ${activeInq.phone ? `<div style="font-size:.75rem;color:var(--text-muted);margin-top:0.5rem;">📞 Direct Line: ${activeInq.phone}</div>` : ''}
@@ -1291,7 +1445,7 @@
                 <div class="row-header-wrapper">
                   <div class="user-meta-name">
                     <span class="status-pill verified" style="font-weight:800;font-size:0.75rem;">${l.action}</span>
-                    <span class="user-role-sub" style="margin-top:4px;">👤 <strong>${l.actor_name}</strong> &bull; ${l.created_at ? l.created_at.replace('T',' ').slice(0,19) : '—'}</span>
+                    <span class="user-role-sub" style="margin-top:4px;">👤 <strong>${l.actor_name}</strong> &bull; <span title="${formatUserDateTime(l.created_at, true)} (${USER_TIMEZONE})">${formatUserDateTime(l.created_at)}</span> <span style="font-size:0.72rem;color:var(--brand-cyan);font-weight:700;">(${formatRelativeTime(l.created_at)})</span></span>
                   </div>
                   <div class="row-status-top"><span class="status-pill ${l.severity === 'warning' || l.severity === 'critical' ? 'urgent' : 'verified'}">${l.severity.toUpperCase()}</span></div>
                 </div>
@@ -1327,7 +1481,7 @@
               <div class="activity-icon-badge" style="background:rgba(0,168,150,.15);color:var(--brand-cyan);display:flex;align-items:center;justify-content:center;border-radius:6px;width:32px;height:32px;">⚡</div>
               <div class="activity-content">
                 <div class="activity-title" style="font-weight:700;font-size:0.85rem;">${l.actor_name}: ${l.details || l.action}</div>
-                <div class="activity-time" style="font-size:0.74rem;color:var(--text-muted);">${l.created_at ? l.created_at.slice(0,16).replace('T',' ') : ''} &bull; ${l.target_entity}</div>
+                <div class="activity-time" style="font-size:0.74rem;color:var(--text-muted);" title="${formatUserDateTime(l.created_at, true)} (${USER_TIMEZONE})">${formatRelativeTime(l.created_at)} &bull; ${l.target_entity}</div>
               </div>
             </div>`).join('');
         }
@@ -1424,7 +1578,7 @@
           : '<span class="status-pill expiring"><i data-lucide="shield-alert" style="width:12px;height:12px;vertical-align:middle;margin-right:2px;"></i> Not Enrolled</span>';
 
         const lastLoginText = a.last_login
-          ? `<div style="font-size:0.75rem;font-weight:600;">${a.last_login.slice(0, 16).replace('T', ' ')}</div><div style="font-size:0.68rem;color:var(--text-muted);">${a.last_login_ip || ''}</div>`
+          ? `<div style="font-size:0.75rem;font-weight:600;" title="${formatUserDateTime(a.last_login, true)} (${USER_TIMEZONE})">${formatUserDateTime(a.last_login)}</div><div style="font-size:0.68rem;color:var(--brand-cyan);font-weight:600;">${formatRelativeTime(a.last_login)}</div><div style="font-size:0.68rem;color:var(--text-muted);">${a.last_login_ip || ''}</div>`
           : '<span style="color:var(--text-muted);font-size:0.75rem;font-style:italic;">Never</span>';
 
         const btnClass = a.is_active ? 'btn-secondary-action danger-btn' : 'btn-secondary-action';
@@ -2019,7 +2173,7 @@
             </td>
             <td class="cell-grid-item" data-label="Shift Date & Time">
               <div class="meta-label">Shift Date & Time</div>
-              <div class="meta-value">${r.start_date ? r.start_date.slice(0, 10) : (r.created_at ? r.created_at.slice(0, 10) : '—')} (${escapeHTML(r.shift_type || 'Day')})</div>
+              <div class="meta-value">${formatUserDate(r.start_date || r.shift_date || r.created_at)} (${escapeHTML(r.shift_type || 'Day')})</div>
             </td>
             <td class="cell-grid-item" data-label="Assigned Clinician">
               <div class="meta-label">Assigned Clinician</div>
@@ -2185,7 +2339,10 @@
             </td>
             <td class="cell-grid-item" data-label="Date Applied">
               <div class="meta-label">Date Applied</div>
-              <div class="meta-value">${a.created_at ? a.created_at.slice(0, 10) : '—'}</div>
+              <div class="meta-value" title="${a.created_at ? formatUserDateTime(a.created_at) + ' (' + USER_TIMEZONE + ')' : ''}">
+                <strong>${a.created_at ? formatUserDate(a.created_at) : '—'}</strong>
+                ${a.created_at ? `<span style="font-size:0.72rem;color:var(--text-muted);display:block;">${formatRelativeTime(a.created_at)}</span>` : ''}
+              </div>
             </td>
             <td class="cell-actions" data-label="Action">
               <button type="button" class="btn-secondary-action" style="font-size: 0.75rem; padding: 0.35rem 0.65rem; width: 100%; justify-content: center;" onclick="event.stopPropagation(); window.openApplicantDrawer('${a.id}')">
@@ -2250,7 +2407,10 @@
             </td>
             <td class="cell-grid-item" data-label="Date Subscribed">
               <div class="meta-label">Date Subscribed</div>
-              <div class="meta-value">${s.created_at ? s.created_at.slice(0, 10) : '—'}</div>
+              <div class="meta-value" title="${s.created_at ? formatUserDateTime(s.created_at) + ' (' + USER_TIMEZONE + ')' : ''}">
+                <strong>${s.created_at ? formatUserDate(s.created_at) : '—'}</strong>
+                ${s.created_at ? `<span style="font-size:0.72rem;color:var(--text-muted);display:block;">${formatRelativeTime(s.created_at)}</span>` : ''}
+              </div>
             </td>
             <td class="cell-status-desktop" data-label="Status">
               <div class="meta-label">Status</div>
@@ -2330,9 +2490,9 @@
       d.setDate(monday.getDate() + i);
       weekDays.push({
         dateObj: d,
-        isoDate: d.toISOString().slice(0, 10),
-        dayName: d.toLocaleDateString('en-US', { weekday: 'short' }),
-        monthDay: d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        isoDate: getLocalDateIsoString(d),
+        dayName: d.toLocaleDateString(undefined, { weekday: 'short' }),
+        monthDay: d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
         isToday: d.toDateString() === new Date().toDateString()
       });
     }
@@ -2435,10 +2595,9 @@
           </td>
           ${weekDays.map((d, dayIndex) => {
             const dayShifts = fac.shifts.filter((s, idx) => {
-              if (s.start_date && s.start_date.slice(0, 10) === d.isoDate) return true;
-              if (s.shift_date && s.shift_date === d.isoDate) return true;
-              const reqDate = s.created_at ? s.created_at.slice(0, 10) : '';
-              return reqDate === d.isoDate || (fac.shifts.length > 0 && (idx % 7 === dayIndex));
+              const sDate = s.start_date || s.shift_date || (s.created_at ? getLocalDateIsoString(parseUtcDate(s.created_at) || new Date()) : '');
+              if (sDate && sDate.slice(0, 10) === d.isoDate) return true;
+              return (fac.shifts.length > 0 && (idx % 7 === dayIndex));
             });
 
             if (dayShifts.length === 0) {
@@ -3110,7 +3269,7 @@
       container.innerHTML = docs.map(doc => {
         const sizeKb = Math.round((doc.file_size || 0) / 1024);
         const sizeDisplay = sizeKb > 1024 ? `${(sizeKb/1024).toFixed(1)} MB` : `${sizeKb} KB`;
-        const expDisplay = doc.expiry_date ? `Expires: ${doc.expiry_date.slice(0, 10)}` : 'No Expiry Set';
+        const expDisplay = doc.expiry_date ? `Expires: ${formatUserDate(doc.expiry_date)}` : 'No Expiry Set';
 
         return `
           <div style="background:var(--bg-surface);padding:0.75rem;border-radius:8px;margin-bottom:0.6rem;border:1px solid var(--border-subtle);display:flex;justify-content:space-between;align-items:center;gap:0.5rem;flex-wrap:wrap;">
@@ -3253,8 +3412,8 @@
       return `<option value="${s.id}" ${req.assigned_staff_id === s.id ? 'selected' : ''}>${s.name} (${s.role} - ${s.region})${conflictTag}</option>`;
     }).join('');
 
-    const clockInDisplay = req.clock_in_time ? new Date(req.clock_in_time).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : '—';
-    const clockOutDisplay = req.clock_out_time ? new Date(req.clock_out_time).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : '—';
+    const clockInDisplay = req.clock_in_time ? formatUserDateTime(req.clock_in_time) : '—';
+    const clockOutDisplay = req.clock_out_time ? formatUserDateTime(req.clock_out_time) : '—';
 
     drawerContent.innerHTML = `
       <div style="display: flex; flex-direction: column; gap: 0.85rem; margin-bottom: 1.5rem;">
@@ -3297,7 +3456,7 @@
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.25rem;">
           <div>
             <label style="font-weight: 700; font-size: 0.78rem; display: block; margin-bottom: 0.4rem; text-transform: uppercase; color: var(--text-muted);">Shift Date</label>
-            <input type="date" id="drawer-shift-date" class="filter-select" style="width: 100%; height: 44px; padding: 0.55rem 0.75rem; font-weight: 600;" value="${(req.start_date || req.shift_date || req.created_at || '').slice(0, 10)}">
+            <input type="date" id="drawer-shift-date" class="filter-select" style="width: 100%; height: 44px; padding: 0.55rem 0.75rem; font-weight: 600;" value="${getLocalDateIsoString(parseUtcDate(req.start_date || req.shift_date || req.created_at) || new Date())}">
           </div>
           <div>
             <label style="font-weight: 700; font-size: 0.78rem; display: block; margin-bottom: 0.4rem; text-transform: uppercase; color: var(--text-muted);">Change Status</label>
@@ -3522,7 +3681,7 @@
     if (facInput && facilityName) facInput.value = facilityName;
     if (unitInput && unitName) unitInput.value = unitName;
     if (dateInput) {
-      dateInput.value = targetDate || new Date().toISOString().slice(0, 10);
+      dateInput.value = targetDate || getLocalDateIsoString();
     }
 
     if (modalNewRequest) modalNewRequest.classList.add('open');
@@ -3563,7 +3722,7 @@
         contact_phone:        document.getElementById('req-contact-phone')?.value,
         role_requested:       document.getElementById('req-role-needed')?.value,
         shift_type:           document.getElementById('req-shift-type')?.value,
-        start_date:           document.getElementById('req-start-date')?.value || new Date().toISOString().slice(0, 10),
+        start_date:           document.getElementById('req-start-date')?.value || getLocalDateIsoString(),
         urgency_level:        document.getElementById('req-urgency')?.value,
         assigned_staff_id:    document.getElementById('req-assign-staff')?.value || null,
         special_instructions: document.getElementById('req-instructions')?.value
@@ -3854,6 +4013,7 @@
 
   // ── 17. Initialization ──────────────────────────────────────────────────────
   initTheme();
+  initLiveTopbarClock();
   checkAuth();
 
 })();
