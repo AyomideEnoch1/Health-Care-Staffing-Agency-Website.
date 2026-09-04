@@ -1105,7 +1105,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (submitBtn) {
       submitBtn.disabled = true;
-      submitBtn.textContent = '⏳ Submitting Bulk Shifts to Dispatch Board...';
+      submitBtn.textContent = '⏳ Submitting Request...';
     }
 
     try {
@@ -1145,7 +1145,8 @@ document.addEventListener('DOMContentLoaded', () => {
     } finally {
       if (submitBtn) {
         submitBtn.disabled = false;
-        submitBtn.textContent = '🚀 SUBMIT BULK CLINICAL STAFFING REQUEST';
+        submitBtn.innerHTML = '<i data-lucide="send" style="width: 18px; height: 18px;"></i> SUBMIT REQUEST';
+        if (window.lucide) lucide.createIcons();
       }
     }
   };

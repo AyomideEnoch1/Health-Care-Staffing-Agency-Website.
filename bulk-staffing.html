@@ -93,6 +93,16 @@
       color: #ffffff;
       box-shadow: 0 6px 20px rgba(0, 168, 150, 0.3);
     }
+    .bulk-step-title {
+      font-family: var(--font-heading);
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--navy);
+      margin-bottom: 0.35rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
     .stepper-card {
       background: #ffffff;
       border: 1px solid rgba(0, 0, 0, 0.08);
@@ -195,6 +205,94 @@
     .csv-preview-table tr:nth-child(even) {
       background: #f9fbfb;
     }
+
+    /* ── Mobile Screen Only Adjustments ───────────────────────────── */
+    @media (max-width: 768px) {
+      /* Remove the icon of the headers in both modes */
+      .bulk-step-title i,
+      .bulk-step-title svg,
+      .bulk-mode-btn i,
+      .bulk-mode-btn svg {
+        display: none !important;
+      }
+
+      /* Make the headers in both modes responsive */
+      .bulk-step-title {
+        font-size: 1.12rem !important;
+        line-height: 1.35 !important;
+        gap: 0.35rem !important;
+      }
+      .bulk-mode-switcher {
+        flex-direction: column !important;
+        gap: 0.75rem !important;
+        margin: 1.25rem 0 !important;
+        width: 100% !important;
+      }
+      .bulk-mode-btn {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        padding: 0.85rem 1rem !important;
+        font-size: 0.88rem !important;
+        text-align: center !important;
+        justify-content: center !important;
+      }
+
+      /* Expand the input card width of the headcount shift breakdown to occupy 98% of their parent container */
+      .stepper-card {
+        width: 98% !important;
+        max-width: 98% !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+        box-sizing: border-box !important;
+        padding: 1.15rem 0.95rem !important;
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 0.85rem !important;
+      }
+      .stepper-card > div:first-child {
+        width: 100% !important;
+        min-width: 0 !important;
+      }
+      .stepper-shift-select {
+        width: 100% !important;
+        min-width: 0 !important;
+        box-sizing: border-box !important;
+      }
+      .stepper-controls {
+        width: 100% !important;
+        justify-content: space-between !important;
+      }
+
+      #bulk-staffing-form {
+        padding: 1.35rem 0.85rem !important;
+        border-radius: 14px !important;
+      }
+
+      .bulk-submit-btn {
+        font-size: 0.88rem !important;
+        padding: 0.8rem 1rem !important;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .bulk-step-title {
+        font-size: 1.02rem !important;
+      }
+      .bulk-mode-btn {
+        font-size: 0.82rem !important;
+        padding: 0.75rem 0.85rem !important;
+      }
+      .bulk-submit-btn {
+        font-size: 0.84rem !important;
+      }
+      .stepper-role-title {
+        font-size: 0.96rem !important;
+      }
+      .stepper-role-desc {
+        font-size: 0.76rem !important;
+      }
+    }
   </style>
 </head>
 <body>
@@ -270,7 +368,7 @@
         
         <!-- STEP 1: ORGANIZATION & CONTACT DETAILS -->
         <div style="margin-bottom: 2rem;">
-          <h3 style="font-family: var(--font-heading); font-size: 1.25rem; font-weight: 800; color: var(--navy); margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.6rem;">
+          <h3 class="bulk-step-title" style="margin-bottom: 0.35rem;">
             <i data-lucide="building" style="width: 20px; height: 20px; color: var(--teal-green);"></i>
             <span>1.</span> Facility &amp; Authorized Contact Details
           </h3>
@@ -298,7 +396,7 @@
         <div id="section-stepper-mode">
           <div style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
             <div>
-              <h3 style="font-family: var(--font-heading); font-size: 1.25rem; font-weight: 800; color: var(--navy); margin-bottom: 0.2rem; display: flex; align-items: center; gap: 0.6rem;">
+              <h3 class="bulk-step-title" style="margin-bottom: 0.2rem;">
                 <i data-lucide="users" style="width: 20px; height: 20px; color: var(--teal-green);"></i>
                 <span>2.</span> Headcount &amp; Shift Breakdown
               </h3>
@@ -447,7 +545,7 @@
         <!-- MODE 2: CSV SPREADSHEET UPLOAD -->
         <div id="section-csv-mode" style="display: none;">
           <div style="margin-bottom: 1.5rem;">
-            <h3 style="font-family: var(--font-heading); font-size: 1.25rem; font-weight: 800; color: var(--navy); margin-bottom: 0.2rem; display: flex; align-items: center; gap: 0.6rem;">
+            <h3 class="bulk-step-title" style="margin-bottom: 0.2rem;">
               <i data-lucide="file-spreadsheet" style="width: 20px; height: 20px; color: var(--teal-green);"></i>
               <span>2.</span> Upload Hospital Shift Schedule (CSV)
             </h3>
@@ -510,8 +608,8 @@
 
         <!-- SUBMIT BUTTON -->
         <div style="margin-top: 2rem;">
-          <button type="submit" id="btn-submit-bulk-order" class="btn btn-pill-hero full-width-btn" style="padding: 1rem; font-size: 1.05rem; letter-spacing: 0.5px; display: flex; align-items: center; justify-content: center; gap: 0.6rem;">
-            <i data-lucide="send" style="width: 18px; height: 18px;"></i> SUBMIT BULK CLINICAL STAFFING REQUEST
+          <button type="submit" id="btn-submit-bulk-order" class="btn btn-pill-hero full-width-btn bulk-submit-btn" style="padding: 0.95rem 1.25rem; font-size: 0.95rem; letter-spacing: 0.5px; display: flex; align-items: center; justify-content: center; gap: 0.6rem;">
+            <i data-lucide="send" style="width: 18px; height: 18px;"></i> SUBMIT REQUEST
           </button>
           <div class="form-feedback-msg" id="bulk-form-feedback"></div>
         </div>
@@ -554,7 +652,7 @@
     </div>
   </footer>
 
-  <script src="script.js?v=3.5.0"></script>
+  <script src="script.js?v=5.3.0"></script>
   <script>
     if (window.lucide) lucide.createIcons();
   </script>
