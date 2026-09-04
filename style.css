@@ -2989,6 +2989,14 @@ ul {
     padding: 0.75rem 0.5rem;
   }
 
+  .brand-logo .brand-logo-img {
+    height: 38px;
+  }
+
+  .brand-logo .logo-wrapper {
+    gap: 0.6rem;
+  }
+
   .header-cta-right {
     display: none;
   }
@@ -3317,6 +3325,12 @@ ul {
 @media (max-width: 480px) {
   .site-header {
     padding: 0.65rem 0.4rem;
+  }
+  .brand-logo .brand-logo-img {
+    height: 32px;
+  }
+  .brand-logo .logo-wrapper {
+    gap: 0.5rem;
   }
   .subpage-hero {
     min-height: 210px !important;
