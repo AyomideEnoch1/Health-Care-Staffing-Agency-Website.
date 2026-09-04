@@ -661,10 +661,204 @@
         flex-direction: column;
         align-items: flex-start;
       }
-      .btn-claim-shift {
-        width: 100%;
-        text-align: center;
+    /* Clock In / Out EVV Station */
+    .clock-station-panel {
+      border: 2px solid rgba(27, 174, 207, 0.25);
+      background: #FFFFFF;
+      box-shadow: 0 4px 20px rgba(10, 37, 64, 0.05);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .clock-station-panel::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #10B981, #1BAECF, #0284C7);
+    }
+
+    .clock-display-hero {
+      background: linear-gradient(135deg, #0A2540 0%, #0F3B66 100%);
+      border-radius: 12px;
+      padding: 1.5rem 1.75rem;
+      color: #FFFFFF;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 8px 24px rgba(10, 37, 64, 0.15);
+    }
+
+    .clock-hero-left, .clock-hero-right {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .clock-hero-sublabel {
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #94A3B8;
+      margin-bottom: 4px;
+    }
+
+    .clock-hero-time {
+      font-family: 'SF Mono', 'Roboto Mono', Menlo, monospace;
+      font-size: 2.3rem;
+      font-weight: 800;
+      color: #38BDF8;
+      letter-spacing: 1px;
+      line-height: 1.1;
+      text-shadow: 0 0 16px rgba(56, 189, 248, 0.35);
+    }
+
+    .clock-duration-time {
+      font-family: 'SF Mono', 'Roboto Mono', Menlo, monospace;
+      font-size: 2.1rem;
+      font-weight: 800;
+      color: #34D399;
+      letter-spacing: 1px;
+      line-height: 1.1;
+      text-shadow: 0 0 16px rgba(52, 211, 153, 0.35);
+    }
+
+    .clock-hero-zone {
+      font-size: 0.76rem;
+      color: #CBD5E1;
+      margin-top: 5px;
+      font-weight: 600;
+    }
+
+    .pulse-dot {
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #10B981;
+      margin-right: 6px;
+      animation: pulseGlow 1.6s infinite ease-in-out;
+    }
+
+    @keyframes pulseGlow {
+      0% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+      70% { transform: scale(1.1); box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+      100% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+
+    .clock-status-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.35rem 0.85rem;
+      border-radius: 9999px;
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+
+    .clock-status-pill.on-duty {
+      background: rgba(16, 185, 129, 0.12);
+      color: #059669;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .clock-status-pill.off-duty {
+      background: #F1F5F9;
+      color: #64748B;
+      border: 1px solid #CBD5E1;
+    }
+
+    .clock-form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    @media (max-width: 650px) {
+      .clock-form-grid {
+        grid-template-columns: 1fr;
       }
+    }
+
+    .clock-form-label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 0.35rem;
+    }
+
+    .clock-form-input {
+      width: 100%;
+      padding: 0.65rem 0.85rem;
+      border: 1.5px solid #CBD5E1;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.85rem;
+      color: var(--navy);
+      background: #F8FAFC;
+      transition: all 0.2s ease;
+    }
+
+    .clock-form-input:focus {
+      outline: none;
+      border-color: #1BAECF;
+      background: #FFFFFF;
+      box-shadow: 0 0 0 3px rgba(27, 174, 207, 0.15);
+    }
+
+    .btn-clock-in {
+      width: 100%;
+      background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+      color: #FFFFFF;
+      border: none;
+      padding: 0.95rem 1.5rem;
+      border-radius: 10px;
+      font-family: var(--font-heading);
+      font-size: 1rem;
+      font-weight: 800;
+      letter-spacing: 0.4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.35);
+      transition: all 0.2s ease;
+    }
+
+    .btn-clock-in:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(16, 185, 129, 0.45);
+      background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    }
+
+    .btn-clock-out {
+      width: 100%;
+      background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+      color: #FFFFFF;
+      border: none;
+      padding: 0.95rem 1.5rem;
+      border-radius: 10px;
+      font-family: var(--font-heading);
+      font-size: 1rem;
+      font-weight: 800;
+      letter-spacing: 0.4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      box-shadow: 0 6px 20px rgba(239, 68, 68, 0.35);
+      transition: all 0.2s ease;
+    }
+
+    .btn-clock-out:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(239, 68, 68, 0.45);
+      background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%);
     }
   </style>
 </head>
@@ -760,6 +954,148 @@
                 <!-- Populated dynamically via JS -->
               </tbody>
             </table>
+          </div>
+        </div>
+
+        <!-- WORKER VIEW: CLINICAL TIMECARD & SHIFT CLOCK STATION -->
+        <div class="portal-panel clock-station-panel" id="worker-clock-panel" style="display: none;">
+          <div class="panel-header" style="margin-bottom: 1.25rem;">
+            <div class="panel-title" style="display: flex; align-items: center; gap: 0.5rem;">
+              <i data-lucide="clock" style="color: #1BAECF;"></i> Electronic Visit Verification &amp; Shift Timecard
+            </div>
+            <div id="clock-status-badge-container">
+              <span class="clock-status-pill off-duty">⚪ Off Duty / Ready</span>
+            </div>
+          </div>
+
+          <!-- Hero Time Display Box -->
+          <div class="clock-display-hero">
+            <div class="clock-hero-left">
+              <span class="clock-hero-sublabel" id="clock-device-date">Today</span>
+              <div class="clock-hero-time" id="clock-device-time">--:--:--</div>
+              <div class="clock-hero-zone" id="clock-device-zone">Device Local Time</div>
+            </div>
+            <div class="clock-hero-right" id="clock-shift-timer-box" style="display: none;">
+              <span class="clock-hero-sublabel" style="color: #34D399;">LIVE SHIFT DURATION</span>
+              <div class="clock-duration-time" id="clock-duration-timer">00h : 00m : 00s</div>
+              <div class="clock-hero-zone" id="clock-active-facility-text">On Duty</div>
+            </div>
+          </div>
+
+          <!-- Active Shift Details (When Clocked In) -->
+          <div id="clock-active-details" style="display: none; background: #F0FDF4; border: 1.5px solid #BBF7D0; border-radius: 10px; padding: 1.25rem; margin-bottom: 1.25rem;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 0.75rem;">
+              <div>
+                <span style="font-size: 0.72rem; font-weight: 800; color: #166534; text-transform: uppercase; letter-spacing: 0.5px;">Active Placement</span>
+                <h4 id="active-facility-name" style="margin: 2px 0; color: #065F46; font-size: 1.15rem; font-weight: 800;">--</h4>
+                <div style="font-size: 0.82rem; color: #047857; margin-top: 2px;">
+                  <span id="active-unit-dept">General Floor</span> • <span id="active-role-title">Registered Nurse</span>
+                </div>
+              </div>
+              <div style="text-align: right;">
+                <span style="font-size: 0.72rem; font-weight: 800; color: #166534; text-transform: uppercase; letter-spacing: 0.5px;">Clocked In At</span>
+                <div id="active-clockin-time" style="font-size: 0.95rem; font-weight: 800; color: #065F46;">--</div>
+              </div>
+            </div>
+
+            <div style="margin-top: 1rem; padding-top: 0.75rem; border-top: 1px dashed #86EFAC;">
+              <label style="display: block; font-size: 0.78rem; font-weight: 700; color: #166534; margin-bottom: 0.4rem;">End-of-Shift Handover / Clinical Summary Notes (Optional)</label>
+              <textarea id="clockout-notes" rows="2" placeholder="e.g. Med pass and patient documentation complete. Handover given to oncoming charge nurse." style="width: 100%; border: 1px solid #86EFAC; border-radius: 6px; padding: 0.6rem; font-size: 0.82rem; font-family: inherit; resize: vertical;"></textarea>
+            </div>
+
+            <div style="margin-top: 1rem;">
+              <button type="button" class="btn-clock-out" id="btn-clock-out" onclick="handleClockOut()">
+                <i data-lucide="log-out" style="width: 18px; height: 18px;"></i>
+                <span>🔴 Clock Out &amp; Conclude Shift</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Shift Selection & Clock In Form (When Off Duty) -->
+          <div id="clock-in-form-container">
+            <div class="clock-form-grid">
+              <div>
+                <label class="clock-form-label">Healthcare Facility / Hospital *</label>
+                <select id="clockin-facility-select" class="clock-form-input" onchange="toggleCustomFacility(this)">
+                  <option value="Scarborough Health Network - General Hospital">Scarborough Health Network - General Hospital</option>
+                  <option value="Sunnybrook Health Sciences Centre">Sunnybrook Health Sciences Centre</option>
+                  <option value="Toronto Central General Hospital">Toronto Central General Hospital</option>
+                  <option value="North York General Hospital">North York General Hospital</option>
+                  <option value="St. Michael's Hospital (Unity Health)">St. Michael's Hospital (Unity Health)</option>
+                  <option value="Michael Garron Hospital (Toronto East)">Michael Garron Hospital (Toronto East)</option>
+                  <option value="Trillium Health Partners - Mississauga">Trillium Health Partners - Mississauga</option>
+                  <option value="Extendicare Guildwood Long Term Care">Extendicare Guildwood Long Term Care</option>
+                  <option value="custom">Other Facility (Specify Name)...</option>
+                </select>
+                <input type="text" id="clockin-custom-facility" class="clock-form-input" placeholder="Type Facility / Hospital Name" style="display: none; margin-top: 0.5rem;">
+              </div>
+              <div>
+                <label class="clock-form-label">Hospital Unit / Department *</label>
+                <select id="clockin-unit-select" class="clock-form-input">
+                  <option value="Emergency Department (ED)">Emergency Department (ED)</option>
+                  <option value="Intensive Care Unit (ICU)">Intensive Care Unit (ICU)</option>
+                  <option value="General Medicine / Med-Surg">General Medicine / Med-Surg</option>
+                  <option value="Long Term Care / Geriatrics">Long Term Care / Geriatrics</option>
+                  <option value="Cardiology &amp; Telemetry">Cardiology &amp; Telemetry</option>
+                  <option value="Pediatrics &amp; NICU">Pediatrics &amp; NICU</option>
+                  <option value="Complex Continuing Care">Complex Continuing Care</option>
+                  <option value="Specialized Float Pool">Specialized Float Pool</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="clock-form-grid" style="margin-top: 0.75rem;">
+              <div>
+                <label class="clock-form-label">Staff Practicing Role *</label>
+                <select id="clockin-role-select" class="clock-form-input">
+                  <option value="Registered Nurse (RN)">Registered Nurse (RN)</option>
+                  <option value="Registered Practical Nurse (RPN)">Registered Practical Nurse (RPN)</option>
+                  <option value="Personal Support Worker (PSW)">Personal Support Worker (PSW)</option>
+                  <option value="Travel Nurse">Travel Nurse</option>
+                  <option value="Clinical Companion">Clinical Companion</option>
+                </select>
+              </div>
+              <div>
+                <label class="clock-form-label">Shift Verification Notes (Optional)</label>
+                <input type="text" id="clockin-notes" class="clock-form-input" placeholder="e.g. Unit 4B Coverage / Charge Nurse Sarah">
+              </div>
+            </div>
+
+            <div style="margin-top: 1.25rem;">
+              <button type="button" class="btn-clock-in" id="btn-clock-in" onclick="handleClockIn()">
+                <i data-lucide="play-circle" style="width: 20px; height: 20px;"></i>
+                <span>🟢 1-Tap Clock In to Shift</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Recent Timecard & Punches Table -->
+          <div style="margin-top: 1.75rem; border-top: 1px solid #E2E8F0; padding-top: 1.25rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem;">
+              <h4 style="margin: 0; font-size: 0.95rem; font-weight: 800; color: var(--navy); display: flex; align-items: center; gap: 0.4rem;">
+                <i data-lucide="history" style="width: 16px; height: 16px; color: #0284C7;"></i> Recent Timecard Punches
+              </h4>
+              <span id="weekly-hours-pill" style="font-size: 0.78rem; font-weight: 700; background: #E0F2FE; color: #0369A1; padding: 0.25rem 0.65rem; border-radius: 9999px;">
+                Week: 0.0 hrs
+              </span>
+            </div>
+            <div style="overflow-x: auto;">
+              <table class="portal-table" style="font-size: 0.82rem;">
+                <thead>
+                  <tr>
+                    <th>Facility &amp; Unit</th>
+                    <th>Role</th>
+                    <th>Clock In</th>
+                    <th>Clock Out</th>
+                    <th>Duration</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="punches-table-body">
+                  <tr><td colspan="6" style="text-align: center; color: #64748B; padding: 1.5rem;">Loading verified timecards...</td></tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
 
@@ -1072,8 +1408,11 @@
 
         document.getElementById('client-requests-panel').style.display = 'none';
         document.getElementById('worker-shifts-panel').style.display = 'block';
+        const clockPanel = document.getElementById('worker-clock-panel');
+        if (clockPanel) clockPanel.style.display = 'block';
 
         loadWorkerShifts();
+        initClockStation();
       }
 
       if (window.lucide) lucide.createIcons();
@@ -1180,6 +1519,289 @@
       btn.disabled = true;
       if (window.lucide) lucide.createIcons();
       alert(`Shift #${shiftId} has been successfully requested! The Divine Fingers Clinical Dispatch Coordinator will confirm placement within 15 minutes.`);
+    }
+
+    // ── Caregiver Electronic Visit Verification & Shift Clock Station ────────────
+    let deviceClockInterval = null;
+    let shiftDurationInterval = null;
+    let currentActivePunch = null;
+
+    function toggleCustomFacility(select) {
+      const customInput = document.getElementById('clockin-custom-facility');
+      if (customInput) {
+        if (select.value === 'custom') {
+          customInput.style.display = 'block';
+          customInput.focus();
+        } else {
+          customInput.style.display = 'none';
+        }
+      }
+    }
+
+    function startDeviceClock() {
+      if (deviceClockInterval) clearInterval(deviceClockInterval);
+      const updateClock = () => {
+        const now = new Date();
+        const timeEl = document.getElementById('clock-device-time');
+        const dateEl = document.getElementById('clock-device-date');
+        const zoneEl = document.getElementById('clock-device-zone');
+
+        if (timeEl) timeEl.textContent = now.toLocaleTimeString();
+        if (dateEl) dateEl.textContent = now.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+        if (zoneEl) {
+          try {
+            const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Device Local Time';
+            zoneEl.textContent = `${tz} • Synchronized`;
+          } catch (e) {
+            zoneEl.textContent = 'Device Local Time';
+          }
+        }
+      };
+      updateClock();
+      deviceClockInterval = setInterval(updateClock, 1000);
+    }
+
+    function startShiftDurationTimer(clockInIso) {
+      if (shiftDurationInterval) clearInterval(shiftDurationInterval);
+      const startTime = new Date(clockInIso).getTime();
+
+      const updateDuration = () => {
+        const elapsedSec = Math.max(0, Math.floor((Date.now() - startTime) / 1000));
+        const hrs = Math.floor(elapsedSec / 3600);
+        const mins = Math.floor((elapsedSec % 3600) / 60);
+        const secs = elapsedSec % 60;
+
+        const str = `${String(hrs).padStart(2, '0')}h : ${String(mins).padStart(2, '0')}m : ${String(secs).padStart(2, '0')}s`;
+        const durEl = document.getElementById('clock-duration-timer');
+        if (durEl) durEl.textContent = str;
+      };
+
+      updateDuration();
+      shiftDurationInterval = setInterval(updateDuration, 1000);
+    }
+
+    async function initClockStation() {
+      startDeviceClock();
+      await checkClockStatus();
+      await loadPunchHistory();
+    }
+
+    async function checkClockStatus() {
+      try {
+        const res = await fetch(`${API_BASE}/shifts/clock-status`, { credentials: 'include' });
+        if (!res.ok) return;
+
+        const data = await res.json();
+        if (!data || !data.success) return;
+
+        const badgeContainer = document.getElementById('clock-status-badge-container');
+        const shiftTimerBox  = document.getElementById('clock-shift-timer-box');
+        const activeDetails  = document.getElementById('clock-active-details');
+        const clockinForm    = document.getElementById('clock-in-form-container');
+        const weeklyPill     = document.getElementById('weekly-hours-pill');
+
+        if (weeklyPill && typeof data.weeklyHours !== 'undefined') {
+          weeklyPill.textContent = `Week: ${data.weeklyHours} hrs`;
+          const metricsContainer = document.getElementById('portal-metrics-container');
+          if (metricsContainer) {
+            const valElements = metricsContainer.querySelectorAll('.metric-val');
+            if (valElements.length >= 2) {
+              valElements[1].textContent = `${data.weeklyHours}h`;
+            }
+          }
+        }
+
+        if (data.onShift && data.activePunch) {
+          currentActivePunch = data.activePunch;
+          if (badgeContainer) {
+            badgeContainer.innerHTML = '<span class="clock-status-pill on-duty"><span class="pulse-dot"></span> 🟢 Active On Shift</span>';
+          }
+          if (shiftTimerBox) shiftTimerBox.style.display = 'flex';
+          if (activeDetails) activeDetails.style.display = 'block';
+          if (clockinForm) clockinForm.style.display = 'none';
+
+          const facEl = document.getElementById('active-facility-name');
+          const unitEl = document.getElementById('active-unit-dept');
+          const roleEl = document.getElementById('active-role-title');
+          const inTimeEl = document.getElementById('active-clockin-time');
+          const facTextEl = document.getElementById('clock-active-facility-text');
+
+          if (facEl) facEl.textContent = data.activePunch.facility_name || 'Hospital Facility';
+          if (unitEl) unitEl.textContent = data.activePunch.unit_department || 'General Floor';
+          if (roleEl) roleEl.textContent = data.activePunch.role || 'RN';
+          if (facTextEl) facTextEl.textContent = data.activePunch.facility_name || 'On Duty';
+
+          const inDate = new Date(data.activePunch.clock_in_time);
+          if (inTimeEl) inTimeEl.textContent = inDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' (' + inDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) + ')';
+
+          startShiftDurationTimer(data.activePunch.clock_in_time);
+
+        } else {
+          currentActivePunch = null;
+          if (shiftDurationInterval) clearInterval(shiftDurationInterval);
+          if (badgeContainer) {
+            badgeContainer.innerHTML = '<span class="clock-status-pill off-duty">⚪ Off Duty / Ready</span>';
+          }
+          if (shiftTimerBox) shiftTimerBox.style.display = 'none';
+          if (activeDetails) activeDetails.style.display = 'none';
+          if (clockinForm) clockinForm.style.display = 'block';
+        }
+
+        if (window.lucide) lucide.createIcons();
+
+      } catch (err) {
+        console.warn('Could not verify shift clock status:', err);
+      }
+    }
+
+    async function handleClockIn() {
+      const btn = document.getElementById('btn-clock-in');
+      const facilitySelect = document.getElementById('clockin-facility-select');
+      const customFacility = document.getElementById('clockin-custom-facility');
+      const unitSelect = document.getElementById('clockin-unit-select');
+      const roleSelect = document.getElementById('clockin-role-select');
+      const notesInput = document.getElementById('clockin-notes');
+
+      let facilityName = facilitySelect ? facilitySelect.value : 'Scarborough Health Network';
+      if (facilityName === 'custom' && customFacility && customFacility.value.trim()) {
+        facilityName = customFacility.value.trim();
+      }
+      const unitDepartment = unitSelect ? unitSelect.value : 'General Medicine';
+      const role = roleSelect ? roleSelect.value : 'RN';
+      const notes = notesInput ? notesInput.value.trim() : '';
+
+      if (!facilityName) {
+        alert('Please select or specify a healthcare facility to clock into.');
+        return;
+      }
+
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span class="portal-spinner" style="width: 16px; height: 16px; border-width: 2px; margin-right: 6px; display: inline-block; vertical-align: middle;"></span> Transmitting EVV Verification...';
+      }
+
+      try {
+        const response = await fetch(`${API_BASE}/shifts/clock-in`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({
+            facility_name: facilityName,
+            unit_department: unitDepartment,
+            role: role,
+            notes: notes
+          })
+        });
+
+        const data = await response.json();
+        if (response.ok && data.success) {
+          alert(`✅ ${data.message || 'Clocked in successfully!'}`);
+          await checkClockStatus();
+          await loadPunchHistory();
+        } else {
+          alert(`❌ Clock In Failed: ${data.error || 'Server error'}`);
+        }
+      } catch (err) {
+        alert('❌ Network error while attempting to clock in. Please check your connection.');
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = '<i data-lucide="play-circle" style="width: 20px; height: 20px;"></i> <span>🟢 1-Tap Clock In to Shift</span>';
+          if (window.lucide) lucide.createIcons();
+        }
+      }
+    }
+
+    async function handleClockOut() {
+      const btn = document.getElementById('btn-clock-out');
+      const notesEl = document.getElementById('clockout-notes');
+      const notes = notesEl ? notesEl.value.trim() : '';
+
+      const confirmConclude = confirm('Conclude Shift Verification:\n\nAre you sure you want to clock out of this shift and submit your hours to Divine Fingers Clinical Dispatch?');
+      if (!confirmConclude) return;
+
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span class="portal-spinner" style="width: 16px; height: 16px; border-width: 2px; margin-right: 6px; display: inline-block; vertical-align: middle;"></span> Submitting Shift Timesheet...';
+      }
+
+      try {
+        const response = await fetch(`${API_BASE}/shifts/clock-out`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ notes })
+        });
+
+        const data = await response.json();
+        if (response.ok && data.success) {
+          alert(data.message || '🎉 Shift Concluded and Clocked Out Successfully!');
+          if (notesEl) notesEl.value = '';
+          await checkClockStatus();
+          await loadPunchHistory();
+        } else {
+          alert(`❌ Clock Out Failed: ${data.error || 'Server error'}`);
+        }
+      } catch (err) {
+        alert('❌ Network error while submitting clock out. Please check your connection.');
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = '<i data-lucide="log-out" style="width: 18px; height: 18px;"></i> <span>🔴 Clock Out &amp; Conclude Shift</span>';
+          if (window.lucide) lucide.createIcons();
+        }
+      }
+    }
+
+    async function loadPunchHistory() {
+      const tbody = document.getElementById('punches-table-body');
+      if (!tbody) return;
+
+      try {
+        const res = await fetch(`${API_BASE}/shifts/my-punches`, { credentials: 'include' });
+        if (!res.ok) return;
+
+        const data = await res.json();
+        const punches = (data && data.punches) ? data.punches : [];
+
+        if (punches.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #64748B; padding: 2rem;">No previous shift punches recorded yet. Your completed timecards will display here.</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = punches.map(p => {
+          const inDate = p.clock_in_time ? new Date(p.clock_in_time) : null;
+          const outDate = p.clock_out_time ? new Date(p.clock_out_time) : null;
+
+          const inStr = inDate ? `${inDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} <span style="color:#94A3B8; font-size:0.75rem;">(${inDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })})</span>` : '--';
+          const outStr = outDate ? `${outDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} <span style="color:#94A3B8; font-size:0.75rem;">(${outDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })})</span>` : '<span style="color:#10B981; font-weight:700;">● In Progress</span>';
+
+          const durationStr = p.status === 'active' 
+            ? '<span class="status-badge urgent">On Duty</span>' 
+            : `<strong style="color: #047857;">${Number(p.total_hours || 0).toFixed(2)} hrs</strong>`;
+
+          const statusBadge = p.status === 'active'
+            ? '<span class="status-badge pending">Active Shift</span>'
+            : '<span class="status-badge confirmed">Approved for Payroll</span>';
+
+          return `
+            <tr>
+              <td>
+                <strong style="color: var(--navy);">${p.facility_name}</strong><br>
+                <span style="font-size: 0.75rem; color: #64748B;">${p.unit_department || 'General Floor'}</span>
+              </td>
+              <td><span style="font-weight: 700;">${p.role || 'RN'}</span></td>
+              <td>${inStr}</td>
+              <td>${outStr}</td>
+              <td>${durationStr}</td>
+              <td>${statusBadge}</td>
+            </tr>
+          `;
+        }).join('');
+
+      } catch (err) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #64748B; padding: 1.5rem;">Timecard punch logs will update after your next shift.</td></tr>';
+      }
     }
 
     // Handle logout

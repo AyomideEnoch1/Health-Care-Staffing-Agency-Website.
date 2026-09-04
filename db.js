@@ -105,6 +105,7 @@ const inMemoryStore = {
   audit_logs: [],
   staff_documents: [],
   newsletter_subscribers: [],
+  shift_punches: [],
   users: [
     {
       id: 'u-c4970cd8-eb90-4e33-9aba-446711e88d8b',
@@ -411,6 +412,57 @@ function handleInMemoryQuery(sql, params = []) {
         const user = inMemoryStore.users.find(u => u.id === idParam);
         if (user) user.last_login = new Date().toISOString();
         return [{ affectedRows: 1 }];
+      }
+      return [{ affectedRows: 1 }];
+    }
+  }
+
+  // 13. SHIFT_PUNCHES
+  if (normalized.includes('shift_punches') || normalized.includes('`shift_punches`')) {
+    if (normalized.startsWith('select')) {
+      if (normalized.includes("status = 'active'")) {
+        const staffIdParam = params[0];
+        const active = inMemoryStore.shift_punches.filter(p => p.staff_id === staffIdParam && p.status === 'active');
+        return [active];
+      }
+      if (normalized.includes('where staff_id = ?')) {
+        const staffIdParam = params[0];
+        const list = inMemoryStore.shift_punches.filter(p => p.staff_id === staffIdParam);
+        return [list];
+      }
+      return [inMemoryStore.shift_punches];
+    }
+    if (normalized.startsWith('insert')) {
+      const punch = {
+        id: params[0] || crypto.randomUUID(),
+        staff_id: params[1],
+        staff_name: params[2],
+        staff_email: params[3],
+        shift_id: params[4] || null,
+        facility_name: params[5],
+        unit_department: params[6] || 'General Floor',
+        role: params[7] || 'RN',
+        clock_in_time: new Date().toISOString(),
+        clock_out_time: null,
+        total_hours: 0,
+        notes: params[8] || null,
+        status: 'active',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+      inMemoryStore.shift_punches.unshift(punch);
+      return [{ affectedRows: 1, insertId: punch.id }];
+    }
+    if (normalized.startsWith('update')) {
+      if (params.length > 0) {
+        const targetId = params[params.length - 1];
+        const punch = inMemoryStore.shift_punches.find(p => p.id === targetId);
+        if (punch) {
+          punch.status = 'completed';
+          punch.clock_out_time = new Date().toISOString();
+          punch.total_hours = params[0] || 0;
+          punch.notes = params[1] || punch.notes;
+        }
       }
       return [{ affectedRows: 1 }];
     }
