@@ -1228,31 +1228,15 @@ async function initHeaderAuthSync() {
     // Offline or network error: defaults to unauthenticated
   }
 
-  // Remove any previously injected elements in navList
-  document.querySelectorAll('.injected-auth-elem').forEach(el => el.remove());
+  // Ensure no injected auth elements exist in the DOM / nav-list
+  document.querySelectorAll('.injected-auth-elem, .nav-auth-item').forEach(el => el.remove());
 
   if (user) {
-    const firstName = (user.full_name || 'Member').split(' ')[0];
-
-    // 1. Update header CTA button to PORTAL
+    // Update header CTA button to PORTAL
     if (ctaBtn) {
       ctaBtn.href = 'portal.html';
-      ctaBtn.innerHTML = `<i data-lucide="user" style="width: 14px; height: 14px; vertical-align: -1px; margin-right: 4px;"></i>PORTAL (${firstName.toUpperCase()})`;
+      ctaBtn.innerHTML = `<i data-lucide="user" style="width: 14px; height: 14px; vertical-align: -1px; margin-right: 4px;"></i>PORTAL`;
       ctaBtn.title = `Access Portal as ${user.full_name}`;
-    }
-
-    // 2. Mobile Nav List
-    if (navList) {
-      const portalLi = document.createElement('li');
-      portalLi.className = 'nav-item nav-auth-item portal-item injected-auth-elem';
-      portalLi.innerHTML = `<a href="portal.html" class="nav-link" style="color: var(--teal-green) !important; font-weight: 800;">PORTAL (${firstName.toUpperCase()})</a>`;
-
-      const logoutLi = document.createElement('li');
-      logoutLi.className = 'nav-item nav-auth-item logout-item injected-auth-elem';
-      logoutLi.innerHTML = `<a href="#" class="nav-link" onclick="fetch('/api/users/logout',{method:'POST'}).then(()=>window.location.reload());return false;" style="color: #EF4444 !important; font-weight: 800;">SIGN OUT</a>`;
-
-      navList.appendChild(portalLi);
-      navList.appendChild(logoutLi);
     }
   } else {
     // Unauthenticated: Keep/set header CTA button to SIGN IN
