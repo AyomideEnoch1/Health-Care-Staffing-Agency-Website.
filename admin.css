@@ -3287,11 +3287,12 @@ select optgroup,
 
   /* Reset all table cells on mobile */
   .table-card-row > td {
-    display: block !important;
-    width: 100% !important;
-    padding: 0 !important;
-    border: none !important;
-    text-align: left !important;
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: none;
+    text-align: left;
+    box-sizing: border-box;
   }
 
   .table-card-row > td::before {
@@ -3339,15 +3340,19 @@ select optgroup,
   }
 
   /* 2. Subtitle / Email Row & Key-Value Items Aligned on a Row */
+  .table-card-row > td.cell-email,
+  .table-card-row > td.cell-subtitle,
+  .table-card-row > td.cell-grid-item,
+  .table-card-row > td.cell-status-desktop,
   .cell-email,
   .cell-subtitle,
-  .cell-grid-item,
-  .table-card-row > td.cell-status-desktop {
+  .cell-grid-item {
     display: flex !important;
     flex-direction: row !important;
     align-items: center !important;
     justify-content: space-between !important;
     flex-wrap: nowrap !important;
+    width: 100% !important;
     gap: 0.5rem 0.75rem !important;
     margin-bottom: 0.55rem !important;
     padding: 0.7rem 1.05rem !important;
@@ -3362,10 +3367,13 @@ select optgroup,
     min-height: 44px !important;
   }
 
+  [data-theme="dark"] .table-card-row > td.cell-email,
+  [data-theme="dark"] .table-card-row > td.cell-subtitle,
+  [data-theme="dark"] .table-card-row > td.cell-grid-item,
+  [data-theme="dark"] .table-card-row > td.cell-status-desktop,
   [data-theme="dark"] .cell-email,
   [data-theme="dark"] .cell-subtitle,
-  [data-theme="dark"] .cell-grid-item,
-  [data-theme="dark"] .table-card-row > td.cell-status-desktop {
+  [data-theme="dark"] .cell-grid-item {
     background: rgba(255, 255, 255, 0.035) !important;
     border-color: rgba(255, 255, 255, 0.08) !important;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2) !important;
@@ -3386,6 +3394,7 @@ select optgroup,
     margin-bottom: 0 !important;
     flex-shrink: 0 !important;
     white-space: nowrap !important;
+    text-align: left !important;
   }
 
   .table-card-row .meta-label::after,
@@ -3408,11 +3417,16 @@ select optgroup,
   }
 
   .table-card-row .meta-value,
+  .cell-email .meta-value,
+  .cell-subtitle .meta-value,
+  .cell-grid-item .meta-value,
+  .cell-status-desktop .meta-value,
   .meta-value {
     display: inline-flex !important;
     align-items: center !important;
     justify-content: flex-end !important;
     text-align: right !important;
+    margin-left: auto !important;
     flex-shrink: 1 !important;
     min-width: 0 !important;
     overflow: hidden !important;
@@ -3424,7 +3438,9 @@ select optgroup,
     color: var(--text-primary) !important;
     line-height: 1.35 !important;
     min-height: auto !important;
-    margin: 0 !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    margin-right: 0 !important;
   }
 
   /* Hide select checkbox on mobile card view */
@@ -3612,10 +3628,13 @@ select optgroup,
     gap: 0.65rem !important;
   }
 
+  .table-card-row > td.cell-email,
+  .table-card-row > td.cell-subtitle,
+  .table-card-row > td.cell-grid-item,
+  .table-card-row > td.cell-status-desktop,
   .cell-email,
   .cell-subtitle,
-  .cell-grid-item,
-  .table-card-row > td.cell-status-desktop {
+  .cell-grid-item {
     display: flex !important;
     flex-direction: row !important;
     align-items: center !important;
