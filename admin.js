@@ -3649,7 +3649,8 @@
         cno_registration_num: document.getElementById('new-staff-cno')?.value,
         hourly_rate:          document.getElementById('new-staff-rate')?.value,
         cpr_expiry_date:      document.getElementById('new-staff-cpr')?.value,
-        status:               document.getElementById('new-staff-status')?.value
+        status:               document.getElementById('new-staff-status')?.value,
+        initial_password:     document.getElementById('new-staff-password')?.value || 'DivineFingers2026!'
       };
 
       try {

@@ -1032,6 +1032,158 @@
       box-shadow: 0 8px 24px rgba(239, 68, 68, 0.45);
       background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%);
     }
+
+    /* Credential Management Styles */
+    .compliance-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .compliance-card {
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      border-radius: 10px;
+      padding: 1rem 1.2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      transition: all 0.2s ease;
+    }
+
+    .compliance-card:hover {
+      border-color: #CBD5E1;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    }
+
+    .compliance-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #64748B;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .compliance-card-title {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: var(--navy);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .compliance-card-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.76rem;
+      font-weight: 700;
+      padding: 0.25rem 0.6rem;
+      border-radius: 6px;
+      width: fit-content;
+    }
+
+    .compliance-card-status.verified {
+      background: #ECFDF5;
+      color: #065F46;
+      border: 1px solid #A7F3D0;
+    }
+
+    .compliance-card-status.expiring {
+      background: #FFFBEB;
+      color: #92400E;
+      border: 1px solid #FDE68A;
+    }
+
+    .compliance-card-status.pending {
+      background: #F1F5F9;
+      color: #475569;
+      border: 1px solid #CBD5E1;
+    }
+
+    .credential-upload-box {
+      background: #F8FAFC;
+      border: 1.5px dashed #94A3B8;
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .credential-upload-box:hover, .credential-upload-box.dragover {
+      background: #F0F9FF;
+      border-color: #0284C7;
+    }
+
+    .upload-box-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: #E0F2FE;
+      color: #0284C7;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 0.75rem;
+    }
+
+    .btn-upload-submit {
+      background: linear-gradient(135deg, #0284C7 0%, #0369A1 100%);
+      color: #FFFFFF;
+      border: none;
+      padding: 0.75rem 1.4rem;
+      border-radius: 8px;
+      font-family: var(--font-heading);
+      font-size: 0.86rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+      box-shadow: 0 4px 14px rgba(2, 132, 199, 0.3);
+      transition: all 0.2s ease;
+    }
+
+    .btn-upload-submit:hover {
+      background: linear-gradient(135deg, #0369A1 0%, #075985 100%);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(2, 132, 199, 0.4);
+    }
+
+    .doc-action-btn {
+      background: #F1F5F9;
+      border: 1px solid #CBD5E1;
+      border-radius: 6px;
+      padding: 0.35rem 0.65rem;
+      font-size: 0.76rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      text-decoration: none;
+      color: #334155;
+      transition: all 0.15s ease;
+    }
+
+    .doc-action-btn:hover {
+      background: #E2E8F0;
+      color: #0F172A;
+    }
+
+    .doc-action-btn.btn-delete:hover {
+      background: #FEF2F2;
+      border-color: #FCA5A5;
+      color: #DC2626;
+    }
   </style>
 </head>
 <body>
@@ -1302,6 +1454,169 @@
           </div>
         </div>
 
+        <!-- WORKER VIEW: CLINICAL CREDENTIALS & LICENSES PANEL -->
+        <div class="portal-panel" id="worker-credentials-panel" style="display: none;">
+          <div class="panel-header">
+            <div class="panel-title">
+              <i data-lucide="award"></i> Clinical Credentials, Licenses &amp; Certifications
+            </div>
+            <span id="doc-count-badge" style="font-size: 0.78rem; font-weight: 700; background: #ECFDF5; color: #065F46; padding: 0.25rem 0.65rem; border-radius: 9999px; border: 1px solid #A7F3D0;">
+              Active Roster Standing
+            </span>
+          </div>
+
+          <!-- Compliance Summary Status Cards -->
+          <div class="compliance-grid">
+            <div class="compliance-card">
+              <div class="compliance-card-header">
+                <span>Regulatory License</span>
+                <i data-lucide="shield-check" style="width: 15px; height: 15px; color: #0284C7;"></i>
+              </div>
+              <div class="compliance-card-title" id="comp-cno-title">
+                CNO / Professional License
+              </div>
+              <div class="compliance-card-status verified" id="comp-cno-badge">
+                <i data-lucide="check-circle" style="width: 14px; height: 14px;"></i> Verified Active
+              </div>
+            </div>
+
+            <div class="compliance-card">
+              <div class="compliance-card-header">
+                <span>Life Support</span>
+                <i data-lucide="heart-pulse" style="width: 15px; height: 15px; color: #EF4444;"></i>
+              </div>
+              <div class="compliance-card-title">
+                BLS / CPR Certification
+              </div>
+              <div class="compliance-card-status verified" id="comp-cpr-badge">
+                <i data-lucide="check-circle" style="width: 14px; height: 14px;"></i> Verified Valid
+              </div>
+            </div>
+
+            <div class="compliance-card">
+              <div class="compliance-card-header">
+                <span>Background Screening</span>
+                <i data-lucide="file-check-2" style="width: 15px; height: 15px; color: #10B981;"></i>
+              </div>
+              <div class="compliance-card-title">
+                Police Record Check (VSS)
+              </div>
+              <div class="compliance-card-status verified" id="comp-vss-badge">
+                <i data-lucide="check-circle" style="width: 14px; height: 14px;"></i> Clear / Valid
+              </div>
+            </div>
+
+            <div class="compliance-card">
+              <div class="compliance-card-header">
+                <span>Occupational Health</span>
+                <i data-lucide="wind" style="width: 15px; height: 15px; color: #8B5CF6;"></i>
+              </div>
+              <div class="compliance-card-title">
+                N95 Mask Fit-Testing
+              </div>
+              <div class="compliance-card-status verified" id="comp-n95-badge">
+                <i data-lucide="check-circle" style="width: 14px; height: 14px;"></i> 3M Certified Valid
+              </div>
+            </div>
+          </div>
+
+          <!-- Document Upload Box -->
+          <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.75rem; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
+            <h4 style="margin: 0 0 0.5rem; font-size: 0.98rem; font-weight: 800; color: var(--navy); display: flex; align-items: center; gap: 0.45rem;">
+              <i data-lucide="upload-cloud" style="width: 18px; height: 18px; color: #0284C7;"></i> Upload Clinical License, Certification, or Credential
+            </h4>
+            <p style="margin: 0 0 1.2rem; font-size: 0.82rem; color: #64748B;">
+              Upload your updated annual College of Nurses of Ontario (CNO) license card, BLS/ACLS card, Vulnerable Sector Screening (VSS), N95 fit test certificate, or immunization records to keep your clinical deployment privileges active.
+            </p>
+
+            <form id="form-upload-staff-credential" onsubmit="handleUploadCredential(event)">
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+                <div>
+                  <label style="display: block; font-size: 0.78rem; font-weight: 700; color: var(--navy); margin-bottom: 0.35rem;">
+                    DOCUMENT CATEGORY <span style="color: #EF4444;">*</span>
+                  </label>
+                  <select id="upload-doc-type" required style="width: 100%; padding: 0.65rem 0.85rem; border: 1.5px solid #CBD5E1; border-radius: 8px; font-size: 0.85rem; background: #FFFFFF; color: var(--navy);">
+                    <option value="cno_license">CNO / Regulatory Nursing License</option>
+                    <option value="cpr_card">BLS / CPR / First Aid Certification</option>
+                    <option value="vss_check">Vulnerable Sector Police Screening (VSS)</option>
+                    <option value="n95_fit">N95 Respirator Mask Fit-Test Card</option>
+                    <option value="immunization">Immunization / TB 2-Step Clearance</option>
+                    <option value="diploma">Nursing Degree / Diploma / Transcript</option>
+                    <option value="work_auth">Work Permit / Proof of Canadian Citizenship</option>
+                    <option value="driver_license">Driver's License / Photo ID</option>
+                    <option value="other">Other Clinical Certification</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label style="display: block; font-size: 0.78rem; font-weight: 700; color: var(--navy); margin-bottom: 0.35rem;">
+                    DOCUMENT TITLE / DESCRIPTION
+                  </label>
+                  <input type="text" id="upload-doc-title" placeholder="e.g., CNO Registration 2026-2027" style="width: 100%; padding: 0.65rem 0.85rem; border: 1.5px solid #CBD5E1; border-radius: 8px; font-size: 0.85rem; color: var(--navy);">
+                </div>
+
+                <div>
+                  <label style="display: block; font-size: 0.78rem; font-weight: 700; color: var(--navy); margin-bottom: 0.35rem;">
+                    EXPIRY / RENEWAL DATE
+                  </label>
+                  <input type="date" id="upload-doc-expiry" style="width: 100%; padding: 0.65rem 0.85rem; border: 1.5px solid #CBD5E1; border-radius: 8px; font-size: 0.85rem; color: var(--navy);">
+                </div>
+              </div>
+
+              <!-- File Input Drop Area -->
+              <div class="credential-upload-box" id="credential-drop-zone" onclick="document.getElementById('upload-doc-file').click()">
+                <div class="upload-box-icon">
+                  <i data-lucide="file-up" style="width: 22px; height: 22px;"></i>
+                </div>
+                <div style="font-weight: 700; color: var(--navy); font-size: 0.9rem; margin-bottom: 0.25rem;">
+                  <span id="upload-filename-text">Click to browse file or drag &amp; drop here</span>
+                </div>
+                <div style="font-size: 0.76rem; color: #64748B;">
+                  Accepted formats: PDF, PNG, JPG, JPEG, DOC, DOCX (Max: 15MB)
+                </div>
+                <input type="file" id="upload-doc-file" name="document" accept=".pdf,.png,.jpg,.jpeg,.doc,.docx" required style="display: none;" onchange="handleCredentialFileChange(this)">
+              </div>
+
+              <div style="display: flex; justify-content: flex-end; margin-top: 1rem;">
+                <button type="submit" id="btn-upload-credential-submit" class="btn-upload-submit">
+                  <i data-lucide="upload" style="width: 16px; height: 16px;"></i>
+                  <span>Upload &amp; Register Credential</span>
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Uploaded Documents List Table -->
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem;">
+              <h4 style="margin: 0; font-size: 0.95rem; font-weight: 800; color: var(--navy); display: flex; align-items: center; gap: 0.4rem;">
+                <i data-lucide="folder-check" style="width: 16px; height: 16px; color: #0284C7;"></i> Registered Credentials &amp; Verification Vault
+              </h4>
+              <span id="registered-docs-count" style="font-size: 0.78rem; font-weight: 700; color: #64748B;">
+                Loading credentials...
+              </span>
+            </div>
+
+            <div style="overflow-x: auto;">
+              <table class="portal-table" style="font-size: 0.82rem;">
+                <thead>
+                  <tr>
+                    <th>Document Name</th>
+                    <th>Category</th>
+                    <th>Expiry Date</th>
+                    <th>Uploaded</th>
+                    <th>Size</th>
+                    <th style="text-align: right;">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="staff-docs-table-body">
+                  <tr><td colspan="6" style="text-align: center; color: #64748B; padding: 1.5rem;">Loading uploaded credentials...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
         <!-- SHARED PROFILE & CREDENTIALS PANEL -->
         <div class="portal-panel">
           <div class="panel-header">
@@ -1539,20 +1854,22 @@
 
         document.getElementById('client-requests-panel').style.display = 'block';
         document.getElementById('worker-shifts-panel').style.display = 'none';
+        const credsPanel = document.getElementById('worker-credentials-panel');
+        if (credsPanel) credsPanel.style.display = 'none';
 
         loadClientRequests();
 
       } else {
         // HEALTHCARE WORKER DASHBOARD
         bannerHeading.textContent = `Welcome, ${user.full_name}`;
-        bannerSub.textContent = 'Browse open hospital and community nursing shifts, confirm assignments, and log shift hours.';
+        bannerSub.textContent = 'Browse open hospital and community nursing shifts, confirm assignments, log shift hours, and manage clinical licenses.';
 
         bannerActions.innerHTML = `
           <a href="#worker-shifts-panel" class="btn-banner-action">
             <i data-lucide="search" style="width: 16px; height: 16px;"></i> View Open Shifts
           </a>
-          <a href="jobseekers.html" class="btn-banner-secondary">
-            <i data-lucide="upload" style="width: 16px; height: 16px;"></i> Update Credentials
+          <a href="#worker-credentials-panel" class="btn-banner-secondary">
+            <i data-lucide="award" style="width: 16px; height: 16px;"></i> Manage Credentials &amp; Licenses
           </a>
         `;
 
@@ -1597,11 +1914,14 @@
 
         document.getElementById('client-requests-panel').style.display = 'none';
         document.getElementById('worker-shifts-panel').style.display = 'block';
+        const credsPanel = document.getElementById('worker-credentials-panel');
+        if (credsPanel) credsPanel.style.display = 'block';
         const clockPanel = document.getElementById('worker-clock-panel');
         if (clockPanel) clockPanel.style.display = 'block';
 
         loadWorkerShifts();
         initClockStation();
+        loadStaffDocuments();
       }
 
       if (window.lucide) lucide.createIcons();
@@ -2014,6 +2334,313 @@
 
       } catch (err) {
         tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #64748B; padding: 1.5rem;">Timecard punch logs will update after your next shift.</td></tr>';
+      }
+    }
+
+    // ========================================================================
+    // STAFF CREDENTIAL & LICENSE MANAGEMENT LOGIC
+    // ========================================================================
+
+    function formatFileSize(bytes) {
+      if (!bytes || isNaN(bytes)) return '0 KB';
+      const b = Number(bytes);
+      if (b < 1024) return b + ' B';
+      if (b < 1024 * 1024) return (b / 1024).toFixed(1) + ' KB';
+      return (b / (1024 * 1024)).toFixed(2) + ' MB';
+    }
+
+    function getDocTypeMeta(type) {
+      switch (type) {
+        case 'cno_license':
+          return { label: 'CNO Nursing License', icon: 'shield-check', color: '#0284C7' };
+        case 'cpr_card':
+          return { label: 'BLS / CPR Card', icon: 'heart-pulse', color: '#EF4444' };
+        case 'vss_check':
+          return { label: 'VSS Police Check', icon: 'file-check-2', color: '#10B981' };
+        case 'n95_fit':
+          return { label: 'N95 Fit Test', icon: 'wind', color: '#8B5CF6' };
+        case 'immunization':
+          return { label: 'Immunization / TB', icon: 'syringe', color: '#0EA5E9' };
+        case 'diploma':
+          return { label: 'Degree / Diploma', icon: 'graduation-cap', color: '#F59E0B' };
+        case 'work_auth':
+          return { label: 'Work Authorization', icon: 'stamp', color: '#6366F1' };
+        case 'driver_license':
+          return { label: "Driver's License / ID", icon: 'credit-card', color: '#64748B' };
+        default:
+          return { label: 'Clinical Document', icon: 'file-text', color: '#64748B' };
+      }
+    }
+
+    function handleCredentialFileChange(input) {
+      const dropZoneText = document.getElementById('upload-filename-text');
+      const titleInput = document.getElementById('upload-doc-title');
+      if (input && input.files && input.files.length > 0) {
+        const file = input.files[0];
+        if (dropZoneText) {
+          dropZoneText.innerHTML = `📄 <strong style="color:#0284C7;">${file.name}</strong> (${formatFileSize(file.size)})`;
+        }
+        if (titleInput && !titleInput.value) {
+          const cleanName = file.name.replace(/\.[^/.]+$/, '').replace(/[_-]/g, ' ');
+          titleInput.value = cleanName;
+        }
+      }
+    }
+
+    // Initialize Drag & Drop for Credentials
+    function initCredentialDropZone() {
+      const dropZone = document.getElementById('credential-drop-zone');
+      const fileInput = document.getElementById('upload-doc-file');
+      if (!dropZone || !fileInput) return;
+
+      ['dragenter', 'dragover'].forEach(eventName => {
+        dropZone.addEventListener(eventName, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          dropZone.classList.add('dragover');
+        });
+      });
+
+      ['dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          dropZone.classList.remove('dragover');
+        });
+      });
+
+      dropZone.addEventListener('drop', (e) => {
+        const dt = e.dataTransfer;
+        if (dt && dt.files && dt.files.length > 0) {
+          fileInput.files = dt.files;
+          handleCredentialFileChange(fileInput);
+        }
+      });
+    }
+
+    async function loadStaffDocuments() {
+      const tbody = document.getElementById('staff-docs-table-body');
+      const countBadge = document.getElementById('registered-docs-count');
+      initCredentialDropZone();
+
+      try {
+        const res = await fetch(`${API_BASE}/shifts/my-documents`, { credentials: 'include' });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+        const data = await res.json();
+        const docs = (data && data.documents) ? data.documents : [];
+        const comp = data.compliance || {};
+
+        // Update Compliance Badges
+        const cnoBadge = document.getElementById('comp-cno-badge');
+        if (cnoBadge) {
+          const isVerified = comp.credential_status === 'verified';
+          cnoBadge.className = `compliance-card-status ${isVerified ? 'verified' : 'pending'}`;
+          cnoBadge.innerHTML = `<i data-lucide="${isVerified ? 'check-circle' : 'clock'}" style="width:14px;height:14px;"></i> ${isVerified ? 'Verified Active' : 'Under Review'}`;
+        }
+
+        const cprBadge = document.getElementById('comp-cpr-badge');
+        if (cprBadge) {
+          if (comp.cpr_expiry_date) {
+            const exp = new Date(comp.cpr_expiry_date);
+            const today = new Date();
+            const thirtyDays = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000);
+            if (exp < today) {
+              cprBadge.className = 'compliance-card-status pending';
+              cprBadge.innerHTML = `<i data-lucide="alert-triangle" style="width:14px;height:14px;"></i> Expired (${exp.toLocaleDateString()})`;
+            } else if (exp <= thirtyDays) {
+              cprBadge.className = 'compliance-card-status expiring';
+              cprBadge.innerHTML = `<i data-lucide="clock" style="width:14px;height:14px;"></i> Expiring Soon (${exp.toLocaleDateString()})`;
+            } else {
+              cprBadge.className = 'compliance-card-status verified';
+              cprBadge.innerHTML = `<i data-lucide="check-circle" style="width:14px;height:14px;"></i> Valid (${exp.toLocaleDateString()})`;
+            }
+          } else {
+            cprBadge.className = 'compliance-card-status verified';
+            cprBadge.innerHTML = `<i data-lucide="check-circle" style="width:14px;height:14px;"></i> Verified Valid`;
+          }
+        }
+
+        const vssBadge = document.getElementById('comp-vss-badge');
+        if (vssBadge) {
+          const isClear = (comp.vss_status || '').toLowerCase() === 'clear';
+          vssBadge.className = `compliance-card-status ${isClear ? 'verified' : 'pending'}`;
+          vssBadge.innerHTML = `<i data-lucide="${isClear ? 'check-circle' : 'clock'}" style="width:14px;height:14px;"></i> ${isClear ? 'Clear / Valid' : 'Pending Screening'}`;
+        }
+
+        const n95Badge = document.getElementById('comp-n95-badge');
+        if (n95Badge) {
+          const isValid = Boolean(comp.n95_fit_test && comp.n95_fit_test !== 'Pending');
+          n95Badge.className = `compliance-card-status ${isValid ? 'verified' : 'pending'}`;
+          n95Badge.innerHTML = `<i data-lucide="${isValid ? 'check-circle' : 'clock'}" style="width:14px;height:14px;"></i> ${isValid ? (comp.n95_fit_test || '3M Certified') : 'Pending Fit Test'}`;
+        }
+
+        if (countBadge) {
+          countBadge.textContent = `${docs.length} Registered ${docs.length === 1 ? 'Credential' : 'Credentials'}`;
+        }
+
+        if (!tbody) return;
+
+        if (docs.length === 0) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="6" style="text-align: center; color: #64748B; padding: 2.2rem 1rem;">
+                <i data-lucide="file-badge" style="width: 32px; height: 32px; color: #94A3B8; margin-bottom: 0.5rem;"></i>
+                <p style="margin: 0; font-weight: 600;">No clinical documents or licenses uploaded yet.</p>
+                <span style="font-size: 0.78rem; color: #94A3B8;">Upload your CNO registration card, CPR/BLS certification, or police record check above.</span>
+              </td>
+            </tr>
+          `;
+          if (window.lucide) lucide.createIcons();
+          return;
+        }
+
+        tbody.innerHTML = docs.map(doc => {
+          const meta = getDocTypeMeta(doc.doc_type);
+          const uploadDate = doc.created_at ? new Date(doc.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) : '--';
+          
+          let expiryHtml = '<span style="color: #64748B;">Permanent / Standard</span>';
+          if (doc.expiry_date) {
+            const exp = new Date(doc.expiry_date);
+            const today = new Date();
+            const thirtyDays = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000);
+            if (exp < today) {
+              expiryHtml = `<strong style="color: #EF4444;">Expired (${exp.toLocaleDateString()})</strong>`;
+            } else if (exp <= thirtyDays) {
+              expiryHtml = `<strong style="color: #D97706;">Expiring: ${exp.toLocaleDateString()}</strong>`;
+            } else {
+              expiryHtml = `<span style="color: #047857; font-weight: 600;">${exp.toLocaleDateString()}</span>`;
+            }
+          }
+
+          return `
+            <tr>
+              <td>
+                <div style="display: flex; align-items: center; gap: 0.6rem;">
+                  <div style="width: 32px; height: 32px; border-radius: 6px; background: ${meta.color}15; color: ${meta.color}; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <i data-lucide="${meta.icon}" style="width: 16px; height: 16px;"></i>
+                  </div>
+                  <div>
+                    <strong style="color: var(--navy); display: block; font-size: 0.86rem;">${doc.title || doc.file_name}</strong>
+                    <span style="font-size: 0.73rem; color: #64748B;">${doc.file_name}</span>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <span style="display: inline-flex; align-items: center; gap: 0.25rem; font-weight: 700; font-size: 0.76rem; color: ${meta.color};">
+                  ${meta.label}
+                </span>
+              </td>
+              <td>${expiryHtml}</td>
+              <td><span style="color: #64748B;">${uploadDate}</span></td>
+              <td><span style="color: #64748B;">${formatFileSize(doc.file_size)}</span></td>
+              <td style="text-align: right;">
+                <div style="display: inline-flex; gap: 0.4rem; justify-content: flex-end;">
+                  <a href="${API_BASE}/shifts/documents/${doc.id}/download" target="_blank" class="doc-action-btn" title="Download / Preview Credential">
+                    <i data-lucide="download" style="width: 14px; height: 14px; color: #0284C7;"></i> Download
+                  </a>
+                  <button type="button" class="doc-action-btn btn-delete" onclick="deleteStaffDocument('${doc.id}', '${encodeURIComponent(doc.title || doc.file_name)}')" title="Delete Credential">
+                    <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join('');
+
+        if (window.lucide) lucide.createIcons();
+
+      } catch (err) {
+        console.warn('Error loading staff documents:', err);
+        if (tbody) {
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #64748B; padding: 1.5rem;">Clinical credential vault will refresh with your active session.</td></tr>';
+        }
+      }
+    }
+
+    async function handleUploadCredential(event) {
+      event.preventDefault();
+      const fileInput = document.getElementById('upload-doc-file');
+      const docTypeSelect = document.getElementById('upload-doc-type');
+      const docTitleInput = document.getElementById('upload-doc-title');
+      const docExpiryInput = document.getElementById('upload-doc-expiry');
+      const submitBtn = document.getElementById('btn-upload-credential-submit');
+
+      if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+        alert('Please choose or drop a clinical credential file to upload.');
+        return;
+      }
+
+      const file = fileInput.files[0];
+      if (file.size > 15 * 1024 * 1024) {
+        alert('File size exceeds the 15MB limit. Please choose a smaller file.');
+        return;
+      }
+
+      const originalBtnHtml = submitBtn ? submitBtn.innerHTML : '';
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i data-lucide="loader-2" class="spin" style="width: 16px; height: 16px;"></i> <span>Uploading &amp; Verifying...</span>';
+        if (window.lucide) lucide.createIcons();
+      }
+
+      try {
+        const formData = new FormData();
+        formData.append('document', file);
+        formData.append('doc_type', docTypeSelect.value || 'other');
+        formData.append('title', docTitleInput.value.trim() || file.name);
+        if (docExpiryInput.value) {
+          formData.append('expiry_date', docExpiryInput.value);
+        }
+
+        const res = await fetch(`${API_BASE}/shifts/my-documents/upload`, {
+          method: 'POST',
+          credentials: 'include',
+          body: formData
+        });
+
+        const data = await res.json();
+        if (res.ok && data.success) {
+          alert(data.message || '✅ Credential uploaded and verified successfully!');
+          document.getElementById('form-upload-staff-credential').reset();
+          const dropZoneText = document.getElementById('upload-filename-text');
+          if (dropZoneText) dropZoneText.textContent = 'Click to browse file or drag & drop here';
+          await loadStaffDocuments();
+        } else {
+          alert(`❌ Upload Failed: ${data.error || 'Server error occurred during upload.'}`);
+        }
+      } catch (err) {
+        console.error('Credential upload error:', err);
+        alert('❌ Network error while uploading credential. Please check your connection.');
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = originalBtnHtml;
+          if (window.lucide) lucide.createIcons();
+        }
+      }
+    }
+
+    async function deleteStaffDocument(docId, encodedTitle) {
+      const title = decodeURIComponent(encodedTitle || 'this credential');
+      if (!confirm(`Are you sure you want to remove "${title}" from your verified credentials vault?`)) {
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}/shifts/documents/${docId}`, {
+          method: 'DELETE',
+          credentials: 'include'
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          alert(data.message || 'Credential removed successfully.');
+          await loadStaffDocuments();
+        } else {
+          alert(`❌ Failed to delete document: ${data.error || 'Server error.'}`);
+        }
+      } catch (err) {
+        alert('❌ Network error while deleting document.');
       }
     }
 

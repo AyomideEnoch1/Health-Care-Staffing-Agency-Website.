@@ -315,7 +315,7 @@ function handleInMemoryQuery(sql, params = []) {
   if (normalized.includes('staff_documents')) {
     if (normalized.startsWith('select')) {
       if (params.length > 0) {
-        return [inMemoryStore.staff_documents.filter(d => d.staff_id === params[0] || d.id === params[0])];
+        return [inMemoryStore.staff_documents.filter(d => params.includes(d.staff_id) || params.includes(d.id))];
       }
       return [inMemoryStore.staff_documents];
     }

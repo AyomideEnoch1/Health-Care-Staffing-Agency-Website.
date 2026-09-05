@@ -332,6 +332,52 @@ router.patch('/applications/:id/stage', requirePermission('applications:manage')
 
     await pool.query('UPDATE job_applications SET stage = ? WHERE id = ?', [stage, id]);
 
+    // If marked as hired, auto-provision user account and staff roster record if not exists
+    if (stage === 'hired') {
+      try {
+        const [appRows] = await pool.query('SELECT full_name, email, phone, role_applied FROM job_applications WHERE id = ?', [id]);
+        if (appRows && appRows.length > 0) {
+          const app = appRows[0];
+          const emailClean = (app.email || '').toLowerCase().trim();
+          if (emailClean) {
+            // Check users table
+            const [userRows] = await pool.query('SELECT id FROM users WHERE email = ?', [emailClean]);
+            if (!userRows || userRows.length === 0) {
+              const plainPassword = 'DivineFingers2026!';
+              const salt = await bcrypt.genSalt(10);
+              const passwordHash = await bcrypt.hash(plainPassword, salt);
+              await pool.query(
+                `INSERT INTO users (id, email, password_hash, full_name, role, phone, is_active, email_verified)
+                 VALUES (?, ?, ?, ?, 'healthcare_worker', ?, 1, 1)`,
+                [id, emailClean, passwordHash, app.full_name, app.phone || null]
+              );
+            } else {
+              await pool.query(
+                `UPDATE users SET is_active = 1, role = 'healthcare_worker' WHERE id = ?`,
+                [userRows[0].id]
+              );
+            }
+
+            // Check staff_roster table
+            const [rosterRows] = await pool.query('SELECT id FROM staff_roster WHERE email = ?', [emailClean]);
+            if (!rosterRows || rosterRows.length === 0) {
+              const [countRows] = await pool.query('SELECT COUNT(*) AS total FROM staff_roster');
+              const nextNum = String((countRows?.[0]?.total || 0) + 1).padStart(3, '0');
+              const staffCode = `STF-${nextNum}`;
+              await pool.query(
+                `INSERT INTO staff_roster
+                  (id, name, role, specialty, status, credential_status, rating, region, phone, email, staff_code)
+                 VALUES (?, ?, ?, ?, 'active', 'verified', 5.0, 'GTA', ?, ?, ?)`,
+                [id, app.full_name, app.role_applied || 'Registered Nurse (RN)', 'General', app.phone || null, emailClean, staffCode]
+              );
+            }
+          }
+        }
+      } catch (provErr) {
+        console.warn('[Auto-Hire Provisioning Warning]:', provErr.message);
+      }
+    }
+
     await pool.query(
       `INSERT INTO audit_logs (id, admin_id, actor_name, action, target_entity, target_id, details, severity, ip_address)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
@@ -396,7 +442,8 @@ router.post('/roster', requirePermission('roster:manage'), async (req, res, next
     const {
       name, role, specialty, region, phone, email,
       hourly_rate, cpr_expiry_date, cno_registration_num,
-      status, credential_status, vss_status, n95_fit_test
+      status, credential_status, vss_status, n95_fit_test,
+      initial_password
     } = req.body;
 
     if (!name || !role || !phone || !email) {
@@ -427,20 +474,43 @@ router.post('/roster', requirePermission('roster:manage'), async (req, res, next
       ]
     );
 
+    // Auto-provision user account in `users` table so hired staff can immediately log into the Staff Portal
+    const emailClean = email.toLowerCase().trim();
+    try {
+      const [existingUser] = await pool.query('SELECT id FROM users WHERE email = ?', [emailClean]);
+      if (!existingUser || existingUser.length === 0) {
+        const plainPassword = initial_password || 'DivineFingers2026!';
+        const salt = await bcrypt.genSalt(10);
+        const passwordHash = await bcrypt.hash(plainPassword, salt);
+        await pool.query(
+          `INSERT INTO users (id, email, password_hash, full_name, role, phone, is_active, email_verified)
+           VALUES (?, ?, ?, ?, 'healthcare_worker', ?, 1, 1)`,
+          [id, emailClean, passwordHash, name.trim(), phone ? phone.trim() : null]
+        );
+      } else {
+        await pool.query(
+          `UPDATE users SET is_active = 1, role = 'healthcare_worker' WHERE id = ?`,
+          [existingUser[0].id]
+        );
+      }
+    } catch (userErr) {
+      console.warn('[Staff User Provisioning Warning]:', userErr.message);
+    }
+
     await pool.query(
       `INSERT INTO audit_logs (id, admin_id, actor_name, action, target_entity, target_id, details, severity, ip_address)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [crypto.randomUUID(), req.admin.id, req.admin.full_name,
        'STAFF_ADDED', 'staff_roster', id,
-       `Added new staff ${name} (${role}) as ${staffCode}`, 'info', req.ip]
+       `Added new staff ${name} (${role}) as ${staffCode} (Portal Login Provisioned)`, 'info', req.ip]
     );
 
     adminEvents.emit('status:changed', { entity: 'staff_roster', id, action: 'created' });
 
     res.status(201).json({
       success: true,
-      message: `Staff member ${name} added successfully.`,
-      data: { id, staff_code: staffCode }
+      message: `Staff member ${name} onboarded successfully with portal access.`,
+      data: { id, staff_code: staffCode, email: emailClean, login_provisioned: true }
     });
   } catch (err) { next(err); }
 });
