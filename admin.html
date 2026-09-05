@@ -1268,11 +1268,16 @@
             </select>
           </div>
         </div>
-        <div class="modal-form-group" style="margin-top: 0.5rem;">
-          <label for="new-staff-password">Initial Portal Password</label>
-          <input type="text" class="modal-input" id="new-staff-password" value="DivineFingers2026!" placeholder="Default: DivineFingers2026!">
-          <span style="font-size: 0.72rem; color: var(--text-muted); margin-top: 4px; display: block;">
-            The staff member will use this password to sign into their Staff Portal. They can change it after login.
+        <div style="background: var(--status-info-bg); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 10px; padding: 1rem 1.15rem; margin-top: 0.85rem;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.45rem;">
+            <label for="new-staff-password" style="margin: 0; font-size: 0.78rem; font-weight: 800; color: var(--status-info); display: flex; align-items: center; gap: 0.45rem;">
+              <i data-lucide="key-round" style="width: 15px; height: 15px;"></i> Staff Portal Initial Password
+            </label>
+            <span style="font-size: 0.7rem; font-weight: 800; background: rgba(56, 189, 248, 0.2); color: var(--status-info); padding: 0.15rem 0.5rem; border-radius: 4px;">Auto-Provisioned</span>
+          </div>
+          <input type="text" class="modal-input" id="new-staff-password" value="DivineFingers2026!" placeholder="Default: DivineFingers2026!" style="font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace; font-weight: 700; background: var(--bg-input); border-color: rgba(56, 189, 248, 0.4);">
+          <span style="font-size: 0.73rem; color: var(--text-muted); margin-top: 6px; display: block; line-height: 1.4;">
+            Creates an active login account in the database. The caregiver can log into their Staff Portal (<span style="font-family: monospace;">portal.html</span>) immediately using their work email and this password.
           </span>
         </div>
         <div class="modal-actions">
