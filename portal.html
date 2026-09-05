@@ -733,24 +733,28 @@
 
     .clock-hero-time {
       font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
-      font-size: 2.35rem;
+      font-size: clamp(1.5rem, 5vw, 2.35rem);
       font-weight: 800;
       color: #38BDF8;
-      letter-spacing: 1.5px;
+      letter-spacing: 1px;
       line-height: 1.15;
       text-shadow: 0 0 20px rgba(56, 189, 248, 0.45);
       margin: 0.25rem 0;
+      word-break: keep-all;
+      white-space: nowrap;
     }
 
     .clock-duration-time {
       font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
-      font-size: 2.35rem;
+      font-size: clamp(1.4rem, 4.5vw, 2.35rem);
       font-weight: 800;
       color: #34D399;
-      letter-spacing: 1.5px;
+      letter-spacing: 1px;
       line-height: 1.15;
       text-shadow: 0 0 20px rgba(52, 211, 153, 0.45);
       margin: 0.25rem 0;
+      word-break: keep-all;
+      white-space: nowrap;
     }
 
     .clock-hero-zone {
@@ -1805,16 +1809,27 @@
       }
 
       .clock-display-hero {
-        padding: 1.25rem 1rem;
-        gap: 1rem;
+        padding: 1rem 0.85rem !important;
+        gap: 0.75rem !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
       }
 
       .clock-hero-left, .clock-hero-right {
-        padding: 0.95rem 1.1rem;
+        padding: 0.85rem 0.95rem !important;
+        min-width: 0 !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
       }
 
-      .clock-hero-time, .clock-duration-time {
-        font-size: 1.95rem;
+      .clock-hero-time {
+        font-size: clamp(1.4rem, 6vw, 1.85rem) !important;
+        letter-spacing: 0.5px !important;
+      }
+
+      .clock-duration-time {
+        font-size: clamp(1.25rem, 5vw, 1.75rem) !important;
+        letter-spacing: 0.5px !important;
       }
 
       .shift-hero-banner {
@@ -1987,22 +2002,27 @@
         
         <!-- CLIENT VIEW: STAFFING REQUESTS ROSTER -->
         <div class="portal-panel" id="client-requests-panel" style="display: none;">
-          <div class="panel-header">
+          <div class="panel-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
             <div class="panel-title">
-              <i data-lucide="clipboard-list"></i> Active Staffing Shifts &amp; Requests
+              <i data-lucide="clipboard-list"></i> Active Shifts, Dispatched Personnel &amp; Live Tracking
             </div>
-            <a href="clients.html" class="panel-action-link">+ New Request</a>
+            <div style="display: flex; align-items: center; gap: 0.6rem;">
+              <button type="button" class="btn-portal-refresh" onclick="loadClientRequests()" style="padding: 0.4rem 0.8rem; font-size: 0.78rem; font-weight: 700; border-radius: 6px; border: 1px solid #CBD5E1; background: #FFFFFF; color: #1E293B; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;">
+                <i data-lucide="refresh-cw" style="width: 12px; height: 12px;"></i> Refresh
+              </button>
+              <a href="clients.html" class="panel-action-link">+ New Staffing Request</a>
+            </div>
           </div>
 
           <div class="portal-table-wrap">
             <table class="portal-table">
               <thead>
                 <tr>
-                  <th>Request ID</th>
-                  <th>Role</th>
-                  <th>Shift Type</th>
-                  <th>Urgency</th>
-                  <th>Date</th>
+                  <th>Request &amp; Date</th>
+                  <th>Shift &amp; Dept</th>
+                  <th>Dispatched Caregiver</th>
+                  <th>Live Activity &amp; EVV</th>
+                  <th>Caregiver Rating</th>
                   <th>Status</th>
                 </tr>
               </thead>
@@ -2562,6 +2582,61 @@
 
   </main>
 
+  <!-- CLIENT STAFF RATING & REVIEW MODAL -->
+  <div id="client-rating-modal" style="display: none; position: fixed; inset: 0; z-index: 9999; background: rgba(10, 37, 64, 0.65); backdrop-filter: blur(4px); align-items: center; justify-content: center; padding: 1rem;">
+    <div style="background: #FFFFFF; border-radius: 16px; width: 100%; max-width: 480px; box-shadow: 0 20px 40px -8px rgba(0,0,0,0.3); border: 1px solid #E2E8F0; overflow: hidden; animation: modalFadeIn 0.25s ease-out;">
+      <div style="background: linear-gradient(135deg, #071324 0%, #0F2744 100%); padding: 1.25rem 1.5rem; color: #FFFFFF; display: flex; justify-content: space-between; align-items: center;">
+        <div style="display: flex; align-items: center; gap: 0.6rem;">
+          <i data-lucide="star" style="width: 20px; height: 20px; color: #F59E0B; fill: #F59E0B;"></i>
+          <h3 style="margin: 0; font-size: 1.05rem; font-weight: 800; font-family: var(--font-heading);">Rate Dispatched Caregiver</h3>
+        </div>
+        <button type="button" onclick="closeClientRateModal()" style="background: transparent; border: none; color: #94A3B8; font-size: 1.4rem; line-height: 1; cursor: pointer; padding: 0.2rem;">&times;</button>
+      </div>
+
+      <div style="padding: 1.5rem;">
+        <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 1rem; margin-bottom: 1.25rem;">
+          <div style="font-size: 0.72rem; font-weight: 800; color: #64748B; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem;">Dispatched Healthcare Worker</div>
+          <div id="rate-modal-staff-name" style="font-size: 1.05rem; font-weight: 800; color: #0F172A;">Caregiver Name</div>
+          <div id="rate-modal-shift-info" style="font-size: 0.78rem; color: #64748B; margin-top: 2px;">General Floor &bull; Day Shift</div>
+        </div>
+
+        <input type="hidden" id="rate-modal-request-id" value="">
+
+        <div style="text-align: center; margin-bottom: 1.5rem;">
+          <label style="display: block; font-size: 0.75rem; font-weight: 800; color: #475569; margin-bottom: 0.6rem; text-transform: uppercase; letter-spacing: 0.05em;">
+            HOW WOULD YOU RATE THIS CLINICIAN'S CARE &amp; CONDUCT? *
+          </label>
+          <div id="star-picker-container" style="display: inline-flex; gap: 0.5rem; font-size: 2.2rem; cursor: pointer; user-select: none;">
+            <span class="star-btn" data-val="1" onclick="setStarRating(1)" style="color: #F59E0B; transition: transform 0.15s ease;">★</span>
+            <span class="star-btn" data-val="2" onclick="setStarRating(2)" style="color: #F59E0B; transition: transform 0.15s ease;">★</span>
+            <span class="star-btn" data-val="3" onclick="setStarRating(3)" style="color: #F59E0B; transition: transform 0.15s ease;">★</span>
+            <span class="star-btn" data-val="4" onclick="setStarRating(4)" style="color: #F59E0B; transition: transform 0.15s ease;">★</span>
+            <span class="star-btn" data-val="5" onclick="setStarRating(5)" style="color: #F59E0B; transition: transform 0.15s ease;">★</span>
+          </div>
+          <div id="star-rating-label" style="font-size: 0.85rem; font-weight: 800; color: #F59E0B; margin-top: 0.35rem;">
+            5.0 Stars - Excellent / Outstanding Care
+          </div>
+        </div>
+
+        <div style="margin-bottom: 1.25rem;">
+          <label for="rate-modal-feedback" style="display: block; font-size: 0.75rem; font-weight: 700; color: #475569; margin-bottom: 0.35rem; text-transform: uppercase; letter-spacing: 0.05em;">
+            Facility Feedback / Notes (Optional)
+          </label>
+          <textarea id="rate-modal-feedback" rows="3" placeholder="Punctuality, patient communication, clinical competence, unit integration..." style="width: 100%; border: 1px solid #CBD5E1; border-radius: 8px; padding: 0.75rem; font-family: var(--font-body); font-size: 0.85rem; resize: vertical; box-sizing: border-box;"></textarea>
+        </div>
+
+        <div style="display: flex; gap: 0.75rem; justify-content: flex-end;">
+          <button type="button" onclick="closeClientRateModal()" style="padding: 0.65rem 1.1rem; border-radius: 8px; border: 1px solid #CBD5E1; background: #FFFFFF; color: #475569; font-weight: 700; font-size: 0.85rem; cursor: pointer;">
+            Cancel
+          </button>
+          <button type="button" id="btn-submit-rating" onclick="submitClientRating()" style="padding: 0.65rem 1.4rem; border-radius: 8px; border: none; background: linear-gradient(135deg, #0284C7 0%, #0369A1 100%); color: #FFFFFF; font-weight: 700; font-size: 0.85rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(2,132,199,0.3);">
+            <i data-lucide="check" style="width: 15px; height: 15px;"></i> Submit Rating
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
     let currentUser = null;
 
@@ -2787,13 +2862,13 @@
       if (window.lucide) lucide.createIcons();
     }
 
-    // Load Client Requests Table
+    // Load Client Requests Table with Live Staff Activity Tracking & Ratings
     async function loadClientRequests() {
       const tbody = document.getElementById('client-requests-table-body');
-      tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #64748B; padding: 1.5rem;">Loading active staffing requests...</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #64748B; padding: 1.5rem;">Loading active staffing requests & live personnel tracking...</td></tr>';
 
       try {
-        const res = await fetch(`${API_BASE}/requests`);
+        const res = await fetch(`${API_BASE}/requests`, { credentials: 'include' });
         let requests = [];
         if (res.ok) {
           const data = await res.json();
@@ -2810,17 +2885,107 @@
           const dateStr = d && !isNaN(d.getTime()) ? d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : 'Today';
           const status = req.status || 'pending';
           const urgency = req.urgency_level || 'routine';
+          
+          // 1. Dispatched Caregiver Info
+          let staffDisplay = '';
+          if (req.staff_name) {
+            staffDisplay = `
+              <div style="display:flex;align-items:center;gap:8px;">
+                <div style="width:34px;height:34px;border-radius:50%;background:rgba(2,132,199,0.12);color:#0284C7;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:0.75rem;border:1.5px solid rgba(2,132,199,0.25);flex-shrink:0;">
+                  ${req.staff_name.split(' ').map(n=>n[0]).join('').slice(0,2)}
+                </div>
+                <div>
+                  <strong style="color:#0F172A;font-size:0.86rem;display:block;">${req.staff_name}</strong>
+                  <span style="color:#64748B;font-size:0.74rem;font-weight:600;">${req.staff_role || req.role_requested} &bull; ${req.staff_code || 'Verified'}</span>
+                  ${req.staff_phone ? `<a href="tel:${req.staff_phone}" style="display:block;font-size:0.72rem;color:#0284C7;text-decoration:none;font-weight:700;"><i data-lucide="phone" style="width:11px;height:11px;vertical-align:middle;"></i> ${req.staff_phone}</a>` : ''}
+                </div>
+              </div>
+            `;
+          } else {
+            staffDisplay = `
+              <span style="color:#64748B;font-size:0.8rem;font-style:italic;display:inline-flex;align-items:center;gap:4px;">
+                <i data-lucide="user-x" style="width:13px;height:13px;color:#94A3B8;"></i> Dispatch In Progress
+              </span>
+            `;
+          }
+
+          // 2. Real-Time Staff Activity & EVV Telemetry
+          let activityDisplay = '';
+          if (!req.staff_name) {
+            activityDisplay = `<span class="status-badge routine" style="font-size:0.72rem;">Matching Caregiver</span>`;
+          } else if (req.clock_out_time) {
+            const outDate = new Date(req.clock_out_time);
+            activityDisplay = `
+              <div style="display:flex;flex-direction:column;gap:2px;">
+                <span class="status-badge completed" style="width:fit-content;display:inline-flex;align-items:center;gap:4px;font-size:0.72rem;">
+                  <i data-lucide="check-check" style="width:11px;height:11px;"></i> Shift Completed
+                </span>
+                <span style="font-size:0.72rem;color:#64748B;">Clocked out ${outDate.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
+              </div>
+            `;
+          } else if (req.clock_in_time) {
+            const inDate = new Date(req.clock_in_time);
+            activityDisplay = `
+              <div style="display:flex;flex-direction:column;gap:2px;">
+                <span class="status-badge confirmed" style="width:fit-content;background:#DCFCE7;color:#15803D;border:1px solid #86EFAC;display:inline-flex;align-items:center;gap:4px;font-size:0.72rem;">
+                  <span class="pulse-dot" style="width:7px;height:7px;background:#16A34A;display:inline-block;border-radius:50%;"></span> Active On-Site
+                </span>
+                <span style="font-size:0.72rem;color:#15803D;font-weight:700;">Since ${inDate.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
+              </div>
+            `;
+          } else {
+            activityDisplay = `
+              <div style="display:flex;flex-direction:column;gap:2px;">
+                <span class="status-badge pending" style="width:fit-content;background:#FEF3C7;color:#B45309;border:1px solid #FCD34D;display:inline-flex;align-items:center;gap:4px;font-size:0.72rem;">
+                  <i data-lucide="truck" style="width:11px;height:11px;"></i> En Route / Assigned
+                </span>
+                <span style="font-size:0.72rem;color:#64748B;">Scheduled for ${req.shift_type}</span>
+              </div>
+            `;
+          }
+
+          // 3. Client Staff Rating & Review
+          let ratingDisplay = '';
+          if (!req.staff_name) {
+            ratingDisplay = `<span style="color:#94A3B8;font-size:0.75rem;">—</span>`;
+          } else if (req.client_rating) {
+            const stars = '★'.repeat(req.client_rating) + '☆'.repeat(5 - req.client_rating);
+            ratingDisplay = `
+              <div>
+                <span style="color:#F59E0B;font-size:0.92rem;letter-spacing:1px;font-weight:800;" title="${req.client_feedback || 'Verified hospital rating'}">${stars}</span>
+                <span style="font-size:0.74rem;font-weight:700;color:#0F172A;display:block;">${req.client_rating}.0 / 5.0</span>
+                ${req.client_feedback ? `<span style="font-size:0.7rem;color:#64748B;display:block;max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${req.client_feedback}">"${req.client_feedback}"</span>` : ''}
+              </div>
+            `;
+          } else {
+            ratingDisplay = `
+              <button type="button" class="btn-rate-staff" onclick="openClientRateModal('${req.id}', '${(req.staff_name || '').replace(/'/g, "\\'")}', '${req.role_requested || 'Caregiver'}', '${(req.facility_name || '').replace(/'/g, "\\'")}')" style="background:#F8FAFC;border:1.5px solid #CBD5E1;padding:0.35rem 0.65rem;border-radius:6px;font-size:0.74rem;font-weight:800;color:#0F172A;cursor:pointer;display:inline-flex;align-items:center;gap:4px;transition:all 0.2s ease;">
+                <span style="color:#F59E0B;font-size:0.85rem;">★</span> Rate Staff
+              </button>
+            `;
+          }
+
           return `
             <tr>
-              <td><strong style="font-family: monospace; color: #0284C7;">#${(req.id || 'REQ').toString().slice(-6)}</strong></td>
-              <td><span style="font-weight: 700;">${req.role_requested || 'RN / PSW'}</span></td>
-              <td>${req.shift_type || 'Day Shift'}</td>
-              <td><span class="status-badge ${urgency}">${urgency}</span></td>
-              <td>${dateStr}</td>
+              <td>
+                <strong style="font-family: monospace; color: #0284C7; font-size:0.85rem;">#${(req.request_code || req.id || 'REQ').toString().slice(-8)}</strong>
+                <div style="font-weight:700;color:#0F172A;font-size:0.85rem;margin-top:2px;">${req.role_requested || 'RN / PSW'}</div>
+                <span style="font-size:0.72rem;color:#64748B;">${dateStr}</span>
+              </td>
+              <td>
+                <strong style="color:#1E293B;font-size:0.82rem;display:block;">${req.shift_type || 'Day Shift'}</strong>
+                <span style="color:#64748B;font-size:0.75rem;">${req.unit_department || 'General Floor'}</span>
+                <div style="margin-top:3px;"><span class="status-badge ${urgency}">${urgency}</span></div>
+              </td>
+              <td>${staffDisplay}</td>
+              <td>${activityDisplay}</td>
+              <td>${ratingDisplay}</td>
               <td><span class="status-badge ${status}">${status}</span></td>
             </tr>
           `;
         }).join('');
+
+        if (window.lucide) lucide.createIcons();
 
       } catch (e) {
         console.error('Failed to load requests:', e);
@@ -3516,6 +3681,90 @@
         }
       } catch (err) {
         alert('❌ Network error while deleting document.');
+      }
+    }
+
+    // ── Client Staff Rating & Telemetry Feedback Controls ───────────────────
+    let currentRatingValue = 5;
+
+    function openClientRateModal(reqId, staffName, role, facility) {
+      document.getElementById('rate-modal-request-id').value = reqId;
+      document.getElementById('rate-modal-staff-name').textContent = staffName || 'Dispatched Caregiver';
+      document.getElementById('rate-modal-shift-info').textContent = `${role || 'Staff Member'} • ${facility || 'Facility Placement'}`;
+      document.getElementById('rate-modal-feedback').value = '';
+      setStarRating(5);
+      
+      const modal = document.getElementById('client-rating-modal');
+      modal.style.display = 'flex';
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function closeClientRateModal() {
+      const modal = document.getElementById('client-rating-modal');
+      modal.style.display = 'none';
+    }
+
+    function setStarRating(val) {
+      currentRatingValue = val;
+      const stars = document.querySelectorAll('#star-picker-container .star-btn');
+      stars.forEach((star, idx) => {
+        if (idx < val) {
+          star.style.color = '#F59E0B';
+          star.textContent = '★';
+        } else {
+          star.style.color = '#CBD5E1';
+          star.textContent = '☆';
+        }
+      });
+      
+      const labels = {
+        1: '1.0 Star - Unsatisfactory Care',
+        2: '2.0 Stars - Needs Improvement',
+        3: '3.0 Stars - Satisfactory Performance',
+        4: '4.0 Stars - Very Good Care',
+        5: '5.0 Stars - Excellent / Outstanding Care'
+      };
+      const labelEl = document.getElementById('star-rating-label');
+      if (labelEl) labelEl.textContent = labels[val] || `${val}.0 Stars`;
+    }
+
+    async function submitClientRating() {
+      const reqId = document.getElementById('rate-modal-request-id').value;
+      const feedback = document.getElementById('rate-modal-feedback').value.trim();
+      const btn = document.getElementById('btn-submit-rating');
+
+      if (!reqId) return;
+
+      const originalBtnHtml = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = 'Submitting...';
+
+      try {
+        const res = await fetch(`${API_BASE}/requests/${reqId}/rate`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({
+            rating: currentRatingValue,
+            feedback: feedback || null
+          })
+        });
+
+        const data = await res.json();
+        if (res.ok && data.success) {
+          alert(`✅ ${data.message || 'Rating submitted successfully!'}`);
+          closeClientRateModal();
+          await loadClientRequests();
+        } else {
+          alert(`❌ Rating Submission Failed: ${data.error || 'Server error.'}`);
+        }
+      } catch (err) {
+        console.error('Rating error:', err);
+        alert('❌ Network error while submitting rating. Please try again.');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalBtnHtml;
+        if (window.lucide) lucide.createIcons();
       }
     }
 

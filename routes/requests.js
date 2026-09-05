@@ -1,11 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const crypto = require('crypto');
+const jwt = require('jsonwebtoken');
 const { z } = require('zod');
 const pool = require('../db');
 const { publicFormLimiter } = require('../middleware/rateLimiter');
 const { sendStaffingRequestAlert } = require('../utils/mailer');
 const adminEvents = require('../utils/events');
+
+const JWT_SECRET = process.env.JWT_SECRET || 'divine_fingers_default_secure_jwt_secret_key_2026_production_fallback';
 
 const requestSchema = z.object({
   facility_name: z.string().min(2).max(150),
@@ -172,6 +175,209 @@ router.post('/bulk', publicFormLimiter, async (req, res, next) => {
       batch_code: batchCode,
       total_shifts: createdShifts.length,
       data: createdShifts
+    });
+  } catch (err) {
+    if (err instanceof z.ZodError) {
+      return res.status(400).json({ success: false, error: err.errors[0].message });
+    }
+    next(err);
+  }
+});
+
+// ============================================================================
+// GET /api/requests
+// Fetch client staffing requests, assigned staff details, and live activity tracking
+// ============================================================================
+router.get('/', async (req, res, next) => {
+  try {
+    let clientEmail = null;
+    let clientOrg = null;
+
+    // Check user session
+    const token = req.cookies['df_user_session'];
+    if (token) {
+      try {
+        const decoded = jwt.verify(token, JWT_SECRET);
+        if (decoded && decoded.email) {
+          clientEmail = decoded.email.toLowerCase().trim();
+          clientOrg = decoded.organization_name ? decoded.organization_name.trim() : null;
+        }
+      } catch (_) {}
+    }
+
+    let sql = `
+      SELECT 
+        sr.id,
+        sr.request_code,
+        sr.batch_code,
+        sr.facility_name,
+        sr.unit_department,
+        sr.contact_name,
+        sr.contact_email,
+        sr.contact_phone,
+        sr.role_requested,
+        sr.shift_type,
+        sr.urgency_level,
+        sr.start_date,
+        sr.status,
+        sr.special_instructions,
+        sr.created_at,
+        sr.clock_in_time,
+        sr.clock_out_time,
+        sr.client_rating,
+        sr.client_feedback,
+        sr.client_rated_at,
+        st.id AS staff_id,
+        st.name AS staff_name,
+        st.role AS staff_role,
+        st.phone AS staff_phone,
+        st.email AS staff_email,
+        st.staff_code,
+        st.rating AS staff_rating,
+        st.avatar_url AS staff_avatar
+      FROM staffing_requests sr
+      LEFT JOIN staff_roster st ON sr.assigned_staff_id = st.id
+    `;
+
+    const params = [];
+    if (clientEmail && req.query.all !== 'true') {
+      if (clientOrg) {
+        sql += ` WHERE (LOWER(sr.contact_email) = ? OR LOWER(sr.facility_name) LIKE ?)`;
+        params.push(clientEmail, `%${clientOrg.toLowerCase()}%`);
+      } else {
+        sql += ` WHERE LOWER(sr.contact_email) = ?`;
+        params.push(clientEmail);
+      }
+    }
+
+    sql += ` ORDER BY sr.created_at DESC LIMIT 100`;
+
+    let [rows] = await pool.query(sql, params);
+
+    // Fallback if client has no specific requests yet: show demo/recent staffing requests
+    if (clientEmail && rows.length === 0) {
+      const [fallbackRows] = await pool.query(`
+        SELECT 
+          sr.id,
+          sr.request_code,
+          sr.batch_code,
+          sr.facility_name,
+          sr.unit_department,
+          sr.contact_name,
+          sr.contact_email,
+          sr.contact_phone,
+          sr.role_requested,
+          sr.shift_type,
+          sr.urgency_level,
+          sr.start_date,
+          sr.status,
+          sr.special_instructions,
+          sr.created_at,
+          sr.clock_in_time,
+          sr.clock_out_time,
+          sr.client_rating,
+          sr.client_feedback,
+          sr.client_rated_at,
+          st.id AS staff_id,
+          st.name AS staff_name,
+          st.role AS staff_role,
+          st.phone AS staff_phone,
+          st.email AS staff_email,
+          st.staff_code,
+          st.rating AS staff_rating,
+          st.avatar_url AS staff_avatar
+        FROM staffing_requests sr
+        LEFT JOIN staff_roster st ON sr.assigned_staff_id = st.id
+        ORDER BY sr.created_at DESC LIMIT 20
+      `);
+      rows = fallbackRows;
+    }
+
+    res.json({
+      success: true,
+      count: rows.length,
+      requests: rows
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// ============================================================================
+// POST /api/requests/:id/rate
+// Allow client facilities to rate and review dispatched healthcare staff
+// ============================================================================
+const ratingSchema = z.object({
+  rating: z.number().int().min(1).max(5),
+  feedback: z.string().max(1000).optional().nullable()
+});
+
+router.post('/:id/rate', async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const validated = ratingSchema.parse(req.body);
+
+    const [rows] = await pool.query(
+      'SELECT id, request_code, facility_name, assigned_staff_id, status FROM staffing_requests WHERE id = ? LIMIT 1',
+      [id]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ success: false, error: 'Staffing request not found.' });
+    }
+
+    const request = rows[0];
+    if (!request.assigned_staff_id) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Cannot rate a request that does not have a dispatched healthcare worker.' 
+      });
+    }
+
+    // Update request rating and feedback
+    await pool.query(
+      `UPDATE staffing_requests 
+       SET client_rating = ?, client_feedback = ?, client_rated_at = NOW() 
+       WHERE id = ?`,
+      [validated.rating, validated.feedback ? validated.feedback.trim() : null, id]
+    );
+
+    // Recalculate assigned staff rating average in staff_roster
+    try {
+      const [avgRows] = await pool.query(
+        `SELECT ROUND(AVG(client_rating), 2) AS avg_rating, COUNT(client_rating) AS total_ratings
+         FROM staffing_requests 
+         WHERE assigned_staff_id = ? AND client_rating IS NOT NULL`,
+        [request.assigned_staff_id]
+      );
+
+      if (avgRows.length > 0 && avgRows[0].avg_rating !== null) {
+        const newRating = parseFloat(avgRows[0].avg_rating);
+        await pool.query(
+          'UPDATE staff_roster SET rating = ? WHERE id = ?',
+          [newRating, request.assigned_staff_id]
+        );
+      }
+    } catch (calcErr) {
+      console.warn('[Rating Recalculation Warning]:', calcErr.message);
+    }
+
+    // Broadcast rating event
+    adminEvents.emit('request:rated', {
+      request_id: id,
+      request_code: request.request_code,
+      facility_name: request.facility_name,
+      staff_id: request.assigned_staff_id,
+      rating: validated.rating,
+      feedback: validated.feedback
+    });
+
+    res.json({
+      success: true,
+      message: `Thank you! Rating of ${validated.rating} / 5 stars recorded for your assigned caregiver.`,
+      rating: validated.rating,
+      feedback: validated.feedback || null,
+      rated_at: new Date().toISOString()
     });
   } catch (err) {
     if (err instanceof z.ZodError) {
