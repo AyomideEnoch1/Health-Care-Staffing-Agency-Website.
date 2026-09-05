@@ -135,8 +135,7 @@
     if (!d) return dateStr || '—';
     const now = new Date();
     const diffSec = Math.floor((now.getTime() - d.getTime()) / 1000);
-    if (diffSec < 0) return 'In the future';
-    if (diffSec < 45) return 'Just now';
+    if (diffSec < 45 || diffSec < 0) return 'Just now';
     if (diffSec < 3600) return `${Math.floor(diffSec / 60)}m ago`;
     if (diffSec < 86400) return `${Math.floor(diffSec / 3600)}h ago`;
     if (diffSec < 172800) return `Yesterday at ${formatUserTime(d)}`;
