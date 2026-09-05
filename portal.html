@@ -679,58 +679,87 @@
     }
 
     .clock-display-hero {
-      background: linear-gradient(135deg, #0A2540 0%, #0F3B66 100%);
-      border-radius: 12px;
-      padding: 1.5rem 1.75rem;
+      background: radial-gradient(circle at 85% 20%, rgba(27, 174, 207, 0.18), transparent 45%),
+                  radial-gradient(circle at 15% 85%, rgba(16, 185, 129, 0.12), transparent 45%),
+                  linear-gradient(135deg, #071324 0%, #0A1C32 50%, #0D2440 100%);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      border-radius: 16px;
+      padding: 1.6rem 2rem;
       color: #FFFFFF;
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
       gap: 1.5rem;
-      margin-bottom: 1.5rem;
-      box-shadow: 0 8px 24px rgba(10, 37, 64, 0.15);
+      margin-bottom: 1.65rem;
+      box-shadow: 0 14px 34px -6px rgba(7, 19, 36, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .clock-display-hero::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, #38BDF8, #34D399, #00F5D4);
+      opacity: 0.7;
     }
 
     .clock-hero-left, .clock-hero-right {
       display: flex;
       flex-direction: column;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 1rem 1.4rem;
+      backdrop-filter: blur(10px);
+      min-width: 240px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
     }
 
     .clock-hero-sublabel {
-      font-size: 0.72rem;
+      font-size: 0.74rem;
       font-weight: 800;
-      letter-spacing: 1px;
+      letter-spacing: 1.2px;
       text-transform: uppercase;
       color: #94A3B8;
-      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
     }
 
     .clock-hero-time {
-      font-family: 'SF Mono', 'Roboto Mono', Menlo, monospace;
-      font-size: 2.3rem;
+      font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+      font-size: 2.35rem;
       font-weight: 800;
       color: #38BDF8;
-      letter-spacing: 1px;
-      line-height: 1.1;
-      text-shadow: 0 0 16px rgba(56, 189, 248, 0.35);
+      letter-spacing: 1.5px;
+      line-height: 1.15;
+      text-shadow: 0 0 20px rgba(56, 189, 248, 0.45);
+      margin: 0.25rem 0;
     }
 
     .clock-duration-time {
-      font-family: 'SF Mono', 'Roboto Mono', Menlo, monospace;
-      font-size: 2.1rem;
+      font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+      font-size: 2.35rem;
       font-weight: 800;
       color: #34D399;
-      letter-spacing: 1px;
-      line-height: 1.1;
-      text-shadow: 0 0 16px rgba(52, 211, 153, 0.35);
+      letter-spacing: 1.5px;
+      line-height: 1.15;
+      text-shadow: 0 0 20px rgba(52, 211, 153, 0.45);
+      margin: 0.25rem 0;
     }
 
     .clock-hero-zone {
       font-size: 0.76rem;
       color: #CBD5E1;
-      margin-top: 5px;
       font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
     }
 
     .pulse-dot {
@@ -741,33 +770,37 @@
       background: #10B981;
       margin-right: 6px;
       animation: pulseGlow 1.6s infinite ease-in-out;
+      flex-shrink: 0;
     }
 
     @keyframes pulseGlow {
       0% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
-      70% { transform: scale(1.1); box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+      70% { transform: scale(1.15); box-shadow: 0 0 0 9px rgba(16, 185, 129, 0); }
       100% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
     }
 
     .clock-status-pill {
       display: inline-flex;
       align-items: center;
-      padding: 0.35rem 0.85rem;
+      gap: 0.45rem;
+      padding: 0.38rem 0.95rem;
       border-radius: 9999px;
-      font-size: 0.78rem;
-      font-weight: 700;
+      font-size: 0.8rem;
+      font-weight: 800;
+      letter-spacing: 0.3px;
     }
 
     .clock-status-pill.on-duty {
-      background: rgba(16, 185, 129, 0.12);
+      background: rgba(16, 185, 129, 0.14);
       color: #059669;
-      border: 1px solid rgba(16, 185, 129, 0.3);
+      border: 1.5px solid rgba(16, 185, 129, 0.4);
+      box-shadow: 0 2px 10px rgba(16, 185, 129, 0.15);
     }
 
     .clock-status-pill.off-duty {
       background: #F1F5F9;
-      color: #64748B;
-      border: 1px solid #CBD5E1;
+      color: #475569;
+      border: 1.5px solid #CBD5E1;
     }
 
     .clock-form-grid {
@@ -814,18 +847,19 @@
        ========================================================================== */
     .allocated-shift-card {
       background: #FFFFFF;
-      border: 1px solid #BAE6FD;
-      border-radius: 14px;
+      border: 1.5px solid #BAE6FD;
+      border-radius: 18px;
       overflow: hidden;
-      box-shadow: 0 10px 25px -5px rgba(2, 132, 199, 0.08), 0 8px 10px -6px rgba(2, 132, 199, 0.04);
-      margin-bottom: 1.5rem;
+      box-shadow: 0 16px 36px -8px rgba(2, 132, 199, 0.12), 0 4px 16px -2px rgba(2, 132, 199, 0.06);
+      margin-bottom: 1.75rem;
       position: relative;
-      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .allocated-shift-card:hover {
-      box-shadow: 0 16px 32px -8px rgba(2, 132, 199, 0.14);
-      border-color: #7DD3FC;
+      box-shadow: 0 22px 48px -10px rgba(2, 132, 199, 0.2);
+      border-color: #38BDF8;
+      transform: translateY(-2px);
     }
 
     .allocated-shift-card::before {
@@ -834,177 +868,453 @@
       top: 0;
       left: 0;
       right: 0;
-      height: 4px;
-      background: linear-gradient(90deg, #0284C7 0%, #10B981 100%);
+      height: 4.5px;
+      background: linear-gradient(90deg, #0284C7 0%, #10B981 50%, #00F5D4 100%);
       z-index: 3;
     }
 
     .shift-card-header {
-      background: linear-gradient(135deg, #0B2545 0%, #17375E 100%);
+      background: linear-gradient(135deg, #071526 0%, #0D2644 100%);
       color: #FFFFFF;
-      padding: 0.95rem 1.4rem;
+      padding: 1.1rem 1.6rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
-      gap: 0.6rem;
+      gap: 0.75rem;
       position: relative;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }
 
     .shift-badge-dispatched {
       display: inline-flex;
       align-items: center;
-      gap: 0.5rem;
-      font-size: 0.74rem;
+      gap: 0.55rem;
+      font-size: 0.76rem;
       font-weight: 800;
-      letter-spacing: 0.6px;
+      letter-spacing: 0.8px;
       text-transform: uppercase;
-      background: rgba(16, 185, 129, 0.2);
-      border: 1px solid rgba(16, 185, 129, 0.4);
-      color: #A7F3D0;
-      padding: 0.32rem 0.85rem;
+      background: rgba(16, 185, 129, 0.16);
+      border: 1px solid rgba(16, 185, 129, 0.45);
+      color: #6EE7B7;
+      padding: 0.38rem 0.95rem;
       border-radius: 9999px;
+      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.15);
     }
 
     .shift-code-tag {
       font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
-      font-size: 0.8rem;
-      font-weight: 700;
-      background: rgba(255, 255, 255, 0.12);
+      font-size: 0.82rem;
+      font-weight: 800;
+      background: rgba(255, 255, 255, 0.08);
       border: 1px solid rgba(255, 255, 255, 0.2);
-      color: #E2E8F0;
-      padding: 0.25rem 0.65rem;
-      border-radius: 6px;
-      letter-spacing: 0.5px;
+      color: #BAE6FD;
+      padding: 0.3rem 0.75rem;
+      border-radius: 8px;
+      letter-spacing: 0.6px;
     }
 
     .shift-card-body {
-      padding: 1.5rem;
+      padding: 1.75rem;
+    }
+
+    .shift-hero-banner {
+      display: flex;
+      align-items: flex-start;
+      gap: 1.15rem;
+      margin-bottom: 1.35rem;
+      padding-bottom: 1.25rem;
+      border-bottom: 1px solid #E2E8F0;
+    }
+
+    .facility-icon-wrap {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #E0F2FE 0%, #BAE6FD 100%);
+      color: #0284C7;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 4px 14px rgba(2, 132, 199, 0.15);
+    }
+
+    .placement-confirmed-pill {
+      font-size: 0.74rem;
+      font-weight: 800;
+      background: #ECFDF5;
+      color: #059669;
+      border: 1px solid #A7F3D0;
+      padding: 0.25rem 0.65rem;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .geofence-verified-pill {
+      font-size: 0.74rem;
+      font-weight: 800;
+      background: #EFF6FF;
+      color: #1D4ED8;
+      border: 1px solid #BFDBFE;
+      padding: 0.25rem 0.65rem;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
     }
 
     .shift-facility-title {
       font-family: var(--font-heading);
-      font-size: 1.35rem;
+      font-size: 1.45rem;
       font-weight: 800;
       color: var(--navy);
-      margin: 0 0 0.35rem 0;
-      letter-spacing: -0.2px;
+      margin: 0.25rem 0 0.35rem 0;
+      letter-spacing: -0.3px;
+      line-height: 1.25;
       word-break: break-word;
     }
 
     .shift-unit-role {
-      font-size: 0.9rem;
-      color: #0284C7;
+      font-size: 0.92rem;
+      color: #0369A1;
       font-weight: 700;
-      margin-bottom: 1.25rem;
       display: inline-flex;
       align-items: center;
       flex-wrap: wrap;
       gap: 0.45rem;
-      background: #EFF6FF;
-      border: 1px solid #DBEAFE;
-      padding: 0.3rem 0.8rem;
-      border-radius: 6px;
     }
 
     .shift-details-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 0.95rem;
-      background: #F8FAFC;
-      border: 1px solid #E2E8F0;
-      border-radius: 10px;
-      padding: 1.15rem;
-      margin-bottom: 1.25rem;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
     }
 
     .shift-detail-item {
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      border-radius: 12px;
+      padding: 1rem 1.15rem;
       display: flex;
-      align-items: flex-start;
-      gap: 0.75rem;
+      align-items: center;
+      gap: 0.9rem;
+      transition: all 0.25s ease;
     }
 
-    .shift-detail-item i {
-      color: #0284C7;
-      width: 20px;
-      height: 20px;
+    .shift-detail-item:hover {
+      background: #FFFFFF;
+      border-color: #CBD5E1;
+      transform: translateY(-1.5px);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+    }
+
+    .shift-detail-icon-box {
+      width: 42px;
+      height: 42px;
+      border-radius: 11px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       flex-shrink: 0;
-      margin-top: 1px;
     }
 
     .shift-detail-label {
       display: block;
-      font-size: 0.7rem;
-      font-weight: 700;
+      font-size: 0.72rem;
+      font-weight: 800;
       color: #64748B;
       text-transform: uppercase;
-      letter-spacing: 0.6px;
+      letter-spacing: 0.7px;
       margin-bottom: 2px;
     }
 
     .shift-detail-val {
-      font-size: 0.9rem;
+      font-size: 0.95rem;
       font-weight: 800;
       color: var(--navy);
+      line-height: 1.25;
     }
 
     .instructions-callout {
-      background: #F0F9FF;
-      border-left: 4px solid #0284C7;
-      border-radius: 6px;
-      padding: 0.85rem 1.15rem;
-      font-size: 0.84rem;
+      background: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%);
+      border: 1px solid #BAE6FD;
+      border-left: 4.5px solid #0284C7;
+      border-radius: 12px;
+      padding: 1.1rem 1.35rem;
+      font-size: 0.88rem;
       color: #0369A1;
-      margin-bottom: 1.35rem;
-      line-height: 1.5;
+      margin-bottom: 1.5rem;
+      line-height: 1.55;
       display: flex;
       align-items: flex-start;
+      gap: 0.85rem;
+      box-shadow: 0 2px 8px rgba(2, 132, 199, 0.05);
+    }
+
+    .instructions-callout .instructions-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: #BAE6FD;
+      color: #0284C7;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .btn-clock-in {
+      width: 100%;
+      background: linear-gradient(135deg, #059669 0%, #10B981 50%, #047857 100%);
+      background-size: 200% auto;
+      color: #FFFFFF;
+      border: none;
+      padding: 1.15rem 1.8rem;
+      border-radius: 12px;
+      font-family: var(--font-heading);
+      font-size: 1.08rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      box-shadow: 0 8px 24px rgba(16, 185, 129, 0.35), 0 2px 6px rgba(16, 185, 129, 0.2);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .btn-clock-in:hover {
+      background-position: right center;
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(16, 185, 129, 0.45);
+    }
+
+    .btn-clock-in:active {
+      transform: translateY(0);
+      box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+    }
+
+    .clock-in-footer-note {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-top: 0.85rem;
+      font-size: 0.74rem;
+      color: #64748B;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    /* Active Shift Details When Clocked In */
+    .active-shift-container {
+      background: linear-gradient(180deg, #F0FDF4 0%, #ECFDF5 100%);
+      border: 1.5px solid #86EFAC;
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 1.65rem;
+      box-shadow: 0 10px 28px -4px rgba(16, 185, 129, 0.15);
+      animation: modalFadeIn 0.3s ease-out;
+    }
+
+    .active-shift-header {
+      background: #DCFCE7;
+      border-bottom: 1px solid #BBF7D0;
+      padding: 0.85rem 1.4rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
       gap: 0.6rem;
+    }
+
+    .active-shift-header-title {
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: #15803D;
+    }
+
+    .active-shift-evv-tag {
+      font-size: 0.72rem;
+      font-weight: 700;
+      background: #FFFFFF;
+      color: #15803D;
+      border: 1px solid #86EFAC;
+      padding: 0.2rem 0.6rem;
+      border-radius: 9999px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .active-shift-body {
+      padding: 1.5rem;
+    }
+
+    .active-shift-info-grid {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .active-sublabel {
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: #166534;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .active-facility-name {
+      margin: 0;
+      color: #065F46;
+      font-size: 1.35rem;
+      font-weight: 800;
+      font-family: var(--font-heading);
+    }
+
+    .active-role-strip {
+      font-size: 0.86rem;
+      color: #047857;
+      margin-top: 4px;
+      font-weight: 600;
+    }
+
+    .active-clockin-pod {
+      text-align: right;
+      background: #FFFFFF;
+      border: 1px solid #BBF7D0;
+      border-radius: 10px;
+      padding: 0.6rem 1rem;
+      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.08);
+    }
+
+    .active-clockin-time {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: #065F46;
+      font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    }
+
+    .active-notes-wrap {
+      margin-bottom: 1.25rem;
+      padding-top: 0.95rem;
+      border-top: 1px dashed #86EFAC;
+    }
+
+    .active-notes-label {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #166534;
+      margin-bottom: 0.45rem;
+    }
+
+    .active-notes-input {
+      width: 100%;
+      border: 1.5px solid #86EFAC;
+      border-radius: 8px;
+      padding: 0.75rem 0.95rem;
+      font-size: 0.85rem;
+      font-family: inherit;
+      resize: vertical;
+      background: #FFFFFF;
+      color: #065F46;
+      box-sizing: border-box;
+      transition: all 0.2s ease;
+    }
+
+    .active-notes-input:focus {
+      outline: none;
+      border-color: #10B981;
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+    }
+
+    .btn-clock-out {
+      width: 100%;
+      background: linear-gradient(135deg, #EF4444 0%, #DC2626 50%, #B91C1C 100%);
+      background-size: 200% auto;
+      color: #FFFFFF;
+      border: none;
+      padding: 1.1rem 1.8rem;
+      border-radius: 12px;
+      font-family: var(--font-heading);
+      font-size: 1.05rem;
+      font-weight: 800;
+      letter-spacing: 0.4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      box-shadow: 0 8px 24px rgba(239, 68, 68, 0.35);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .btn-clock-out:hover {
+      background-position: right center;
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(239, 68, 68, 0.45);
     }
 
     /* Zero Allocation Presentable Card */
     .no-shift-assigned-card {
       background: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%);
       border: 2px dashed #CBD5E1;
-      border-radius: 14px;
-      padding: 2.75rem 2rem;
+      border-radius: 18px;
+      padding: 3rem 2.25rem;
       text-align: center;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1.75rem;
       transition: all 0.25s ease;
     }
 
     .no-shift-assigned-card:hover {
       border-color: #93C5FD;
       background: #F0F9FF;
+      box-shadow: 0 8px 24px rgba(2, 132, 199, 0.05);
     }
 
     .no-shift-icon-circle {
-      width: 60px;
-      height: 60px;
+      width: 68px;
+      height: 68px;
       background: linear-gradient(135deg, #E0F2FE 0%, #BAE6FD 100%);
       color: #0284C7;
       border-radius: 50%;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      margin: 0 auto 1.1rem auto;
-      box-shadow: 0 4px 14px rgba(2, 132, 199, 0.15);
+      margin: 0 auto 1.25rem auto;
+      box-shadow: 0 6px 18px rgba(2, 132, 199, 0.18);
     }
 
     .no-shift-title {
       font-family: var(--font-heading);
-      font-size: 1.25rem;
+      font-size: 1.35rem;
       font-weight: 800;
       color: var(--navy);
-      margin: 0 0 0.45rem 0;
+      margin: 0 0 0.5rem 0;
     }
 
     .no-shift-desc {
-      font-size: 0.88rem;
+      font-size: 0.9rem;
       color: #64748B;
-      max-width: 540px;
-      margin: 0 auto 1.35rem auto;
-      line-height: 1.55;
+      max-width: 560px;
+      margin: 0 auto 1.5rem auto;
+      line-height: 1.6;
     }
 
     .dispatch-contact-strip {
@@ -1012,15 +1322,15 @@
       align-items: center;
       justify-content: center;
       flex-wrap: wrap;
-      gap: 0.75rem;
+      gap: 0.85rem;
       background: #FFFFFF;
       border: 1px solid #E2E8F0;
-      padding: 0.55rem 1.25rem;
+      padding: 0.65rem 1.4rem;
       border-radius: 9999px;
-      font-size: 0.83rem;
+      font-size: 0.84rem;
       color: var(--navy);
       font-weight: 600;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
       max-width: 100%;
     }
 
@@ -1030,7 +1340,7 @@
       text-decoration: none;
       display: inline-flex;
       align-items: center;
-      gap: 0.35rem;
+      gap: 0.4rem;
       transition: color 0.15s ease;
     }
 
@@ -1039,87 +1349,168 @@
       text-decoration: underline;
     }
 
-    .btn-clock-in {
-      width: 100%;
-      background: linear-gradient(135deg, #10B981 0%, #059669 100%);
-      color: #FFFFFF;
-      border: none;
-      padding: 1rem 1.6rem;
-      border-radius: 10px;
-      font-family: var(--font-heading);
-      font-size: 1.05rem;
-      font-weight: 800;
-      letter-spacing: 0.4px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.65rem;
-      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.35);
-      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .btn-clock-in:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 28px rgba(16, 185, 129, 0.45);
-      background: linear-gradient(135deg, #059669 0%, #047857 100%);
-    }
-
-    .btn-clock-out {
-      width: 100%;
-      background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
-      color: #FFFFFF;
-      border: none;
-      padding: 1rem 1.6rem;
-      border-radius: 10px;
-      font-family: var(--font-heading);
-      font-size: 1.05rem;
-      font-weight: 800;
-      letter-spacing: 0.4px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.65rem;
-      box-shadow: 0 6px 20px rgba(239, 68, 68, 0.35);
-      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .btn-clock-out:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 28px rgba(239, 68, 68, 0.45);
-      background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%);
-    }
-
     /* ==========================================================================
        ENTERPRISE CLINICAL CREDENTIALS & LICENSES VAULT
        ========================================================================== */
-    .compliance-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(215px, 1fr));
-      gap: 1.15rem;
+    .compliance-meter-card {
+      background: linear-gradient(135deg, #FFFFFF 0%, #F0FDF4 100%);
+      border: 1.5px solid #BBF7D0;
+      border-radius: 16px;
+      padding: 1.35rem 1.6rem;
       margin-bottom: 1.75rem;
-    }
-
-    .compliance-card {
-      background: #FFFFFF;
-      border: 1px solid #E2E8F0;
-      border-radius: 12px;
-      padding: 1.15rem 1.25rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.55rem;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
-      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 8px 24px -4px rgba(16, 185, 129, 0.08);
       position: relative;
       overflow: hidden;
     }
 
+    .compliance-meter-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3.5px;
+      background: linear-gradient(90deg, #10B981 0%, #0284C7 100%);
+    }
+
+    .compliance-meter-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.85rem;
+      margin-bottom: 0.85rem;
+    }
+
+    .compliance-meter-left {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .compliance-meter-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: #DCFCE7;
+      color: #10B981;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+    }
+
+    .compliance-meter-badge {
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: #065F46;
+      background: #D1FAE5;
+      border: 1px solid #A7F3D0;
+      padding: 0.35rem 0.85rem;
+      border-radius: 9999px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      letter-spacing: 0.2px;
+    }
+
+    .compliance-meter-track {
+      width: 100%;
+      height: 8px;
+      background: #E2E8F0;
+      border-radius: 9999px;
+      overflow: hidden;
+      margin-bottom: 0.75rem;
+    }
+
+    .compliance-meter-bar {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, #10B981 0%, #0284C7 100%);
+      border-radius: 9999px;
+      animation: fillBar 1s ease-out;
+    }
+
+    @keyframes fillBar {
+      from { width: 0%; }
+      to { width: 100%; }
+    }
+
+    .compliance-meter-tags {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .compliance-pill-tag {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #475569;
+      background: #FFFFFF;
+      border: 1px solid #CBD5E1;
+      padding: 0.25rem 0.65rem;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .compliance-pill-tag.active {
+      background: #ECFDF5;
+      color: #065F46;
+      border-color: #A7F3D0;
+      font-weight: 800;
+    }
+
+    .compliance-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 1.85rem;
+    }
+
+    .compliance-card {
+      background: #FFFFFF;
+      border: 1.5px solid #E2E8F0;
+      border-radius: 16px;
+      padding: 1.35rem 1.4rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+      transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .compliance-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3.5px;
+      background: #CBD5E1;
+      transition: all 0.25s ease;
+    }
+
+    .compliance-card.cno-card::before { background: #0284C7; }
+    .compliance-card.cpr-card::before { background: #EF4444; }
+    .compliance-card.vss-card::before { background: #10B981; }
+    .compliance-card.n95-card::before { background: #8B5CF6; }
+
     .compliance-card:hover {
       border-color: #CBD5E1;
-      transform: translateY(-2.5px);
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+      transform: translateY(-3.5px);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
     }
+
+    .compliance-card.cno-card:hover { border-color: #93C5FD; box-shadow: 0 12px 28px rgba(2, 132, 199, 0.12); }
+    .compliance-card.cpr-card:hover { border-color: #FCA5A5; box-shadow: 0 12px 28px rgba(239, 68, 68, 0.12); }
+    .compliance-card.vss-card:hover { border-color: #86EFAC; box-shadow: 0 12px 28px rgba(16, 185, 129, 0.12); }
+    .compliance-card.n95-card:hover { border-color: #DDD6FE; box-shadow: 0 12px 28px rgba(139, 92, 246, 0.12); }
 
     .compliance-card-header {
       display: flex;
@@ -1129,44 +1520,46 @@
       font-weight: 800;
       color: #64748B;
       text-transform: uppercase;
-      letter-spacing: 0.6px;
+      letter-spacing: 0.7px;
     }
 
     .compliance-card-icon-wrap {
-      width: 34px;
-      height: 34px;
-      border-radius: 8px;
+      width: 40px;
+      height: 40px;
+      border-radius: 11px;
       display: flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     }
 
     .compliance-card-title {
       font-family: var(--font-heading);
-      font-size: 0.98rem;
+      font-size: 1.05rem;
       font-weight: 800;
       color: var(--navy);
       letter-spacing: -0.2px;
+      line-height: 1.3;
     }
 
     .compliance-card-subtitle {
-      font-size: 0.76rem;
+      font-size: 0.78rem;
       color: #64748B;
-      line-height: 1.35;
+      line-height: 1.4;
     }
 
     .compliance-card-status {
       display: inline-flex;
       align-items: center;
-      gap: 0.4rem;
-      font-size: 0.76rem;
+      gap: 0.45rem;
+      font-size: 0.78rem;
       font-weight: 800;
-      padding: 0.3rem 0.75rem;
+      padding: 0.35rem 0.85rem;
       border-radius: 9999px;
       width: fit-content;
       margin-top: auto;
-      letter-spacing: 0.2px;
+      letter-spacing: 0.3px;
     }
 
     .compliance-card-status.verified {
@@ -1182,7 +1575,7 @@
     }
 
     .compliance-card-status.pending {
-      background: #F1F5F9;
+      background: #F8FAFC;
       color: #475569;
       border: 1px solid #CBD5E1;
     }
@@ -1190,11 +1583,11 @@
     /* Upload Form Card */
     .credential-form-card {
       background: #FFFFFF;
-      border: 1px solid #E2E8F0;
-      border-radius: 14px;
-      padding: 1.65rem 1.75rem;
-      margin-bottom: 2rem;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+      border: 1.5px solid #E2E8F0;
+      border-radius: 18px;
+      padding: 1.85rem 2rem;
+      margin-bottom: 2.25rem;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.03);
       position: relative;
     }
 
@@ -1204,24 +1597,24 @@
       top: 0;
       left: 0;
       right: 0;
-      height: 3.5px;
+      height: 4px;
       background: linear-gradient(90deg, #0284C7 0%, #10B981 100%);
-      border-radius: 14px 14px 0 0;
+      border-radius: 18px 18px 0 0;
     }
 
     .credential-form-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 1rem;
-      margin-bottom: 1.15rem;
+      gap: 1.15rem;
+      margin-bottom: 1.25rem;
     }
 
     .form-input-styled {
       width: 100%;
-      padding: 0.72rem 0.95rem;
+      padding: 0.75rem 1rem;
       border: 1.5px solid #CBD5E1;
-      border-radius: 8px;
-      font-size: 0.86rem;
+      border-radius: 9px;
+      font-size: 0.88rem;
       font-family: inherit;
       color: var(--navy);
       background: #FFFFFF;
@@ -1232,19 +1625,19 @@
     .form-input-styled:focus {
       outline: none;
       border-color: #0284C7;
-      box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+      box-shadow: 0 0 0 3.5px rgba(2, 132, 199, 0.15);
       background: #FFFFFF;
     }
 
     /* Drag and Drop Zone */
     .credential-upload-box {
-      background: linear-gradient(135deg, #F8FAFC 0%, #F0F9FF 100%);
+      background: radial-gradient(circle at center, #FFFFFF 0%, #F0F9FF 100%);
       border: 2px dashed #93C5FD;
-      border-radius: 14px;
-      padding: 2rem 1.5rem;
+      border-radius: 16px;
+      padding: 2.25rem 1.75rem;
       text-align: center;
       cursor: pointer;
-      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
       position: relative;
       margin-top: 0.5rem;
     }
@@ -1252,25 +1645,26 @@
     .credential-upload-box:hover, .credential-upload-box.dragover {
       background: #EFF6FF;
       border-color: #2563EB;
-      box-shadow: 0 8px 24px rgba(37, 99, 235, 0.12);
-      transform: translateY(-1.5px);
+      box-shadow: 0 10px 30px rgba(37, 99, 235, 0.15);
+      transform: translateY(-2px);
     }
 
     .upload-box-icon {
-      width: 52px;
-      height: 52px;
+      width: 58px;
+      height: 58px;
       border-radius: 50%;
       background: #DBEAFE;
       color: #1D4ED8;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin: 0 auto 0.95rem;
+      margin: 0 auto 1.1rem;
       transition: all 0.25s ease;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.18);
     }
 
     .credential-upload-box:hover .upload-box-icon {
-      transform: scale(1.08);
+      transform: scale(1.1);
       background: #BFDBFE;
     }
 
@@ -1278,18 +1672,18 @@
       display: flex;
       justify-content: center;
       flex-wrap: wrap;
-      gap: 0.4rem;
-      margin-top: 0.85rem;
+      gap: 0.45rem;
+      margin-top: 0.95rem;
     }
 
     .format-pill {
-      font-size: 0.68rem;
+      font-size: 0.7rem;
       font-weight: 700;
       background: #FFFFFF;
       border: 1px solid #CBD5E1;
       color: #475569;
-      padding: 0.2rem 0.55rem;
-      border-radius: 4px;
+      padding: 0.22rem 0.6rem;
+      border-radius: 5px;
       text-transform: uppercase;
       letter-spacing: 0.4px;
     }
@@ -1298,25 +1692,25 @@
       background: linear-gradient(135deg, #0284C7 0%, #0369A1 100%);
       color: #FFFFFF;
       border: none;
-      padding: 0.85rem 1.65rem;
-      border-radius: 9px;
+      padding: 0.95rem 1.85rem;
+      border-radius: 11px;
       font-family: var(--font-heading);
-      font-size: 0.9rem;
+      font-size: 0.92rem;
       font-weight: 800;
       letter-spacing: 0.4px;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 0.55rem;
-      box-shadow: 0 4px 16px rgba(2, 132, 199, 0.35);
+      gap: 0.6rem;
+      box-shadow: 0 6px 20px rgba(2, 132, 199, 0.35);
       transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .btn-upload-submit:hover {
       background: linear-gradient(135deg, #0369A1 0%, #075985 100%);
-      transform: translateY(-1.5px);
-      box-shadow: 0 8px 22px rgba(2, 132, 199, 0.45);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 28px rgba(2, 132, 199, 0.45);
     }
 
     /* Vault Table Actions */
@@ -1324,14 +1718,14 @@
       background: #EFF6FF;
       border: 1px solid #BFDBFE;
       color: #1D4ED8;
-      border-radius: 7px;
-      padding: 0.42rem 0.8rem;
-      font-size: 0.78rem;
+      border-radius: 8px;
+      padding: 0.45rem 0.85rem;
+      font-size: 0.8rem;
       font-weight: 700;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 0.4rem;
+      gap: 0.45rem;
       text-decoration: none;
       transition: all 0.2s ease;
       white-space: nowrap;
@@ -1358,12 +1752,12 @@
     .badge-pill-verified {
       display: inline-flex;
       align-items: center;
-      gap: 0.35rem;
-      font-size: 0.75rem;
+      gap: 0.4rem;
+      font-size: 0.78rem;
       font-weight: 800;
       background: #ECFDF5;
       color: #065F46;
-      padding: 0.3rem 0.8rem;
+      padding: 0.35rem 0.85rem;
       border-radius: 9999px;
       border: 1px solid #A7F3D0;
       letter-spacing: 0.3px;
@@ -1375,10 +1769,16 @@
     @media (max-width: 900px) {
       .compliance-grid {
         grid-template-columns: repeat(2, 1fr);
-        gap: 0.95rem;
+        gap: 1rem;
       }
       .shift-details-grid {
         grid-template-columns: repeat(2, 1fr);
+      }
+      .clock-display-hero {
+        padding: 1.35rem 1.4rem;
+      }
+      .clock-hero-left, .clock-hero-right {
+        min-width: 100%;
       }
     }
 
@@ -1404,53 +1804,101 @@
         box-sizing: border-box;
       }
 
+      .clock-display-hero {
+        padding: 1.25rem 1rem;
+        gap: 1rem;
+      }
+
+      .clock-hero-left, .clock-hero-right {
+        padding: 0.95rem 1.1rem;
+      }
+
+      .clock-hero-time, .clock-duration-time {
+        font-size: 1.95rem;
+      }
+
+      .shift-hero-banner {
+        flex-direction: column;
+        gap: 0.85rem;
+      }
+
       .shift-card-header {
-        padding: 0.85rem 1rem;
+        padding: 0.95rem 1.15rem;
       }
 
       .shift-card-body {
-        padding: 1.15rem 1rem;
+        padding: 1.25rem 1.15rem;
       }
 
       .shift-facility-title {
-        font-size: 1.15rem;
+        font-size: 1.2rem;
       }
 
       .shift-details-grid {
         grid-template-columns: 1fr;
-        padding: 0.95rem;
-        gap: 0.8rem;
+        gap: 0.85rem;
+      }
+
+      .active-shift-body {
+        padding: 1.2rem 1rem;
+      }
+
+      .active-shift-info-grid {
+        flex-direction: column;
+        gap: 0.85rem;
+      }
+
+      .active-clockin-pod {
+        width: 100%;
+        text-align: left;
+        box-sizing: border-box;
       }
 
       .no-shift-assigned-card {
-        padding: 2rem 1.15rem;
+        padding: 2.25rem 1.25rem;
       }
 
       .dispatch-contact-strip {
-        border-radius: 12px;
-        padding: 0.75rem;
+        border-radius: 14px;
+        padding: 0.85rem;
         flex-direction: column;
-        gap: 0.4rem;
+        gap: 0.5rem;
         width: 100%;
+        box-sizing: border-box;
+      }
+
+      .compliance-meter-card {
+        padding: 1.15rem 1rem;
+      }
+
+      .compliance-meter-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.65rem;
+      }
+
+      .compliance-meter-badge {
+        width: 100%;
+        justify-content: center;
         box-sizing: border-box;
       }
 
       .compliance-grid {
         grid-template-columns: 1fr;
-        gap: 0.85rem;
+        gap: 0.95rem;
       }
 
       .credential-form-card {
-        padding: 1.25rem 1rem;
+        padding: 1.35rem 1.15rem;
       }
 
       .credential-form-grid {
         grid-template-columns: 1fr;
-        gap: 0.85rem;
+        gap: 0.95rem;
       }
 
       .credential-upload-box {
-        padding: 1.5rem 0.85rem;
+        padding: 1.6rem 0.95rem;
       }
 
       .btn-upload-submit {
@@ -1568,8 +2016,13 @@
         <!-- WORKER VIEW: CLINICAL TIMECARD & SHIFT CLOCK STATION -->
         <div class="portal-panel clock-station-panel" id="worker-clock-panel" style="display: none;">
           <div class="panel-header" style="margin-bottom: 1.25rem;">
-            <div class="panel-title" style="display: flex; align-items: center; gap: 0.5rem;">
-              <i data-lucide="clock" style="color: #1BAECF;"></i> Electronic Visit Verification &amp; Shift Timecard
+            <div>
+              <div class="panel-title" style="display: flex; align-items: center; gap: 0.55rem;">
+                <i data-lucide="clock" style="color: #0284C7;"></i> Electronic Visit Verification &amp; Shift Timecard
+              </div>
+              <span style="font-size: 0.76rem; color: #64748B; font-weight: 600; margin-top: 2px; display: block;">
+                Ontario Ministry of Health EVV Standards • Geofenced Shift Punching
+              </span>
             </div>
             <div id="clock-status-badge-container">
               <span class="clock-status-pill off-duty">⚪ Off Duty / Ready</span>
@@ -1579,41 +2032,65 @@
           <!-- Hero Time Display Box -->
           <div class="clock-display-hero">
             <div class="clock-hero-left">
-              <span class="clock-hero-sublabel" id="clock-device-date">Today</span>
+              <span class="clock-hero-sublabel">
+                <i data-lucide="calendar" style="width: 14px; height: 14px; color: #38BDF8;"></i>
+                <span id="clock-device-date">Today</span>
+              </span>
               <div class="clock-hero-time" id="clock-device-time">--:--:--</div>
-              <div class="clock-hero-zone" id="clock-device-zone">Device Local Time</div>
+              <div class="clock-hero-zone">
+                <i data-lucide="map-pin" style="width: 12px; height: 12px; color: #38BDF8;"></i>
+                <span id="clock-device-zone">Device Local Time</span>
+              </div>
             </div>
             <div class="clock-hero-right" id="clock-shift-timer-box" style="display: none;">
-              <span class="clock-hero-sublabel" style="color: #34D399;">LIVE SHIFT DURATION</span>
+              <span class="clock-hero-sublabel" style="color: #34D399;">
+                <span class="pulse-dot"></span> LIVE SHIFT DURATION
+              </span>
               <div class="clock-duration-time" id="clock-duration-timer">00h : 00m : 00s</div>
-              <div class="clock-hero-zone" id="clock-active-facility-text">On Duty</div>
+              <div class="clock-hero-zone" style="color: #A7F3D0;">
+                <i data-lucide="building-2" style="width: 12px; height: 12px;"></i>
+                <span id="clock-active-facility-text">On Duty</span>
+              </div>
             </div>
           </div>
 
           <!-- Active Shift Details (When Clocked In) -->
-          <div id="clock-active-details" style="display: none; background: #F0FDF4; border: 1.5px solid #BBF7D0; border-radius: 10px; padding: 1.25rem; margin-bottom: 1.25rem;">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 0.75rem;">
-              <div>
-                <span style="font-size: 0.72rem; font-weight: 800; color: #166534; text-transform: uppercase; letter-spacing: 0.5px;">Active Placement</span>
-                <h4 id="active-facility-name" style="margin: 2px 0; color: #065F46; font-size: 1.15rem; font-weight: 800;">--</h4>
-                <div style="font-size: 0.82rem; color: #047857; margin-top: 2px;">
-                  <span id="active-unit-dept">General Floor</span> • <span id="active-role-title">Registered Nurse</span>
+          <div id="clock-active-details" class="active-shift-container" style="display: none;">
+            <div class="active-shift-header">
+              <div style="display: flex; align-items: center; gap: 0.55rem;">
+                <span class="pulse-dot" style="background: #EF4444;"></span>
+                <span class="active-shift-header-title">ACTIVE CLINICAL SHIFT IN PROGRESS</span>
+              </div>
+              <span class="active-shift-evv-tag">
+                <i data-lucide="satellite" style="width: 12px; height: 12px;"></i> EVV Live Telemetry
+              </span>
+            </div>
+
+            <div class="active-shift-body">
+              <div class="active-shift-info-grid">
+                <div>
+                  <span class="active-sublabel">ACTIVE PLACEMENT FACILITY</span>
+                  <h4 id="active-facility-name" class="active-facility-name">--</h4>
+                  <div class="active-role-strip">
+                    <span id="active-unit-dept">General Floor</span> • <span id="active-role-title">Registered Nurse</span>
+                  </div>
+                </div>
+                <div class="active-clockin-pod">
+                  <span class="active-sublabel">CLOCKED IN AT</span>
+                  <div id="active-clockin-time" class="active-clockin-time">--</div>
                 </div>
               </div>
-              <div style="text-align: right;">
-                <span style="font-size: 0.72rem; font-weight: 800; color: #166534; text-transform: uppercase; letter-spacing: 0.5px;">Clocked In At</span>
-                <div id="active-clockin-time" style="font-size: 0.95rem; font-weight: 800; color: #065F46;">--</div>
+
+              <div class="active-notes-wrap">
+                <label for="clockout-notes" class="active-notes-label">
+                  <i data-lucide="clipboard-pen" style="width: 15px; height: 15px; color: #059669;"></i>
+                  End-of-Shift Handover / Clinical Summary Notes (Optional)
+                </label>
+                <textarea id="clockout-notes" rows="2" class="active-notes-input" placeholder="e.g. Med pass and patient charting completed. Formal handover given to oncoming charge nurse."></textarea>
               </div>
-            </div>
 
-            <div style="margin-top: 1rem; padding-top: 0.75rem; border-top: 1px dashed #86EFAC;">
-              <label style="display: block; font-size: 0.78rem; font-weight: 700; color: #166534; margin-bottom: 0.4rem;">End-of-Shift Handover / Clinical Summary Notes (Optional)</label>
-              <textarea id="clockout-notes" rows="2" placeholder="e.g. Med pass and patient documentation complete. Handover given to oncoming charge nurse." style="width: 100%; border: 1px solid #86EFAC; border-radius: 6px; padding: 0.6rem; font-size: 0.82rem; font-family: inherit; resize: vertical;"></textarea>
-            </div>
-
-            <div style="margin-top: 1rem;">
               <button type="button" class="btn-clock-out" id="btn-clock-out" onclick="handleClockOut()">
-                <i data-lucide="log-out" style="width: 18px; height: 18px;"></i>
+                <i data-lucide="log-out" style="width: 20px; height: 20px;"></i>
                 <span>🔴 Clock Out &amp; Conclude Shift</span>
               </button>
             </div>
@@ -1626,69 +2103,105 @@
             <div class="allocated-shift-card" id="allocated-shift-card" style="display: none;">
               <div class="shift-card-header">
                 <div class="shift-badge-dispatched">
-                  <span class="pulse-dot"></span> DISPATCHED BY ADMIN
+                  <span class="pulse-dot"></span> DISPATCHED BY CLINICAL ADMIN
                 </div>
                 <span class="shift-code-tag" id="allocated-shift-code">REQ-DISPATCHED</span>
               </div>
               <div class="shift-card-body">
-                <h3 class="shift-facility-title" id="allocated-facility-name">Healthcare Partner Facility</h3>
-                <div class="shift-unit-role" id="allocated-unit-role">Clinical Unit • Healthcare Role</div>
+                <div class="shift-hero-banner">
+                  <div class="facility-icon-wrap">
+                    <i data-lucide="building-2" style="width: 26px; height: 26px;"></i>
+                  </div>
+                  <div style="flex: 1; min-width: 0;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 4px;">
+                      <span class="placement-confirmed-pill">
+                        <i data-lucide="check-circle-2" style="width: 12px; height: 12px;"></i> Confirmed Placement
+                      </span>
+                      <span class="geofence-verified-pill">
+                        <i data-lucide="map-pin" style="width: 12px; height: 12px;"></i> GPS Geofenced
+                      </span>
+                    </div>
+                    <h3 class="shift-facility-title" id="allocated-facility-name">Healthcare Partner Facility</h3>
+                    <div class="shift-unit-role" id="allocated-unit-role">Clinical Unit • Healthcare Role</div>
+                  </div>
+                </div>
 
                 <div class="shift-details-grid">
                   <div class="shift-detail-item">
-                    <i data-lucide="calendar"></i>
+                    <div class="shift-detail-icon-box" style="background: #E0F2FE; color: #0284C7;">
+                      <i data-lucide="calendar" style="width: 20px; height: 20px;"></i>
+                    </div>
                     <div>
                       <span class="shift-detail-label">Scheduled Date</span>
                       <span class="shift-detail-val" id="allocated-shift-date">Today</span>
                     </div>
                   </div>
                   <div class="shift-detail-item">
-                    <i data-lucide="clock"></i>
+                    <div class="shift-detail-icon-box" style="background: #EDE9FE; color: #8B5CF6;">
+                      <i data-lucide="clock" style="width: 20px; height: 20px;"></i>
+                    </div>
                     <div>
-                      <span class="shift-detail-label">Shift Hours</span>
+                      <span class="shift-detail-label">Assigned Hours</span>
                       <span class="shift-detail-val" id="allocated-shift-hours">Day Shift</span>
                     </div>
                   </div>
                   <div class="shift-detail-item">
-                    <i data-lucide="user-check"></i>
+                    <div class="shift-detail-icon-box" style="background: #DCFCE7; color: #10B981;">
+                      <i data-lucide="user-check" style="width: 20px; height: 20px;"></i>
+                    </div>
                     <div>
-                      <span class="shift-detail-label">Facility Contact</span>
+                      <span class="shift-detail-label">On-Site Contact</span>
                       <span class="shift-detail-val" id="allocated-facility-contact">Clinical Dispatch</span>
                     </div>
                   </div>
                   <div class="shift-detail-item">
-                    <i data-lucide="shield-check"></i>
+                    <div class="shift-detail-icon-box" style="background: #CCFBF1; color: #0D9488;">
+                      <i data-lucide="shield-check" style="width: 20px; height: 20px;"></i>
+                    </div>
                     <div>
-                      <span class="shift-detail-label">Dispatch Status</span>
-                      <span class="shift-detail-val" style="color: #059669;">Verified / Confirmed</span>
+                      <span class="shift-detail-label">Compliance Status</span>
+                      <span class="shift-detail-val" style="color: #059669;">Verified / Geofenced</span>
                     </div>
                   </div>
                 </div>
 
                 <div class="instructions-callout" id="allocated-instructions-box" style="display: none;">
-                  <strong>Reporting Instructions: </strong>
-                  <span id="allocated-instructions-text">Report to nursing supervisor upon arrival.</span>
+                  <div class="instructions-icon">
+                    <i data-lucide="clipboard-list" style="width: 18px; height: 18px;"></i>
+                  </div>
+                  <div>
+                    <strong style="display: block; font-size: 0.82rem; font-weight: 800; margin-bottom: 2px;">Reporting &amp; Handover Instructions:</strong>
+                    <span id="allocated-instructions-text">Report to nursing supervisor upon arrival.</span>
+                  </div>
                 </div>
 
                 <button type="button" class="btn-clock-in" id="btn-clock-in" onclick="handleClockIn()">
-                  <i data-lucide="play-circle" style="width: 20px; height: 20px;"></i>
+                  <i data-lucide="play-circle" style="width: 22px; height: 22px;"></i>
                   <span>🟢 Clock In to Dispatched Shift</span>
                 </button>
+
+                <div class="clock-in-footer-note">
+                  <i data-lucide="shield-check" style="width: 14px; height: 14px; color: #10B981;"></i>
+                  <span>Ontario EVV Geofence Verification Active • 1-Tap Cryptographic Timestamping</span>
+                </div>
               </div>
             </div>
 
             <!-- State 2: Displayed when NO Shift is currently allocated by Admin -->
             <div class="no-shift-assigned-card" id="no-shift-assigned-card" style="display: none;">
               <div class="no-shift-icon-circle">
-                <i data-lucide="calendar-x" style="width: 26px; height: 26px;"></i>
+                <i data-lucide="calendar-check" style="width: 32px; height: 32px;"></i>
               </div>
               <h3 class="no-shift-title">No Active Shift Dispatched for Today</h3>
               <p class="no-shift-desc">
-                The Admin Clinical Dispatch desk has not allocated an active healthcare placement to your profile for today. Once a coordinator schedules and dispatches your shift, all hospital parameters, unit reporting details, and your 1-tap Clock-In button will appear right here.
+                The Clinical Operations Dispatch desk has not scheduled an active placement to your profile for today. Once an administrator confirms and dispatches your upcoming shift, your healthcare facility details, ward assignment, and 1-tap EVV Clock-In station will appear right here.
               </p>
               <div class="dispatch-contact-strip">
-                <span>Need shift assignment or scheduling update?</span>
+                <span style="display: inline-flex; align-items: center; gap: 0.35rem;">
+                  <i data-lucide="headphones" style="width: 14px; height: 14px; color: #0284C7;"></i> Have scheduling questions?
+                </span>
                 <a href="tel:+16472106463"><i data-lucide="phone-call" style="width: 14px; height: 14px;"></i> Call Dispatch: (647) 210-6463</a>
+                <a href="mailto:staffing@divinefingershealthcare.ca"><i data-lucide="mail" style="width: 14px; height: 14px;"></i> staffing@divinefingershealthcare.ca</a>
               </div>
             </div>
 
@@ -1754,13 +2267,44 @@
             </p>
           </div>
 
+          <!-- Clinical Compliance Readiness Meter -->
+          <div class="compliance-meter-card">
+            <div class="compliance-meter-header">
+              <div class="compliance-meter-left">
+                <div class="compliance-meter-icon">
+                  <i data-lucide="shield-check" style="width: 22px; height: 22px;"></i>
+                </div>
+                <div>
+                  <div style="font-weight: 800; color: var(--navy); font-size: 0.96rem; font-family: var(--font-heading);">
+                    Ontario Clinical Placement Readiness
+                  </div>
+                  <div style="font-size: 0.78rem; color: #64748B;">
+                    College of Nurses of Ontario &amp; Ministry of Health Placement Standards
+                  </div>
+                </div>
+              </div>
+              <div class="compliance-meter-badge">
+                <span class="pulse-dot"></span> 100% Eligible for Hospital &amp; LTC Dispatch
+              </div>
+            </div>
+            <div class="compliance-meter-track">
+              <div class="compliance-meter-bar"></div>
+            </div>
+            <div class="compliance-meter-tags">
+              <span class="compliance-pill-tag active"><i data-lucide="check" style="width: 12px; height: 12px;"></i> Regulatory CNO License</span>
+              <span class="compliance-pill-tag active"><i data-lucide="check" style="width: 12px; height: 12px;"></i> BLS / CPR Certification</span>
+              <span class="compliance-pill-tag active"><i data-lucide="check" style="width: 12px; height: 12px;"></i> Police Background Check (VSS)</span>
+              <span class="compliance-pill-tag active"><i data-lucide="check" style="width: 12px; height: 12px;"></i> N95 Respirator Mask Fit-Test</span>
+            </div>
+          </div>
+
           <!-- Compliance Summary Status Cards -->
           <div class="compliance-grid">
-            <div class="compliance-card">
+            <div class="compliance-card cno-card">
               <div class="compliance-card-header">
                 <span>Regulatory License</span>
                 <div class="compliance-card-icon-wrap" style="background: #E0F2FE; color: #0284C7;">
-                  <i data-lucide="shield-check" style="width: 18px; height: 18px;"></i>
+                  <i data-lucide="shield-check" style="width: 20px; height: 20px;"></i>
                 </div>
               </div>
               <div class="compliance-card-title" id="comp-cno-title">
@@ -1770,33 +2314,33 @@
                 College of Nurses of Ontario
               </div>
               <div class="compliance-card-status verified" id="comp-cno-badge">
-                <i data-lucide="check-circle" style="width: 13px; height: 13px;"></i> Verified Active
+                <i data-lucide="check-circle" style="width: 14px; height: 14px;"></i> Verified Active
               </div>
             </div>
 
-            <div class="compliance-card">
+            <div class="compliance-card cpr-card">
               <div class="compliance-card-header">
                 <span>Life Support</span>
                 <div class="compliance-card-icon-wrap" style="background: #FEE2E2; color: #EF4444;">
-                  <i data-lucide="heart-pulse" style="width: 18px; height: 18px;"></i>
+                  <i data-lucide="heart-pulse" style="width: 20px; height: 20px;"></i>
                 </div>
               </div>
               <div class="compliance-card-title">
                 BLS / CPR Certification
               </div>
               <div class="compliance-card-subtitle">
-                Heart &amp; Stroke / First Aid
+                Heart &amp; Stroke Foundation
               </div>
               <div class="compliance-card-status verified" id="comp-cpr-badge">
-                <i data-lucide="check-circle" style="width: 13px; height: 13px;"></i> Verified Valid
+                <i data-lucide="check-circle" style="width: 14px; height: 14px;"></i> Verified Valid
               </div>
             </div>
 
-            <div class="compliance-card">
+            <div class="compliance-card vss-card">
               <div class="compliance-card-header">
                 <span>Background Check</span>
                 <div class="compliance-card-icon-wrap" style="background: #DCFCE7; color: #10B981;">
-                  <i data-lucide="file-check-2" style="width: 18px; height: 18px;"></i>
+                  <i data-lucide="file-check-2" style="width: 20px; height: 20px;"></i>
                 </div>
               </div>
               <div class="compliance-card-title">
@@ -1806,15 +2350,15 @@
                 Vulnerable Sector Screening
               </div>
               <div class="compliance-card-status verified" id="comp-vss-badge">
-                <i data-lucide="check-circle" style="width: 13px; height: 13px;"></i> Clear / Valid
+                <i data-lucide="check-circle" style="width: 14px; height: 14px;"></i> Clear / Valid
               </div>
             </div>
 
-            <div class="compliance-card">
+            <div class="compliance-card n95-card">
               <div class="compliance-card-header">
                 <span>Health &amp; Safety</span>
                 <div class="compliance-card-icon-wrap" style="background: #EDE9FE; color: #8B5CF6;">
-                  <i data-lucide="wind" style="width: 18px; height: 18px;"></i>
+                  <i data-lucide="wind" style="width: 20px; height: 20px;"></i>
                 </div>
               </div>
               <div class="compliance-card-title">
@@ -1824,7 +2368,7 @@
                 3M Respirator Certification
               </div>
               <div class="compliance-card-status verified" id="comp-n95-badge">
-                <i data-lucide="check-circle" style="width: 13px; height: 13px;"></i> 3M Certified Valid
+                <i data-lucide="check-circle" style="width: 14px; height: 14px;"></i> 3M Certified Valid
               </div>
             </div>
           </div>
