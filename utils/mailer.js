@@ -134,10 +134,43 @@ async function sendNewsletterWelcomeEmail(subscriberEmail) {
   }
 }
 
+async function sendAdminInviteEmail(adminEmail, adminName, inviteToken, role) {
+  const appUrl = process.env.APP_URL || 'http://localhost:3000';
+  const inviteUrl = `${appUrl}/admin-login.html?invite=${inviteToken}&email=${encodeURIComponent(adminEmail)}`;
+
+  const mailOptions = {
+    from: `"Divine Fingers Admin Operations" <${process.env.SMTP_USER || 'no-reply@divinefingershealthcare.ca'}>`,
+    to: adminEmail,
+    subject: `Administrator Access Invitation — Divine Fingers Healthcare Services`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 560px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 8px; background: #ffffff;">
+        <h2 style="color: #00a896; margin-top: 0;">Portal Operator Invitation</h2>
+        <p>Hello <strong>${adminName}</strong>,</p>
+        <p>You have been invited to join the <strong>Divine Fingers Healthcare Services Inc.</strong> Operations &amp; Dispatch Portal as <strong>${role}</strong>.</p>
+        <p>In compliance with Canadian healthcare privacy and security standards, your account requires you to establish your own private password and complete Two-Factor Authentication (TOTP) enrollment.</p>
+        <div style="margin: 24px 0; text-align: center;">
+          <a href="${inviteUrl}" style="background: #00a896; color: #ffffff; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">Activate Administrator Account</a>
+        </div>
+        <p style="font-size: 13px; color: #64748b;">Or copy and paste this activation link into your browser:<br><span style="font-family: monospace; word-break: break-all;">${inviteUrl}</span></p>
+        <p style="font-size: 13px; color: #64748b;">This invitation link is valid for 24 hours.</p>
+        <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 20px 0;" />
+        <p style="font-size: 12px; color: #94a3b8; margin: 0;">Divine Fingers Healthcare Services Inc. &bull; 17-2 Dailing Gate, Scarborough, ON M1B 1Z8</p>
+      </div>
+    `
+  };
+  try {
+    return await transporter.sendMail(mailOptions);
+  } catch (err) {
+    console.warn(`⚠️ [SMTP Offline / Dev Intercept] Admin invitation email (${adminEmail}) logged: ${inviteUrl}`);
+    return { mock: true, accepted: [adminEmail], inviteUrl };
+  }
+}
+
 module.exports = {
   sendStaffingRequestAlert,
   sendApplicantConfirmation,
   sendAdminEmailVerificationOtp,
+  sendAdminInviteEmail,
   sendNewsletterWelcomeEmail,
   verifyConnection
 };

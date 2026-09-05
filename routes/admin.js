@@ -33,7 +33,7 @@ const { z } = require('zod');
 const { uploadCredential } = require('../middleware/uploadCredentials');
 const { requireAdminAuth, requirePermission, normalizePermissions, ALL_PERMISSIONS } = require('../middleware/auth');
 const adminEvents = require('../utils/events');
-const { sendAdminEmailVerificationOtp } = require('../utils/mailer');
+const { sendAdminEmailVerificationOtp, sendAdminInviteEmail } = require('../utils/mailer');
 
 // All admin routes require authentication
 router.use(requireAdminAuth());
@@ -901,7 +901,7 @@ const createAdminSchema = z.object({
   email: z.string().email().max(191),
   full_name: z.string().min(2).max(100),
   role: z.enum(['super-admin', 'dispatch', 'care-coordinator', 'recruiter', 'auditor', 'custom']),
-  password: z.string().min(8, 'Password must be at least 8 characters long')
+  password: z.string().min(8, 'Password must be at least 8 characters long').optional().or(z.literal(''))
 });
 
 // GET /api/admin/admins — list all admin accounts (super-admin only)
@@ -1069,7 +1069,9 @@ router.post('/admins', requirePermission('admins:manage'), async (req, res, next
     }
 
     const newId = crypto.randomUUID();
-    const passwordHash = await bcrypt.hash(validated.password, 12);
+    const hasTypedPassword = Boolean(validated.password && validated.password.trim().length >= 8);
+    const initialSecret = hasTypedPassword ? validated.password.trim() : crypto.randomBytes(24).toString('base64url');
+    const passwordHash = await bcrypt.hash(initialSecret, 12);
     const emailOtp = crypto.randomInt(100000, 999999).toString();
     const hashedOtp = crypto.createHash('sha256').update(emailOtp).digest('hex');
     const initialPermissions = normalizePermissions(validated.role, req.body.permissions);
@@ -1080,7 +1082,9 @@ router.post('/admins', requirePermission('admins:manage'), async (req, res, next
       [newId, emailLower, passwordHash, validated.full_name.trim(), validated.role, JSON.stringify(initialPermissions), hashedOtp]
     );
 
-    // Send verification OTP to new administrator's corporate email
+    // Send invitation email and verification OTP to new administrator's corporate email
+    const inviteToken = crypto.randomBytes(24).toString('hex');
+    await sendAdminInviteEmail(emailLower, validated.full_name.trim(), inviteToken, validated.role);
     await sendAdminEmailVerificationOtp(emailLower, validated.full_name.trim(), emailOtp);
 
     await pool.query(
@@ -1088,7 +1092,7 @@ router.post('/admins', requirePermission('admins:manage'), async (req, res, next
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [crypto.randomUUID(), req.admin.id, req.admin.full_name,
        'ADMIN_ACCOUNT_CREATED', 'admins', newId,
-       `Super-admin ${req.admin.full_name} created new ${validated.role} account for ${validated.full_name} (${emailLower}) with verification requirement`,
+       `Super-admin ${req.admin.full_name} provisioned new ${validated.role} account for ${validated.full_name} (${emailLower}) with ${hasTypedPassword ? 'temporary password' : 'secure activation invite'} requirement`,
        'info', req.ip]
     );
 
@@ -1103,7 +1107,7 @@ router.post('/admins', requirePermission('admins:manage'), async (req, res, next
 
     res.status(201).json({
       success: true,
-      message: `Admin account provisioned for ${validated.full_name}. A verification email has been dispatched to ${emailLower}.`,
+      message: `Admin account provisioned for ${validated.full_name}. A secure activation invitation and verification token have been dispatched to ${emailLower}.`,
       data: {
         id: newId,
         email: emailLower,
@@ -1111,7 +1115,8 @@ router.post('/admins', requirePermission('admins:manage'), async (req, res, next
         role: validated.role,
         permissions: initialPermissions,
         is_active: 1,
-        email_verified: 0
+        email_verified: 0,
+        invite_dispatched: true
       }
     });
   } catch (err) {

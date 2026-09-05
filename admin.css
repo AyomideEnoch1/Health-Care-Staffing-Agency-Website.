@@ -1144,6 +1144,26 @@ button .pulse-dot::before,
   line-height: 1;
 }
 
+.skeleton-shimmer {
+  display: inline-block;
+  min-width: 44px;
+  height: 1.25em;
+  background: linear-gradient(90deg, rgba(255,255,255,0.06) 25%, rgba(255,255,255,0.16) 50%, rgba(255,255,255,0.06) 75%);
+  background-size: 200% 100%;
+  animation: shimmerSkeleton 1.4s infinite linear;
+  border-radius: 6px;
+  vertical-align: middle;
+}
+
+[data-theme="light"] .skeleton-shimmer {
+  background: linear-gradient(90deg, rgba(0,0,0,0.04) 25%, rgba(0,0,0,0.10) 50%, rgba(0,0,0,0.04) 75%);
+}
+
+@keyframes shimmerSkeleton {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
 .kpi-trend {
   display: inline-flex;
   align-items: center;

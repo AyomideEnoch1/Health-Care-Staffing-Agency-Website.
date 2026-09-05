@@ -40,14 +40,14 @@
           <li class="nav-item"><a href="blog.html" class="nav-link">BLOG/NEWS</a></li>
           <li class="nav-item"><a href="contact.html" class="nav-link">CONTACT</a></li>
           <li class="nav-item mobile-nav-action">
-            <a href="login.html" class="btn nav-cta-btn mobile-nav-btn" id="mobile-header-cta-btn">SIGN IN</a>
+            <a href="login.html" class="btn nav-cta-btn mobile-nav-btn" id="mobile-header-cta-btn" aria-label="Sign in to Healthcare Staff Portal">STAFF PORTAL</a>
           </li>
         </ul>
       </nav>
 
       <!-- Extreme Right CTA Button -->
       <div class="header-cta-right">
-        <a href="login.html" class="btn nav-cta-btn" id="header-cta-btn">SIGN IN</a>
+        <a href="login.html" class="btn nav-cta-btn" id="header-cta-btn" aria-label="Sign in to Healthcare Staff Portal">STAFF PORTAL</a>
       </div>
 
       <button class="mobile-toggle" id="mobile-toggle" aria-label="Open menu">
@@ -75,8 +75,8 @@
           At Divine Fingers Healthcare Services, we value people first. We partner with healthcare organizations to craft high-quality patient-centered care rooted in trusted expertise.
         </p>
         <div class="hero-btn-row">
-          <a href="clients.html" class="btn btn-pill-hero">REQUEST STAFF</a>
-          <a href="jobseekers.html" class="btn btn-pill-outline">JOIN OUR TEAM</a>
+          <a href="clients.html" class="btn btn-pill-hero" aria-label="Request healthcare staffing for hospitals, facilities, or home care">REQUEST STAFF (FACILITIES)</a>
+          <a href="jobseekers.html" class="btn btn-pill-outline" aria-label="Join clinical roster for registered nurses, RPNs, and PSWs">JOIN CLINICAL ROSTER</a>
         </div>
 
         <div class="hero-carousel-dots" id="hero-dots">
@@ -254,12 +254,12 @@
           <p class="proto-body-text">
             From bustling acute-care hospitals to long-term care homes and intimate community settings, we understand the diverse needs of the healthcare landscape. We treat healthcare professionals, clients and patients with respect and dignity, prioritizing patients’ needs and care in every interaction.
           </p>
-          <a href="services.html" class="proto-arrow-link">
+          <a href="services.html" class="proto-arrow-link" aria-label="See all community care and home support services">
             See community care services <i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i>
           </a>
         </div>
         <div class="proto-story-img-card slide-from-right">
-          <img src="assets/images/role_psw_care.jpg" alt="Compassionate Care in Ontario">
+          <img src="assets/images/service_homecare.jpg" alt="Compassionate Community &amp; Home Care in Ontario">
         </div>
       </div>
 
@@ -271,12 +271,12 @@
           <p class="proto-body-text">
             Delivering clinically sound, compassionate, and accessible healthcare across home, community, and facility settings in Canada. Helping shape a more connected, responsive, and patient-focused future for healthcare through our Travelling Nursing Program, Personal Care Support, and Respite Care Services.
           </p>
-          <a href="services.html" class="proto-arrow-link">
+          <a href="services.html" class="proto-arrow-link" aria-label="Explore all specialized clinical practices and staffing models">
             Explore all clinical practices <i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i>
           </a>
         </div>
         <div class="proto-story-img-card slide-from-right">
-          <img src="assets/images/service_nurse.jpg" alt="Clinical Practice and Nurse Care">
+          <img src="assets/images/role_icu_care.jpg" alt="Critical Care, Acute Hospital &amp; Clinical Nursing">
         </div>
       </div>
 
@@ -287,10 +287,10 @@
         <div class="proto-showcase-visual slide-from-left">
           <div class="proto-mockup-phone">
             <h5>Divine Fingers</h5>
-            <p>Connecting people to care that matters.</p>
+            <p>Clinical Dispatch &amp; Shift Management Portal</p>
             <div class="proto-mockup-btn-row">
-              <a href="login.html" class="proto-mockup-btn btn-login">LOGIN &rarr;</a>
-              <a href="login.html?tab=register" class="proto-mockup-btn btn-signup">SIGN UP &rarr;</a>
+              <a href="login.html" class="proto-mockup-btn btn-login" aria-label="Sign in to Staff Shift Portal">STAFF LOGIN &rarr;</a>
+              <a href="jobseekers.html" class="proto-mockup-btn btn-signup" aria-label="Apply to join our nursing and caregiver roster">APPLY TO ROSTER &rarr;</a>
             </div>
           </div>
         </div>
@@ -305,12 +305,12 @@
           </p>
           
           <div class="proto-action-badges-group">
-            <a href="clients.html" class="proto-action-badge badge-facilities">
+            <a href="clients.html" class="proto-action-badge badge-facilities" aria-label="Facilities and hospitals request certified staff online">
               <div class="proto-badge-icon-box">
                 <i data-lucide="building-2"></i>
               </div>
               <div class="proto-badge-content">
-                <span class="proto-badge-eyebrow">FACILITIES &amp; HOSPITALS</span>
+                <span class="proto-badge-eyebrow">HOSPITALS &amp; FACILITIES</span>
                 <strong class="proto-badge-title">Request Staff Online</strong>
               </div>
               <div class="proto-badge-arrow">
@@ -318,12 +318,25 @@
               </div>
             </a>
 
-            <a href="tel:+16472106463" class="proto-action-badge badge-hotline">
+            <a href="login.html" class="proto-action-badge" style="background: linear-gradient(135deg, rgba(0, 168, 150, 0.08) 0%, rgba(2, 132, 199, 0.08) 100%); border: 1px solid rgba(0, 168, 150, 0.3);" aria-label="Clinicians and healthcare workers access assigned shifts and timecards">
+              <div class="proto-badge-icon-box" style="background: linear-gradient(135deg, #00A896 0%, #0284C7 100%); color: #fff;">
+                <i data-lucide="calendar-check"></i>
+              </div>
+              <div class="proto-badge-content">
+                <span class="proto-badge-eyebrow" style="color: var(--brand-turquoise, #00A896);">NURSES, RPNS &amp; PSWS</span>
+                <strong class="proto-badge-title">Staff Shift Portal &amp; EVV</strong>
+              </div>
+              <div class="proto-badge-arrow">
+                <i data-lucide="chevron-right"></i>
+              </div>
+            </a>
+
+            <a href="tel:+16472106463" class="proto-action-badge badge-hotline" aria-label="Call 24/7 direct clinical dispatch hotline">
               <div class="proto-badge-icon-box">
                 <i data-lucide="phone-call"></i>
               </div>
               <div class="proto-badge-content">
-                <span class="proto-badge-eyebrow">24/7 DIRECT LINE</span>
+                <span class="proto-badge-eyebrow">24/7 CLINICAL DISPATCH</span>
                 <strong class="proto-badge-title">+1 (647) 210-6463</strong>
               </div>
               <div class="proto-badge-arrow">
@@ -361,10 +374,10 @@
             </div>
             <div class="collage-row-sub">
               <div class="collage-item collage-item-sub">
-                <img src="assets/images/hero_divine.jpg" alt="Registered Nurses &amp; PSWs" class="collage-img">
+                <img src="assets/images/service_travel_nurse.jpg" alt="Travelling Registered Nurses Across Ontario &amp; Canada" class="collage-img">
               </div>
               <div class="collage-item collage-item-sub">
-                <img src="assets/images/role_psw_care.jpg" alt="Personal Support Workers Care" class="collage-img">
+                <img src="assets/images/role_education_care.jpg" alt="Specialized PSW Clinical Team Care" class="collage-img">
               </div>
             </div>
           </div>
@@ -386,15 +399,15 @@
               </p>
             </div>
 
-            <button type="button" class="btn-see-more-toggle" id="btn-team-see-more" onclick="toggleTeamContent(this)" aria-expanded="false" aria-controls="team-text-collapse-home">
+            <button type="button" class="btn-see-more-toggle" id="btn-team-see-more" onclick="toggleTeamContent(this)" aria-expanded="false" aria-controls="team-text-collapse-home" aria-label="Expand and read more about our clinical team composition and patient-centered values">
               <span class="btn-toggle-label">See More</span>
               <i data-lucide="chevron-down" class="btn-toggle-icon"></i>
             </button>
           </div>
 
           <div style="margin-top: 1rem;">
-            <a href="about.html" class="proto-arrow-link">
-              Learn more about our team <i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i>
+            <a href="about.html" class="proto-arrow-link" aria-label="Learn more about our executive leadership, nursing directors, and agency history">
+              Learn more about our agency team <i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i>
             </a>
           </div>
         </div>
@@ -577,11 +590,61 @@
     </div>
   </footer>
 
+  <!-- =========================================================================
+       PIPEDA & CASL COMPLIANT COOKIE & PRIVACY CONSENT BANNER
+       ========================================================================= -->
+  <div id="cookie-consent-banner" class="cookie-consent-banner" style="display: none;" role="region" aria-label="Privacy &amp; Cookie Consent">
+    <div class="cookie-consent-container">
+      <div class="cookie-consent-content">
+        <div class="cookie-consent-header">
+          <i data-lucide="shield-check" class="cookie-icon" style="width: 20px; height: 20px; color: var(--brand-turquoise, #00A896);"></i>
+          <strong>Privacy, PIPEDA &amp; CASL Compliance Notice</strong>
+        </div>
+        <p class="cookie-consent-text">
+          Divine Fingers Healthcare Services Inc. respects your privacy in accordance with Canadian PIPEDA and Ontario PHIPA standards. We utilize strictly necessary cookies and authenticated telemetry to secure shift dispatch, safeguard clinician timecards, and ensure regulatory data integrity.
+        </p>
+      </div>
+      <div class="cookie-consent-actions">
+        <button type="button" id="btn-cookie-essential" class="btn btn-cookie-secondary">Essential Only</button>
+        <button type="button" id="btn-cookie-accept-all" class="btn btn-cookie-primary">Accept &amp; Continue</button>
+      </div>
+    </div>
+  </div>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <script src="script.js?v=5.1.0"></script>
   <script>
     if (window.lucide) lucide.createIcons();
+
+    // ── PIPEDA / CASL Cookie & Privacy Consent Management ────────────────────
+    (function() {
+      const banner = document.getElementById('cookie-consent-banner');
+      const btnAcceptAll = document.getElementById('btn-cookie-accept-all');
+      const btnEssential = document.getElementById('btn-cookie-essential');
+      if (!banner) return;
+
+      const consent = localStorage.getItem('df_cookie_consent');
+      if (!consent) {
+        setTimeout(function() {
+          banner.style.display = 'block';
+          if (window.lucide) lucide.createIcons();
+        }, 1000);
+      }
+
+      function dismissConsent(type) {
+        localStorage.setItem('df_cookie_consent', JSON.stringify({ type: type, timestamp: new Date().toISOString() }));
+        banner.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+        banner.style.opacity = '0';
+        banner.style.transform = 'translateY(100%)';
+        setTimeout(function() {
+          banner.style.display = 'none';
+        }, 300);
+      }
+
+      if (btnAcceptAll) btnAcceptAll.addEventListener('click', function() { dismissConsent('all'); });
+      if (btnEssential) btnEssential.addEventListener('click', function() { dismissConsent('essential'); });
+    })();
   </script>
 </body>
 </html>

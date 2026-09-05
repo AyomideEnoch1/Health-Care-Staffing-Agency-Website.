@@ -19,7 +19,7 @@ module.exports = (req, res) => {
   }
 
   try {
-    if (req.url && !req.url.startsWith('/api')) {
+    if (req.url && !req.url.startsWith('/api') && !req.url.startsWith('/admin')) {
       req.url = '/api' + req.url;
     }
     return app(req, res);

@@ -42,11 +42,41 @@ const errorHandler      = require('./middleware/errorHandler');
 const app  = express();
 const PORT = process.env.PORT || 3000;
 
-// ── Security Headers (Helmet) ─────────────────────────────────────────────────
+// ── Security Headers (Helmet + Strict Telemetry & Privacy Safeguards) ──────────
 app.use(helmet({
-  contentSecurityPolicy: false,       // Permit inline GSAP/CDN scripts — tighten before full production
-  crossOriginEmbedderPolicy: false
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net", "https://unpkg.com"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com"],
+      imgSrc: ["'self'", "data:", "blob:", "https:"],
+      connectSrc: ["'self'", "https:"],
+      frameAncestors: ["'none'"],
+      objectSrc: ["'none'"],
+      upgradeInsecureRequests: process.env.NODE_ENV === 'production' ? [] : null
+    }
+  },
+  crossOriginEmbedderPolicy: false,
+  hsts: {
+    maxAge: 31536000,
+    includeSubDomains: true,
+    preload: true
+  },
+  frameguard: {
+    action: 'deny'
+  },
+  referrerPolicy: {
+    policy: 'strict-origin-when-cross-origin'
+  }
 }));
+
+// Additional HTTP Security & Permissions Headers
+app.use((req, res, next) => {
+  res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=(self)');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  next();
+});
 
 // ── CORS ──────────────────────────────────────────────────────────────────────
 // Allowed origins are configured via ALLOWED_ORIGINS env var (comma-separated).
@@ -102,6 +132,36 @@ function verifyCsrfToken(req, res, next) {
 // ── Body Parsers ──────────────────────────────────────────────────────────────
 app.use(express.json({ limit: '2mb' }));
 app.use(express.urlencoded({ extended: true, limit: '2mb' }));
+
+// ── Server-Side Gate for Admin Dashboard (Zero Unauthenticated Markup) ────────
+const jwt = require('jsonwebtoken');
+const JWT_SECRET = process.env.JWT_SECRET || 'divine_fingers_default_secure_jwt_secret_key_2026_production_fallback';
+
+app.get(['/admin', '/admin.html'], (req, res) => {
+  const sessionCookie = req.cookies['df_admin_session'];
+  if (!sessionCookie) {
+    // Unauthenticated visitor: Return ONLY the clean login shell (no dashboard DOM/PII)
+    return res.sendFile(path.join(__dirname, 'admin-login.html'));
+  }
+
+  try {
+    const decoded = jwt.verify(sessionCookie, JWT_SECRET);
+    if (!decoded || !decoded.id) {
+      res.clearCookie('df_admin_session');
+      return res.sendFile(path.join(__dirname, 'admin-login.html'));
+    }
+    // Authenticated administrator: Serve private operational dashboard shell
+    return res.sendFile(path.join(__dirname, 'private/admin-dashboard.html'));
+  } catch (err) {
+    res.clearCookie('df_admin_session');
+    return res.sendFile(path.join(__dirname, 'admin-login.html'));
+  }
+});
+
+// Block any direct public access to private directory
+app.use('/private', (req, res) => {
+  res.status(403).json({ error: 'Access Denied: Private Server Directory' });
+});
 
 // ── Static Assets (serves HTML, CSS, JS, images) ─────────────────────────────
 app.use(express.static(path.join(__dirname, './')));

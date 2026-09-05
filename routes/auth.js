@@ -117,6 +117,8 @@ router.post('/login', authLoginLimiter, async (req, res, next) => {
         }
       }
 
+      // Dummy bcrypt comparison to normalize execution time and defend against username enumeration
+      await bcrypt.compare(password, '$2a$12$e8ukB6rR.Gg3oV8vW3oN9.vV4U3KzM2pL9Y8N7O6P5Q4R3S2T1U0V');
       return res.status(401).json({ success: false, error: 'Invalid email or password.' });
     }
 
