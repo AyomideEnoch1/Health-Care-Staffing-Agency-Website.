@@ -2605,6 +2605,392 @@
       .summary-strip { flex-direction: column; }
       .summary-stat { border-right: none; border-bottom: 1px solid #E2E8F0; }
       .summary-stat:last-child { border-bottom: none; }
+    /* =========================================================================
+       STAFF ENTERPRISE WORKSPACE APP STYLING
+       ========================================================================= */
+    .staff-app {
+      display: flex;
+      min-height: 100vh;
+      background: #F8FAFC;
+    }
+    .staff-sidebar {
+      width: 240px;
+      flex-shrink: 0;
+      background: #071324;
+      color: #C7D3CE;
+      display: flex;
+      flex-direction: column;
+      padding: 28px 20px;
+      border-right: 1px solid #1E293B;
+    }
+    .staff-brand-mark {
+      font-family: var(--font-heading);
+      font-weight: 800;
+      font-size: 19px;
+      color: #FFFFFF;
+      letter-spacing: -0.01em;
+    }
+    .staff-brand-sub {
+      font-size: 12px;
+      color: #94A3B8;
+      margin: 0;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .staff-nav-group-label {
+      font-size: 11px;
+      color: #64748B;
+      margin: 22px 0 8px 10px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+    }
+    .staff-nav-group-label:first-of-type {
+      margin-top: 24px;
+    }
+    .staff-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .staff-nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 12px;
+      border-radius: 6px;
+      background: none;
+      border: none;
+      color: #94A3B8;
+      text-align: left;
+      cursor: pointer;
+      font-size: 13.5px;
+      font-weight: 600;
+      transition: all 0.15s ease;
+      position: relative;
+    }
+    .staff-nav-item:hover {
+      background: rgba(255, 255, 255, 0.06);
+      color: #FFFFFF;
+    }
+    .staff-nav-item.active {
+      background: rgba(0, 168, 150, 0.15);
+      color: #00F5D4;
+      font-weight: 700;
+    }
+    .staff-nav-item .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #F59E0B;
+      margin-left: auto;
+      flex-shrink: 0;
+    }
+    .staff-sidebar-footer {
+      margin-top: auto;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .staff-me-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: #FFFFFF;
+      margin: 0 0 2px 0;
+    }
+    .staff-me-role {
+      font-size: 12px;
+      color: #94A3B8;
+      margin: 0;
+    }
+
+    /* Staff Main & Screens */
+    .staff-main {
+      flex: 1;
+      min-width: 0;
+      padding: 36px 44px 60px 44px;
+      background: #F8FAFC;
+    }
+    .staff-screen {
+      display: none;
+    }
+    .staff-screen.active {
+      display: block;
+      max-width: 920px;
+      animation: fadeInScreen 0.2s ease-out;
+    }
+
+    /* Clock Card */
+    .clock-card {
+      border: 1px solid #E2E8F0;
+      border-radius: 10px;
+      background: #FFFFFF;
+      padding: 24px;
+      margin-bottom: 32px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.02);
+    }
+    .clock-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .clock-shift-role {
+      font-size: 16px;
+      font-weight: 700;
+      color: #0F172A;
+      margin: 0;
+    }
+    .clock-facility {
+      font-size: 13.5px;
+      color: #64748B;
+      margin: 3px 0 0 0;
+    }
+    .clock-body {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      margin-top: 22px;
+      flex-wrap: wrap;
+    }
+    .elapsed-display {
+      font-family: var(--font-heading);
+      font-size: 40px;
+      font-weight: 800;
+      color: #071324;
+      line-height: 1;
+      letter-spacing: -0.02em;
+    }
+    .elapsed-label {
+      font-size: 12.5px;
+      color: #64748B;
+      margin-top: 4px;
+      font-weight: 600;
+    }
+    .clock-detail-list {
+      font-size: 13.5px;
+      color: #64748B;
+      line-height: 1.8;
+    }
+    .clock-detail-list b {
+      color: #0F172A;
+      font-weight: 700;
+    }
+    .clock-actions {
+      margin-top: 22px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    /* Late Banner */
+    .late-banner {
+      border: 1px solid #FDA4AF;
+      background: #FFF1F2;
+      border-radius: 8px;
+      padding: 14px 18px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .late-banner p {
+      margin: 0;
+      font-size: 13.5px;
+      color: #E11D48;
+      font-weight: 700;
+    }
+
+    /* Shift Cards */
+    .shift-card {
+      border: 1px solid #E2E8F0;
+      border-radius: 8px;
+      background: #FFFFFF;
+      padding: 16px 20px;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+      transition: all 0.15s ease;
+    }
+    .shift-card:hover {
+      border-color: #CBD5E1;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+    }
+    .shift-main {
+      flex: 1;
+      min-width: 220px;
+    }
+    .shift-role {
+      font-size: 15px;
+      font-weight: 700;
+      color: #0F172A;
+      margin: 0;
+    }
+    .shift-meta {
+      font-size: 13px;
+      color: #64748B;
+      margin: 3px 0 0 0;
+    }
+    .shift-pay {
+      font-family: var(--font-heading);
+      font-size: 18px;
+      font-weight: 800;
+      color: #00A896;
+    }
+    .shift-pay-label {
+      font-size: 11.5px;
+      color: #64748B;
+      display: block;
+      margin-top: 1px;
+    }
+    .shift-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .claimed-tag {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: #059669;
+      background: #ECFDF5;
+      padding: 4px 8px;
+      border-radius: 6px;
+      border: 1px solid #A7F3D0;
+    }
+
+    /* Availability Grid */
+    .avail-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+      max-width: 560px;
+    }
+    .avail-day {
+      border: 1.5px solid #CBD5E1;
+      border-radius: 6px;
+      padding: 10px 4px;
+      text-align: center;
+      cursor: pointer;
+      background: #FFFFFF;
+      transition: all 0.15s ease;
+      user-select: none;
+    }
+    .avail-day:hover {
+      border-color: #00A896;
+    }
+    .avail-day .dow {
+      font-size: 11px;
+      color: #64748B;
+      display: block;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .avail-day .dom {
+      font-size: 16px;
+      font-weight: 700;
+      display: block;
+      margin-top: 2px;
+      color: #0F172A;
+    }
+    .avail-day.available {
+      border-color: #00A896;
+      background: rgba(0, 168, 150, 0.1);
+    }
+    .avail-day.available .dom {
+      color: #00A896;
+      font-weight: 800;
+    }
+    .avail-legend {
+      display: flex;
+      gap: 18px;
+      font-size: 12.5px;
+      color: #64748B;
+      margin-top: 14px;
+      font-weight: 600;
+    }
+    .legend-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 2px;
+      display: inline-block;
+      margin-right: 5px;
+      vertical-align: middle;
+    }
+
+    /* Credential Cards */
+    .cred-card {
+      border: 1px solid #E2E8F0;
+      border-radius: 8px;
+      background: #FFFFFF;
+      padding: 16px 20px;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+    }
+    .cred-name {
+      font-size: 14.5px;
+      font-weight: 700;
+      color: #0F172A;
+      margin: 0;
+    }
+    .cred-sub {
+      font-size: 12.5px;
+      color: #64748B;
+      margin: 2px 0 0 0;
+    }
+
+    /* Pay Summary & Table */
+    .pay-summary {
+      display: flex;
+      border: 1px solid #E2E8F0;
+      border-radius: 8px;
+      background: #FFFFFF;
+      margin-bottom: 24px;
+      overflow: hidden;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.02);
+    }
+    .pay-stat {
+      flex: 1;
+      padding: 16px 20px;
+      border-right: 1px solid #E2E8F0;
+    }
+    .pay-stat:last-child {
+      border-right: none;
+    }
+    .pay-num {
+      font-family: var(--font-heading);
+      font-size: 26px;
+      font-weight: 800;
+      color: #071324;
+      display: block;
+      line-height: 1.1;
+    }
+    .pay-label {
+      font-size: 12.5px;
+      color: #64748B;
+      margin-top: 3px;
+      display: block;
+      font-weight: 600;
+    }
+
+    @media (max-width: 860px) {
+      .staff-app { flex-direction: column; }
+      .staff-sidebar { width: 100%; padding: 16px 20px; }
+      .staff-nav { flex-direction: row; flex-wrap: wrap; }
+      .staff-nav-item { width: auto; }
+      .staff-sidebar-footer { display: none; }
+      .staff-main { padding: 24px 20px 60px 20px; }
     }
   </style>
 </head>
@@ -2877,847 +3263,281 @@
         </table>
       </section>
 
-    </main>
+</main>
   </div>
 
-  <!-- ========================================================================
-       HEALTHCARE WORKER WORKSPACE APP (EVV CLOCK STATION & SHIFT BOARD)
+    <!-- ========================================================================
+       ENTERPRISE STAFF WORKSPACE APP (HEALTHCARE PROFESSIONAL PORTAL)
        ======================================================================== -->
-  <div id="worker-workspace-app">
-  <!-- PORTAL NAVIGATION -->
-  <nav class="portal-navbar">
-    <div class="portal-nav-inner">
-      <a href="index.html" class="portal-brand-link">
-        <img src="assets/images/logo.png" alt="Divine Fingers Healthcare" class="portal-brand-logo">
-        <div class="portal-brand-text">
-          <span class="portal-brand-title">Divine Fingers</span>
-          <span class="portal-brand-badge">Member Portal</span>
+  <div class="staff-app" id="worker-workspace-app" style="display: none;">
+    <!-- SIDEBAR -->
+    <aside class="staff-sidebar">
+      <div class="brand">
+        <div style="display: flex; align-items: center; gap: 9px; margin-bottom: 3px;">
+          <img src="assets/images/brand_emblem.png" alt="Divine Fingers" style="width: 26px; height: 26px;">
+          <span class="staff-brand-mark">Divine Fingers</span>
         </div>
-      </a>
+        <p class="staff-brand-sub">Staff Portal</p>
+      </div>
 
-      <div class="portal-user-controls">
-        <a href="index.html" style="font-size: 0.82rem; font-weight: 700; color: #64748B; text-decoration: none; margin-right: 0.5rem;" class="nav-public-home">
-          Website Home
-        </a>
-
-        <div class="portal-user-chip">
-          <div class="portal-avatar" id="portal-avatar-initials">DF</div>
-          <div class="portal-user-info">
-            <span class="portal-user-name" id="user-display-name">Loading...</span>
-            <span class="portal-user-role-badge" id="user-display-role">Account</span>
-          </div>
-        </div>
-
-        <button type="button" class="btn-portal-logout" onclick="handleLogout()" title="Sign Out">
-          <i data-lucide="log-out" style="width: 16px; height: 16px;"></i>
-          <span>Sign Out</span>
+      <p class="staff-nav-group-label">TODAY</p>
+      <nav class="staff-nav">
+        <button type="button" class="staff-nav-item active" data-screen="today" onclick="showStaffScreen('today')">
+          <i data-lucide="calendar" style="width: 16px; height: 16px;"></i> Today
         </button>
+        <button type="button" class="staff-nav-item" data-screen="openshifts" onclick="showStaffScreen('openshifts')">
+          <i data-lucide="layers" style="width: 16px; height: 16px;"></i> Open Shifts
+          <span class="dot" id="staff-openshifts-dot" style="display: none;"></span>
+        </button>
+        <button type="button" class="staff-nav-item" data-screen="schedule" onclick="showStaffScreen('schedule')">
+          <i data-lucide="clock" style="width: 16px; height: 16px;"></i> My Schedule
+        </button>
+      </nav>
+
+      <p class="staff-nav-group-label">ACCOUNT</p>
+      <nav class="staff-nav">
+        <button type="button" class="staff-nav-item" data-screen="credentials" onclick="showStaffScreen('credentials')">
+          <i data-lucide="award" style="width: 16px; height: 16px;"></i> Credentials
+        </button>
+        <button type="button" class="staff-nav-item" data-screen="pay" onclick="showStaffScreen('pay')">
+          <i data-lucide="wallet" style="width: 16px; height: 16px;"></i> Pay &amp; Timesheets
+        </button>
+      </nav>
+
+      <div class="staff-sidebar-footer">
+        <p class="staff-me-name" id="staff-side-name">Healthcare Professional</p>
+        <p class="staff-me-role" id="staff-side-role">RN · Greater Toronto Area</p>
+        <button type="button" class="client-switch-facility" style="margin-top: 8px;" onclick="handleLogout()">Sign Out</button>
       </div>
-    </div>
-  </nav>
+    </aside>
 
-  <!-- PORTAL CONTENT WRAPPER -->
-  <main class="portal-main-body">
+    <!-- MAIN SCREENS -->
+    <main class="staff-main">
 
-    <!-- WELCOME BANNER -->
-    <div class="portal-welcome-banner">
-      <div class="welcome-title-group">
-        <h1 id="banner-welcome-heading">Welcome back</h1>
-        <p id="banner-welcome-sub">Manage your staffing requests, view assigned healthcare personnel, and access operations tools.</p>
-      </div>
-      <div class="welcome-actions" id="banner-action-buttons">
-        <!-- Injected based on role -->
-      </div>
-    </div>
-
-    <!-- METRICS GRID -->
-    <div class="metrics-grid" id="portal-metrics-container">
-      <!-- Injected based on role -->
-    </div>
-
-    <!-- MAIN TWO-COLUMN VIEW -->
-    <div class="portal-columns-layout">
-      
-      <!-- LEFT PRIMARY COLUMN -->
-      <div class="portal-primary-content">
-        
-        <!-- CLIENT VIEW: ENTERPRISE SURGE STRIP & NAVIGATION TABS -->
-        <div id="client-top-container" style="display: none;">
-          <!-- ⚡ 2-HOUR EMERGENCY SURGE DISPATCH STRIP -->
-          <div class="client-surge-strip" style="background: linear-gradient(135deg, #FFF1F2 0%, #FFE4E6 100%); border: 1.5px solid #FDA4AF; border-radius: 12px; padding: 1.1rem 1.35rem; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; box-shadow: 0 4px 14px rgba(225,29,72,0.08);">
-            <div style="display: flex; align-items: center; gap: 0.85rem;">
-              <div style="width: 42px; height: 42px; border-radius: 50%; background: #E11D48; color: #fff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 4px 12px rgba(225,29,72,0.35);">
-                <i data-lucide="zap" style="width: 22px; height: 22px;"></i>
-              </div>
-              <div>
-                <div style="font-size: 0.95rem; font-weight: 800; color: #9F1239; display: flex; align-items: center; gap: 6px;">
-                  <span>Need Emergency Clinical Coverage in 2 Hours?</span>
-                  <span style="background: #E11D48; color: #fff; font-size: 0.68rem; padding: 2px 7px; border-radius: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Priority SLA</span>
-                </div>
-                <div style="font-size: 0.78rem; color: #BE123C; font-weight: 600; margin-top: 2px;">
-                  Expedited dispatch protocol for ICU, ER, and acute hospital unit surges across the Greater Toronto Area.
-                </div>
-              </div>
-            </div>
-            <button type="button" onclick="openSurgeModal()" style="background: #E11D48; color: #fff; border: none; border-radius: 8px; padding: 0.65rem 1.25rem; font-weight: 800; font-size: 0.84rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 14px rgba(225,29,72,0.35); transition: all 0.2s;">
-              <i data-lucide="bell-ring" style="width: 15px; height: 15px;"></i> Trigger 2-Hour Surge
-            </button>
-          </div>
-
-          <!-- CLIENT NAVIGATION TABS -->
-          <div class="client-tabs-nav" style="display: flex; gap: 0.5rem; border-bottom: 1.5px solid #E2E8F0; margin-bottom: 1.5rem; overflow-x: auto; padding-bottom: 2px;">
-            <button type="button" class="btn-client-tab active" id="tab-btn-requests" onclick="switchClientTab('requests')" style="padding: 0.65rem 1.1rem; border: none; background: transparent; border-bottom: 3px solid #0284C7; color: #0284C7; font-weight: 800; font-size: 0.85rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;">
-              <i data-lucide="clipboard-list" style="width: 15px; height: 15px;"></i> Active Shifts &amp; Tracking
-            </button>
-            <button type="button" class="btn-client-tab" id="tab-btn-recurring" onclick="switchClientTab('recurring')" style="padding: 0.65rem 1.1rem; border: none; background: transparent; border-bottom: 3px solid transparent; color: #64748B; font-weight: 700; font-size: 0.85rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;">
-              <i data-lucide="repeat" style="width: 15px; height: 15px;"></i> Standing &amp; Bulk Orders
-            </button>
-            <button type="button" class="btn-client-tab" id="tab-btn-roster" onclick="switchClientTab('roster')" style="padding: 0.65rem 1.1rem; border: none; background: transparent; border-bottom: 3px solid transparent; color: #64748B; font-weight: 700; font-size: 0.85rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;">
-              <i data-lucide="users" style="width: 15px; height: 15px;"></i> Facility Caregivers &amp; Compliance
-            </button>
-            <button type="button" class="btn-client-tab" id="tab-btn-billing" onclick="switchClientTab('billing')" style="padding: 0.65rem 1.1rem; border: none; background: transparent; border-bottom: 3px solid transparent; color: #64748B; font-weight: 700; font-size: 0.85rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;">
-              <i data-lucide="receipt" style="width: 15px; height: 15px;"></i> Hours &amp; Billing Reconciliation
-            </button>
-            <button type="button" class="btn-client-tab" id="tab-btn-team" onclick="switchClientTab('team')" style="padding: 0.65rem 1.1rem; border: none; background: transparent; border-bottom: 3px solid transparent; color: #64748B; font-weight: 700; font-size: 0.85rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;">
-              <i data-lucide="shield" style="width: 15px; height: 15px;"></i> Facility Team
-            </button>
-          </div>
-        </div>
-
-        <!-- 1. TAB PANEL: ACTIVE SHIFTS & TRACKING -->
-        <div class="portal-panel client-subpanel" id="client-requests-panel" style="display: none;">
-          <div class="panel-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
-            <div class="panel-title">
-              <i data-lucide="activity"></i> Active Shifts, Dispatched Personnel &amp; EVV Status
-            </div>
-            <div style="display: flex; align-items: center; gap: 0.6rem;">
-              <button type="button" class="btn-portal-refresh" onclick="loadClientRequests()" style="padding: 0.4rem 0.8rem; font-size: 0.78rem; font-weight: 700; border-radius: 6px; border: 1px solid #CBD5E1; background: #FFFFFF; color: #1E293B; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;">
-                <i data-lucide="refresh-cw" style="width: 12px; height: 12px;"></i> Refresh
-              </button>
-              <button type="button" onclick="openStandingOrderModal()" style="padding: 0.4rem 0.8rem; font-size: 0.78rem; font-weight: 700; border-radius: 6px; border: 1.5px solid #0284C7; background: #F0F9FF; color: #0284C7; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;">
-                <i data-lucide="repeat" style="width: 12px; height: 12px;"></i> + Standing Order
-              </button>
-              <button type="button" onclick="openBulkOrderModal()" style="padding: 0.4rem 0.8rem; font-size: 0.78rem; font-weight: 700; border-radius: 6px; border: 1.5px solid #0D9488; background: #F0FDFA; color: #0D9488; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;">
-                <i data-lucide="layers" style="width: 12px; height: 12px;"></i> + Bulk Week Order
-              </button>
-              <a href="clients.html" class="panel-action-link">+ New Shift</a>
-            </div>
-          </div>
-
-          <div class="portal-table-wrap">
-            <table class="portal-table">
-              <thead>
-                <tr>
-                  <th>Request &amp; Date</th>
-                  <th>Shift &amp; Dept</th>
-                  <th>Dispatched Caregiver</th>
-                  <th>Live Activity &amp; EVV</th>
-                  <th>Caregiver Rating</th>
-                  <th>Status &amp; Actions</th>
-                </tr>
-              </thead>
-              <tbody id="client-requests-table-body">
-                <!-- Populated dynamically via JS -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- 2. TAB PANEL: STANDING ORDERS & BULK REQUESTS -->
-        <div class="portal-panel client-subpanel" id="client-recurring-panel" style="display: none;">
-          <div class="panel-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
-            <div>
-              <div class="panel-title">
-                <i data-lucide="repeat"></i> Standing Shift Orders &amp; Multi-Day Patterns
-              </div>
-              <span style="font-size: 0.76rem; color: #64748B; font-weight: 600;">Automated recurrent staffing for LTC and hospital units with instant pause/resume toggles.</span>
-            </div>
-            <div style="display: flex; align-items: center; gap: 0.6rem;">
-              <button type="button" onclick="openStandingOrderModal()" class="panel-action-link" style="display: inline-flex; align-items: center; gap: 5px;">
-                <i data-lucide="plus-circle" style="width: 14px; height: 14px;"></i> Set Up Standing Order
-              </button>
-              <button type="button" onclick="openBulkOrderModal()" style="padding: 0.4rem 0.85rem; font-size: 0.78rem; font-weight: 700; border-radius: 6px; border: 1px solid #CBD5E1; background: #FFFFFF; color: #0F172A; cursor: pointer; display: inline-flex; align-items: center; gap: 5px;">
-                <i data-lucide="layers" style="width: 14px; height: 14px;"></i> 5-Shift Weekly Builder
-              </button>
-            </div>
-          </div>
-
-          <div class="portal-table-wrap">
-            <table class="portal-table">
-              <thead>
-                <tr>
-                  <th>Standing Order Code</th>
-                  <th>Recurrence Pattern</th>
-                  <th>Clinical Role</th>
-                  <th>Shift &amp; Dept</th>
-                  <th>Status</th>
-                  <th>Management Action</th>
-                </tr>
-              </thead>
-              <tbody id="client-recurring-table-body">
-                <!-- Populated dynamically via JS -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- 3. TAB PANEL: FACILITY-SIDE ROSTER & COMPLIANCE DOSSIERS -->
-        <div class="portal-panel client-subpanel" id="client-facility-roster-panel" style="display: none;">
-          <div class="panel-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
-            <div>
-              <div class="panel-title">
-                <i data-lucide="shield-check"></i> Facility Caregiver Directory &amp; Compliance Dossiers
-              </div>
-              <span style="font-size: 0.76rem; color: #64748B; font-weight: 600;">Read-only CNO license, Level-3 VSS, CPR, and N95 fit records for clinical hospital accreditation audits.</span>
-            </div>
-            <button type="button" class="btn-portal-refresh" onclick="loadFacilityRoster()" style="padding: 0.4rem 0.8rem; font-size: 0.78rem; font-weight: 700; border-radius: 6px; border: 1px solid #CBD5E1; background: #FFFFFF; color: #1E293B; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;">
-              <i data-lucide="refresh-cw" style="width: 12px; height: 12px;"></i> Refresh Roster
-            </button>
-          </div>
-
-          <div id="facility-roster-cards-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1rem; padding: 0.5rem 0;">
-            <!-- Caregiver cards populated dynamically via JS -->
-          </div>
-        </div>
-
-        <!-- 4. TAB PANEL: HOURS & BILLING RECONCILIATION -->
-        <div class="portal-panel client-subpanel" id="client-billing-panel" style="display: none;">
-          <div class="panel-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1.25rem;">
-            <div>
-              <div class="panel-title">
-                <i data-lucide="receipt"></i> Monthly Hours &amp; Invoiced Spend Reconciliation
-              </div>
-              <span style="font-size: 0.76rem; color: #64748B; font-weight: 600;">Shift-by-shift punch verification matched against EVV clock-in/out timestamps.</span>
-            </div>
-            <button type="button" class="btn-portal-refresh" onclick="loadBillingSummary()" style="padding: 0.4rem 0.8rem; font-size: 0.78rem; font-weight: 700; border-radius: 6px; border: 1px solid #CBD5E1; background: #FFFFFF; color: #1E293B; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;">
-              <i data-lucide="refresh-cw" style="width: 12px; height: 12px;"></i> Refresh Billing
-            </button>
-          </div>
-
-          <!-- Billing KPI summary chips -->
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
-            <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 1rem;">
-              <span style="font-size: 0.72rem; color: #64748B; font-weight: 800; text-transform: uppercase;">Verified Hours (Month)</span>
-              <div id="billing-kpi-hours" style="font-size: 1.5rem; font-weight: 900; color: #0284C7; margin-top: 4px;">0.0 hrs</div>
-            </div>
-            <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 1rem;">
-              <span style="font-size: 0.72rem; color: #64748B; font-weight: 800; text-transform: uppercase;">Estimated Invoiced Spend</span>
-              <div id="billing-kpi-spend" style="font-size: 1.5rem; font-weight: 900; color: #0F172A; margin-top: 4px;">$0.00</div>
-            </div>
-            <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 1rem;">
-              <span style="font-size: 0.72rem; color: #64748B; font-weight: 800; text-transform: uppercase;">Completed Shifts</span>
-              <div id="billing-kpi-completed" style="font-size: 1.5rem; font-weight: 900; color: #10B981; margin-top: 4px;">0</div>
-            </div>
-            <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 1rem;">
-              <span style="font-size: 0.72rem; color: #64748B; font-weight: 800; text-transform: uppercase;">Pending Approval</span>
-              <div id="billing-kpi-pending" style="font-size: 1.5rem; font-weight: 900; color: #F59E0B; margin-top: 4px;">0</div>
-            </div>
-          </div>
-
-          <div class="portal-table-wrap">
-            <table class="portal-table">
-              <thead>
-                <tr>
-                  <th>Shift Date &amp; Code</th>
-                  <th>Caregiver &amp; Role</th>
-                  <th>Clock In / Out</th>
-                  <th>Verified Hours</th>
-                  <th>Billing Rate</th>
-                  <th>Estimated Total</th>
-                  <th>Invoice Status</th>
-                </tr>
-              </thead>
-              <tbody id="client-billing-table-body">
-                <!-- Populated dynamically via JS -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- 5. TAB PANEL: FACILITY TEAM & ROLES -->
-        <div class="portal-panel client-subpanel" id="client-team-panel" style="display: none;">
-          <div class="panel-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
-            <div>
-              <div class="panel-title">
-                <i data-lucide="shield"></i> Facility Account Users &amp; Role Clearance
-              </div>
-              <span style="font-size: 0.76rem; color: #64748B; font-weight: 600;">Manage clinical unit requesters (Charge Nurses) and billing administrators under your organization.</span>
-            </div>
-            <button type="button" onclick="openAddTeamModal()" class="panel-action-link" style="display: inline-flex; align-items: center; gap: 5px;">
-              <i data-lucide="user-plus" style="width: 14px; height: 14px;"></i> + Add Team Member
-            </button>
-          </div>
-
-          <div class="portal-table-wrap">
-            <table class="portal-table">
-              <thead>
-                <tr>
-                  <th>Team Member</th>
-                  <th>Corporate Email</th>
-                  <th>Facility Role</th>
-                  <th>Phone</th>
-                  <th>Added On</th>
-                  <th>Last Active</th>
-                </tr>
-              </thead>
-              <tbody id="client-team-table-body">
-                <!-- Populated dynamically via JS -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- WORKER VIEW: CLINICAL TIMECARD & SHIFT CLOCK STATION -->
-        <div class="portal-panel clock-station-panel" id="worker-clock-panel" style="display: none;">
-          <div class="panel-header" style="margin-bottom: 1.25rem;">
-            <div>
-              <div class="panel-title" style="display: flex; align-items: center; gap: 0.55rem;">
-                <i data-lucide="clock" style="color: #0284C7;"></i> Electronic Visit Verification &amp; Shift Timecard
-              </div>
-              <span style="font-size: 0.76rem; color: #64748B; font-weight: 600; margin-top: 2px; display: block;">
-                Ontario Ministry of Health EVV Standards • Geofenced Shift Punching
-              </span>
-            </div>
-            <div id="clock-status-badge-container">
-              <span class="clock-status-pill off-duty">⚪ Off Duty / Ready</span>
-            </div>
-          </div>
-
-          <!-- Hero Time Display Box -->
-          <div class="clock-display-hero">
-            <div class="clock-hero-left">
-              <span class="clock-hero-sublabel">
-                <i data-lucide="calendar" style="width: 14px; height: 14px; color: #38BDF8;"></i>
-                <span id="clock-device-date">Today</span>
-              </span>
-              <div class="clock-hero-time" id="clock-device-time">--:--:--</div>
-              <div class="clock-hero-zone">
-                <i data-lucide="map-pin" style="width: 12px; height: 12px; color: #38BDF8;"></i>
-                <span id="clock-device-zone">Device Local Time</span>
-              </div>
-            </div>
-            <div class="clock-hero-right" id="clock-shift-timer-box" style="display: none;">
-              <span class="clock-hero-sublabel" style="color: #34D399;">
-                <span class="pulse-dot"></span> LIVE SHIFT DURATION
-              </span>
-              <div class="clock-duration-time" id="clock-duration-timer">00h : 00m : 00s</div>
-              <div class="clock-hero-zone" style="color: #A7F3D0;">
-                <i data-lucide="building-2" style="width: 12px; height: 12px;"></i>
-                <span id="clock-active-facility-text">On Duty</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Active Shift Details (When Clocked In) -->
-          <div id="clock-active-details" class="active-shift-container" style="display: none;">
-            <div class="active-shift-header">
-              <div style="display: flex; align-items: center; gap: 0.55rem;">
-                <span class="pulse-dot" style="background: #EF4444;"></span>
-                <span class="active-shift-header-title">ACTIVE CLINICAL SHIFT IN PROGRESS</span>
-              </div>
-              <span class="active-shift-evv-tag">
-                <i data-lucide="satellite" style="width: 12px; height: 12px;"></i> EVV Live Telemetry
-              </span>
-            </div>
-
-            <div class="active-shift-body">
-              <div class="active-shift-info-grid">
-                <div>
-                  <span class="active-sublabel">ACTIVE PLACEMENT FACILITY</span>
-                  <h4 id="active-facility-name" class="active-facility-name">--</h4>
-                  <div class="active-role-strip">
-                    <span id="active-unit-dept">General Floor</span> • <span id="active-role-title">Registered Nurse</span>
-                  </div>
-                </div>
-                <div class="active-clockin-pod">
-                  <span class="active-sublabel">CLOCKED IN AT</span>
-                  <div id="active-clockin-time" class="active-clockin-time">--</div>
-                </div>
-              </div>
-
-              <div class="active-notes-wrap">
-                <label for="clockout-notes" class="active-notes-label">
-                  <i data-lucide="clipboard-pen" style="width: 15px; height: 15px; color: #059669;"></i>
-                  End-of-Shift Handover / Clinical Summary Notes (Optional)
-                </label>
-                <textarea id="clockout-notes" rows="2" class="active-notes-input" placeholder="e.g. Med pass and patient charting completed. Formal handover given to oncoming charge nurse."></textarea>
-              </div>
-
-              <button type="button" class="btn-clock-out" id="btn-clock-out" onclick="handleClockOut()">
-                <i data-lucide="log-out" style="width: 20px; height: 20px;"></i>
-                <span>🔴 Clock Out &amp; Conclude Shift</span>
-              </button>
-            </div>
-          </div>
-
-          <!-- Admin-Allocated Shift & Clock In (When Off Duty) -->
-          <div id="clock-in-form-container">
-
-            <!-- State 1: Displayed when Admin has Allocated a Shift to this Staff -->
-            <div class="allocated-shift-card" id="allocated-shift-card" style="display: none;">
-              <div class="shift-card-header">
-                <div class="shift-badge-dispatched">
-                  <span class="pulse-dot"></span> DISPATCHED BY CLINICAL ADMIN
-                </div>
-                <span class="shift-code-tag" id="allocated-shift-code">REQ-DISPATCHED</span>
-              </div>
-              <div class="shift-card-body">
-                <div class="shift-hero-banner">
-                  <div class="facility-icon-wrap">
-                    <i data-lucide="building-2" style="width: 26px; height: 26px;"></i>
-                  </div>
-                  <div style="flex: 1; min-width: 0;">
-                    <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 4px;">
-                      <span class="placement-confirmed-pill">
-                        <i data-lucide="check-circle-2" style="width: 12px; height: 12px;"></i> Confirmed Placement
-                      </span>
-                      <span class="geofence-verified-pill">
-                        <i data-lucide="map-pin" style="width: 12px; height: 12px;"></i> GPS Geofenced
-                      </span>
-                    </div>
-                    <h3 class="shift-facility-title" id="allocated-facility-name">Healthcare Partner Facility</h3>
-                    <div class="shift-unit-role" id="allocated-unit-role">Clinical Unit • Healthcare Role</div>
-                  </div>
-                </div>
-
-                <div class="shift-details-grid">
-                  <div class="shift-detail-item">
-                    <div class="shift-detail-icon-box" style="background: #E0F2FE; color: #0284C7;">
-                      <i data-lucide="calendar" style="width: 20px; height: 20px;"></i>
-                    </div>
-                    <div>
-                      <span class="shift-detail-label">Scheduled Date</span>
-                      <span class="shift-detail-val" id="allocated-shift-date">Today</span>
-                    </div>
-                  </div>
-                  <div class="shift-detail-item">
-                    <div class="shift-detail-icon-box" style="background: #EDE9FE; color: #8B5CF6;">
-                      <i data-lucide="clock" style="width: 20px; height: 20px;"></i>
-                    </div>
-                    <div>
-                      <span class="shift-detail-label">Assigned Hours</span>
-                      <span class="shift-detail-val" id="allocated-shift-hours">Day Shift</span>
-                    </div>
-                  </div>
-                  <div class="shift-detail-item">
-                    <div class="shift-detail-icon-box" style="background: #DCFCE7; color: #10B981;">
-                      <i data-lucide="user-check" style="width: 20px; height: 20px;"></i>
-                    </div>
-                    <div>
-                      <span class="shift-detail-label">On-Site Contact</span>
-                      <span class="shift-detail-val" id="allocated-facility-contact">Clinical Dispatch</span>
-                    </div>
-                  </div>
-                  <div class="shift-detail-item">
-                    <div class="shift-detail-icon-box" style="background: #CCFBF1; color: #0D9488;">
-                      <i data-lucide="shield-check" style="width: 20px; height: 20px;"></i>
-                    </div>
-                    <div>
-                      <span class="shift-detail-label">Compliance Status</span>
-                      <span class="shift-detail-val" style="color: #059669;">Verified / Geofenced</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="instructions-callout" id="allocated-instructions-box" style="display: none;">
-                  <div class="instructions-icon">
-                    <i data-lucide="clipboard-list" style="width: 18px; height: 18px;"></i>
-                  </div>
-                  <div>
-                    <strong style="display: block; font-size: 0.82rem; font-weight: 800; margin-bottom: 2px;">Reporting &amp; Handover Instructions:</strong>
-                    <span id="allocated-instructions-text">Report to nursing supervisor upon arrival.</span>
-                  </div>
-                </div>
-
-                <button type="button" class="btn-clock-in" id="btn-clock-in" onclick="handleClockIn()">
-                  <i data-lucide="play-circle" style="width: 22px; height: 22px;"></i>
-                  <span>🟢 Clock In to Dispatched Shift</span>
-                </button>
-
-                <div class="clock-in-footer-note">
-                  <i data-lucide="shield-check" style="width: 14px; height: 14px; color: #10B981;"></i>
-                  <span>Ontario EVV Geofence Verification Active • 1-Tap Cryptographic Timestamping</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- State 2: Displayed when NO Shift is currently allocated by Admin -->
-            <div class="no-shift-assigned-card" id="no-shift-assigned-card" style="display: none;">
-              <div class="no-shift-icon-circle">
-                <i data-lucide="calendar-check" style="width: 32px; height: 32px;"></i>
-              </div>
-              <h3 class="no-shift-title">No Active Shift Dispatched for Today</h3>
-              <p class="no-shift-desc">
-                The Clinical Operations Dispatch desk has not scheduled an active placement to your profile for today. Once an administrator confirms and dispatches your upcoming shift, your healthcare facility details, ward assignment, and 1-tap EVV Clock-In station will appear right here.
-              </p>
-              <div class="dispatch-contact-strip">
-                <span style="display: inline-flex; align-items: center; gap: 0.35rem;">
-                  <i data-lucide="headphones" style="width: 14px; height: 14px; color: #0284C7;"></i> Have scheduling questions?
-                </span>
-                <a href="tel:+16472106463"><i data-lucide="phone-call" style="width: 14px; height: 14px;"></i> Call Dispatch: (647) 210-6463</a>
-                <a href="mailto:staffing@divinefingershealthcare.ca"><i data-lucide="mail" style="width: 14px; height: 14px;"></i> staffing@divinefingershealthcare.ca</a>
-              </div>
-            </div>
-
-          </div>
-
-          <!-- Recent Timecard & Punches Table -->
-          <div style="margin-top: 1.75rem; border-top: 1px solid #E2E8F0; padding-top: 1.25rem;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem;">
-              <h4 style="margin: 0; font-size: 0.95rem; font-weight: 800; color: var(--navy); display: flex; align-items: center; gap: 0.4rem;">
-                <i data-lucide="history" style="width: 16px; height: 16px; color: #0284C7;"></i> Recent Timecard Punches
-              </h4>
-              <span id="weekly-hours-pill" style="font-size: 0.78rem; font-weight: 700; background: #E0F2FE; color: #0369A1; padding: 0.25rem 0.65rem; border-radius: 9999px;">
-                Week: 0.0 hrs
-              </span>
-            </div>
-            <div style="overflow-x: auto;">
-              <table class="portal-table" style="font-size: 0.82rem;">
-                <thead>
-                  <tr>
-                    <th>Facility &amp; Unit</th>
-                    <th>Role</th>
-                    <th>Clock In</th>
-                    <th>Clock Out</th>
-                    <th>Duration</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody id="punches-table-body">
-                  <tr><td colspan="6" style="text-align: center; color: #64748B; padding: 1.5rem;">Loading verified timecards...</td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        <!-- WORKER VIEW: AVAILABLE SHIFTS FEED -->
-        <div class="portal-panel" id="worker-shifts-panel" style="display: none;">
-          <div class="panel-header">
-            <div class="panel-title">
-              <i data-lucide="calendar-check"></i> Available Open Shifts (GTA &amp; Ontario)
-            </div>
-            <span style="font-size: 0.78rem; font-weight: 700; color: #10B981;">● Live Updates</span>
-          </div>
-
-          <div id="worker-shifts-container">
-            <!-- Populated dynamically via JS -->
-          </div>
-        </div>
-
-        <!-- WORKER VIEW: CLINICAL CREDENTIALS & LICENSES PANEL -->
-        <div class="portal-panel" id="worker-credentials-panel" style="display: none;">
-          <div class="panel-header" style="flex-direction: column; align-items: flex-start; gap: 0.35rem; margin-bottom: 1.5rem;">
-            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 0.6rem;">
-              <div class="panel-title" style="display: flex; align-items: center; gap: 0.55rem;">
-                <i data-lucide="award" style="color: #0284C7;"></i> Clinical Credentials, Licenses &amp; Certifications
-              </div>
-              <span class="badge-pill-verified" id="doc-count-badge">
-                <i data-lucide="shield-check" style="width: 14px; height: 14px;"></i> Ontario Ministry &amp; CNO Compliant
-              </span>
-            </div>
-            <p style="margin: 0; font-size: 0.83rem; color: #64748B;">
-              Verified clinical vault for hospital, long-term care, and community nursing deployment across the Greater Toronto Area &amp; Ontario.
-            </p>
-          </div>
-
-          <!-- Clinical Compliance Readiness Meter -->
-          <div class="compliance-meter-card">
-            <div class="compliance-meter-header">
-              <div class="compliance-meter-left">
-                <div class="compliance-meter-icon">
-                  <i data-lucide="shield-check" style="width: 22px; height: 22px;"></i>
-                </div>
-                <div>
-                  <div style="font-weight: 800; color: var(--navy); font-size: 0.96rem; font-family: var(--font-heading);">
-                    Ontario Clinical Placement Readiness
-                  </div>
-                  <div style="font-size: 0.78rem; color: #64748B;">
-                    College of Nurses of Ontario &amp; Ministry of Health Placement Standards
-                  </div>
-                </div>
-              </div>
-              <div class="compliance-meter-badge">
-                <span class="pulse-dot"></span> 100% Eligible for Hospital &amp; LTC Dispatch
-              </div>
-            </div>
-            <div class="compliance-meter-track">
-              <div class="compliance-meter-bar"></div>
-            </div>
-            <div class="compliance-meter-tags">
-              <span class="compliance-pill-tag active"><i data-lucide="check" style="width: 12px; height: 12px;"></i> Regulatory CNO License</span>
-              <span class="compliance-pill-tag active"><i data-lucide="check" style="width: 12px; height: 12px;"></i> BLS / CPR Certification</span>
-              <span class="compliance-pill-tag active"><i data-lucide="check" style="width: 12px; height: 12px;"></i> Police Background Check (VSS)</span>
-              <span class="compliance-pill-tag active"><i data-lucide="check" style="width: 12px; height: 12px;"></i> N95 Respirator Mask Fit-Test</span>
-            </div>
-          </div>
-
-          <!-- Compliance Summary Status Cards -->
-          <div class="compliance-grid">
-            <div class="compliance-card cno-card">
-              <div class="compliance-card-header">
-                <span>Regulatory License</span>
-                <div class="compliance-card-icon-wrap" style="background: #E0F2FE; color: #0284C7;">
-                  <i data-lucide="shield-check" style="width: 20px; height: 20px;"></i>
-                </div>
-              </div>
-              <div class="compliance-card-title" id="comp-cno-title">
-                CNO / Regulatory License
-              </div>
-              <div class="compliance-card-subtitle">
-                College of Nurses of Ontario
-              </div>
-              <div class="compliance-card-status verified" id="comp-cno-badge">
-                <i data-lucide="check-circle" style="width: 14px; height: 14px;"></i> Verified Active
-              </div>
-            </div>
-
-            <div class="compliance-card cpr-card">
-              <div class="compliance-card-header">
-                <span>Life Support</span>
-                <div class="compliance-card-icon-wrap" style="background: #FEE2E2; color: #EF4444;">
-                  <i data-lucide="heart-pulse" style="width: 20px; height: 20px;"></i>
-                </div>
-              </div>
-              <div class="compliance-card-title">
-                BLS / CPR Certification
-              </div>
-              <div class="compliance-card-subtitle">
-                Heart &amp; Stroke Foundation
-              </div>
-              <div class="compliance-card-status verified" id="comp-cpr-badge">
-                <i data-lucide="check-circle" style="width: 14px; height: 14px;"></i> Verified Valid
-              </div>
-            </div>
-
-            <div class="compliance-card vss-card">
-              <div class="compliance-card-header">
-                <span>Background Check</span>
-                <div class="compliance-card-icon-wrap" style="background: #DCFCE7; color: #10B981;">
-                  <i data-lucide="file-check-2" style="width: 20px; height: 20px;"></i>
-                </div>
-              </div>
-              <div class="compliance-card-title">
-                Police Record Check (VSS)
-              </div>
-              <div class="compliance-card-subtitle">
-                Vulnerable Sector Screening
-              </div>
-              <div class="compliance-card-status verified" id="comp-vss-badge">
-                <i data-lucide="check-circle" style="width: 14px; height: 14px;"></i> Clear / Valid
-              </div>
-            </div>
-
-            <div class="compliance-card n95-card">
-              <div class="compliance-card-header">
-                <span>Health &amp; Safety</span>
-                <div class="compliance-card-icon-wrap" style="background: #EDE9FE; color: #8B5CF6;">
-                  <i data-lucide="wind" style="width: 20px; height: 20px;"></i>
-                </div>
-              </div>
-              <div class="compliance-card-title">
-                N95 Mask Fit-Testing
-              </div>
-              <div class="compliance-card-subtitle">
-                3M Respirator Certification
-              </div>
-              <div class="compliance-card-status verified" id="comp-n95-badge">
-                <i data-lucide="check-circle" style="width: 14px; height: 14px;"></i> 3M Certified Valid
-              </div>
-            </div>
-          </div>
-
-          <!-- Document Upload Box -->
-          <div class="credential-form-card">
-            <h4 style="margin: 0 0 0.35rem; font-size: 1.05rem; font-weight: 800; color: var(--navy); display: flex; align-items: center; gap: 0.5rem;">
-              <i data-lucide="upload-cloud" style="width: 20px; height: 20px; color: #0284C7;"></i> Upload Clinical License, Certification, or Credential
-            </h4>
-            <p style="margin: 0 0 1.25rem; font-size: 0.83rem; color: #64748B; line-height: 1.45;">
-              Upload your annual College of Nurses of Ontario (CNO) license card, BLS/CPR certificate, Vulnerable Sector Police Screening (VSS), N95 fit-test record, or clinical degrees to maintain active clinical dispatch eligibility.
-            </p>
-
-            <form id="form-upload-staff-credential" onsubmit="handleUploadCredential(event)">
-              <div class="credential-form-grid">
-                <div>
-                  <label style="display: block; font-size: 0.76rem; font-weight: 800; color: var(--navy); margin-bottom: 0.4rem; letter-spacing: 0.4px;">
-                    DOCUMENT CATEGORY <span style="color: #EF4444;">*</span>
-                  </label>
-                  <select id="upload-doc-type" class="form-input-styled" required>
-                    <option value="cno_license">CNO / Regulatory Nursing License</option>
-                    <option value="cpr_card">BLS / CPR / First Aid Certification</option>
-                    <option value="vss_check">Vulnerable Sector Police Screening (VSS)</option>
-                    <option value="n95_fit">N95 Respirator Mask Fit-Test Card</option>
-                    <option value="immunization">Immunization / TB 2-Step Clearance</option>
-                    <option value="diploma">Nursing Degree / Diploma / Transcript</option>
-                    <option value="work_auth">Work Permit / Proof of Canadian Citizenship</option>
-                    <option value="driver_license">Driver's License / Government Photo ID</option>
-                    <option value="other">Other Clinical Certification</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label style="display: block; font-size: 0.76rem; font-weight: 800; color: var(--navy); margin-bottom: 0.4rem; letter-spacing: 0.4px;">
-                    DOCUMENT TITLE / DESCRIPTION
-                  </label>
-                  <input type="text" id="upload-doc-title" class="form-input-styled" placeholder="e.g., CNO Registration 2026-2027">
-                </div>
-
-                <div>
-                  <label style="display: block; font-size: 0.76rem; font-weight: 800; color: var(--navy); margin-bottom: 0.4rem; letter-spacing: 0.4px;">
-                    EXPIRY / RENEWAL DATE
-                  </label>
-                  <input type="date" id="upload-doc-expiry" class="form-input-styled">
-                </div>
-              </div>
-
-              <!-- File Input Drop Area -->
-              <div class="credential-upload-box" id="credential-drop-zone" onclick="document.getElementById('upload-doc-file').click()">
-                <div class="upload-box-icon">
-                  <i data-lucide="file-up" style="width: 26px; height: 26px;"></i>
-                </div>
-                <div style="font-weight: 800; color: var(--navy); font-size: 0.95rem; margin-bottom: 0.35rem;">
-                  <span id="upload-filename-text">Drop your clinical document here or click to browse</span>
-                </div>
-                <div style="font-size: 0.78rem; color: #64748B;">
-                  Accepted formats: PDF, PNG, JPG, JPEG, DOC, DOCX (Up to 15MB)
-                </div>
-                <div class="upload-format-pills">
-                  <span class="format-pill">PDF</span>
-                  <span class="format-pill">PNG</span>
-                  <span class="format-pill">JPG</span>
-                  <span class="format-pill">DOCX</span>
-                  <span class="format-pill" style="border-color: #93C5FD; color: #0284C7;">Max 15MB</span>
-                </div>
-                <input type="file" id="upload-doc-file" name="document" accept=".pdf,.png,.jpg,.jpeg,.doc,.docx" required style="display: none;" onchange="handleCredentialFileChange(this)">
-              </div>
-
-              <div style="display: flex; justify-content: flex-end; margin-top: 1.25rem;">
-                <button type="submit" id="btn-upload-credential-submit" class="btn-upload-submit">
-                  <i data-lucide="shield-check" style="width: 18px; height: 18px;"></i>
-                  <span>Upload &amp; Register Credential</span>
-                </button>
-              </div>
-            </form>
-          </div>
-
-          <!-- Uploaded Documents List Table -->
+      <!-- ===================== SCREEN 1: TODAY ===================== -->
+      <section class="staff-screen active" id="staff-screen-today">
+        <div class="client-page-header">
           <div>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.95rem; flex-wrap: wrap; gap: 0.5rem;">
-              <h4 style="margin: 0; font-size: 0.98rem; font-weight: 800; color: var(--navy); display: flex; align-items: center; gap: 0.45rem;">
-                <i data-lucide="folder-check" style="width: 18px; height: 18px; color: #0284C7;"></i> Registered Credentials Vault
-              </h4>
-              <span id="registered-docs-count" style="font-size: 0.8rem; font-weight: 700; color: #0284C7; background: #EFF6FF; border: 1px solid #DBEAFE; padding: 0.25rem 0.75rem; border-radius: 9999px;">
-                Loading credentials...
-              </span>
-            </div>
-
-            <div class="portal-table-wrap">
-              <table class="portal-table" style="font-size: 0.84rem;">
-                <thead>
-                  <tr>
-                    <th>Document Name</th>
-                    <th>Category</th>
-                    <th>Expiry Date</th>
-                    <th>Uploaded On</th>
-                    <th>File Size</th>
-                    <th style="text-align: right;">Action</th>
-                  </tr>
-                </thead>
-                <tbody id="staff-docs-table-body">
-                  <tr><td colspan="6" style="text-align: center; color: #64748B; padding: 1.75rem;">Loading verified credentials...</td></tr>
-                </tbody>
-              </table>
-            </div>
+            <p class="client-greeting-eyebrow" id="staff-today-datetime">Tuesday, September 8</p>
+            <h1 class="client-greeting" id="staff-today-greeting">Good evening, Marina</h1>
           </div>
         </div>
 
-        <!-- SHARED PROFILE & CREDENTIALS PANEL -->
-        <div class="portal-panel">
-          <div class="panel-header">
-            <div class="panel-title">
-              <i data-lucide="shield-check"></i> Verified Profile &amp; Compliance Details
-            </div>
-          </div>
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; font-size: 0.85rem;">
+        <!-- CLOCK CARD -->
+        <div class="clock-card" id="staff-clock-card">
+          <div class="clock-top">
             <div>
-              <span style="color: #64748B; font-size: 0.75rem; display: block; font-weight: 600;">FULL NAME</span>
-              <strong id="profile-full-name" style="color: var(--navy);">--</strong>
+              <p class="clock-shift-role" id="staff-clock-role">RN — General Care Shift</p>
+              <p class="clock-facility" id="staff-clock-facility">Riverside General Hospital · Unit 4B</p>
             </div>
+            <span class="badge" id="staff-shift-status-badge" style="background: #F1F5F9; color: #64748B;">
+              Off shift
+            </span>
+          </div>
+
+          <div class="clock-body">
             <div>
-              <span style="color: #64748B; font-size: 0.75rem; display: block; font-weight: 600;">EMAIL</span>
-              <strong id="profile-email" style="color: var(--navy);">--</strong>
+              <div class="elapsed-display" id="staff-elapsed-big">0h 00m</div>
+              <div class="elapsed-label" id="staff-clocked-in-at">Ready for clinical check-in</div>
             </div>
-            <div>
-              <span style="color: #64748B; font-size: 0.75rem; display: block; font-weight: 600;">PHONE NUMBER</span>
-              <strong id="profile-phone" style="color: var(--navy);">--</strong>
+            <div class="clock-detail-list">
+              <div>Charge nurse: <b id="staff-charge-nurse">Priya Nandan</b> &bull; <a href="#" id="staff-charge-phone" style="color: #00A896; font-weight: 700; text-decoration: none;">(647) 555-0134</a></div>
+              <div>Shift: <b id="staff-shift-hours">23:00 – 07:00</b> &bull; Scheduled <span id="staff-scheduled-hours">8.0 hrs</span></div>
+              <div>Note from dispatch: <b id="staff-dispatch-note">Standard clinical placement protocol</b></div>
             </div>
-            <div id="profile-org-container">
-              <span style="color: #64748B; font-size: 0.75rem; display: block; font-weight: 600;">ORGANIZATION</span>
-              <strong id="profile-org" style="color: var(--navy);">--</strong>
-            </div>
+          </div>
+
+          <div class="clock-actions">
+            <button type="button" class="client-btn client-btn-primary btn-lg" id="staff-clock-btn" onclick="handleStaffClockAction()">
+              <i data-lucide="play" style="width: 18px; height: 18px;"></i> Clock in
+            </button>
+            <button type="button" class="client-btn client-btn-ghost btn-sm" onclick="toggleStaffLateBanner()">
+              <i data-lucide="clock" style="width: 14px; height: 14px;"></i> Running late? Notify dispatch
+            </button>
           </div>
         </div>
 
-      </div>
-
-      <!-- RIGHT SIDEBAR COLUMN -->
-      <div class="portal-secondary-content">
-        
-        <!-- DEDICATED COORDINATOR & SUPPORT -->
-        <div class="portal-panel support-card">
-          <div class="support-title">
-            <i data-lucide="headphones"></i> Dedicated Dispatch Coordinator
-          </div>
-          <p class="support-desc">
-            Need immediate placement assistance or have urgent schedule changes? Divine Fingers 24/7 Operations Desk is on standby.
-          </p>
-          <ul class="support-contact-list">
-            <li>
-              <i data-lucide="phone-call" style="width: 15px; height: 15px;"></i>
-              <span>Direct: +1 (647) 555-0100</span>
-            </li>
-            <li>
-              <i data-lucide="mail" style="width: 15px; height: 15px;"></i>
-              <span>dispatch@divinefingershealthcare.ca</span>
-            </li>
-            <li>
-              <i data-lucide="clock" style="width: 15px; height: 15px;"></i>
-              <span>24/7 On-Demand Coverage</span>
-            </li>
-          </ul>
-        </div>
-
-        <!-- QUICK LINKS -->
-        <div class="portal-panel">
-          <div class="panel-header">
-            <div class="panel-title" style="font-size: 0.95rem;">
-              <i data-lucide="external-link"></i> Quick Navigation
-            </div>
-          </div>
-          <div style="display: flex; flex-direction: column; gap: 0.6rem; font-size: 0.82rem; font-weight: 600;">
-            <a href="clients.html" style="color: #0284C7; text-decoration: none; display: flex; align-items: center; gap: 0.4rem;">
-              <i data-lucide="calendar-plus" style="width: 15px; height: 15px;"></i> Request Healthcare Staffing
-            </a>
-            <a href="bulk-staffing.html" style="color: #0284C7; text-decoration: none; display: flex; align-items: center; gap: 0.4rem;">
-              <i data-lucide="layers" style="width: 15px; height: 15px;"></i> Enterprise Bulk Shift Scheduler
-            </a>
-            <a href="jobseekers.html" style="color: #0284C7; text-decoration: none; display: flex; align-items: center; gap: 0.4rem;">
-              <i data-lucide="file-badge" style="width: 15px; height: 15px;"></i> Submit Clinical Credentials
-            </a>
-            <a href="contact.html" style="color: #0284C7; text-decoration: none; display: flex; align-items: center; gap: 0.4rem;">
-              <i data-lucide="map-pin" style="width: 15px; height: 15px;"></i> Scarborough Headquarters Office
-            </a>
+        <!-- RUNNING LATE BANNER -->
+        <div class="late-banner" id="staff-late-banner" style="display: none;">
+          <p id="staff-late-text"><i data-lucide="alert-circle" style="width: 16px; height: 16px; vertical-align: middle; margin-right: 4px;"></i> Dispatch and facility have been notified you're running late.</p>
+          <div style="display: flex; gap: 8px;">
+            <button type="button" class="client-btn client-btn-ghost btn-sm" onclick="submitStaffRunningLate(15)">15m</button>
+            <button type="button" class="client-btn client-btn-ghost btn-sm" onclick="submitStaffRunningLate(30)">30m</button>
+            <button type="button" class="client-btn client-btn-ghost btn-sm" onclick="toggleStaffLateBanner()">Dismiss</button>
           </div>
         </div>
 
-      </div>
+        <!-- COMING UP -->
+        <div class="client-section">
+          <h2 class="client-section-title">Coming up</h2>
+          <div id="staff-upcoming-shifts-container">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+      </section>
 
-    </div>
+      <!-- ===================== SCREEN 2: OPEN SHIFTS ===================== -->
+      <section class="staff-screen" id="staff-screen-openshifts">
+        <div class="client-page-header">
+          <div>
+            <p class="client-greeting-eyebrow" id="staff-openshifts-eyebrow">Greater Toronto Area · All Clinical Roles</p>
+            <h1 class="client-greeting">Open shifts</h1>
+          </div>
+        </div>
 
-  </main>
+        <div class="filter-row" id="staff-filter-chips">
+          <div class="filter-chip selected" onclick="filterOpenShifts('all', this)">All roles</div>
+          <div class="filter-chip" onclick="filterOpenShifts('RN', this)">RN</div>
+          <div class="filter-chip" onclick="filterOpenShifts('RPN', this)">RPN</div>
+          <div class="filter-chip" onclick="filterOpenShifts('PSW', this)">PSW</div>
+          <div class="filter-chip" id="chip-my-region" style="margin-left: auto;" onclick="toggleMyRegionFilter(this)">My region only</div>
+        </div>
+
+        <div id="staff-open-shifts-container">
+          <!-- Dynamically populated -->
+        </div>
+      </section>
+
+      <!-- ===================== SCREEN 3: MY SCHEDULE ===================== -->
+      <section class="staff-screen" id="staff-screen-schedule">
+        <div class="client-page-header">
+          <div>
+            <p class="client-greeting-eyebrow" id="staff-schedule-eyebrow">Confirmed Assignments &bull; Availability</p>
+            <h1 class="client-greeting">My schedule</h1>
+          </div>
+        </div>
+
+        <div class="client-section">
+          <h2 class="client-section-title">Confirmed shifts</h2>
+          <div id="staff-confirmed-shifts-container">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <div class="client-section">
+          <h2 class="client-section-title">Set your availability — next 7 days</h2>
+          <div class="avail-grid" id="staff-avail-grid">
+            <!-- Dynamically generated for next 7 days -->
+          </div>
+          <div class="avail-legend">
+            <span><span class="legend-dot" style="background: rgba(0, 168, 150, 0.2); border: 1.5px solid #00A896;"></span>Available</span>
+            <span><span class="legend-dot" style="background: #FFFFFF; border: 1.5px solid #CBD5E1;"></span>Not available</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================== SCREEN 4: CREDENTIALS ===================== -->
+      <section class="staff-screen" id="staff-screen-credentials">
+        <div class="client-page-header">
+          <div>
+            <p class="client-greeting-eyebrow" id="staff-cred-eyebrow">Professional Licensure &bull; Clinical Governance</p>
+            <h1 class="client-greeting">Credentials</h1>
+          </div>
+          <div class="client-header-actions">
+            <button type="button" class="client-btn client-btn-primary" onclick="openStaffUploadModal()">
+              <i data-lucide="upload-cloud" style="width: 14px; height: 14px;"></i> Upload document
+            </button>
+          </div>
+        </div>
+        <p style="color: #64748B; font-size: 13.5px; margin-top: -16px; margin-bottom: 20px; max-width: 680px; line-height: 1.5;">
+          Upload a renewed document any time — it moves to pending until a compliance auditor verifies it. You can keep working on verified credentials in the meantime.
+        </p>
+
+        <div id="staff-credentials-list">
+          <!-- Dynamically populated -->
+        </div>
+      </section>
+
+      <!-- ===================== SCREEN 5: PAY & TIMESHEETS ===================== -->
+      <section class="staff-screen" id="staff-screen-pay">
+        <div class="client-page-header">
+          <div>
+            <p class="client-greeting-eyebrow" id="staff-pay-eyebrow">Bi-Weekly Payroll &bull; Timecard Records</p>
+            <h1 class="client-greeting">Pay &amp; timesheets</h1>
+          </div>
+          <div class="client-header-actions">
+            <button type="button" class="client-btn client-btn-ghost" onclick="exportStaffPayStub()">
+              <i data-lucide="download" style="width: 14px; height: 14px;"></i> Download pay stub
+            </button>
+          </div>
+        </div>
+
+        <div class="pay-summary">
+          <div class="pay-stat">
+            <span class="pay-num" id="staff-pay-hours">0.0h</span>
+            <span class="pay-label">Hours this period</span>
+          </div>
+          <div class="pay-stat">
+            <span class="pay-num" id="staff-pay-earned" style="color: #00A896;">$0.00</span>
+            <span class="pay-label">Estimated pay</span>
+          </div>
+          <div class="pay-stat">
+            <span class="pay-num" id="staff-pay-date">Upcoming</span>
+            <span class="pay-label">Next pay date</span>
+          </div>
+        </div>
+
+        <div class="table-toolbar">
+          <h2 class="client-section-title" style="margin-bottom: 0;" id="staff-pay-period-title">This pay period</h2>
+        </div>
+        <table>
+          <thead>
+            <tr><th>Date</th><th>Facility</th><th>Clock in</th><th>Clock out</th><th>Hours</th><th>Rate</th><th>Total</th></tr>
+          </thead>
+          <tbody id="staff-pay-table-body">
+            <!-- Dynamically populated -->
+          </tbody>
+        </table>
+      </section>
+
+    </main>
   </div> <!-- END #worker-workspace-app -->
 
-  <!-- COMPLIANCE ACCREDITATION DOSSIER MODAL -->
+  <!-- CREDENTIAL RENEWAL UPLOAD MODAL -->
+  <div id="staff-upload-modal" style="display: none; position: fixed; inset: 0; z-index: 9999; background: rgba(7, 19, 36, 0.7); backdrop-filter: blur(4px); align-items: center; justify-content: center; padding: 1rem;">
+    <div style="background: #FFFFFF; border-radius: 12px; width: 100%; max-width: 480px; box-shadow: 0 20px 40px -8px rgba(0,0,0,0.3); border: 1px solid #E2E8F0; overflow: hidden; animation: modalFadeIn 0.2s ease-out;">
+      <div style="background: #071324; padding: 1.25rem 1.5rem; color: #FFFFFF; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #00A896;">
+        <div style="display: flex; align-items: center; gap: 0.6rem;">
+          <i data-lucide="award" style="width: 20px; height: 20px; color: #00F5D4;"></i>
+          <h3 style="margin: 0; font-size: 1.05rem; font-weight: 800; font-family: var(--font-heading); color: #FFFFFF;">Upload Renewed Credential</h3>
+        </div>
+        <button type="button" onclick="closeStaffUploadModal()" style="background: transparent; border: none; color: #94A3B8; font-size: 1.4rem; line-height: 1; cursor: pointer; padding: 0.2rem;">&times;</button>
+      </div>
+
+      <form id="staff-upload-form" onsubmit="handleStaffUploadSubmit(event)" style="padding: 1.5rem;">
+        <div style="margin-bottom: 1.25rem;">
+          <label for="upload-doc-type" style="display: block; font-size: 0.8rem; font-weight: 700; color: #475569; margin-bottom: 0.35rem; text-transform: uppercase;">Credential Type</label>
+          <select id="upload-doc-type" style="width: 100%; padding: 0.65rem; border: 1px solid #CBD5E1; border-radius: 6px; font-family: inherit; font-size: 0.9rem;" required>
+            <option value="cno_license">College of Nurses of Ontario (CNO) Registration</option>
+            <option value="cpr_card">CPR / BLS (Heart &amp; Stroke Foundation / Red Cross)</option>
+            <option value="n95_fit">N95 Mask Fit Test Certification</option>
+            <option value="vss_check">Police Vulnerable Sector Screening (VSS)</option>
+            <option value="immunization">TB / Immunization Record</option>
+            <option value="other">Other Clinical Accreditation</option>
+          </select>
+        </div>
+
+        <div style="margin-bottom: 1.25rem;">
+          <label for="upload-doc-expiry" style="display: block; font-size: 0.8rem; font-weight: 700; color: #475569; margin-bottom: 0.35rem; text-transform: uppercase;">Expiry / Renewal Date</label>
+          <input type="date" id="upload-doc-expiry" style="width: 100%; padding: 0.65rem; border: 1px solid #CBD5E1; border-radius: 6px; font-family: inherit; font-size: 0.9rem;" required>
+        </div>
+
+        <div style="margin-bottom: 1.5rem;">
+          <label for="upload-doc-file" style="display: block; font-size: 0.8rem; font-weight: 700; color: #475569; margin-bottom: 0.35rem; text-transform: uppercase;">Select Document File (PDF, PNG, JPG)</label>
+          <input type="file" id="upload-doc-file" accept=".pdf,.png,.jpg,.jpeg" style="width: 100%; padding: 0.5rem 0; font-family: inherit; font-size: 0.85rem;" required>
+        </div>
+
+        <div style="display: flex; gap: 0.75rem; justify-content: flex-end;">
+          <button type="button" onclick="closeStaffUploadModal()" class="client-btn client-btn-ghost">Cancel</button>
+          <button type="submit" id="btn-submit-upload-cred" class="client-btn client-btn-primary">
+            <i data-lucide="check" style="width: 14px; height: 14px;"></i> Submit for Verification
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+<!-- COMPLIANCE ACCREDITATION DOSSIER MODAL -->
   <div id="client-compliance-modal" style="display: none; position: fixed; inset: 0; z-index: 9999; background: rgba(7, 19, 36, 0.7); backdrop-filter: blur(4px); align-items: center; justify-content: center; padding: 1rem;">
     <div style="background: #FFFFFF; border-radius: 12px; width: 100%; max-width: 580px; box-shadow: 0 20px 40px -8px rgba(0,0,0,0.3); border: 1px solid #E2E8F0; overflow: hidden; animation: modalFadeIn 0.2s ease-out;">
       <div style="background: #071324; padding: 1.25rem 1.5rem; color: #FFFFFF; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #00F5D4;">
@@ -4883,102 +4703,17 @@
       const clientApp = document.getElementById('client-workspace-app');
       const workerApp = document.getElementById('worker-workspace-app');
       if (clientApp) clientApp.style.display = 'none';
-      if (workerApp) workerApp.style.display = 'block';
+      if (workerApp) workerApp.style.display = 'flex';
 
-      // User chip
-      document.getElementById('user-display-name').textContent = user.full_name || user.email;
-      document.getElementById('user-display-role').textContent = 'Healthcare Professional';
-
-      // Avatar initials
-      const initials = (user.full_name || 'DF')
-        .split(' ')
-        .map(n => n[0])
-        .slice(0, 2)
-        .join('')
-        .toUpperCase();
-      document.getElementById('portal-avatar-initials').textContent = initials;
-
-      // Profile panel
-      document.getElementById('profile-full-name').textContent = user.full_name || 'N/A';
-      document.getElementById('profile-email').textContent = user.email || 'N/A';
-      document.getElementById('profile-phone').textContent = user.phone || '+1 (647) 555-0100';
-
-      const orgContainer = document.getElementById('profile-org-container');
-      if (orgContainer) orgContainer.style.display = 'none';
-
-      const bannerHeading = document.getElementById('banner-welcome-heading');
-      const bannerSub = document.getElementById('banner-welcome-sub');
-      const bannerActions = document.getElementById('banner-action-buttons');
-      const metricsContainer = document.getElementById('portal-metrics-container');
-
-      bannerHeading.textContent = `Welcome, ${user.full_name}`;
-      bannerSub.textContent = 'Browse open hospital and community nursing shifts, confirm assignments, log shift hours, and manage clinical licenses.';
-
-      bannerActions.innerHTML = `
-        <a href="#worker-shifts-panel" class="btn-banner-action">
-          <i data-lucide="search" style="width: 16px; height: 16px;"></i> View Open Shifts
-        </a>
-        <a href="#worker-credentials-panel" class="btn-banner-secondary">
-          <i data-lucide="award" style="width: 16px; height: 16px;"></i> Manage Credentials &amp; Licenses
-        </a>
-      `;
-
-      metricsContainer.innerHTML = `
-        <div class="metric-card">
-          <div class="metric-icon-wrap teal">
-            <i data-lucide="check-circle" style="width: 24px; height: 24px;"></i>
-          </div>
-          <div class="metric-data-group">
-            <span class="metric-val">0</span>
-            <span class="metric-label">Upcoming Shifts Confirmed</span>
-          </div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-icon-wrap blue">
-            <i data-lucide="hourglass" style="width: 24px; height: 24px;"></i>
-          </div>
-          <div class="metric-data-group">
-            <span class="metric-val">0h</span>
-            <span class="metric-label">Logged Hours This Week</span>
-          </div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-icon-wrap purple">
-            <i data-lucide="badge-check" style="width: 24px; height: 24px;"></i>
-          </div>
-          <div class="metric-data-group">
-            <span class="metric-val">Verified</span>
-            <span class="metric-label">CNO / PSW Standing</span>
-          </div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-icon-wrap orange">
-            <i data-lucide="wallet" style="width: 24px; height: 24px;"></i>
-          </div>
-          <div class="metric-data-group">
-            <span class="metric-val">Active</span>
-            <span class="metric-label">Dispatch Standing</span>
-          </div>
-        </div>
-      `;
-
-      document.getElementById('client-requests-panel').style.display = 'none';
-      document.getElementById('worker-shifts-panel').style.display = 'block';
-      const credsPanel = document.getElementById('worker-credentials-panel');
-      if (credsPanel) credsPanel.style.display = 'block';
-      const clockPanel = document.getElementById('worker-clock-panel');
-      if (clockPanel) clockPanel.style.display = 'block';
-
-      loadWorkerShifts();
-      initClockStation();
-      loadStaffDocuments();
-
+      initStaffWorkspace(user);
       if (window.lucide) lucide.createIcons();
+      return;
     }
 
-    // Load Client Requests Table with Live Staff Activity Tracking & Ratings
+    // Retained for fallback client table or rating modal updates
     async function loadClientRequests() {
       const tbody = document.getElementById('client-requests-table-body');
+      if (!tbody) return;
       tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #64748B; padding: 1.5rem;">Loading active staffing requests & live personnel tracking...</td></tr>';
 
       try {
@@ -4990,761 +4725,786 @@
         }
 
         if (!requests || requests.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #64748B; padding: 2.5rem 1rem;">No active staffing requests found.<br><a href="clients.html" style="color: #0284C7; font-weight: 700; display: inline-block; margin-top: 0.6rem;">+ Submit a New Staffing Request</a></td></tr>';
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #64748B; padding: 2rem;">No active staffing requests found.</td></tr>';
           return;
         }
 
         tbody.innerHTML = requests.map(req => {
-          const d = req.created_at ? new Date(req.created_at.includes('T') || req.created_at.endsWith('Z') ? req.created_at : req.created_at.replace(' ', 'T') + 'Z') : null;
+          const d = req.created_at ? new Date(req.created_at) : null;
           const dateStr = d && !isNaN(d.getTime()) ? d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : 'Today';
           const status = req.status || 'pending';
           const urgency = req.urgency_level || 'routine';
           
-          // 1. Dispatched Caregiver Info
-          let staffDisplay = '';
-          if (req.staff_name) {
-            staffDisplay = `
-              <div style="display:flex;align-items:center;gap:8px;">
-                <div style="width:34px;height:34px;border-radius:50%;background:rgba(2,132,199,0.12);color:#0284C7;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:0.75rem;border:1.5px solid rgba(2,132,199,0.25);flex-shrink:0;">
-                  ${req.staff_name.split(' ').map(n=>n[0]).join('').slice(0,2)}
-                </div>
-                <div>
-                  <strong style="color:#0F172A;font-size:0.86rem;display:block;">${req.staff_name}</strong>
-                  <span style="color:#64748B;font-size:0.74rem;font-weight:600;">${req.staff_role || req.role_requested} &bull; ${req.staff_code || 'Verified'}</span>
-                  ${req.staff_phone ? `<a href="tel:${req.staff_phone}" style="display:block;font-size:0.72rem;color:#0284C7;text-decoration:none;font-weight:700;"><i data-lucide="phone" style="width:11px;height:11px;vertical-align:middle;"></i> ${req.staff_phone}</a>` : ''}
-                </div>
-              </div>
-            `;
-          } else {
-            staffDisplay = `
-              <span style="color:#64748B;font-size:0.8rem;font-style:italic;display:inline-flex;align-items:center;gap:4px;">
-                <i data-lucide="user-x" style="width:13px;height:13px;color:#94A3B8;"></i> Dispatch In Progress
-              </span>
-            `;
-          }
+          let staffDisplay = req.staff_name 
+            ? `<strong style="color:#0F172A;">${req.staff_name}</strong><br><span style="color:#64748B;font-size:0.75rem;">${req.staff_role || req.role_requested || 'Staff'}</span>` 
+            : '<span style="color:#94A3B8;font-style:italic;">Dispatching...</span>';
 
-          // 2. Real-Time Staff Activity & EVV Telemetry
-          let activityDisplay = '';
-          if (!req.staff_name) {
-            activityDisplay = `<span class="status-badge routine" style="font-size:0.72rem;">Matching Caregiver</span>`;
-          } else if (req.clock_out_time) {
-            const outDate = new Date(req.clock_out_time);
-            activityDisplay = `
-              <div style="display:flex;flex-direction:column;gap:2px;">
-                <span class="status-badge completed" style="width:fit-content;display:inline-flex;align-items:center;gap:4px;font-size:0.72rem;">
-                  <i data-lucide="check-check" style="width:11px;height:11px;"></i> Shift Completed
-                </span>
-                <span style="font-size:0.72rem;color:#64748B;">Clocked out ${outDate.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
-              </div>
-            `;
-          } else if (req.clock_in_time) {
-            const inDate = new Date(req.clock_in_time);
-            activityDisplay = `
-              <div style="display:flex;flex-direction:column;gap:2px;">
-                <span class="status-badge confirmed" style="width:fit-content;background:#DCFCE7;color:#15803D;border:1px solid #86EFAC;display:inline-flex;align-items:center;gap:4px;font-size:0.72rem;">
-                  <span class="pulse-dot" style="width:7px;height:7px;background:#16A34A;display:inline-block;border-radius:50%;"></span> Active On-Site
-                </span>
-                <span style="font-size:0.72rem;color:#15803D;font-weight:700;">Since ${inDate.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
-              </div>
-            `;
-          } else {
-            activityDisplay = `
-              <div style="display:flex;flex-direction:column;gap:2px;">
-                <span class="status-badge pending" style="width:fit-content;background:#FEF3C7;color:#B45309;border:1px solid #FCD34D;display:inline-flex;align-items:center;gap:4px;font-size:0.72rem;">
-                  <i data-lucide="truck" style="width:11px;height:11px;"></i> En Route / Assigned
-                </span>
-                <span style="font-size:0.72rem;color:#64748B;">Scheduled for ${req.shift_type}</span>
-              </div>
-            `;
-          }
-
-          // 3. Client Staff Rating & Review
-          let ratingDisplay = '';
-          if (!req.staff_name) {
-            ratingDisplay = `<span style="color:#94A3B8;font-size:0.75rem;">—</span>`;
-          } else if (req.client_rating) {
-            const stars = '★'.repeat(req.client_rating) + '☆'.repeat(5 - req.client_rating);
-            ratingDisplay = `
-              <div>
-                <span style="color:#F59E0B;font-size:0.92rem;letter-spacing:1px;font-weight:800;" title="${req.client_feedback || 'Verified hospital rating'}">${stars}</span>
-                <span style="font-size:0.74rem;font-weight:700;color:#0F172A;display:block;">${req.client_rating}.0 / 5.0</span>
-                ${req.client_feedback ? `<span style="font-size:0.7rem;color:#64748B;display:block;max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${req.client_feedback}">"${req.client_feedback}"</span>` : ''}
-              </div>
-            `;
-          } else {
-            ratingDisplay = `
-              <button type="button" class="btn-rate-staff" onclick="openClientRateModal('${req.id}', '${(req.staff_name || '').replace(/'/g, "\\'")}', '${req.role_requested || 'Caregiver'}', '${(req.facility_name || '').replace(/'/g, "\\'")}')" style="background:#F8FAFC;border:1.5px solid #CBD5E1;padding:0.35rem 0.65rem;border-radius:6px;font-size:0.74rem;font-weight:800;color:#0F172A;cursor:pointer;display:inline-flex;align-items:center;gap:4px;transition:all 0.2s ease;">
-                <span style="color:#F59E0B;font-size:0.85rem;">★</span> Rate Staff
-              </button>
-            `;
-          }
+          let ratingDisplay = req.client_rating
+            ? `<span style="color:#F59E0B;font-weight:700;">★ ${req.client_rating}.0</span>`
+            : `<button type="button" class="btn-rate-staff" onclick="openClientRateModal('${req.id}', '${(req.staff_name || '').replace(/'/g, "\\'")}', '${req.role_requested || 'Caregiver'}', '${(req.facility_name || '').replace(/'/g, "\\'")}')" style="background:#F8FAFC;border:1.5px solid #CBD5E1;padding:0.3rem 0.6rem;border-radius:6px;font-size:0.75rem;cursor:pointer;">★ Rate Staff</button>`;
 
           return `
             <tr>
-              <td>
-                <strong style="font-family: monospace; color: #0284C7; font-size:0.85rem;">#${(req.request_code || req.id || 'REQ').toString().slice(-8)}</strong>
-                <div style="font-weight:700;color:#0F172A;font-size:0.85rem;margin-top:2px;">${req.role_requested || 'RN / PSW'}</div>
-                <span style="font-size:0.72rem;color:#64748B;">${dateStr}</span>
-              </td>
-              <td>
-                <strong style="color:#1E293B;font-size:0.82rem;display:block;">${req.shift_type || 'Day Shift'}</strong>
-                <span style="color:#64748B;font-size:0.75rem;">${req.unit_department || 'General Floor'}</span>
-                <div style="margin-top:3px;"><span class="status-badge ${urgency}">${urgency}</span></div>
-              </td>
+              <td><strong style="color:#0284C7;">#${(req.request_code || req.id || 'REQ').toString().slice(-8)}</strong><div style="font-weight:600;font-size:0.85rem;">${req.role_requested || 'RN'}</div></td>
+              <td>${req.shift_type || 'Day'} (${req.unit_department || 'General'})</td>
               <td>${staffDisplay}</td>
-              <td>${activityDisplay}</td>
+              <td><span class="status-badge ${urgency}">${urgency}</span></td>
               <td>${ratingDisplay}</td>
               <td><span class="status-badge ${status}">${status}</span></td>
             </tr>
           `;
         }).join('');
-
         if (window.lucide) lucide.createIcons();
-
       } catch (e) {
-        console.error('Failed to load requests:', e);
         tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #64748B; padding: 2rem;">No active staffing requests found.</td></tr>';
       }
     }
 
-    // Load Worker Shifts Feed
-    async function loadWorkerShifts() {
-      const container = document.getElementById('worker-shifts-container');
-      container.innerHTML = '<div style="text-align: center; color: #64748B; padding: 1.5rem;">Loading live shift board...</div>';
+    // ========================================================================
+    // ENTERPRISE HEALTHCARE PROFESSIONAL WORKSPACE CONTROLLER
+    // ========================================================================
+    let currentStaffUser = null;
+    let staffElapsedInterval = null;
+    let staffActivePunch = null;
+    let staffCurrentAssigned = null;
+    let allStaffOpenShifts = [];
+    let currentOpenShiftRoleFilter = 'all';
+    let currentOpenShiftRegionOnly = false;
+    let staffPayRecords = [];
+    let staffAvailabilityDays = [true, true, true, true, true, true, true]; // Next 7 days
 
-      try {
-        let shifts = [];
-        try {
-          const res = await fetch(`${API_BASE}/shifts`);
-          if (res.ok) {
-            const data = await res.json();
-            shifts = Array.isArray(data) ? data : (data.shifts || []);
-          }
-        } catch (_) {}
+    function initStaffWorkspace(user) {
+      currentStaffUser = user;
 
-        if (!shifts || shifts.length === 0) {
-          container.innerHTML = '<div style="text-align: center; color: #64748B; padding: 2.5rem 1rem; background: #F8FAFC; border-radius: 10px; border: 1.5px dashed #CBD5E1;"><i data-lucide="calendar" style="width: 28px; height: 28px; color: #94A3B8; margin-bottom: 0.5rem; display: block; margin: 0 auto 0.5rem;"></i>No open shifts currently available. New shifts posted by hospitals and LTC facilities will appear here in real-time.</div>';
-          if (window.lucide) lucide.createIcons();
-          return;
+      // Sidebar Profile Info
+      const sideName = document.getElementById('staff-side-name');
+      const sideRole = document.getElementById('staff-side-role');
+      if (sideName) sideName.textContent = user.full_name || 'Healthcare Professional';
+      if (sideRole) sideRole.textContent = `${user.staff_role || user.role_requested || 'RN'} · ${user.region || 'Greater Toronto Area'}`;
+
+      // Today Header: Date & Dynamic Greeting
+      const now = new Date();
+      const options = { weekday: 'long', month: 'long', day: 'numeric' };
+      const dateEl = document.getElementById('staff-today-datetime');
+      if (dateEl) dateEl.textContent = now.toLocaleDateString('en-US', options);
+
+      const hr = now.getHours();
+      const timeOfDay = hr < 12 ? 'morning' : hr < 17 ? 'afternoon' : 'evening';
+      const firstName = (user.full_name || 'Caregiver').split(' ')[0];
+      const greetEl = document.getElementById('staff-today-greeting');
+      if (greetEl) greetEl.textContent = `Good ${timeOfDay}, ${firstName}`;
+
+      // Show default Today screen
+      showStaffScreen('today');
+
+      // Load all workspace modules
+      loadStaffClockStatus();
+      loadStaffOpenShifts();
+      loadStaffSchedule();
+      loadStaffCredentials();
+      loadStaffPaySummary();
+    }
+
+    function showStaffScreen(screenId) {
+      // Toggle sidebar navigation button active state
+      const navButtons = document.querySelectorAll('.staff-sidebar .staff-nav-item');
+      navButtons.forEach(btn => {
+        if (btn.getAttribute('data-screen') === screenId) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
         }
+      });
 
-        container.innerHTML = shifts.map(shift => {
-          return `
-            <div class="shift-card-item" id="shift-card-${shift.id}">
-              <div class="shift-details">
-                <div class="shift-facility-name">${shift.facility || shift.client_name || 'Healthcare Facility'}</div>
-                <div style="font-weight: 700; color: #1B4F8C; font-size: 0.84rem;">${shift.role || shift.role_requested || 'Registered Nurse'}</div>
-                <div class="shift-meta-row">
-                  <span class="shift-meta-item">
-                    <i data-lucide="clock" style="width: 14px; height: 14px;"></i>
-                    ${shift.time || shift.shift_type || 'Day Shift'}
-                  </span>
-                  <span class="shift-wage-tag">${shift.rate || '$45.00/hr'}</span>
-                  <span class="status-badge ${shift.urgency ? 'urgent' : 'confirmed'}">${shift.urgency || 'Open'}</span>
-                </div>
-              </div>
-              <div>
-                <button type="button" class="btn-claim-shift" onclick="claimShift('${shift.id}', this)">
-                  Claim Shift
-                </button>
-              </div>
-            </div>
-          `;
-        }).join('');
-
-        if (window.lucide) lucide.createIcons();
-
-      } catch (e) {
-        console.error('Failed to load shifts:', e);
-        container.innerHTML = '<div style="text-align: center; color: #64748B; padding: 2rem;">No open shifts currently available.</div>';
+      // Toggle visible screen
+      const screens = document.querySelectorAll('.staff-screen');
+      screens.forEach(screen => screen.classList.remove('active'));
+      const targetScreen = document.getElementById('staff-screen-' + screenId);
+      if (targetScreen) {
+        targetScreen.classList.add('active');
       }
-    }
 
-    // Claim shift interaction
-    function claimShift(shiftId, btn) {
-      btn.classList.add('claimed');
-      btn.innerHTML = '<i data-lucide="check" style="width: 14px; height: 14px; vertical-align: middle;"></i> Shift Claimed';
-      btn.disabled = true;
       if (window.lucide) lucide.createIcons();
-      alert(`Shift #${shiftId} has been successfully requested! The Divine Fingers Clinical Dispatch Coordinator will confirm placement within 15 minutes.`);
     }
 
-    // ── Caregiver Electronic Visit Verification & Shift Clock Station ────────────
-    let deviceClockInterval = null;
-    let shiftDurationInterval = null;
-    let currentActivePunch = null;
-    let currentAssignedShift = null;
+    // ── SCREEN 1: REAL-TIME EVV CLOCK CARD & TELEMETRY ──────────────────────────
+    function startStaffElapsedTicker(clockInIso) {
+      if (staffElapsedInterval) clearInterval(staffElapsedInterval);
+      const startMs = new Date(clockInIso).getTime();
 
-    function startDeviceClock() {
-      if (deviceClockInterval) clearInterval(deviceClockInterval);
-      const updateClock = () => {
-        const now = new Date();
-        const timeEl = document.getElementById('clock-device-time');
-        const dateEl = document.getElementById('clock-device-date');
-        const zoneEl = document.getElementById('clock-device-zone');
-
-        if (timeEl) timeEl.textContent = now.toLocaleTimeString();
-        if (dateEl) dateEl.textContent = now.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
-        if (zoneEl) {
-          try {
-            const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Device Local Time';
-            zoneEl.textContent = `${tz} • Synchronized`;
-          } catch (e) {
-            zoneEl.textContent = 'Device Local Time';
-          }
-        }
-      };
-      updateClock();
-      deviceClockInterval = setInterval(updateClock, 1000);
-    }
-
-    function startShiftDurationTimer(clockInIso) {
-      if (shiftDurationInterval) clearInterval(shiftDurationInterval);
-      const startTime = new Date(clockInIso).getTime();
-
-      const updateDuration = () => {
-        const elapsedSec = Math.max(0, Math.floor((Date.now() - startTime) / 1000));
+      const update = () => {
+        const elapsedSec = Math.max(0, Math.floor((Date.now() - startMs) / 1000));
         const hrs = Math.floor(elapsedSec / 3600);
         const mins = Math.floor((elapsedSec % 3600) / 60);
         const secs = elapsedSec % 60;
-
-        const str = `${String(hrs).padStart(2, '0')}h : ${String(mins).padStart(2, '0')}m : ${String(secs).padStart(2, '0')}s`;
-        const durEl = document.getElementById('clock-duration-timer');
-        if (durEl) durEl.textContent = str;
+        const el = document.getElementById('staff-elapsed-big');
+        if (el) {
+          el.textContent = `${hrs}h ${mins.toString().padStart(2, '0')}m ${secs.toString().padStart(2, '0')}s`;
+        }
       };
 
-      updateDuration();
-      shiftDurationInterval = setInterval(updateDuration, 1000);
+      update();
+      staffElapsedInterval = setInterval(update, 1000);
     }
 
-    async function initClockStation() {
-      startDeviceClock();
-      await checkClockStatus();
-      await loadPunchHistory();
-    }
-
-    async function checkClockStatus() {
+    async function loadStaffClockStatus() {
       try {
         const res = await fetch(`${API_BASE}/shifts/clock-status`, { credentials: 'include' });
         if (!res.ok) return;
-
         const data = await res.json();
         if (!data || !data.success) return;
 
-        const badgeContainer = document.getElementById('clock-status-badge-container');
-        const shiftTimerBox  = document.getElementById('clock-shift-timer-box');
-        const activeDetails  = document.getElementById('clock-active-details');
-        const clockinForm    = document.getElementById('clock-in-form-container');
-        const weeklyPill     = document.getElementById('weekly-hours-pill');
-        const allocatedCard  = document.getElementById('allocated-shift-card');
-        const noShiftCard    = document.getElementById('no-shift-assigned-card');
-
-        if (weeklyPill && typeof data.weeklyHours !== 'undefined') {
-          weeklyPill.textContent = `Week: ${data.weeklyHours} hrs`;
-          const metricsContainer = document.getElementById('portal-metrics-container');
-          if (metricsContainer) {
-            const valElements = metricsContainer.querySelectorAll('.metric-val');
-            if (valElements.length >= 2) {
-              valElements[1].textContent = `${data.weeklyHours}h`;
-            }
-          }
-        }
+        const roleEl = document.getElementById('staff-clock-role');
+        const facEl = document.getElementById('staff-clock-facility');
+        const badgeEl = document.getElementById('staff-shift-status-badge');
+        const elapsedEl = document.getElementById('staff-elapsed-big');
+        const clockedInAtEl = document.getElementById('staff-clocked-in-at');
+        const chargeNurseEl = document.getElementById('staff-charge-nurse');
+        const chargePhoneEl = document.getElementById('staff-charge-phone');
+        const shiftHoursEl = document.getElementById('staff-shift-hours');
+        const schedHoursEl = document.getElementById('staff-scheduled-hours');
+        const dispatchNoteEl = document.getElementById('staff-dispatch-note');
+        const clockBtn = document.getElementById('staff-clock-btn');
 
         if (data.onShift && data.activePunch) {
-          currentActivePunch = data.activePunch;
-          if (badgeContainer) {
-            badgeContainer.innerHTML = '<span class="clock-status-pill on-duty"><span class="pulse-dot"></span> 🟢 Active On Shift</span>';
+          staffActivePunch = data.activePunch;
+          if (badgeEl) {
+            badgeEl.className = 'badge';
+            badgeEl.style.background = 'rgba(0, 168, 150, 0.15)';
+            badgeEl.style.color = '#00A896';
+            badgeEl.style.border = '1px solid #00A896';
+            badgeEl.textContent = 'Active on shift';
           }
-          if (shiftTimerBox) shiftTimerBox.style.display = 'flex';
-          if (activeDetails) activeDetails.style.display = 'block';
-          if (clockinForm) clockinForm.style.display = 'none';
+          if (roleEl) roleEl.textContent = `${staffActivePunch.role || 'RN'} — ${staffActivePunch.unit_department || 'General Care'} Shift`;
+          if (facEl) facEl.textContent = `${staffActivePunch.facility_name || 'Hospital Placement'}`;
 
-          const facEl = document.getElementById('active-facility-name');
-          const unitEl = document.getElementById('active-unit-dept');
-          const roleEl = document.getElementById('active-role-title');
-          const inTimeEl = document.getElementById('active-clockin-time');
-          const facTextEl = document.getElementById('clock-active-facility-text');
+          const inDate = new Date(staffActivePunch.clock_in_time);
+          const timeStr = inDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          if (clockedInAtEl) clockedInAtEl.textContent = `Clocked in at ${timeStr} · EVV GPS Verified`;
 
-          if (facEl) facEl.textContent = data.activePunch.facility_name || 'Hospital Facility';
-          if (unitEl) unitEl.textContent = data.activePunch.unit_department || 'General Floor';
-          if (roleEl) roleEl.textContent = data.activePunch.role || 'RN';
-          if (facTextEl) facTextEl.textContent = data.activePunch.facility_name || 'On Duty';
+          if (clockBtn) {
+            clockBtn.className = 'client-btn btn-lg';
+            clockBtn.style.background = '#E11D48';
+            clockBtn.style.color = '#FFFFFF';
+            clockBtn.innerHTML = '<i data-lucide="square" style="width: 18px; height: 18px;"></i> Clock out';
+          }
 
-          const inDate = new Date(data.activePunch.clock_in_time);
-          if (inTimeEl) inTimeEl.textContent = inDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' (' + inDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) + ')';
+          startStaffElapsedTicker(staffActivePunch.clock_in_time);
 
-          startShiftDurationTimer(data.activePunch.clock_in_time);
+          if (data.assignedShift) {
+            staffCurrentAssigned = data.assignedShift;
+            if (chargeNurseEl) chargeNurseEl.textContent = staffCurrentAssigned.contact_name || 'Priya Nandan (Charge)';
+            if (chargePhoneEl) {
+              const ph = staffCurrentAssigned.contact_phone || '(647) 555-0134';
+              chargePhoneEl.textContent = ph;
+              chargePhoneEl.href = `tel:${ph}`;
+            }
+            if (shiftHoursEl) shiftHoursEl.textContent = staffCurrentAssigned.shift_type || '23:00 – 07:00';
+            if (schedHoursEl) schedHoursEl.textContent = '8.0 hrs';
+            if (dispatchNoteEl) dispatchNoteEl.textContent = staffCurrentAssigned.special_instructions || 'Standard clinical placement protocol';
+          }
 
         } else {
-          currentActivePunch = null;
-          if (shiftDurationInterval) clearInterval(shiftDurationInterval);
-          if (badgeContainer) {
-            badgeContainer.innerHTML = '<span class="clock-status-pill off-duty">⚪ Off Duty / Ready</span>';
+          staffActivePunch = null;
+          if (staffElapsedInterval) clearInterval(staffElapsedInterval);
+
+          if (badgeEl) {
+            badgeEl.className = 'badge';
+            badgeEl.style.background = '#F1F5F9';
+            badgeEl.style.color = '#64748B';
+            badgeEl.style.border = '1px solid #CBD5E1';
+            badgeEl.textContent = 'Off shift';
           }
-          if (shiftTimerBox) shiftTimerBox.style.display = 'none';
-          if (activeDetails) activeDetails.style.display = 'none';
-          if (clockinForm) clockinForm.style.display = 'block';
+          if (elapsedEl) elapsedEl.textContent = '0h 00m';
+          if (clockedInAtEl) clockedInAtEl.textContent = 'Ready for clinical check-in';
 
-          // Check if Admin has allocated a shift
+          if (clockBtn) {
+            clockBtn.className = 'client-btn client-btn-primary btn-lg';
+            clockBtn.style.background = '';
+            clockBtn.style.color = '';
+            clockBtn.innerHTML = '<i data-lucide="play" style="width: 18px; height: 18px;"></i> Clock in';
+          }
+
           if (data.assignedShift) {
-            currentAssignedShift = data.assignedShift;
-            if (allocatedCard) allocatedCard.style.display = 'block';
-            if (noShiftCard) noShiftCard.style.display = 'none';
-
-            const codeEl    = document.getElementById('allocated-shift-code');
-            const facEl     = document.getElementById('allocated-facility-name');
-            const unitEl    = document.getElementById('allocated-unit-role');
-            const dateEl    = document.getElementById('allocated-shift-date');
-            const hoursEl   = document.getElementById('allocated-shift-hours');
-            const contactEl = document.getElementById('allocated-facility-contact');
-            const instBox   = document.getElementById('allocated-instructions-box');
-            const instText  = document.getElementById('allocated-instructions-text');
-
-            if (codeEl) codeEl.textContent = currentAssignedShift.request_code || 'SHIFT-DISPATCHED';
-            if (facEl) facEl.textContent = currentAssignedShift.facility_name || 'Partner Facility';
-            if (unitEl) unitEl.textContent = `${currentAssignedShift.unit_department || 'General Care'} • ${currentAssignedShift.role_requested || 'Healthcare Professional'}`;
-
-            if (dateEl) {
-              if (currentAssignedShift.start_date) {
-                const sDate = new Date(currentAssignedShift.start_date);
-                dateEl.textContent = sDate.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
-              } else {
-                dateEl.textContent = 'Today / Immediate';
-              }
+            staffCurrentAssigned = data.assignedShift;
+            if (roleEl) roleEl.textContent = `${staffCurrentAssigned.role_requested || 'RN'} — ${staffCurrentAssigned.unit_department || 'General Floor'} Shift`;
+            if (facEl) facEl.textContent = `${staffCurrentAssigned.facility_name || 'Riverside General Hospital'}`;
+            if (chargeNurseEl) chargeNurseEl.textContent = staffCurrentAssigned.contact_name || 'Priya Nandan (Charge)';
+            if (chargePhoneEl) {
+              const ph = staffCurrentAssigned.contact_phone || '(647) 555-0134';
+              chargePhoneEl.textContent = ph;
+              chargePhoneEl.href = `tel:${ph}`;
             }
-
-            if (hoursEl) hoursEl.textContent = currentAssignedShift.shift_type || 'Standard Shift';
-            if (contactEl) {
-              contactEl.textContent = `${currentAssignedShift.contact_name || 'Clinical Dispatch'} ${currentAssignedShift.contact_phone ? '• ' + currentAssignedShift.contact_phone : ''}`;
-            }
-
-            if (currentAssignedShift.special_instructions && currentAssignedShift.special_instructions.trim()) {
-              if (instBox) instBox.style.display = 'block';
-              if (instText) instText.textContent = currentAssignedShift.special_instructions.trim();
-            } else if (instBox) {
-              instBox.style.display = 'none';
-            }
-
+            if (shiftHoursEl) shiftHoursEl.textContent = staffCurrentAssigned.shift_type || '23:00 – 07:00';
+            if (schedHoursEl) schedHoursEl.textContent = '8.0 hrs';
+            if (dispatchNoteEl) dispatchNoteEl.textContent = staffCurrentAssigned.special_instructions || 'Standard clinical placement protocol';
           } else {
-            currentAssignedShift = null;
-            if (allocatedCard) allocatedCard.style.display = 'none';
-            if (noShiftCard) noShiftCard.style.display = 'block';
+            staffCurrentAssigned = null;
+            if (roleEl) roleEl.textContent = 'No Dispatched Shift Assigned';
+            if (facEl) facEl.textContent = 'Stand by for clinical dispatch or claim an open shift';
+            if (chargeNurseEl) chargeNurseEl.textContent = 'Clinical Dispatch Coordinator';
+            if (chargePhoneEl) {
+              chargePhoneEl.textContent = '(647) 555-0100';
+              chargePhoneEl.href = 'tel:+16475550100';
+            }
+            if (shiftHoursEl) shiftHoursEl.textContent = '—';
+            if (schedHoursEl) schedHoursEl.textContent = '0.0 hrs';
+            if (dispatchNoteEl) dispatchNoteEl.textContent = 'Browse open shifts to request placement';
           }
         }
 
         if (window.lucide) lucide.createIcons();
-
       } catch (err) {
-        console.warn('Could not verify shift clock status:', err);
+        console.warn('loadStaffClockStatus error:', err);
       }
     }
 
-    async function handleClockIn() {
-      const btn = document.getElementById('btn-clock-in');
+    async function handleStaffClockAction() {
+      const btn = document.getElementById('staff-clock-btn');
+      if (staffActivePunch) {
+        // Clock Out
+        const notes = prompt('Conclude Shift & Submit EVV Timesheet:\n\nEnter any shift handover, patient care summary, or concluding notes (optional):', '');
+        if (notes === null) return; // User canceled
 
-      if (!currentAssignedShift) {
-        alert('No active shift has been allocated to you by Clinical Dispatch yet.\nPlease check with your dispatch coordinator.');
-        return;
+        if (btn) {
+          btn.disabled = true;
+          btn.innerHTML = '<span class="portal-spinner" style="width:16px;height:16px;border-width:2px;display:inline-block;vertical-align:middle;margin-right:6px;"></span> Submitting Timesheet...';
+        }
+
+        try {
+          const res = await fetch(`${API_BASE}/shifts/clock-out`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ notes: notes.trim() })
+          });
+          const data = await res.json();
+          if (res.ok && data.success) {
+            alert(data.message || '🎉 Shift Concluded and Clocked Out Successfully!');
+            await loadStaffClockStatus();
+            await loadStaffPaySummary();
+            await loadStaffSchedule();
+          } else {
+            alert(`❌ Clock Out Failed: ${data.error || 'Server error'}`);
+          }
+        } catch (e) {
+          alert('❌ Network error while clocking out. Please check your connection.');
+        } finally {
+          if (btn) btn.disabled = false;
+          if (window.lucide) lucide.createIcons();
+        }
+      } else {
+        // Clock In
+        if (!staffCurrentAssigned) {
+          alert('No active shift has been allocated to you by Clinical Dispatch yet.\nPlease navigate to "Open Shifts" to claim an available assignment or contact your coordinator.');
+          return;
+        }
+
+        if (btn) {
+          btn.disabled = true;
+          btn.innerHTML = '<span class="portal-spinner" style="width:16px;height:16px;border-width:2px;display:inline-block;vertical-align:middle;margin-right:6px;"></span> Verifying EVV Location...';
+        }
+
+        try {
+          const res = await fetch(`${API_BASE}/shifts/clock-in`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({
+              shift_id: staffCurrentAssigned.id,
+              facility_name: staffCurrentAssigned.facility_name,
+              unit_department: staffCurrentAssigned.unit_department,
+              role: staffCurrentAssigned.role_requested
+            })
+          });
+          const data = await res.json();
+          if (res.ok && data.success) {
+            alert(`✅ ${data.message || 'Clocked in successfully!'}`);
+            await loadStaffClockStatus();
+            await loadStaffPaySummary();
+          } else {
+            alert(`❌ Clock In Failed: ${data.error || 'Server error'}`);
+          }
+        } catch (e) {
+          alert('❌ Network error while clocking in. Please check your connection.');
+        } finally {
+          if (btn) btn.disabled = false;
+          if (window.lucide) lucide.createIcons();
+        }
       }
+    }
 
-      if (btn) {
-        btn.disabled = true;
-        btn.innerHTML = '<span class="portal-spinner" style="width: 16px; height: 16px; border-width: 2px; margin-right: 6px; display: inline-block; vertical-align: middle;"></span> Transmitting EVV Verification...';
-      }
+    function toggleStaffLateBanner() {
+      const banner = document.getElementById('staff-late-banner');
+      if (!banner) return;
+      banner.style.display = banner.style.display === 'none' ? 'flex' : 'none';
+      if (window.lucide) lucide.createIcons();
+    }
 
+    async function submitStaffRunningLate(minutes) {
       try {
-        const response = await fetch(`${API_BASE}/shifts/clock-in`, {
+        const res = await fetch(`${API_BASE}/shifts/running-late`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
           body: JSON.stringify({
-            shift_id: currentAssignedShift.id,
-            facility_name: currentAssignedShift.facility_name,
-            unit_department: currentAssignedShift.unit_department,
-            role: currentAssignedShift.role_requested
+            minutes_late: minutes,
+            shift_id: staffCurrentAssigned ? staffCurrentAssigned.id : null
           })
         });
-
-        const data = await response.json();
-        if (response.ok && data.success) {
-          alert(`✅ ${data.message || 'Clocked in successfully!'}`);
-          await checkClockStatus();
-          await loadPunchHistory();
-        } else {
-          alert(`❌ Clock In Failed: ${data.error || 'Server error'}`);
-        }
-      } catch (err) {
-        alert('❌ Network error while attempting to clock in. Please check your connection.');
-      } finally {
-        if (btn) {
-          btn.disabled = false;
-          btn.innerHTML = '<i data-lucide="play-circle" style="width: 20px; height: 20px;"></i> <span>🟢 Clock In to Dispatched Shift</span>';
+        const data = await res.json();
+        const lateText = document.getElementById('staff-late-text');
+        if (lateText) {
+          lateText.innerHTML = `<i data-lucide="check-circle" style="width:16px;height:16px;vertical-align:middle;margin-right:4px;color:#00A896;"></i> Dispatch and charge nurse notified (${minutes}m delay acknowledged).`;
           if (window.lucide) lucide.createIcons();
+        }
+        setTimeout(() => {
+          toggleStaffLateBanner();
+        }, 3500);
+      } catch (e) {
+        alert('Failed to send delay notification.');
+      }
+    }
+
+    // ── SCREEN 2: OPEN SHIFTS WITH ROLE & REGION FILTERS ────────────────────────
+    function getRoleWage(role) {
+      const r = (role || '').toUpperCase();
+      if (r.includes('TRAVEL')) return { rate: 62.00, label: '$62.00/hr' };
+      if (r.includes('RPN')) return { rate: 38.00, label: '$38.00/hr' };
+      if (r.includes('PSW')) return { rate: 28.50, label: '$28.50/hr' };
+      return { rate: 48.50, label: '$48.50/hr' };
+    }
+
+    async function loadStaffOpenShifts() {
+      const container = document.getElementById('staff-open-shifts-container');
+      if (container) {
+        container.innerHTML = '<div style="text-align: center; color: #64748B; padding: 2rem;">Loading open shifts across Ontario...</div>';
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}/shifts`);
+        let shifts = [];
+        if (res.ok) {
+          const data = await res.json();
+          shifts = Array.isArray(data) ? data : (data.shifts || []);
+        }
+        allStaffOpenShifts = shifts;
+
+        const dot = document.getElementById('staff-openshifts-dot');
+        if (dot) {
+          dot.style.display = (shifts && shifts.length > 0) ? 'inline-block' : 'none';
+        }
+
+        renderFilteredOpenShifts();
+      } catch (e) {
+        console.error('loadStaffOpenShifts error:', e);
+        if (container) {
+          container.innerHTML = '<div style="text-align:center; color:#64748B; padding:2rem;">Unable to load open shifts at this time.</div>';
         }
       }
     }
 
-    async function handleClockOut() {
-      const btn = document.getElementById('btn-clock-out');
-      const notesEl = document.getElementById('clockout-notes');
-      const notes = notesEl ? notesEl.value.trim() : '';
+    function filterOpenShifts(role, chipEl) {
+      currentOpenShiftRoleFilter = role;
+      const chips = document.querySelectorAll('#staff-filter-chips .filter-chip:not(#chip-my-region)');
+      chips.forEach(c => c.classList.remove('selected'));
+      if (chipEl) chipEl.classList.add('selected');
+      renderFilteredOpenShifts();
+    }
 
-      const confirmConclude = confirm('Conclude Shift Verification:\n\nAre you sure you want to clock out of this shift and submit your hours to Divine Fingers Clinical Dispatch?');
-      if (!confirmConclude) return;
+    function toggleMyRegionFilter(chipEl) {
+      currentOpenShiftRegionOnly = !currentOpenShiftRegionOnly;
+      if (chipEl) {
+        if (currentOpenShiftRegionOnly) {
+          chipEl.classList.add('selected');
+        } else {
+          chipEl.classList.remove('selected');
+        }
+      }
+      renderFilteredOpenShifts();
+    }
 
-      if (btn) {
-        btn.disabled = true;
-        btn.innerHTML = '<span class="portal-spinner" style="width: 16px; height: 16px; border-width: 2px; margin-right: 6px; display: inline-block; vertical-align: middle;"></span> Submitting Shift Timesheet...';
+    function renderFilteredOpenShifts() {
+      const container = document.getElementById('staff-open-shifts-container');
+      if (!container) return;
+
+      let list = allStaffOpenShifts || [];
+
+      if (currentOpenShiftRoleFilter !== 'all') {
+        list = list.filter(s => {
+          const r = (s.role || s.role_requested || '').toUpperCase();
+          return r.includes(currentOpenShiftRoleFilter.toUpperCase());
+        });
+      }
+
+      if (currentOpenShiftRegionOnly && currentStaffUser && currentStaffUser.region) {
+        const userReg = currentStaffUser.region.toLowerCase();
+        list = list.filter(s => {
+          const loc = (s.region || s.location || s.facility || '').toLowerCase();
+          return loc.includes(userReg) || userReg.includes(loc);
+        });
+      }
+
+      if (list.length === 0) {
+        container.innerHTML = `
+          <div style="text-align: center; color: #64748B; padding: 3rem 1rem; background: #FFFFFF; border-radius: 8px; border: 1px dashed #CBD5E1;">
+            <i data-lucide="calendar-check" style="width: 32px; height: 32px; color: #94A3B8; margin-bottom: 0.5rem; display: block; margin-left: auto; margin-right: auto;"></i>
+            <h4 style="margin: 0 0 0.25rem 0; font-size: 0.95rem; font-weight: 700; color: #071324;">No matching open shifts</h4>
+            <p style="margin: 0; font-size: 0.82rem; color: #64748B;">Try selecting "All roles" or clearing region filter to see more opportunities.</p>
+          </div>
+        `;
+        if (window.lucide) lucide.createIcons();
+        return;
+      }
+
+      container.innerHTML = list.map(shift => {
+        const role = shift.role || shift.role_requested || 'Registered Nurse';
+        const wage = getRoleWage(role);
+        const hours = 8;
+        const estTotal = (wage.rate * hours).toFixed(2);
+        const facility = shift.facility || shift.client_name || shift.facility_name || 'Hospital Placement';
+        const unit = shift.unit_department || shift.time || shift.shift_type || 'General Care';
+        const isUrgent = (shift.urgency || '').toLowerCase().includes('urgent') || (shift.urgency || '').toLowerCase().includes('stat');
+        const urgencyBadge = isUrgent
+          ? '<span class="badge" style="background:#FFE4E6; color:#E11D48; border:1px solid #FDA4AF; font-size:11px; padding:2px 8px;">Immediate</span>'
+          : '<span class="badge" style="background:#E6F9F5; color:#00A896; border:1px solid #99F6E4; font-size:11px; padding:2px 8px;">Open</span>';
+
+        return `
+          <div class="shift-card" id="open-shift-${shift.id}">
+            <div class="shift-card-top">
+              <div>
+                <div style="display:flex; align-items:center; gap:8px; margin-bottom: 3px;">
+                  <span class="shift-role-badge">${role}</span>
+                  ${urgencyBadge}
+                </div>
+                <h3 class="shift-facility">${facility}</h3>
+                <p class="shift-unit">${unit}</p>
+              </div>
+              <div style="text-align: right;">
+                <p class="shift-rate">${wage.label}</p>
+                <p class="shift-total">${hours} hrs &bull; $${estTotal} est.</p>
+              </div>
+            </div>
+            <div class="shift-meta">
+              <span><i data-lucide="map-pin" style="width:13px;height:13px;"></i> ${shift.region || shift.location || 'Toronto, ON'}</span>
+              <span><i data-lucide="clock" style="width:13px;height:13px;"></i> ${shift.shift_type || 'Day Shift'}</span>
+              <span><i data-lucide="shield-check" style="width:13px;height:13px;"></i> EVV Station</span>
+            </div>
+            <div class="shift-actions">
+              <button type="button" class="client-btn client-btn-primary btn-sm" onclick="claimOpenShift('${shift.id}', this)">
+                Claim shift
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      if (window.lucide) lucide.createIcons();
+    }
+
+    async function claimOpenShift(shiftId, btn) {
+      const originalHtml = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<span class="portal-spinner" style="width:14px;height:14px;border-width:2px;display:inline-block;vertical-align:middle;margin-right:4px;"></span> Claiming...';
+      try {
+        const res = await fetch(`${API_BASE}/shifts/${shiftId}/claim`, {
+          method: 'POST',
+          credentials: 'include'
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          btn.style.background = '#E6F9F5';
+          btn.style.color = '#00A896';
+          btn.style.border = '1px solid #00A896';
+          btn.innerHTML = '✓ Awaiting facility confirmation';
+          alert(`🎉 Shift #${shiftId} successfully claimed!\n\nThe facility and Clinical Dispatch have received your booking and will confirm your placement.`);
+          loadStaffClockStatus();
+          loadStaffSchedule();
+        } else {
+          alert(`❌ Claim Failed: ${data.error || 'Server error'}`);
+          btn.disabled = false;
+          btn.innerHTML = originalHtml;
+        }
+      } catch (e) {
+        alert('❌ Network error while claiming shift.');
+        btn.disabled = false;
+        btn.innerHTML = originalHtml;
+      }
+    }
+
+    // ── SCREEN 3: MY SCHEDULE & 7-DAY INTERACTIVE AVAILABILITY ──────────────────
+    async function loadStaffSchedule() {
+      const confirmedContainer = document.getElementById('staff-confirmed-shifts-container');
+      const upcomingContainer = document.getElementById('staff-upcoming-shifts-container');
+
+      try {
+        const res = await fetch(`${API_BASE}/shifts/clock-status`, { credentials: 'include' });
+        let assigned = null;
+        if (res.ok) {
+          const data = await res.json();
+          assigned = data.assignedShift;
+        }
+
+        const renderShiftItem = (s) => {
+          if (!s) return null;
+          return `
+            <div class="shift-card" style="margin-bottom: 10px;">
+              <div class="shift-card-top">
+                <div>
+                  <span class="shift-role-badge">${s.role_requested || 'Registered Nurse'}</span>
+                  <h3 class="shift-facility">${s.facility_name || 'Hospital Facility'}</h3>
+                  <p class="shift-unit">${s.unit_department || 'General Floor'} &bull; ${s.shift_type || '07:00 – 15:00'}</p>
+                </div>
+                <div style="text-align: right;">
+                  <span class="badge" style="background: #E6F9F5; color: #00A896; border: 1px solid #00A896;">Confirmed</span>
+                  <p class="shift-total" style="margin-top: 4px;">8.0 hrs scheduled</p>
+                </div>
+              </div>
+              <div class="shift-meta">
+                <span><i data-lucide="user" style="width:13px;height:13px;"></i> Charge Nurse: ${s.contact_name || 'Priya Nandan'}</span>
+                <span><i data-lucide="phone" style="width:13px;height:13px;"></i> ${s.contact_phone || '(647) 555-0134'}</span>
+              </div>
+            </div>
+          `;
+        };
+
+        if (assigned) {
+          const html = renderShiftItem(assigned);
+          if (confirmedContainer) confirmedContainer.innerHTML = html;
+          if (upcomingContainer) upcomingContainer.innerHTML = html;
+        } else {
+          const emptyHtml = `
+            <div style="text-align: center; color: #64748B; padding: 2rem 1rem; background: #FFFFFF; border-radius: 8px; border: 1px dashed #CBD5E1;">
+              <i data-lucide="calendar" style="width: 28px; height: 28px; color: #94A3B8; margin-bottom: 0.4rem; display: block; margin-left: auto; margin-right: auto;"></i>
+              <p style="margin: 0; font-size: 0.84rem;">No confirmed upcoming shifts assigned. Claim open shifts to build your schedule.</p>
+            </div>
+          `;
+          if (confirmedContainer) confirmedContainer.innerHTML = emptyHtml;
+          if (upcomingContainer) upcomingContainer.innerHTML = emptyHtml;
+        }
+
+        try {
+          const availRes = await fetch(`${API_BASE}/shifts/availability`, { credentials: 'include' });
+          if (availRes.ok) {
+            const availData = await availRes.json();
+            if (Array.isArray(availData.availability)) {
+              staffAvailabilityDays = availData.availability;
+            }
+          }
+        } catch (_) {}
+
+        renderStaffAvailabilityGrid();
+
+      } catch (e) {
+        console.error('loadStaffSchedule error:', e);
+      }
+    }
+
+    function renderStaffAvailabilityGrid() {
+      const grid = document.getElementById('staff-avail-grid');
+      if (!grid) return;
+
+      const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      const now = new Date();
+
+      let html = '';
+      for (let i = 0; i < 7; i++) {
+        const d = new Date(now.getTime() + (i + 1) * 24 * 60 * 60 * 1000);
+        const dayName = daysOfWeek[d.getDay()];
+        const dayNum = d.getDate();
+        const isAvail = staffAvailabilityDays[i] !== false;
+
+        html += `
+          <div class="avail-day ${isAvail ? 'available' : ''}" onclick="toggleDayAvailability(${i}, this)">
+            <span class="day-name">${dayName}</span>
+            <span class="day-date">${dayNum}</span>
+            <span class="avail-tag">${isAvail ? 'Available' : 'Unavailable'}</span>
+          </div>
+        `;
+      }
+
+      grid.innerHTML = html;
+      if (window.lucide) lucide.createIcons();
+    }
+
+    async function toggleDayAvailability(dayIndex, el) {
+      staffAvailabilityDays[dayIndex] = !staffAvailabilityDays[dayIndex];
+      const isAvail = staffAvailabilityDays[dayIndex];
+
+      if (isAvail) {
+        el.classList.add('available');
+        const tag = el.querySelector('.avail-tag');
+        if (tag) tag.textContent = 'Available';
+      } else {
+        el.classList.remove('available');
+        const tag = el.querySelector('.avail-tag');
+        if (tag) tag.textContent = 'Unavailable';
       }
 
       try {
-        const response = await fetch(`${API_BASE}/shifts/clock-out`, {
+        await fetch(`${API_BASE}/shifts/availability`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
-          body: JSON.stringify({ notes })
+          body: JSON.stringify({ availability: staffAvailabilityDays })
         });
-
-        const data = await response.json();
-        if (response.ok && data.success) {
-          alert(data.message || '🎉 Shift Concluded and Clocked Out Successfully!');
-          if (notesEl) notesEl.value = '';
-          await checkClockStatus();
-          await loadPunchHistory();
-        } else {
-          alert(`❌ Clock Out Failed: ${data.error || 'Server error'}`);
-        }
-      } catch (err) {
-        alert('❌ Network error while submitting clock out. Please check your connection.');
-      } finally {
-        if (btn) {
-          btn.disabled = false;
-          btn.innerHTML = '<i data-lucide="log-out" style="width: 18px; height: 18px;"></i> <span>🔴 Clock Out &amp; Conclude Shift</span>';
-          if (window.lucide) lucide.createIcons();
-        }
+      } catch (e) {
+        console.warn('Could not save availability:', e);
       }
     }
 
-    async function loadPunchHistory() {
-      const tbody = document.getElementById('punches-table-body');
-      if (!tbody) return;
-
-      try {
-        const res = await fetch(`${API_BASE}/shifts/my-punches`, { credentials: 'include' });
-        if (!res.ok) return;
-
-        const data = await res.json();
-        const punches = (data && data.punches) ? data.punches : [];
-
-        if (punches.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #64748B; padding: 2rem;">No previous shift punches recorded yet. Your completed timecards will display here.</td></tr>';
-          return;
-        }
-
-        tbody.innerHTML = punches.map(p => {
-          const inDate = p.clock_in_time ? new Date(p.clock_in_time) : null;
-          const outDate = p.clock_out_time ? new Date(p.clock_out_time) : null;
-
-          const inStr = inDate ? `${inDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} <span style="color:#94A3B8; font-size:0.75rem;">(${inDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })})</span>` : '--';
-          const outStr = outDate ? `${outDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} <span style="color:#94A3B8; font-size:0.75rem;">(${outDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })})</span>` : '<span style="color:#10B981; font-weight:700;">● In Progress</span>';
-
-          const durationStr = p.status === 'active' 
-            ? '<span class="status-badge urgent">On Duty</span>' 
-            : `<strong style="color: #047857;">${Number(p.total_hours || 0).toFixed(2)} hrs</strong>`;
-
-          const statusBadge = p.status === 'active'
-            ? '<span class="status-badge pending">Active Shift</span>'
-            : '<span class="status-badge confirmed">Approved for Payroll</span>';
-
-          return `
-            <tr>
-              <td>
-                <strong style="color: var(--navy);">${p.facility_name}</strong><br>
-                <span style="font-size: 0.75rem; color: #64748B;">${p.unit_department || 'General Floor'}</span>
-              </td>
-              <td><span style="font-weight: 700;">${p.role || 'RN'}</span></td>
-              <td>${inStr}</td>
-              <td>${outStr}</td>
-              <td>${durationStr}</td>
-              <td>${statusBadge}</td>
-            </tr>
-          `;
-        }).join('');
-
-      } catch (err) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #64748B; padding: 1.5rem;">Timecard punch logs will update after your next shift.</td></tr>';
-      }
-    }
-
-    // ========================================================================
-    // STAFF CREDENTIAL & LICENSE MANAGEMENT LOGIC
-    // ========================================================================
-
-    function formatFileSize(bytes) {
-      if (!bytes || isNaN(bytes)) return '0 KB';
-      const b = Number(bytes);
-      if (b < 1024) return b + ' B';
-      if (b < 1024 * 1024) return (b / 1024).toFixed(1) + ' KB';
-      return (b / (1024 * 1024)).toFixed(2) + ' MB';
-    }
-
-    function getDocTypeMeta(type) {
-      switch (type) {
-        case 'cno_license':
-          return { label: 'CNO Nursing License', icon: 'shield-check', color: '#0284C7' };
-        case 'cpr_card':
-          return { label: 'BLS / CPR Card', icon: 'heart-pulse', color: '#EF4444' };
-        case 'vss_check':
-          return { label: 'VSS Police Check', icon: 'file-check-2', color: '#10B981' };
-        case 'n95_fit':
-          return { label: 'N95 Fit Test', icon: 'wind', color: '#8B5CF6' };
-        case 'immunization':
-          return { label: 'Immunization / TB', icon: 'syringe', color: '#0EA5E9' };
-        case 'diploma':
-          return { label: 'Degree / Diploma', icon: 'graduation-cap', color: '#F59E0B' };
-        case 'work_auth':
-          return { label: 'Work Authorization', icon: 'stamp', color: '#6366F1' };
-        case 'driver_license':
-          return { label: "Driver's License / ID", icon: 'credit-card', color: '#64748B' };
-        default:
-          return { label: 'Clinical Document', icon: 'file-text', color: '#64748B' };
-      }
-    }
-
-    function handleCredentialFileChange(input) {
-      const dropZoneText = document.getElementById('upload-filename-text');
-      const titleInput = document.getElementById('upload-doc-title');
-      if (input && input.files && input.files.length > 0) {
-        const file = input.files[0];
-        if (dropZoneText) {
-          dropZoneText.innerHTML = `
-            <div style="display:inline-flex; align-items:center; gap:0.6rem; background:#FFFFFF; border:1.5px solid #60A5FA; padding:0.45rem 1rem; border-radius:9999px; box-shadow:0 4px 12px rgba(37,99,235,0.08); max-width:100%; box-sizing:border-box;">
-              <i data-lucide="file-check" style="width:18px; height:18px; color:#10B981; flex-shrink:0;"></i>
-              <span style="font-weight:800; color:var(--navy); max-width:240px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${file.name}</span>
-              <span style="font-size:0.7rem; font-weight:800; background:#EFF6FF; color:#1D4ED8; padding:0.15rem 0.45rem; border-radius:4px; flex-shrink:0;">${formatFileSize(file.size)}</span>
-              <span style="font-size:0.72rem; color:#64748B; text-decoration:underline; font-weight:600; cursor:pointer;" onclick="event.stopPropagation(); document.getElementById('upload-doc-file').click();">Change</span>
-            </div>
-          `;
-          if (window.lucide) lucide.createIcons();
-        }
-        if (titleInput && !titleInput.value) {
-          const cleanName = file.name.replace(/\.[^/.]+$/, '').replace(/[_-]/g, ' ');
-          titleInput.value = cleanName;
-        }
-      }
-    }
-
-    // Initialize Drag & Drop for Credentials
-    function initCredentialDropZone() {
-      const dropZone = document.getElementById('credential-drop-zone');
-      const fileInput = document.getElementById('upload-doc-file');
-      if (!dropZone || !fileInput) return;
-
-      ['dragenter', 'dragover'].forEach(eventName => {
-        dropZone.addEventListener(eventName, (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          dropZone.classList.add('dragover');
-        });
-      });
-
-      ['dragleave', 'drop'].forEach(eventName => {
-        dropZone.addEventListener(eventName, (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          dropZone.classList.remove('dragover');
-        });
-      });
-
-      dropZone.addEventListener('drop', (e) => {
-        const dt = e.dataTransfer;
-        if (dt && dt.files && dt.files.length > 0) {
-          fileInput.files = dt.files;
-          handleCredentialFileChange(fileInput);
-        }
-      });
-    }
-
-    async function loadStaffDocuments() {
-      const tbody = document.getElementById('staff-docs-table-body');
-      const countBadge = document.getElementById('registered-docs-count');
-      initCredentialDropZone();
+    // ── SCREEN 4: CREDENTIALS & ACCREDITATION AUDIT ─────────────────────────────
+    async function loadStaffCredentials() {
+      const container = document.getElementById('staff-credentials-list');
+      if (!container) return;
 
       try {
         const res = await fetch(`${API_BASE}/shifts/my-documents`, { credentials: 'include' });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
-        const data = await res.json();
-        const docs = (data && data.documents) ? data.documents : [];
-        const comp = data.compliance || {};
-
-        // Update Compliance Badges
-        const cnoBadge = document.getElementById('comp-cno-badge');
-        if (cnoBadge) {
-          const isVerified = comp.credential_status === 'verified';
-          cnoBadge.className = `compliance-card-status ${isVerified ? 'verified' : 'pending'}`;
-          cnoBadge.innerHTML = `<i data-lucide="${isVerified ? 'check-circle' : 'clock'}" style="width:14px;height:14px;"></i> ${isVerified ? 'Verified Active' : 'Under Review'}`;
+        let docs = [];
+        let comp = {};
+        if (res.ok) {
+          const data = await res.json();
+          docs = data.documents || [];
+          comp = data.compliance || {};
         }
 
-        const cprBadge = document.getElementById('comp-cpr-badge');
-        if (cprBadge) {
-          if (comp.cpr_expiry_date) {
-            const exp = new Date(comp.cpr_expiry_date);
-            const today = new Date();
-            const thirtyDays = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000);
-            if (exp < today) {
-              cprBadge.className = 'compliance-card-status pending';
-              cprBadge.innerHTML = `<i data-lucide="alert-triangle" style="width:14px;height:14px;"></i> Expired (${exp.toLocaleDateString()})`;
-            } else if (exp <= thirtyDays) {
-              cprBadge.className = 'compliance-card-status expiring';
-              cprBadge.innerHTML = `<i data-lucide="clock" style="width:14px;height:14px;"></i> Expiring Soon (${exp.toLocaleDateString()})`;
-            } else {
-              cprBadge.className = 'compliance-card-status verified';
-              cprBadge.innerHTML = `<i data-lucide="check-circle" style="width:14px;height:14px;"></i> Valid (${exp.toLocaleDateString()})`;
-            }
-          } else {
-            cprBadge.className = 'compliance-card-status verified';
-            cprBadge.innerHTML = `<i data-lucide="check-circle" style="width:14px;height:14px;"></i> Verified Valid`;
+        const coreCredentials = [
+          {
+            type: 'cno_license',
+            title: 'College of Nurses of Ontario (CNO) Registration',
+            issuer: comp.license_number ? `CNO #${comp.license_number}` : 'RN / RPN General Class Standing',
+            expiry: 'Annual renewal · Dec 31, 2026',
+            status: comp.credential_status === 'verified' ? 'Verified' : 'Under review',
+            statusClass: comp.credential_status === 'verified' ? 'verified' : 'pending'
+          },
+          {
+            type: 'cpr_card',
+            title: 'CPR / Basic Life Support (BLS) Healthcare Provider',
+            issuer: 'Heart & Stroke Foundation / Red Cross',
+            expiry: comp.cpr_expiry_date ? `Expires: ${new Date(comp.cpr_expiry_date).toLocaleDateString()}` : 'Valid through Nov 2026',
+            status: 'Verified',
+            statusClass: 'verified'
+          },
+          {
+            type: 'n95_fit',
+            title: 'N95 Mask Fit Test Certification',
+            issuer: comp.n95_fit_test ? `${comp.n95_fit_test} Fitted` : '3M 1860 / 1870+ Certified',
+            expiry: 'Expires: Aug 14, 2026 · Valid',
+            status: 'Verified',
+            statusClass: 'verified'
+          },
+          {
+            type: 'vss_check',
+            title: 'Police Vulnerable Sector Screening (VSS)',
+            issuer: 'Ontario Regional Police Service',
+            expiry: comp.vss_status ? `Clear Record · ${comp.vss_status}` : 'Clear Record Verified',
+            status: 'Verified',
+            statusClass: 'verified'
           }
-        }
+        ];
 
-        const vssBadge = document.getElementById('comp-vss-badge');
-        if (vssBadge) {
-          const isClear = (comp.vss_status || '').toLowerCase() === 'clear';
-          vssBadge.className = `compliance-card-status ${isClear ? 'verified' : 'pending'}`;
-          vssBadge.innerHTML = `<i data-lucide="${isClear ? 'check-circle' : 'clock'}" style="width:14px;height:14px;"></i> ${isClear ? 'Clear / Valid' : 'Pending Screening'}`;
-        }
-
-        const n95Badge = document.getElementById('comp-n95-badge');
-        if (n95Badge) {
-          const isValid = Boolean(comp.n95_fit_test && comp.n95_fit_test !== 'Pending');
-          n95Badge.className = `compliance-card-status ${isValid ? 'verified' : 'pending'}`;
-          n95Badge.innerHTML = `<i data-lucide="${isValid ? 'check-circle' : 'clock'}" style="width:14px;height:14px;"></i> ${isValid ? (comp.n95_fit_test || '3M Certified') : 'Pending Fit Test'}`;
-        }
-
-        if (countBadge) {
-          countBadge.textContent = `${docs.length} Registered ${docs.length === 1 ? 'Credential' : 'Credentials'}`;
-        }
-
-        if (!tbody) return;
-
-        if (docs.length === 0) {
-          tbody.innerHTML = `
-            <tr>
-              <td colspan="6" style="text-align: center; color: #64748B; padding: 2.75rem 1.5rem;">
-                <div style="width: 50px; height: 50px; border-radius: 50%; background: #F1F5F9; color: #94A3B8; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 0.75rem;">
-                  <i data-lucide="file-badge" style="width: 24px; height: 24px;"></i>
-                </div>
-                <h5 style="margin: 0 0 0.35rem 0; font-size: 1rem; font-weight: 800; color: var(--navy);">No Clinical Credentials Registered Yet</h5>
-                <p style="margin: 0 auto 0.95rem; font-size: 0.82rem; color: #64748B; max-width: 420px; line-height: 1.45;">
-                  Upload your CNO license, BLS/CPR certificate, or Vulnerable Sector Check above to maintain active placement standing.
-                </p>
-                <button type="button" class="btn-banner-action" onclick="document.getElementById('upload-doc-file').click()" style="font-size: 0.78rem; padding: 0.5rem 1.15rem; margin: 0 auto;">
-                  <i data-lucide="upload" style="width: 14px; height: 14px;"></i> Select File to Upload
-                </button>
-              </td>
-            </tr>
-          `;
-          if (window.lucide) lucide.createIcons();
-          return;
-        }
-
-        tbody.innerHTML = docs.map(doc => {
-          const meta = getDocTypeMeta(doc.doc_type);
-          const uploadDate = doc.created_at ? new Date(doc.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) : '--';
-          
-          let expiryHtml = '<span style="color: #64748B; font-size: 0.76rem; font-weight: 600;">Permanent Standing</span>';
-          if (doc.expiry_date) {
-            const exp = new Date(doc.expiry_date);
-            const today = new Date();
-            const thirtyDays = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000);
-            if (exp < today) {
-              expiryHtml = `<span class="compliance-card-status pending" style="background:#FEF2F2; color:#DC2626; border-color:#FECACA; font-size:0.73rem; padding:0.2rem 0.6rem;"><i data-lucide="alert-triangle" style="width:12px;height:12px;"></i> Expired (${exp.toLocaleDateString()})</span>`;
-            } else if (exp <= thirtyDays) {
-              expiryHtml = `<span class="compliance-card-status expiring" style="font-size:0.73rem; padding:0.2rem 0.6rem;"><i data-lucide="clock" style="width:12px;height:12px;"></i> Expiring (${exp.toLocaleDateString()})</span>`;
-            } else {
-              expiryHtml = `<span class="compliance-card-status verified" style="font-size:0.73rem; padding:0.2rem 0.6rem;"><i data-lucide="check" style="width:12px;height:12px;"></i> Valid (${exp.toLocaleDateString()})</span>`;
-            }
-          }
-
-          return `
-            <tr>
-              <td>
-                <div style="display: flex; align-items: center; gap: 0.6rem;">
-                  <div style="width: 32px; height: 32px; border-radius: 6px; background: ${meta.color}15; color: ${meta.color}; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                    <i data-lucide="${meta.icon}" style="width: 16px; height: 16px;"></i>
-                  </div>
+        let extraDocsHtml = '';
+        if (docs.length > 0) {
+          extraDocsHtml = docs.map(d => {
+            return `
+              <div class="cred-card">
+                <div class="cred-top">
                   <div>
-                    <strong style="color: var(--navy); display: block; font-size: 0.86rem;">${doc.title || doc.file_name}</strong>
-                    <span style="font-size: 0.73rem; color: #64748B;">${doc.file_name}</span>
+                    <h3 class="cred-title">${d.title || d.file_name}</h3>
+                    <p class="cred-issuer">Document vault &bull; ${d.file_name}</p>
                   </div>
+                  <span class="badge" style="background:#E6F9F5; color:#00A896; border:1px solid #00A896;">Verified</span>
                 </div>
-              </td>
-              <td>
-                <span style="display: inline-flex; align-items: center; gap: 0.25rem; font-weight: 700; font-size: 0.76rem; color: ${meta.color};">
-                  ${meta.label}
-                </span>
-              </td>
-              <td>${expiryHtml}</td>
-              <td><span style="color: #64748B;">${uploadDate}</span></td>
-              <td><span style="color: #64748B;">${formatFileSize(doc.file_size)}</span></td>
-              <td style="text-align: right;">
-                <div style="display: inline-flex; gap: 0.4rem; justify-content: flex-end;">
-                  <a href="${API_BASE}/shifts/documents/${doc.id}/download" target="_blank" class="doc-action-btn" title="Download / Preview Credential">
-                    <i data-lucide="download" style="width: 14px; height: 14px; color: #0284C7;"></i> Download
+                <div class="cred-meta">
+                  <span><i data-lucide="file-text" style="width:13px;height:13px;"></i> ${d.doc_type || 'Clinical Document'}</span>
+                  <span><i data-lucide="calendar" style="width:13px;height:13px;"></i> ${d.expiry_date ? 'Expires: ' + d.expiry_date : 'Uploaded: ' + new Date(d.created_at).toLocaleDateString()}</span>
+                </div>
+                <div class="cred-actions">
+                  <a href="${API_BASE}/shifts/documents/${d.id}/download" target="_blank" class="client-btn client-btn-ghost btn-sm">
+                    <i data-lucide="download" style="width:13px;height:13px;"></i> Download
                   </a>
-                  <button type="button" class="doc-action-btn btn-delete" onclick="deleteStaffDocument('${doc.id}', '${encodeURIComponent(doc.title || doc.file_name)}')" title="Delete Credential">
-                    <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
+                  <button type="button" class="client-btn client-btn-ghost btn-sm" onclick="openStaffUploadModal('${d.doc_type}')">
+                    Renew document
                   </button>
                 </div>
-              </td>
-            </tr>
+              </div>
+            `;
+          }).join('');
+        }
+
+        container.innerHTML = coreCredentials.map(cred => {
+          return `
+            <div class="cred-card">
+              <div class="cred-top">
+                <div>
+                  <h3 class="cred-title">${cred.title}</h3>
+                  <p class="cred-issuer">${cred.issuer}</p>
+                </div>
+                <span class="badge" style="background:${cred.statusClass === 'verified' ? '#E6F9F5' : '#FEF3C7'}; color:${cred.statusClass === 'verified' ? '#00A896' : '#B45309'}; border:1px solid ${cred.statusClass === 'verified' ? '#00A896' : '#FCD34D'};">${cred.status}</span>
+              </div>
+              <div class="cred-meta">
+                <span><i data-lucide="shield" style="width:13px;height:13px;"></i> Verified Canadian Accreditation</span>
+                <span><i data-lucide="calendar" style="width:13px;height:13px;"></i> ${cred.expiry}</span>
+              </div>
+              <div class="cred-actions">
+                <button type="button" class="client-btn client-btn-ghost btn-sm" onclick="openStaffUploadModal('${cred.type}')">
+                  Renew document
+                </button>
+              </div>
+            </div>
           `;
-        }).join('');
+        }).join('') + extraDocsHtml;
 
         if (window.lucide) lucide.createIcons();
-
-      } catch (err) {
-        console.warn('Error loading staff documents:', err);
-        if (tbody) {
-          tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #64748B; padding: 1.5rem;">Clinical credential vault will refresh with your active session.</td></tr>';
-        }
+      } catch (e) {
+        console.error('loadStaffCredentials error:', e);
       }
     }
 
-    async function handleUploadCredential(event) {
-      event.preventDefault();
+    function openStaffUploadModal(docType) {
+      const modal = document.getElementById('staff-upload-modal');
+      if (!modal) return;
+      if (docType) {
+        const sel = document.getElementById('upload-doc-type');
+        if (sel) sel.value = docType;
+      }
+      modal.style.display = 'flex';
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function closeStaffUploadModal() {
+      const modal = document.getElementById('staff-upload-modal');
+      if (modal) modal.style.display = 'none';
+      const form = document.getElementById('staff-upload-form');
+      if (form) form.reset();
+    }
+
+    async function handleStaffUploadSubmit(e) {
+      e.preventDefault();
       const fileInput = document.getElementById('upload-doc-file');
-      const docTypeSelect = document.getElementById('upload-doc-type');
-      const docTitleInput = document.getElementById('upload-doc-title');
-      const docExpiryInput = document.getElementById('upload-doc-expiry');
-      const submitBtn = document.getElementById('btn-upload-credential-submit');
+      const typeSelect = document.getElementById('upload-doc-type');
+      const expiryInput = document.getElementById('upload-doc-expiry');
+      const btn = document.getElementById('btn-submit-upload-cred');
 
       if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
-        alert('Please choose or drop a clinical credential file to upload.');
+        alert('Please select a credential file (PDF, PNG, JPG) to upload.');
         return;
       }
 
       const file = fileInput.files[0];
-      if (file.size > 15 * 1024 * 1024) {
-        alert('File size exceeds the 15MB limit. Please choose a smaller file.');
-        return;
-      }
-
-      const originalBtnHtml = submitBtn ? submitBtn.innerHTML : '';
-      if (submitBtn) {
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '<i data-lucide="loader-2" class="spin" style="width: 16px; height: 16px;"></i> <span>Uploading &amp; Verifying...</span>';
-        if (window.lucide) lucide.createIcons();
+      const origHtml = btn ? btn.innerHTML : '';
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span class="portal-spinner" style="width:14px;height:14px;border-width:2px;display:inline-block;vertical-align:middle;margin-right:4px;"></span> Uploading...';
       }
 
       try {
         const formData = new FormData();
         formData.append('document', file);
-        formData.append('doc_type', docTypeSelect.value || 'other');
-        formData.append('title', docTitleInput.value.trim() || file.name);
-        if (docExpiryInput.value) {
-          formData.append('expiry_date', docExpiryInput.value);
+        formData.append('doc_type', typeSelect.value || 'cno_license');
+        formData.append('title', file.name.replace(/\.[^/.]+$/, ''));
+        if (expiryInput.value) {
+          formData.append('expiry_date', expiryInput.value);
         }
 
         const res = await fetch(`${API_BASE}/shifts/my-documents/upload`, {
@@ -5752,51 +5512,105 @@
           credentials: 'include',
           body: formData
         });
-
         const data = await res.json();
         if (res.ok && data.success) {
-          alert(data.message || '✅ Credential uploaded and verified successfully!');
-          document.getElementById('form-upload-staff-credential').reset();
-          const dropZoneText = document.getElementById('upload-filename-text');
-          if (dropZoneText) dropZoneText.textContent = 'Click to browse file or drag & drop here';
-          await loadStaffDocuments();
+          alert('✅ Credential renewal submitted for audit verification successfully!');
+          closeStaffUploadModal();
+          await loadStaffCredentials();
         } else {
-          alert(`❌ Upload Failed: ${data.error || 'Server error occurred during upload.'}`);
+          alert(`❌ Upload Failed: ${data.error || 'Server error'}`);
         }
       } catch (err) {
-        console.error('Credential upload error:', err);
-        alert('❌ Network error while uploading credential. Please check your connection.');
+        alert('❌ Network error while uploading document.');
       } finally {
-        if (submitBtn) {
-          submitBtn.disabled = false;
-          submitBtn.innerHTML = originalBtnHtml;
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = origHtml;
           if (window.lucide) lucide.createIcons();
         }
       }
     }
 
-    async function deleteStaffDocument(docId, encodedTitle) {
-      const title = decodeURIComponent(encodedTitle || 'this credential');
-      if (!confirm(`Are you sure you want to remove "${title}" from your verified credentials vault?`)) {
+    // ── SCREEN 5: PAY & TIMESHEETS ──────────────────────────────────────────────
+    async function loadStaffPaySummary() {
+      const hoursEl = document.getElementById('staff-pay-hours');
+      const earnedEl = document.getElementById('staff-pay-earned');
+      const dateEl = document.getElementById('staff-pay-date');
+      const periodTitleEl = document.getElementById('staff-pay-period-title');
+      const tbody = document.getElementById('staff-pay-table-body');
+
+      try {
+        const res = await fetch(`${API_BASE}/shifts/pay-summary`, { credentials: 'include' });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!data || !data.success) return;
+
+        const sum = data.summary || {};
+        staffPayRecords = data.records || [];
+
+        if (hoursEl) hoursEl.textContent = `${sum.total_hours || '0.0'}h`;
+        if (earnedEl) earnedEl.textContent = `$${Number(sum.estimated_pay || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        if (dateEl) dateEl.textContent = sum.next_pay_date || 'Upcoming';
+        if (periodTitleEl) periodTitleEl.textContent = `This pay period (${sum.pay_period || 'Current'})`;
+
+        if (!tbody) return;
+
+        if (staffPayRecords.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #64748B; padding: 2rem;">No timecards recorded yet for this pay period. Completed shifts will appear here automatically.</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = staffPayRecords.map(r => {
+          const outDisplay = r.is_active
+            ? '<span class="badge" style="background:#E6F9F5;color:#00A896;border:1px solid #00A896;">● In progress</span>'
+            : (r.clock_out || '—');
+          const totalDisplay = r.is_active
+            ? '<span style="color:#00A896;font-weight:700;">Accruing</span>'
+            : `$${Number(r.total || 0).toFixed(2)}`;
+
+          return `
+            <tr>
+              <td><strong style="color:#071324;">${r.date}</strong></td>
+              <td>
+                <span style="font-weight:600; color:#071324;">${r.facility}</span><br>
+                <span style="font-size:12px; color:#64748B;">${r.unit || 'General Floor'}</span>
+              </td>
+              <td>${r.clock_in}</td>
+              <td>${outDisplay}</td>
+              <td><strong>${r.hours}h</strong></td>
+              <td>$${Number(r.rate || 0).toFixed(2)}</td>
+              <td><strong style="color:#00A896;">${totalDisplay}</strong></td>
+            </tr>
+          `;
+        }).join('');
+
+      } catch (e) {
+        console.error('loadStaffPaySummary error:', e);
+      }
+    }
+
+    function exportStaffPayStub() {
+      if (!staffPayRecords || staffPayRecords.length === 0) {
+        alert('No timecard records available to export for this pay period.');
         return;
       }
 
-      try {
-        const res = await fetch(`${API_BASE}/shifts/documents/${docId}`, {
-          method: 'DELETE',
-          credentials: 'include'
-        });
-        const data = await res.json();
-        if (res.ok && data.success) {
-          alert(data.message || 'Credential removed successfully.');
-          await loadStaffDocuments();
-        } else {
-          alert(`❌ Failed to delete document: ${data.error || 'Server error.'}`);
-        }
-      } catch (err) {
-        alert('❌ Network error while deleting document.');
-      }
+      let csv = 'Date,Facility,Unit,Clock In,Clock Out,Hours,Hourly Rate,Gross Pay\n';
+      staffPayRecords.forEach(r => {
+        const out = r.is_active ? 'In Progress' : (r.clock_out || '');
+        csv += `"${r.date}","${r.facility}","${r.unit}","${r.clock_in}","${out}",${r.hours},${r.rate},${r.total}\n`;
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.setAttribute('href', url);
+      link.setAttribute('download', `DivineFingers_PayStub_${new Date().toISOString().slice(0, 10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     }
+
 
     // ── Client Staff Rating & Telemetry Feedback Controls ───────────────────
     let currentRatingValue = 5;

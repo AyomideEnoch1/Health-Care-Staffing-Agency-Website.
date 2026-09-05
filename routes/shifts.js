@@ -727,4 +727,270 @@ router.delete('/documents/:docId', async (req, res, next) => {
   }
 });
 
+// ============================================================================
+// STAFF ENTERPRISE PORTAL WORKFLOW ENDPOINTS
+// ============================================================================
+
+// In-memory store for staff availability patterns
+const staffAvailabilityStore = {};
+
+/**
+ * POST /api/shifts/:id/claim
+ * Healthcare worker claims an open shift request
+ */
+router.post('/:id/claim', async (req, res, next) => {
+  try {
+    const user = getAuthUser(req);
+    if (!user) {
+      return res.status(401).json({ success: false, error: 'Authentication required. Please sign in.' });
+    }
+
+    const { id } = req.params;
+    const [rows] = await pool.query(
+      `SELECT id, request_code, facility_name, unit_department, role_requested, shift_type, status, assigned_staff_id
+       FROM staffing_requests WHERE id = ?`,
+      [id]
+    );
+
+    if (!rows || rows.length === 0) {
+      return res.status(404).json({ success: false, error: 'Shift request not found.' });
+    }
+
+    const shift = rows[0];
+    if (shift.status === 'completed' || shift.status === 'cancelled') {
+      return res.status(400).json({ success: false, error: 'This shift is no longer open for claiming.' });
+    }
+
+    // Lookup staff roster ID if exists
+    let rosterId = user.id;
+    try {
+      const [rRows] = await pool.query(
+        'SELECT id, name, staff_code FROM staff_roster WHERE id = ? OR email = ? LIMIT 1',
+        [user.id, user.email || '']
+      );
+      if (rRows && rRows.length > 0) rosterId = rRows[0].id;
+    } catch (e) {}
+
+    // Assign staff and update status to confirmed
+    await pool.query(
+      `UPDATE staffing_requests SET assigned_staff_id = ?, status = 'confirmed' WHERE id = ?`,
+      [rosterId, id]
+    );
+
+    // Audit log
+    await pool.query(
+      `INSERT INTO audit_logs (id, actor_name, action, target_entity, target_id, details, severity, ip_address)
+       VALUES (?, ?, 'SHIFT_CLAIMED', 'staffing_requests', ?, ?, 'info', ?)`,
+      [
+        crypto.randomUUID(),
+        user.full_name || 'Staff Member',
+        id,
+        `Staff member claimed shift #${shift.request_code || id} at ${shift.facility_name} (${shift.unit_department})`,
+        req.ip
+      ]
+    ).catch(() => {});
+
+    adminEvents.emit('status:changed', {
+      entity: 'staffing_requests',
+      id: shift.id,
+      assigned_staff_id: rosterId,
+      staff_name: user.full_name,
+      status: 'confirmed'
+    });
+
+    res.json({
+      success: true,
+      message: `Shift #${shift.request_code || id} claimed successfully! Awaiting facility dispatch confirmation.`,
+      shift_id: id
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+/**
+ * POST /api/shifts/running-late
+ * Caregiver notifies dispatch and facility that they are running late
+ */
+router.post('/running-late', async (req, res, next) => {
+  try {
+    const user = getAuthUser(req);
+    if (!user) {
+      return res.status(401).json({ success: false, error: 'Authentication required.' });
+    }
+
+    const { minutes_late = 15, shift_id = null, message = '' } = req.body || {};
+    const staffName = user.full_name || 'Staff Member';
+
+    // Audit log notification
+    await pool.query(
+      `INSERT INTO audit_logs (id, actor_name, action, target_entity, target_id, details, severity, ip_address)
+       VALUES (?, ?, 'STAFF_RUNNING_LATE', 'shift_punches', ?, ?, 'warning', ?)`,
+      [
+        crypto.randomUUID(),
+        staffName,
+        shift_id || user.id,
+        `Running late alert: ${staffName} notified dispatch of an estimated ${minutes_late}-minute delay. ${message}`,
+        req.ip
+      ]
+    ).catch(() => {});
+
+    adminEvents.emit('status:changed', {
+      entity: 'staff_alerts',
+      action: 'running_late',
+      staff_id: user.id,
+      staff_name: staffName,
+      minutes_late,
+      timestamp: new Date().toISOString()
+    });
+
+    res.json({
+      success: true,
+      message: `Dispatch and the charge nurse have been notified that you are running approximately ${minutes_late} minutes behind schedule.`
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+/**
+ * GET /api/shifts/pay-summary
+ * Get current pay period metrics, estimated gross pay, and itemized timecard ledger
+ */
+router.get('/pay-summary', async (req, res, next) => {
+  try {
+    const user = getAuthUser(req);
+    if (!user) {
+      return res.status(401).json({ success: false, error: 'Authentication required.' });
+    }
+
+    // Determine current bi-weekly or semi-monthly pay cycle
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth();
+    const day = now.getDate();
+
+    let startDate, endDate, nextPayDate;
+    if (day <= 15) {
+      startDate = new Date(year, month, 1);
+      endDate = new Date(year, month, 15, 23, 59, 59);
+      nextPayDate = new Date(year, month, 20);
+    } else {
+      startDate = new Date(year, month, 16);
+      endDate = new Date(year, month + 1, 0, 23, 59, 59);
+      nextPayDate = new Date(year, month + 1, 5);
+    }
+
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const periodLabel = `${monthNames[startDate.getMonth()]} ${startDate.getDate()}–${endDate.getDate()}`;
+    const nextPayLabel = `${monthNames[nextPayDate.getMonth()]} ${nextPayDate.getDate()}`;
+
+    // Base hourly rate based on clinical role
+    const role = (user.role || '').toUpperCase();
+    let hourlyRate = 48.50; // Default RN
+    if (role.includes('PSW')) hourlyRate = 28.50;
+    else if (role.includes('RPN') || role.includes('LPN')) hourlyRate = 38.00;
+    else if (role.includes('TRAVEL')) hourlyRate = 62.00;
+    else hourlyRate = 48.50;
+
+    // Fetch shift punches in this period
+    const [punches] = await pool.query(
+      `SELECT id, shift_id, facility_name, unit_department, role, clock_in_time, clock_out_time, total_hours, status, notes
+       FROM shift_punches
+       WHERE (staff_id = ? OR staff_email = ?)
+       ORDER BY clock_in_time DESC
+       LIMIT 30`,
+      [user.id, user.email || '']
+    );
+
+    let periodHours = 0;
+    let periodEarned = 0;
+
+    const timecards = (punches || []).map(p => {
+      const inDate = new Date(p.clock_in_time);
+      const outDate = p.clock_out_time ? new Date(p.clock_out_time) : null;
+      let hours = Number(p.total_hours) || 0;
+      let inProgress = false;
+
+      if (!outDate && p.status === 'active') {
+        inProgress = true;
+        const elapsedSec = Math.max(0, Math.floor((Date.now() - inDate.getTime()) / 1000));
+        hours = Number((elapsedSec / 3600).toFixed(2));
+      }
+
+      const total = Number((hours * hourlyRate).toFixed(2));
+      periodHours += hours;
+      periodEarned += total;
+
+      return {
+        id: p.id,
+        date: `${monthNames[inDate.getMonth()]} ${inDate.getDate()}`,
+        date_label: `${monthNames[inDate.getMonth()]} ${inDate.getDate()}`,
+        facility: p.facility_name,
+        unit: p.unit_department,
+        clock_in: inDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        clock_out: outDate ? outDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '—',
+        hours: inProgress ? `${hours.toFixed(1)} (in progress)` : hours.toFixed(1),
+        raw_hours: hours,
+        rate: `$${hourlyRate.toFixed(2)}/hr`,
+        raw_rate: hourlyRate,
+        total: `$${total.toFixed(2)}`,
+        raw_total: total,
+        is_active: inProgress,
+        status: p.status
+      };
+    });
+
+    const summary = {
+      pay_period: periodLabel,
+      next_pay_date: nextPayLabel,
+      hourly_rate: hourlyRate,
+      total_hours: Number(periodHours.toFixed(1)),
+      estimated_pay: Number(periodEarned.toFixed(2))
+    };
+
+    res.json({
+      success: true,
+      period_label: periodLabel,
+      next_pay_date: nextPayLabel,
+      hourly_rate: hourlyRate,
+      hours_this_period: Number(periodHours.toFixed(1)),
+      estimated_pay: Number(periodEarned.toFixed(2)),
+      timecards,
+      summary,
+      records: timecards
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+/**
+ * GET /api/shifts/availability
+ * Retrieve 7-day availability preference
+ */
+router.get('/availability', (req, res) => {
+  const user = getAuthUser(req);
+  if (!user) return res.status(401).json({ success: false, error: 'Authentication required.' });
+  const key = user.id || user.email;
+  const avail = staffAvailabilityStore[key] || [0, 1, 0, 1, 1, 0, 0];
+  res.json({ success: true, availability: avail });
+});
+
+/**
+ * POST /api/shifts/availability
+ * Save 7-day availability preference
+ */
+router.post('/availability', (req, res) => {
+  const user = getAuthUser(req);
+  if (!user) return res.status(401).json({ success: false, error: 'Authentication required.' });
+  const { availability } = req.body || {};
+  if (Array.isArray(availability)) {
+    const key = user.id || user.email;
+    staffAvailabilityStore[key] = availability;
+  }
+  res.json({ success: true, message: 'Availability saved successfully.' });
+});
+
 module.exports = router;
+
