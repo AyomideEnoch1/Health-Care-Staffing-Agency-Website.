@@ -1931,6 +1931,681 @@
         font-size: 0.72rem;
       }
     }
+
+    /* ==========================================================================
+       ENTERPRISE CLIENT WORKSPACE STYLES (CONCEPT LAYOUT)
+       ========================================================================== */
+    .client-app {
+      display: flex;
+      min-height: 100vh;
+      background: #F8FAFC;
+      color: #0F172A;
+      font-family: 'Public Sans', -apple-system, sans-serif;
+    }
+
+    /* Sidebar */
+    .client-sidebar {
+      width: 256px;
+      flex-shrink: 0;
+      background: #071324;
+      color: #94A3B8;
+      display: flex;
+      flex-direction: column;
+      padding: 28px 20px;
+      border-right: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .client-brand {
+      margin-bottom: 32px;
+    }
+    .client-brand-mark {
+      font-family: var(--font-heading);
+      font-weight: 800;
+      font-size: 1.15rem;
+      color: #FFFFFF;
+      letter-spacing: -0.02em;
+    }
+    .client-brand-sub {
+      font-size: 0.78rem;
+      color: #00F5D4;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin: 2px 0 0 0;
+    }
+    .client-nav-group-label {
+      font-size: 11px;
+      font-weight: 800;
+      color: #64748B;
+      letter-spacing: 0.08em;
+      margin: 22px 0 8px 8px;
+    }
+    .client-nav-group-label:first-of-type {
+      margin-top: 0;
+    }
+    .client-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .client-nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 6px;
+      background: none;
+      border: none;
+      color: #94A3B8;
+      text-align: left;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.15s ease;
+      width: 100%;
+    }
+    .client-nav-item:hover {
+      background: rgba(255, 255, 255, 0.06);
+      color: #F8FAFC;
+    }
+    .client-nav-item.active {
+      background: rgba(0, 245, 212, 0.12);
+      color: #00F5D4;
+      font-weight: 700;
+    }
+    .client-nav-item .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #E11D48;
+      margin-left: auto;
+      flex-shrink: 0;
+    }
+    .client-sidebar-footer {
+      margin-top: auto;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .client-facility-name {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #FFFFFF;
+      margin: 0 0 2px 0;
+      line-height: 1.25;
+    }
+    .client-facility-unit {
+      font-size: 12px;
+      color: #64748B;
+      margin: 0;
+    }
+    .client-switch-facility {
+      font-size: 12px;
+      color: #00F5D4;
+      text-decoration: underline;
+      background: none;
+      border: none;
+      padding: 8px 0 0 0;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    /* Main Screens */
+    .client-main {
+      flex: 1;
+      min-width: 0;
+      padding: 36px 44px 60px 44px;
+      background: #F8FAFC;
+    }
+    .client-screen {
+      display: none;
+    }
+    .client-screen.active {
+      display: block;
+      max-width: 960px;
+      animation: fadeInScreen 0.2s ease-out;
+    }
+    @keyframes fadeInScreen {
+      from { opacity: 0; transform: translateY(3px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .client-page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .client-greeting-eyebrow {
+      font-size: 13px;
+      color: #64748B;
+      margin: 0 0 4px 0;
+      font-weight: 600;
+    }
+    .client-greeting {
+      font-family: var(--font-heading);
+      font-weight: 800;
+      font-size: 26px;
+      margin: 0;
+      color: #071324;
+      letter-spacing: -0.02em;
+    }
+    .client-header-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .client-btn {
+      font-family: inherit;
+      font-size: 13.5px;
+      font-weight: 700;
+      padding: 9px 16px;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      transition: all 0.15s ease;
+    }
+    .client-btn-primary {
+      background: #0284C7;
+      color: #FFFFFF;
+      box-shadow: 0 2px 8px rgba(2, 132, 199, 0.25);
+    }
+    .client-btn-primary:hover {
+      background: #0369A1;
+    }
+    .client-btn-urgent {
+      background: #E11D48;
+      color: #FFFFFF;
+      box-shadow: 0 2px 8px rgba(225, 29, 72, 0.3);
+    }
+    .client-btn-urgent:hover {
+      background: #BE123C;
+    }
+    .client-btn-ghost {
+      background: #FFFFFF;
+      color: #0F172A;
+      border-color: #CBD5E1;
+    }
+    .client-btn-ghost:hover {
+      background: #F1F5F9;
+      border-color: #94A3B8;
+    }
+    .client-btn-sm {
+      padding: 5px 10px;
+      font-size: 12.5px;
+    }
+
+    /* Summary Strip */
+    .summary-strip {
+      display: flex;
+      border: 1px solid #E2E8F0;
+      border-radius: 8px;
+      background: #FFFFFF;
+      margin-bottom: 32px;
+      overflow: hidden;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.02);
+    }
+    .summary-stat {
+      flex: 1;
+      padding: 16px 20px;
+      border-right: 1px solid #E2E8F0;
+    }
+    .summary-stat:last-child {
+      border-right: none;
+    }
+    .summary-num {
+      font-family: var(--font-heading);
+      font-size: 26px;
+      font-weight: 800;
+      display: block;
+      line-height: 1.1;
+      color: #071324;
+    }
+    .summary-label {
+      font-size: 12.5px;
+      color: #64748B;
+      margin-top: 4px;
+      display: block;
+      font-weight: 600;
+    }
+    .summary-num.urgent-num {
+      color: #E11D48;
+    }
+
+    .client-section-title {
+      font-family: var(--font-heading);
+      font-weight: 800;
+      font-size: 17px;
+      margin: 0 0 16px 0;
+      color: #071324;
+    }
+    .client-section {
+      margin-bottom: 36px;
+    }
+
+    /* Stepper & Pipeline */
+    .request-card {
+      border: 1px solid #E2E8F0;
+      border-radius: 8px;
+      background: #FFFFFF;
+      padding: 18px 20px;
+      margin-bottom: 14px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.02);
+    }
+    .request-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .request-id {
+      font-size: 12.5px;
+      color: #64748B;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      font-family: monospace;
+    }
+    .request-role {
+      font-size: 15.5px;
+      font-weight: 700;
+      margin: 2px 0 0 0;
+      color: #0F172A;
+    }
+    .badge {
+      font-size: 11px;
+      font-weight: 800;
+      padding: 3px 9px;
+      border-radius: 100px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+    }
+    .badge-urgent { background: #FFF1F2; color: #E11D48; border: 1px solid #FDA4AF; }
+    .badge-routine { background: #F1F5F9; color: #475569; border: 1px solid #E2E8F0; }
+    .badge-active { background: #ECFDF5; color: #059669; border: 1px solid #A7F3D0; }
+
+    .stepper {
+      display: flex;
+      align-items: center;
+      margin: 18px 0;
+    }
+    .step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+      position: relative;
+    }
+    .step-circle {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 2px solid #CBD5E1;
+      background: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 800;
+      color: #64748B;
+      z-index: 1;
+    }
+    .step.done .step-circle {
+      background: #00A896;
+      border-color: #00A896;
+      color: #FFFFFF;
+    }
+    .step.current .step-circle {
+      border-color: #0284C7;
+      color: #0284C7;
+      box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.15);
+      font-weight: 900;
+    }
+    .step-label {
+      font-size: 11.5px;
+      color: #64748B;
+      margin-top: 6px;
+      text-align: center;
+      font-weight: 600;
+    }
+    .step.done .step-label,
+    .step.current .step-label {
+      color: #0F172A;
+      font-weight: 700;
+    }
+    .step-line {
+      position: absolute;
+      top: 12px;
+      left: -50%;
+      width: 100%;
+      height: 2px;
+      background: #E2E8F0;
+      z-index: 0;
+    }
+    .step.done .step-line {
+      background: #00A896;
+    }
+    .step:first-child .step-line {
+      display: none;
+    }
+
+    .caregiver-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid #E2E8F0;
+    }
+    .caregiver-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: rgba(0, 168, 150, 0.12);
+      color: #00A896;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 13px;
+      flex-shrink: 0;
+      border: 1px solid rgba(0, 168, 150, 0.25);
+    }
+    .caregiver-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .caregiver-name {
+      font-weight: 700;
+      font-size: 14.5px;
+      margin: 0;
+      color: #0F172A;
+    }
+    .caregiver-meta {
+      font-size: 12.5px;
+      color: #64748B;
+      margin: 2px 0 0 0;
+    }
+    .live-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 800;
+      color: #059669;
+      background: #ECFDF5;
+      padding: 4px 10px;
+      border-radius: 100px;
+      border: 1px solid #A7F3D0;
+    }
+    .live-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #10B981;
+      animation: clientPulse 1.8s ease-in-out infinite;
+    }
+    @keyframes clientPulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.35; }
+    }
+
+    .completed-actions {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid #E2E8F0;
+      flex-wrap: wrap;
+    }
+
+    /* Activity Feed */
+    .activity-item {
+      display: flex;
+      gap: 14px;
+      padding: 11px 0;
+      border-bottom: 1px solid #E2E8F0;
+      align-items: flex-start;
+    }
+    .activity-item:last-child {
+      border-bottom: none;
+    }
+    .activity-time {
+      font-size: 12px;
+      color: #64748B;
+      width: 60px;
+      flex-shrink: 0;
+      font-weight: 600;
+      padding-top: 1px;
+    }
+    .activity-text {
+      font-size: 13.5px;
+      color: #1E293B;
+    }
+    .activity-text b {
+      font-weight: 700;
+      color: #0F172A;
+    }
+
+    /* Form Grid */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px 20px;
+      max-width: 680px;
+    }
+    .form-grid .full {
+      grid-column: 1 / -1;
+    }
+    .form-grid label {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: #0F172A;
+    }
+    .form-grid input[type=text],
+    .form-grid input[type=date],
+    .form-grid select,
+    .form-grid textarea {
+      width: 100%;
+      padding: 9px 12px;
+      border: 1px solid #CBD5E1;
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 14px;
+      background: #FFFFFF;
+      color: #0F172A;
+      box-sizing: border-box;
+    }
+    .form-grid textarea {
+      resize: vertical;
+      min-height: 72px;
+    }
+    .urgency-options {
+      display: flex;
+      gap: 8px;
+    }
+    .urgency-opt {
+      flex: 1;
+      border: 1.5px solid #CBD5E1;
+      border-radius: 6px;
+      padding: 10px 12px;
+      cursor: pointer;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 600;
+      color: #64748B;
+      transition: all 0.15s ease;
+      background: #FFFFFF;
+    }
+    .urgency-opt.selected {
+      border-color: #0284C7;
+      color: #0284C7;
+      background: #F0F9FF;
+    }
+    .urgency-opt.selected.is-emergency {
+      border-color: #E11D48;
+      color: #E11D48;
+      background: #FFF1F2;
+    }
+    .recurring-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 4px;
+    }
+    .recurring-row input {
+      width: auto !important;
+    }
+    .recurring-row label {
+      margin: 0;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .recurring-detail {
+      margin-top: 10px;
+      display: none;
+    }
+    .recurring-detail.shown {
+      display: block;
+    }
+    .form-actions {
+      margin-top: 12px;
+      display: flex;
+      gap: 10px;
+    }
+    .form-note {
+      font-size: 12.5px;
+      color: #64748B;
+      margin-top: 16px;
+      max-width: 680px;
+      line-height: 1.45;
+    }
+
+    /* Tables */
+    .client-main table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.02);
+    }
+    .client-main th {
+      text-align: left;
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #64748B;
+      font-weight: 800;
+      padding: 12px 16px;
+      border-bottom: 1px solid #E2E8F0;
+      background: #F8FAFC;
+    }
+    .client-main td {
+      padding: 12px 16px;
+      font-size: 13.5px;
+      border-bottom: 1px solid #E2E8F0;
+      vertical-align: middle;
+      color: #1E293B;
+    }
+    .client-main tr:last-child td {
+      border-bottom: none;
+    }
+    .cred-badge {
+      font-size: 11.5px;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 100px;
+      display: inline-block;
+    }
+    .cred-verified { background: #ECFDF5; color: #059669; border: 1px solid #A7F3D0; }
+    .cred-expiring { background: #FEF3C7; color: #B45309; border: 1px solid #FCD34D; }
+    .cred-expired { background: #FFF1F2; color: #E11D48; border: 1px solid #FDA4AF; }
+    .doc-link {
+      font-size: 13px;
+      color: #0284C7;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .doc-link:hover {
+      text-decoration: underline;
+    }
+    .table-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+    .billing-total-row td {
+      font-weight: 800;
+      background: #F8FAFC;
+      color: #071324;
+    }
+
+    /* In-Card Rating Panel */
+    .rating-panel {
+      border: 1px solid #E2E8F0;
+      border-radius: 8px;
+      background: #F8FAFC;
+      padding: 18px;
+      margin-top: 14px;
+      max-width: 540px;
+    }
+    .stars {
+      display: flex;
+      gap: 6px;
+      margin: 8px 0 14px 0;
+    }
+    .star {
+      font-size: 28px;
+      color: #CBD5E1;
+      cursor: pointer;
+      background: none;
+      border: none;
+      line-height: 1;
+      padding: 0;
+      transition: all 0.15s ease;
+    }
+    .star.on {
+      color: #F59E0B;
+    }
+    .private-note-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 10px;
+    }
+    .private-tag {
+      font-size: 10.5px;
+      font-weight: 800;
+      color: #64748B;
+      background: #E2E8F0;
+      padding: 2px 7px;
+      border-radius: 100px;
+      text-transform: none;
+    }
+
+    @media (max-width: 860px) {
+      .client-app { flex-direction: column; }
+      .client-sidebar { width: 100%; padding: 16px 20px; }
+      .client-nav { flex-direction: row; flex-wrap: wrap; }
+      .client-nav-item { width: auto; }
+      .client-sidebar-footer { display: none; }
+      .client-main { padding: 24px 20px 60px 20px; }
+      .form-grid { grid-template-columns: 1fr; }
+      .summary-strip { flex-direction: column; }
+      .summary-stat { border-right: none; border-bottom: 1px solid #E2E8F0; }
+      .summary-stat:last-child { border-bottom: none; }
+    }
   </style>
 </head>
 <body>
@@ -1943,6 +2618,272 @@
     </div>
   </div>
 
+  <!-- ========================================================================
+       ENTERPRISE CLIENT WORKSPACE APP (CONCEPT LAYOUT)
+       ======================================================================== -->
+  <div class="client-app" id="client-workspace-app" style="display: none;">
+    <!-- SIDEBAR -->
+    <aside class="client-sidebar">
+      <div class="client-brand">
+        <div style="display: flex; align-items: center; gap: 9px; margin-bottom: 3px;">
+          <img src="assets/images/brand_emblem.png" alt="Divine Fingers" style="width: 26px; height: 26px;">
+          <span class="client-brand-mark">Divine Fingers</span>
+        </div>
+        <p class="client-brand-sub">Client Portal</p>
+      </div>
+
+      <p class="client-nav-group-label">WORKSPACE</p>
+      <nav class="client-nav">
+        <button type="button" class="client-nav-item active" data-screen="overview" onclick="showClientScreen('overview')">
+          <i data-lucide="layout-dashboard" style="width: 16px; height: 16px;"></i> Overview
+        </button>
+        <button type="button" class="client-nav-item" data-screen="request" onclick="showClientScreen('request')">
+          <i data-lucide="calendar-plus" style="width: 16px; height: 16px;"></i> Request Staff
+        </button>
+        <button type="button" class="client-nav-item" data-screen="active" onclick="showClientScreen('active')">
+          <i data-lucide="activity" style="width: 16px; height: 16px;"></i> Active Shifts
+          <span class="dot" id="client-active-shifts-dot" style="display: none;"></span>
+        </button>
+      </nav>
+
+      <p class="client-nav-group-label">FACILITY</p>
+      <nav class="client-nav">
+        <button type="button" class="client-nav-item" data-screen="roster" onclick="showClientScreen('roster')">
+          <i data-lucide="shield-check" style="width: 16px; height: 16px;"></i> Roster &amp; Documents
+        </button>
+        <button type="button" class="client-nav-item" data-screen="billing" onclick="showClientScreen('billing')">
+          <i data-lucide="receipt" style="width: 16px; height: 16px;"></i> Billing
+        </button>
+      </nav>
+
+      <div class="client-sidebar-footer">
+        <p class="client-facility-name" id="client-side-facility-name">Riverside General Hospital</p>
+        <p class="client-facility-unit" id="client-side-unit-name">Unit 4B · Medical/Surgical</p>
+        <button type="button" class="client-switch-facility" onclick="handleLogout()">Sign Out / Switch facility</button>
+      </div>
+    </aside>
+
+    <!-- MAIN SCREENS -->
+    <main class="client-main">
+
+      <!-- ===================== SCREEN 1: OVERVIEW ===================== -->
+      <section class="client-screen active" id="screen-overview">
+        <div class="client-page-header">
+          <div>
+            <p class="client-greeting-eyebrow" id="client-live-datetime">Tuesday, September 8 · 2:14 PM</p>
+            <h1 class="client-greeting" id="client-greeting-title">Good afternoon, Riverside General</h1>
+          </div>
+          <div class="client-header-actions">
+            <button type="button" class="client-btn client-btn-ghost" onclick="showClientScreen('request')">
+              <i data-lucide="plus-circle" style="width: 15px; height: 15px;"></i> Request staff
+            </button>
+            <button type="button" class="client-btn client-btn-urgent" onclick="showClientScreen('request'); setUrgency('emergency');">
+              <i data-lucide="zap" style="width: 15px; height: 15px;"></i> Emergency surge
+            </button>
+          </div>
+        </div>
+
+        <div class="summary-strip">
+          <div class="summary-stat">
+            <span class="summary-num" id="stat-active-onsite">0</span>
+            <span class="summary-label">Active on-site now</span>
+          </div>
+          <div class="summary-stat">
+            <span class="summary-num urgent-num" id="stat-pending-matching">0</span>
+            <span class="summary-label">Pending — needs matching</span>
+          </div>
+          <div class="summary-stat">
+            <span class="summary-num" id="stat-fill-rate">98%</span>
+            <span class="summary-label">Fill rate, last 30 days</span>
+          </div>
+          <div class="summary-stat">
+            <span class="summary-num" id="stat-avg-rating">4.9 ★</span>
+            <span class="summary-label">Your average rating given</span>
+          </div>
+        </div>
+
+        <div class="client-section">
+          <h2 class="client-section-title">Today's shifts</h2>
+          <div id="client-todays-shifts-list">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+
+        <div class="client-section">
+          <h2 class="client-section-title">Recent activity</h2>
+          <div class="request-card" style="padding: 6px 20px;" id="client-recent-activity-list">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================== SCREEN 2: REQUEST STAFF ===================== -->
+      <section class="client-screen" id="screen-request">
+        <div class="client-page-header">
+          <div>
+            <p class="client-greeting-eyebrow" id="client-request-eyebrow">Riverside General · Unit 4B</p>
+            <h1 class="client-greeting">Request staff</h1>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="full">
+            <label>Urgency</label>
+            <div class="urgency-options">
+              <div class="urgency-opt selected" data-urgency="routine" onclick="setUrgency('routine')">
+                <strong>Routine</strong><br><span style="font-weight:400; font-size:12px;">Next 48 hours</span>
+              </div>
+              <div class="urgency-opt" data-urgency="urgent" onclick="setUrgency('urgent')">
+                <strong>Urgent</strong><br><span style="font-weight:400; font-size:12px;">Under 24 hours</span>
+              </div>
+              <div class="urgency-opt is-emergency" data-urgency="emergency" onclick="setUrgency('emergency')">
+                <strong>Emergency surge</strong><br><span style="font-weight:400; font-size:12px;">Immediate, 2-hr target</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label for="req-role">Role needed</label>
+            <select id="req-role">
+              <option value="RN">Registered Nurse (RN)</option>
+              <option value="RPN">Registered Practical Nurse (RPN)</option>
+              <option value="PSW">Personal Support Worker (PSW)</option>
+              <option value="Travel Nurse">Travel Nurse</option>
+              <option value="Companion">Companion</option>
+            </select>
+          </div>
+          <div>
+            <label for="req-unit">Unit / department</label>
+            <input type="text" id="req-unit" value="Unit 4B">
+          </div>
+
+          <div>
+            <label for="req-date">Shift date</label>
+            <input type="date" id="req-date">
+          </div>
+          <div>
+            <label for="req-shift">Shift</label>
+            <select id="req-shift">
+              <option value="Day Shift (07:00 - 15:30)">Day (07:00–15:00)</option>
+              <option value="Evening Shift (15:00 - 23:30)">Evening (15:00–23:00)</option>
+              <option value="Night Shift (23:00 - 07:30)">Night (23:00–07:00)</option>
+              <option value="12-Hour Day (07:00 - 19:30)">12-hour day</option>
+              <option value="12-Hour Night (19:00 - 07:30)">12-hour night</option>
+            </select>
+          </div>
+
+          <div class="full">
+            <label for="req-notes">Patient acuity / special instructions</label>
+            <textarea id="req-notes" placeholder="Anything the assigned caregiver should know before arriving"></textarea>
+          </div>
+
+          <div class="full">
+            <div class="recurring-row">
+              <input type="checkbox" id="req-recurring" onchange="toggleRecurring()">
+              <label for="req-recurring">Make this a recurring request</label>
+            </div>
+            <div class="recurring-detail" id="recurring-detail">
+              <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 8px;">
+                <select id="req-recurring-pattern" style="max-width:220px;">
+                  <option value="weekly">Every week, same day</option>
+                  <option value="biweekly">Every 2 weeks</option>
+                  <option value="daily">Every weekday</option>
+                </select>
+                <input type="text" id="req-recurring-days" placeholder="e.g. Tuesday, Thursday" style="max-width:200px;" value="Tuesday">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="client-btn client-btn-primary" id="btn-submit-request" onclick="handleClientSubmitRequest()">
+            <i data-lucide="check" style="width:15px; height:15px;"></i> Submit request
+          </button>
+          <button type="button" class="client-btn client-btn-ghost" onclick="showClientScreen('overview')">Cancel</button>
+        </div>
+        <p class="form-note">Cancelling before a caregiver is matched is free. Cancelling after dispatch may be subject to your facility agreement's short-notice terms.</p>
+      </section>
+
+      <!-- ===================== SCREEN 3: ACTIVE SHIFTS ===================== -->
+      <section class="client-screen" id="screen-active">
+        <div class="client-page-header">
+          <div>
+            <p class="client-greeting-eyebrow" id="client-active-eyebrow">Riverside General · Unit 4B</p>
+            <h1 class="client-greeting">Active &amp; recent shifts</h1>
+          </div>
+        </div>
+
+        <div class="client-section" id="client-unrated-section">
+          <h2 class="client-section-title">Completed — awaiting your rating</h2>
+          <div id="client-unrated-shifts-container">
+            <!-- In-card rating panels rendered via JS -->
+          </div>
+        </div>
+
+        <div class="client-section">
+          <h2 class="client-section-title">All facility shift requests</h2>
+          <div id="client-all-shifts-container">
+            <!-- Full shift cards rendered via JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================== SCREEN 4: ROSTER & DOCUMENTS ===================== -->
+      <section class="client-screen" id="screen-roster">
+        <div class="client-page-header">
+          <div>
+            <p class="client-greeting-eyebrow" id="client-roster-eyebrow">Riverside General · Unit 4B</p>
+            <h1 class="client-greeting">Roster &amp; documents</h1>
+          </div>
+        </div>
+        <p style="color:var(--muted); font-size:13.5px; margin-top:-16px; margin-bottom:20px; max-width:680px;">
+          Caregivers assigned to your facility in the last 90 days, and their compliance documents on file. This view is read-only — credential updates are managed by Divine Fingers dispatch.
+        </p>
+
+        <table>
+          <thead>
+            <tr><th>Caregiver</th><th>Role</th><th>CNO / License</th><th>VSS Check</th><th>CPR / BLS</th><th>Documents</th></tr>
+          </thead>
+          <tbody id="client-facility-roster-tbody">
+            <!-- Populated dynamically via JS -->
+          </tbody>
+        </table>
+      </section>
+
+      <!-- ===================== SCREEN 5: BILLING ===================== -->
+      <section class="client-screen" id="screen-billing">
+        <div class="client-page-header">
+          <div>
+            <p class="client-greeting-eyebrow" id="client-billing-eyebrow">Riverside General · Unit 4B</p>
+            <h1 class="client-greeting">Billing</h1>
+          </div>
+          <div class="client-header-actions">
+            <button type="button" class="client-btn client-btn-ghost" onclick="exportBillingCSV()">
+              <i data-lucide="download" style="width:14px; height:14px;"></i> Export CSV
+            </button>
+          </div>
+        </div>
+
+        <div class="table-toolbar">
+          <h2 class="client-section-title" style="margin-bottom:0;" id="billing-month-title">September 2026</h2>
+        </div>
+        <table>
+          <thead>
+            <tr><th>Shift</th><th>Caregiver</th><th>Date</th><th>Hours</th><th>Rate</th><th>Subtotal</th></tr>
+          </thead>
+          <tbody id="client-billing-table-body">
+            <!-- Populated dynamically via JS -->
+          </tbody>
+        </table>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ========================================================================
+       HEALTHCARE WORKER WORKSPACE APP (EVV CLOCK STATION & SHIFT BOARD)
+       ======================================================================== -->
+  <div id="worker-workspace-app">
   <!-- PORTAL NAVIGATION -->
   <nav class="portal-navbar">
     <div class="portal-nav-inner">
@@ -2000,17 +2941,66 @@
       <!-- LEFT PRIMARY COLUMN -->
       <div class="portal-primary-content">
         
-        <!-- CLIENT VIEW: STAFFING REQUESTS ROSTER -->
-        <div class="portal-panel" id="client-requests-panel" style="display: none;">
+        <!-- CLIENT VIEW: ENTERPRISE SURGE STRIP & NAVIGATION TABS -->
+        <div id="client-top-container" style="display: none;">
+          <!-- ⚡ 2-HOUR EMERGENCY SURGE DISPATCH STRIP -->
+          <div class="client-surge-strip" style="background: linear-gradient(135deg, #FFF1F2 0%, #FFE4E6 100%); border: 1.5px solid #FDA4AF; border-radius: 12px; padding: 1.1rem 1.35rem; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; box-shadow: 0 4px 14px rgba(225,29,72,0.08);">
+            <div style="display: flex; align-items: center; gap: 0.85rem;">
+              <div style="width: 42px; height: 42px; border-radius: 50%; background: #E11D48; color: #fff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 4px 12px rgba(225,29,72,0.35);">
+                <i data-lucide="zap" style="width: 22px; height: 22px;"></i>
+              </div>
+              <div>
+                <div style="font-size: 0.95rem; font-weight: 800; color: #9F1239; display: flex; align-items: center; gap: 6px;">
+                  <span>Need Emergency Clinical Coverage in 2 Hours?</span>
+                  <span style="background: #E11D48; color: #fff; font-size: 0.68rem; padding: 2px 7px; border-radius: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Priority SLA</span>
+                </div>
+                <div style="font-size: 0.78rem; color: #BE123C; font-weight: 600; margin-top: 2px;">
+                  Expedited dispatch protocol for ICU, ER, and acute hospital unit surges across the Greater Toronto Area.
+                </div>
+              </div>
+            </div>
+            <button type="button" onclick="openSurgeModal()" style="background: #E11D48; color: #fff; border: none; border-radius: 8px; padding: 0.65rem 1.25rem; font-weight: 800; font-size: 0.84rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 14px rgba(225,29,72,0.35); transition: all 0.2s;">
+              <i data-lucide="bell-ring" style="width: 15px; height: 15px;"></i> Trigger 2-Hour Surge
+            </button>
+          </div>
+
+          <!-- CLIENT NAVIGATION TABS -->
+          <div class="client-tabs-nav" style="display: flex; gap: 0.5rem; border-bottom: 1.5px solid #E2E8F0; margin-bottom: 1.5rem; overflow-x: auto; padding-bottom: 2px;">
+            <button type="button" class="btn-client-tab active" id="tab-btn-requests" onclick="switchClientTab('requests')" style="padding: 0.65rem 1.1rem; border: none; background: transparent; border-bottom: 3px solid #0284C7; color: #0284C7; font-weight: 800; font-size: 0.85rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;">
+              <i data-lucide="clipboard-list" style="width: 15px; height: 15px;"></i> Active Shifts &amp; Tracking
+            </button>
+            <button type="button" class="btn-client-tab" id="tab-btn-recurring" onclick="switchClientTab('recurring')" style="padding: 0.65rem 1.1rem; border: none; background: transparent; border-bottom: 3px solid transparent; color: #64748B; font-weight: 700; font-size: 0.85rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;">
+              <i data-lucide="repeat" style="width: 15px; height: 15px;"></i> Standing &amp; Bulk Orders
+            </button>
+            <button type="button" class="btn-client-tab" id="tab-btn-roster" onclick="switchClientTab('roster')" style="padding: 0.65rem 1.1rem; border: none; background: transparent; border-bottom: 3px solid transparent; color: #64748B; font-weight: 700; font-size: 0.85rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;">
+              <i data-lucide="users" style="width: 15px; height: 15px;"></i> Facility Caregivers &amp; Compliance
+            </button>
+            <button type="button" class="btn-client-tab" id="tab-btn-billing" onclick="switchClientTab('billing')" style="padding: 0.65rem 1.1rem; border: none; background: transparent; border-bottom: 3px solid transparent; color: #64748B; font-weight: 700; font-size: 0.85rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;">
+              <i data-lucide="receipt" style="width: 15px; height: 15px;"></i> Hours &amp; Billing Reconciliation
+            </button>
+            <button type="button" class="btn-client-tab" id="tab-btn-team" onclick="switchClientTab('team')" style="padding: 0.65rem 1.1rem; border: none; background: transparent; border-bottom: 3px solid transparent; color: #64748B; font-weight: 700; font-size: 0.85rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;">
+              <i data-lucide="shield" style="width: 15px; height: 15px;"></i> Facility Team
+            </button>
+          </div>
+        </div>
+
+        <!-- 1. TAB PANEL: ACTIVE SHIFTS & TRACKING -->
+        <div class="portal-panel client-subpanel" id="client-requests-panel" style="display: none;">
           <div class="panel-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
             <div class="panel-title">
-              <i data-lucide="clipboard-list"></i> Active Shifts, Dispatched Personnel &amp; Live Tracking
+              <i data-lucide="activity"></i> Active Shifts, Dispatched Personnel &amp; EVV Status
             </div>
             <div style="display: flex; align-items: center; gap: 0.6rem;">
               <button type="button" class="btn-portal-refresh" onclick="loadClientRequests()" style="padding: 0.4rem 0.8rem; font-size: 0.78rem; font-weight: 700; border-radius: 6px; border: 1px solid #CBD5E1; background: #FFFFFF; color: #1E293B; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;">
                 <i data-lucide="refresh-cw" style="width: 12px; height: 12px;"></i> Refresh
               </button>
-              <a href="clients.html" class="panel-action-link">+ New Staffing Request</a>
+              <button type="button" onclick="openStandingOrderModal()" style="padding: 0.4rem 0.8rem; font-size: 0.78rem; font-weight: 700; border-radius: 6px; border: 1.5px solid #0284C7; background: #F0F9FF; color: #0284C7; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;">
+                <i data-lucide="repeat" style="width: 12px; height: 12px;"></i> + Standing Order
+              </button>
+              <button type="button" onclick="openBulkOrderModal()" style="padding: 0.4rem 0.8rem; font-size: 0.78rem; font-weight: 700; border-radius: 6px; border: 1.5px solid #0D9488; background: #F0FDFA; color: #0D9488; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;">
+                <i data-lucide="layers" style="width: 12px; height: 12px;"></i> + Bulk Week Order
+              </button>
+              <a href="clients.html" class="panel-action-link">+ New Shift</a>
             </div>
           </div>
 
@@ -2023,10 +3013,154 @@
                   <th>Dispatched Caregiver</th>
                   <th>Live Activity &amp; EVV</th>
                   <th>Caregiver Rating</th>
-                  <th>Status</th>
+                  <th>Status &amp; Actions</th>
                 </tr>
               </thead>
               <tbody id="client-requests-table-body">
+                <!-- Populated dynamically via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 2. TAB PANEL: STANDING ORDERS & BULK REQUESTS -->
+        <div class="portal-panel client-subpanel" id="client-recurring-panel" style="display: none;">
+          <div class="panel-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+            <div>
+              <div class="panel-title">
+                <i data-lucide="repeat"></i> Standing Shift Orders &amp; Multi-Day Patterns
+              </div>
+              <span style="font-size: 0.76rem; color: #64748B; font-weight: 600;">Automated recurrent staffing for LTC and hospital units with instant pause/resume toggles.</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.6rem;">
+              <button type="button" onclick="openStandingOrderModal()" class="panel-action-link" style="display: inline-flex; align-items: center; gap: 5px;">
+                <i data-lucide="plus-circle" style="width: 14px; height: 14px;"></i> Set Up Standing Order
+              </button>
+              <button type="button" onclick="openBulkOrderModal()" style="padding: 0.4rem 0.85rem; font-size: 0.78rem; font-weight: 700; border-radius: 6px; border: 1px solid #CBD5E1; background: #FFFFFF; color: #0F172A; cursor: pointer; display: inline-flex; align-items: center; gap: 5px;">
+                <i data-lucide="layers" style="width: 14px; height: 14px;"></i> 5-Shift Weekly Builder
+              </button>
+            </div>
+          </div>
+
+          <div class="portal-table-wrap">
+            <table class="portal-table">
+              <thead>
+                <tr>
+                  <th>Standing Order Code</th>
+                  <th>Recurrence Pattern</th>
+                  <th>Clinical Role</th>
+                  <th>Shift &amp; Dept</th>
+                  <th>Status</th>
+                  <th>Management Action</th>
+                </tr>
+              </thead>
+              <tbody id="client-recurring-table-body">
+                <!-- Populated dynamically via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 3. TAB PANEL: FACILITY-SIDE ROSTER & COMPLIANCE DOSSIERS -->
+        <div class="portal-panel client-subpanel" id="client-facility-roster-panel" style="display: none;">
+          <div class="panel-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+            <div>
+              <div class="panel-title">
+                <i data-lucide="shield-check"></i> Facility Caregiver Directory &amp; Compliance Dossiers
+              </div>
+              <span style="font-size: 0.76rem; color: #64748B; font-weight: 600;">Read-only CNO license, Level-3 VSS, CPR, and N95 fit records for clinical hospital accreditation audits.</span>
+            </div>
+            <button type="button" class="btn-portal-refresh" onclick="loadFacilityRoster()" style="padding: 0.4rem 0.8rem; font-size: 0.78rem; font-weight: 700; border-radius: 6px; border: 1px solid #CBD5E1; background: #FFFFFF; color: #1E293B; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;">
+              <i data-lucide="refresh-cw" style="width: 12px; height: 12px;"></i> Refresh Roster
+            </button>
+          </div>
+
+          <div id="facility-roster-cards-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1rem; padding: 0.5rem 0;">
+            <!-- Caregiver cards populated dynamically via JS -->
+          </div>
+        </div>
+
+        <!-- 4. TAB PANEL: HOURS & BILLING RECONCILIATION -->
+        <div class="portal-panel client-subpanel" id="client-billing-panel" style="display: none;">
+          <div class="panel-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1.25rem;">
+            <div>
+              <div class="panel-title">
+                <i data-lucide="receipt"></i> Monthly Hours &amp; Invoiced Spend Reconciliation
+              </div>
+              <span style="font-size: 0.76rem; color: #64748B; font-weight: 600;">Shift-by-shift punch verification matched against EVV clock-in/out timestamps.</span>
+            </div>
+            <button type="button" class="btn-portal-refresh" onclick="loadBillingSummary()" style="padding: 0.4rem 0.8rem; font-size: 0.78rem; font-weight: 700; border-radius: 6px; border: 1px solid #CBD5E1; background: #FFFFFF; color: #1E293B; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;">
+              <i data-lucide="refresh-cw" style="width: 12px; height: 12px;"></i> Refresh Billing
+            </button>
+          </div>
+
+          <!-- Billing KPI summary chips -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+            <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 1rem;">
+              <span style="font-size: 0.72rem; color: #64748B; font-weight: 800; text-transform: uppercase;">Verified Hours (Month)</span>
+              <div id="billing-kpi-hours" style="font-size: 1.5rem; font-weight: 900; color: #0284C7; margin-top: 4px;">0.0 hrs</div>
+            </div>
+            <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 1rem;">
+              <span style="font-size: 0.72rem; color: #64748B; font-weight: 800; text-transform: uppercase;">Estimated Invoiced Spend</span>
+              <div id="billing-kpi-spend" style="font-size: 1.5rem; font-weight: 900; color: #0F172A; margin-top: 4px;">$0.00</div>
+            </div>
+            <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 1rem;">
+              <span style="font-size: 0.72rem; color: #64748B; font-weight: 800; text-transform: uppercase;">Completed Shifts</span>
+              <div id="billing-kpi-completed" style="font-size: 1.5rem; font-weight: 900; color: #10B981; margin-top: 4px;">0</div>
+            </div>
+            <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 1rem;">
+              <span style="font-size: 0.72rem; color: #64748B; font-weight: 800; text-transform: uppercase;">Pending Approval</span>
+              <div id="billing-kpi-pending" style="font-size: 1.5rem; font-weight: 900; color: #F59E0B; margin-top: 4px;">0</div>
+            </div>
+          </div>
+
+          <div class="portal-table-wrap">
+            <table class="portal-table">
+              <thead>
+                <tr>
+                  <th>Shift Date &amp; Code</th>
+                  <th>Caregiver &amp; Role</th>
+                  <th>Clock In / Out</th>
+                  <th>Verified Hours</th>
+                  <th>Billing Rate</th>
+                  <th>Estimated Total</th>
+                  <th>Invoice Status</th>
+                </tr>
+              </thead>
+              <tbody id="client-billing-table-body">
+                <!-- Populated dynamically via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 5. TAB PANEL: FACILITY TEAM & ROLES -->
+        <div class="portal-panel client-subpanel" id="client-team-panel" style="display: none;">
+          <div class="panel-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+            <div>
+              <div class="panel-title">
+                <i data-lucide="shield"></i> Facility Account Users &amp; Role Clearance
+              </div>
+              <span style="font-size: 0.76rem; color: #64748B; font-weight: 600;">Manage clinical unit requesters (Charge Nurses) and billing administrators under your organization.</span>
+            </div>
+            <button type="button" onclick="openAddTeamModal()" class="panel-action-link" style="display: inline-flex; align-items: center; gap: 5px;">
+              <i data-lucide="user-plus" style="width: 14px; height: 14px;"></i> + Add Team Member
+            </button>
+          </div>
+
+          <div class="portal-table-wrap">
+            <table class="portal-table">
+              <thead>
+                <tr>
+                  <th>Team Member</th>
+                  <th>Corporate Email</th>
+                  <th>Facility Role</th>
+                  <th>Phone</th>
+                  <th>Added On</th>
+                  <th>Last Active</th>
+                </tr>
+              </thead>
+              <tbody id="client-team-table-body">
                 <!-- Populated dynamically via JS -->
               </tbody>
             </table>
@@ -2581,6 +3715,75 @@
     </div>
 
   </main>
+  </div> <!-- END #worker-workspace-app -->
+
+  <!-- COMPLIANCE ACCREDITATION DOSSIER MODAL -->
+  <div id="client-compliance-modal" style="display: none; position: fixed; inset: 0; z-index: 9999; background: rgba(7, 19, 36, 0.7); backdrop-filter: blur(4px); align-items: center; justify-content: center; padding: 1rem;">
+    <div style="background: #FFFFFF; border-radius: 12px; width: 100%; max-width: 580px; box-shadow: 0 20px 40px -8px rgba(0,0,0,0.3); border: 1px solid #E2E8F0; overflow: hidden; animation: modalFadeIn 0.2s ease-out;">
+      <div style="background: #071324; padding: 1.25rem 1.5rem; color: #FFFFFF; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #00F5D4;">
+        <div style="display: flex; align-items: center; gap: 0.6rem;">
+          <i data-lucide="shield-check" style="width: 20px; height: 20px; color: #00F5D4;"></i>
+          <div>
+            <h3 style="margin: 0; font-size: 1.05rem; font-weight: 800; font-family: var(--font-heading); color: #FFFFFF;">Clinical Compliance Accreditation Dossier</h3>
+            <span style="font-size: 0.75rem; color: #94A3B8;">Verified Canadian Clinical Governance &bull; Read-Only</span>
+          </div>
+        </div>
+        <button type="button" onclick="closeComplianceModal()" style="background: transparent; border: none; color: #94A3B8; font-size: 1.4rem; line-height: 1; cursor: pointer; padding: 0.2rem;">&times;</button>
+      </div>
+
+      <div style="padding: 1.5rem; max-height: 75vh; overflow-y: auto;" id="compliance-modal-body">
+        <div style="text-align: center; color: #64748B; padding: 2rem;">Loading compliance certificates...</div>
+      </div>
+
+      <div style="background: #F8FAFC; padding: 1rem 1.5rem; border-top: 1px solid #E2E8F0; display: flex; justify-content: space-between; align-items: center;">
+        <span style="font-size: 0.74rem; color: #64748B; font-weight: 600;">College of Nurses of Ontario (CNO) Compliant</span>
+        <div style="display: flex; gap: 8px;">
+          <button type="button" onclick="window.print()" class="client-btn client-btn-ghost client-btn-sm">
+            <i data-lucide="printer" style="width: 14px; height: 14px;"></i> Print
+          </button>
+          <button type="button" onclick="closeComplianceModal()" class="client-btn client-btn-primary client-btn-sm">
+            Done
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SMART SHIFT CANCELLATION MODAL -->
+  <div id="client-cancel-modal" style="display: none; position: fixed; inset: 0; z-index: 9999; background: rgba(7, 19, 36, 0.7); backdrop-filter: blur(4px); align-items: center; justify-content: center; padding: 1rem;">
+    <div style="background: #FFFFFF; border-radius: 12px; width: 100%; max-width: 480px; box-shadow: 0 20px 40px -8px rgba(0,0,0,0.3); border: 1px solid #E2E8F0; overflow: hidden; animation: modalFadeIn 0.2s ease-out;">
+      <div style="background: #071324; padding: 1.25rem 1.5rem; color: #FFFFFF; display: flex; justify-content: space-between; align-items: center;">
+        <div style="display: flex; align-items: center; gap: 0.6rem;">
+          <i data-lucide="alert-circle" style="width: 20px; height: 20px; color: #E11D48;"></i>
+          <h3 style="margin: 0; font-size: 1.05rem; font-weight: 800; font-family: var(--font-heading); color: #FFFFFF;">Cancel Shift Request</h3>
+        </div>
+        <button type="button" onclick="closeCancelModal()" style="background: transparent; border: none; color: #94A3B8; font-size: 1.4rem; line-height: 1; cursor: pointer; padding: 0.2rem;">&times;</button>
+      </div>
+
+      <div style="padding: 1.5rem;">
+        <input type="hidden" id="cancel-modal-req-id" value="">
+        <div id="cancel-policy-notice" style="border-radius: 8px; padding: 1rem; margin-bottom: 1.25rem; font-size: 0.85rem; line-height: 1.45;">
+          <!-- Injected dynamically based on pending vs dispatched -->
+        </div>
+
+        <div style="margin-bottom: 1.25rem;">
+          <label for="cancel-modal-reason" style="display: block; font-size: 0.75rem; font-weight: 700; color: #475569; margin-bottom: 0.35rem; text-transform: uppercase; letter-spacing: 0.05em;">
+            Reason for Cancellation
+          </label>
+          <textarea id="cancel-modal-reason" rows="2" placeholder="e.g. Unit census dropped, surge covered internally, patient discharged..." style="width: 100%; border: 1px solid #CBD5E1; border-radius: 6px; padding: 0.75rem; font-family: inherit; font-size: 0.85rem; resize: vertical; box-sizing: border-box;"></textarea>
+        </div>
+
+        <div style="display: flex; gap: 0.75rem; justify-content: flex-end;">
+          <button type="button" onclick="closeCancelModal()" class="client-btn client-btn-ghost">
+            Keep Shift
+          </button>
+          <button type="button" id="btn-confirm-cancel" onclick="submitCancelShift()" class="client-btn client-btn-urgent">
+            Confirm Cancellation
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- CLIENT STAFF RATING & REVIEW MODAL -->
   <div id="client-rating-modal" style="display: none; position: fixed; inset: 0; z-index: 9999; background: rgba(10, 37, 64, 0.65); backdrop-filter: blur(4px); align-items: center; justify-content: center; padding: 1rem;">
@@ -2695,12 +3898,996 @@
       if (window.lucide) lucide.createIcons();
     }
 
+    // =========================================================================
+    // ENTERPRISE CLIENT WORKSPACE CONTROLLER
+    // =========================================================================
+    let clientSelectedUrgency = 'routine';
+    let activeCardRatings = {};
+    let clientOnSiteTimerInterval = null;
+    let cachedBillingData = [];
+    let clientLiveClockInterval = null;
+
+    function getTimeGreeting() {
+      const hour = new Date().getHours();
+      if (hour < 12) return 'Good morning';
+      if (hour < 17) return 'Good afternoon';
+      return 'Good evening';
+    }
+
+    function updateClientLiveClock() {
+      const el = document.getElementById('client-live-datetime');
+      if (el) {
+        const now = new Date();
+        const dateStr = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+        const timeStr = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+        el.textContent = `${dateStr} · ${timeStr}`;
+      }
+    }
+
+    function showClientScreen(screenId) {
+      document.querySelectorAll('.client-nav-item').forEach(btn => {
+        if (btn.getAttribute('data-screen') === screenId) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+
+      document.querySelectorAll('.client-screen').forEach(sec => {
+        if (sec.id === 'screen-' + screenId) {
+          sec.classList.add('active');
+        } else {
+          sec.classList.remove('active');
+        }
+      });
+
+      if (screenId === 'overview') loadClientOverview();
+      else if (screenId === 'active') loadClientActiveShifts();
+      else if (screenId === 'roster') loadClientRoster();
+      else if (screenId === 'billing') loadClientBilling();
+
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function setUrgency(urgency) {
+      clientSelectedUrgency = urgency;
+      document.querySelectorAll('.urgency-opt').forEach(opt => {
+        if (opt.getAttribute('data-urgency') === urgency) {
+          opt.classList.add('selected');
+        } else {
+          opt.classList.remove('selected');
+        }
+      });
+    }
+
+    function toggleRecurring() {
+      const chk = document.getElementById('req-recurring');
+      const detail = document.getElementById('recurring-detail');
+      if (chk && detail) {
+        detail.style.display = chk.checked ? 'block' : 'none';
+      }
+    }
+
+    function initClientWorkspace(user) {
+      const facility = user.organization_name || user.facility_name || user.full_name || 'Healthcare Facility';
+      const unit = user.unit_department || 'Unit 4B · Medical/Surgical';
+
+      const sideFac = document.getElementById('client-side-facility-name');
+      if (sideFac) sideFac.textContent = facility;
+      const sideUnit = document.getElementById('client-side-unit-name');
+      if (sideUnit) sideUnit.textContent = unit;
+
+      const greetingEl = document.getElementById('client-greeting-title');
+      if (greetingEl) greetingEl.textContent = `${getTimeGreeting()}, ${facility}`;
+
+      const reqEyebrow = document.getElementById('client-request-eyebrow');
+      if (reqEyebrow) reqEyebrow.textContent = `${facility} · ${unit}`;
+      const actEyebrow = document.getElementById('client-active-eyebrow');
+      if (actEyebrow) actEyebrow.textContent = `${facility} · ${unit}`;
+      const rosEyebrow = document.getElementById('client-roster-eyebrow');
+      if (rosEyebrow) rosEyebrow.textContent = `${facility} · ${unit}`;
+      const bilEyebrow = document.getElementById('client-billing-eyebrow');
+      if (bilEyebrow) bilEyebrow.textContent = `${facility} · ${unit}`;
+
+      const reqDate = document.getElementById('req-date');
+      if (reqDate && !reqDate.value) {
+        const tomorrow = new Date(Date.now() + 86400000);
+        reqDate.value = tomorrow.toISOString().split('T')[0];
+      }
+      const reqUnit = document.getElementById('req-unit');
+      if (reqUnit && !reqUnit.value) {
+        reqUnit.value = unit.split('·')[0].trim() || 'Unit 4B';
+      }
+
+      updateClientLiveClock();
+      if (clientLiveClockInterval) clearInterval(clientLiveClockInterval);
+      clientLiveClockInterval = setInterval(updateClientLiveClock, 30000);
+
+      startClientOnSiteTimerLoop();
+
+      loadClientOverview();
+      loadClientActiveShifts();
+      loadClientRoster();
+      loadClientBilling();
+    }
+
+    async function handleClientSubmitRequest() {
+      const btn = document.getElementById('btn-submit-request');
+      const role = document.getElementById('req-role').value;
+      const unit = document.getElementById('req-unit').value.trim() || 'General Unit';
+      const date = document.getElementById('req-date').value;
+      const shift = document.getElementById('req-shift').value;
+      const notes = document.getElementById('req-notes').value.trim();
+      const isRecurring = document.getElementById('req-recurring').checked;
+      const pattern = document.getElementById('req-recurring-pattern').value;
+      const days = document.getElementById('req-recurring-days').value.trim() || 'Tuesday';
+
+      if (!date && !isRecurring) {
+        alert('Please select a shift date.');
+        return;
+      }
+
+      const origText = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = 'Submitting Request...';
+
+      try {
+        let endpoint = `${API_BASE}/requests`;
+        let payload = {
+          role_requested: role,
+          unit_department: unit,
+          shift_type: shift,
+          shift_date: date,
+          patient_acuity: notes,
+          notes: notes,
+          urgency_level: clientSelectedUrgency
+        };
+
+        if (isRecurring) {
+          endpoint = `${API_BASE}/requests/recurring`;
+          payload = {
+            role_requested: role,
+            unit_department: unit,
+            shift_type: shift,
+            start_date: date,
+            notes: notes,
+            urgency_level: clientSelectedUrgency,
+            recurrence_pattern: pattern,
+            recurrence_days: days
+          };
+        } else if (clientSelectedUrgency === 'emergency') {
+          endpoint = `${API_BASE}/requests/surge`;
+        }
+
+        const res = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+        if (res.ok && data.success) {
+          alert(`✅ Shift request submitted successfully!\nRequest Code: #${data.request_code || data.code || 'CONFIRMED'}\n${data.message || ''}`);
+          document.getElementById('req-notes').value = '';
+          if (isRecurring) {
+            document.getElementById('req-recurring').checked = false;
+            toggleRecurring();
+          }
+          showClientScreen('overview');
+        } else {
+          alert(`❌ Could not submit request: ${data.error || 'Server error.'}`);
+        }
+      } catch (err) {
+        console.error('Request submission error:', err);
+        alert('❌ Network error submitting request.');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = origText;
+        if (window.lucide) lucide.createIcons();
+      }
+    }
+
+    async function loadClientOverview() {
+      const container = document.getElementById('client-todays-shifts-list');
+      const activityContainer = document.getElementById('client-recent-activity-list');
+      if (container) container.innerHTML = '<div style="color:#64748B;padding:1.5rem;text-align:center;">Loading today\'s shifts and live status...</div>';
+
+      try {
+        const res = await fetch(`${API_BASE}/requests`, { credentials: 'include' });
+        let requests = [];
+        if (res.ok) {
+          const data = await res.json();
+          requests = Array.isArray(data) ? data : (data.requests || []);
+        }
+
+        // Summary stats
+        const onSiteCount = requests.filter(r => r.clock_in_time && !r.clock_out_time).length;
+        const pendingCount = requests.filter(r => r.status === 'pending' || (!r.staff_name && r.status !== 'cancelled' && r.status !== 'completed')).length;
+        const totalNonCancelled = requests.filter(r => r.status !== 'cancelled').length;
+        const fulfilledCount = requests.filter(r => r.staff_name || r.status === 'completed').length;
+        const fillRate = totalNonCancelled > 0 ? Math.round((fulfilledCount / totalNonCancelled) * 100) : 100;
+
+        const ratedRequests = requests.filter(r => r.client_rating > 0);
+        const avgRating = ratedRequests.length > 0 
+          ? (ratedRequests.reduce((sum, r) => sum + Number(r.client_rating), 0) / ratedRequests.length).toFixed(1)
+          : '5.0';
+
+        const statOnSite = document.getElementById('stat-active-onsite');
+        if (statOnSite) statOnSite.textContent = onSiteCount;
+        const statPending = document.getElementById('stat-pending-matching');
+        if (statPending) statPending.textContent = pendingCount;
+        const statFill = document.getElementById('stat-fill-rate');
+        if (statFill) statFill.textContent = `${fillRate}%`;
+        const statAvg = document.getElementById('stat-avg-rating');
+        if (statAvg) statAvg.textContent = `${avgRating} ★`;
+
+        const dot = document.getElementById('client-active-shifts-dot');
+        if (dot) dot.style.display = onSiteCount > 0 ? 'inline-block' : 'none';
+
+        // Render Today's Shifts cards
+        if (!requests || requests.length === 0) {
+          if (container) {
+            container.innerHTML = `
+              <div class="request-card" style="text-align:center;padding:2.5rem 1rem;">
+                <p style="font-weight:700;color:#0F172A;font-size:15px;margin:0 0 6px 0;">No active shift requests</p>
+                <p style="font-size:13px;color:#64748B;margin:0 0 16px 0;">Your facility has no shifts scheduled. You can post a routine or urgent staffing order anytime.</p>
+                <button type="button" class="client-btn client-btn-primary" onclick="showClientScreen('request')">
+                  <i data-lucide="plus-circle" style="width:14px;height:14px;"></i> Request Staff
+                </button>
+              </div>
+            `;
+          }
+          if (activityContainer) {
+            activityContainer.innerHTML = '<div style="padding:1rem;color:#64748B;text-align:center;font-size:13px;">No recent facility activity logged yet.</div>';
+          }
+          if (window.lucide) lucide.createIcons();
+          return;
+        }
+
+        if (container) {
+          container.innerHTML = requests.map(req => {
+            const reqCode = req.request_code || (req.id ? req.id.toString().slice(-8) : 'REQ');
+            const role = req.role_requested || 'Registered Nurse';
+            const unit = req.unit_department || 'General Floor';
+            const shiftType = req.shift_type || 'Day (07:00–15:00)';
+            const status = req.status || 'pending';
+            const isOnSite = Boolean(req.clock_in_time && !req.clock_out_time);
+            const isCompleted = Boolean(req.clock_out_time || status === 'completed');
+            const isDispatched = Boolean(req.staff_name && !isOnSite && !isCompleted && status !== 'cancelled');
+            const isCancelled = status === 'cancelled';
+
+            // 5-step stepper index: 1: Requested, 2: Matched, 3: Dispatched, 4: On-site, 5: Completed
+            let currentStepIdx = 1;
+            if (isCompleted) currentStepIdx = 5;
+            else if (isOnSite) currentStepIdx = 4;
+            else if (isDispatched || req.staff_name) currentStepIdx = 3;
+            else if (status === 'matched') currentStepIdx = 2;
+
+            function getStepClass(stepNum) {
+              if (currentStepIdx > stepNum) return 'done';
+              if (currentStepIdx === stepNum) return 'current';
+              return '';
+            }
+
+            function getStepContent(stepNum) {
+              if (currentStepIdx > stepNum) return '✓';
+              return stepNum;
+            }
+
+            // Stepper HTML
+            const stepperHtml = `
+              <div class="stepper">
+                <div class="step ${getStepClass(1)}">
+                  <div class="step-line"></div>
+                  <div class="step-circle">${getStepContent(1)}</div>
+                  <div class="step-label">Requested</div>
+                </div>
+                <div class="step ${getStepClass(2)}">
+                  <div class="step-line"></div>
+                  <div class="step-circle">${getStepContent(2)}</div>
+                  <div class="step-label">Matched</div>
+                </div>
+                <div class="step ${getStepClass(3)}">
+                  <div class="step-line"></div>
+                  <div class="step-circle">${getStepContent(3)}</div>
+                  <div class="step-label">Dispatched</div>
+                </div>
+                <div class="step ${getStepClass(4)}">
+                  <div class="step-line"></div>
+                  <div class="step-circle">${getStepContent(4)}</div>
+                  <div class="step-label">On-site</div>
+                </div>
+                <div class="step ${getStepClass(5)}">
+                  <div class="step-line"></div>
+                  <div class="step-circle">${getStepContent(5)}</div>
+                  <div class="step-label">Completed</div>
+                </div>
+              </div>
+            `;
+
+            // Badge
+            let badgeHtml = '<span class="badge badge-routine">Pending</span>';
+            if (isOnSite) {
+              badgeHtml = '<span class="badge badge-active"><span class="live-dot" style="display:inline-block;margin-right:4px;vertical-align:middle;"></span> Active on-site</span>';
+            } else if (isDispatched) {
+              badgeHtml = '<span class="badge badge-active">Dispatched</span>';
+            } else if (isCompleted) {
+              badgeHtml = '<span class="badge badge-active">Completed</span>';
+            } else if (isCancelled) {
+              badgeHtml = '<span class="badge badge-urgent">Cancelled</span>';
+            } else if (req.urgency_level === 'emergency') {
+              badgeHtml = '<span class="badge badge-urgent">Surge Active</span>';
+            }
+
+            // Caregiver strip / Live timer
+            let caregiverStrip = '';
+            if (req.staff_name) {
+              const staffInitials = req.staff_name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
+              caregiverStrip = `
+                <div class="caregiver-row">
+                  <div class="caregiver-avatar">${staffInitials}</div>
+                  <div class="caregiver-info">
+                    <p class="caregiver-name">${req.staff_name}</p>
+                    <p class="caregiver-meta">
+                      ${req.staff_role || role} &bull; ${req.staff_code || 'Verified Caregiver'}
+                      ${req.staff_phone ? ` &bull; <a href="tel:${req.staff_phone}" style="color:#0284C7;font-weight:700;text-decoration:none;">${req.staff_phone}</a>` : ''}
+                    </p>
+                  </div>
+                  ${isOnSite ? `
+                    <div class="live-badge" data-clock-in="${req.clock_in_time}">
+                      <span class="live-dot"></span>
+                      <span class="elapsed-timer-text">On-site · calculating...</span>
+                    </div>
+                  ` : ''}
+                </div>
+              `;
+            }
+
+            // Action buttons
+            let actionBtn = '';
+            if (!isCompleted && !isCancelled) {
+              actionBtn = `
+                <div style="margin-top:14px;padding-top:12px;border-top:1px solid #E2E8F0;display:flex;justify-content:flex-end;gap:8px;">
+                  <button type="button" class="client-btn client-btn-ghost client-btn-sm" onclick="openCancelModal('${req.id}', '${reqCode}', '${req.status}')">
+                    Cancel shift
+                  </button>
+                </div>
+              `;
+            } else if (isCompleted && !req.client_rating) {
+              actionBtn = `
+                <div style="margin-top:14px;padding-top:12px;border-top:1px solid #E2E8F0;display:flex;justify-content:flex-end;gap:8px;">
+                  <button type="button" class="client-btn client-btn-primary client-btn-sm" onclick="showClientScreen('active')">
+                    ★ Rate caregiver shift
+                  </button>
+                </div>
+              `;
+            }
+
+            return `
+              <div class="request-card" id="overview-card-${req.id}">
+                <div class="request-top">
+                  <div>
+                    <span class="request-id">#${reqCode}</span>
+                    <h3 class="request-role">${role} &bull; ${unit}</h3>
+                    <p style="font-size:13px;color:#64748B;margin:2px 0 0 0;">${shiftType}${req.patient_acuity ? ` &bull; <span style="font-style:italic;">"${req.patient_acuity}"</span>` : ''}</p>
+                  </div>
+                  ${badgeHtml}
+                </div>
+                ${!isCancelled ? stepperHtml : ''}
+                ${caregiverStrip}
+                ${actionBtn}
+              </div>
+            `;
+          }).join('');
+        }
+
+        // Recent Activity Feed
+        if (activityContainer) {
+          const events = [];
+          requests.forEach(r => {
+            const code = r.request_code || (r.id ? r.id.toString().slice(-8) : 'REQ');
+            const role = r.role_requested || 'Staff';
+            const unit = r.unit_department || 'Unit 4B';
+
+            if (r.clock_out_time) {
+              events.push({
+                time: new Date(r.clock_out_time),
+                text: `<b>${r.staff_name || 'Caregiver'}</b> completed shift on <b>${unit}</b> (#${code})`
+              });
+            }
+            if (r.clock_in_time) {
+              events.push({
+                time: new Date(r.clock_in_time),
+                text: `<b>${r.staff_name || 'Caregiver'}</b> clocked in on-site at <b>${unit}</b> (#${code})`
+              });
+            }
+            if (r.staff_name && !r.clock_in_time) {
+              events.push({
+                time: new Date(r.created_at || Date.now()),
+                text: `<b>${r.staff_name}</b> assigned and dispatched for <b>${role}</b> (#${code})`
+              });
+            }
+            events.push({
+              time: new Date(r.created_at || Date.now()),
+              text: `Shift request submitted for <b>${role}</b> on <b>${unit}</b> (#${code})`
+            });
+          });
+
+          events.sort((a, b) => b.time - a.time);
+          const topEvents = events.slice(0, 6);
+
+          activityContainer.innerHTML = topEvents.map(ev => {
+            const timeStr = isNaN(ev.time.getTime()) ? 'Recent' : ev.time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            return `
+              <div class="activity-item">
+                <span class="activity-time">${timeStr}</span>
+                <span class="activity-text">${ev.text}</span>
+              </div>
+            `;
+          }).join('');
+        }
+
+        if (window.lucide) lucide.createIcons();
+
+      } catch (err) {
+        console.error('Failed to load client overview:', err);
+        if (container) container.innerHTML = '<div style="color:#E11D48;padding:1.5rem;text-align:center;">Failed to load shifts. Please check connection.</div>';
+      }
+    }
+
+    async function loadClientActiveShifts() {
+      const unratedContainer = document.getElementById('client-unrated-shifts-container');
+      const allContainer = document.getElementById('client-all-shifts-container');
+
+      try {
+        const res = await fetch(`${API_BASE}/requests`, { credentials: 'include' });
+        let requests = [];
+        if (res.ok) {
+          const data = await res.json();
+          requests = Array.isArray(data) ? data : (data.requests || []);
+        }
+
+        // 1. Unrated completed shifts
+        const unrated = requests.filter(r => (r.status === 'completed' || r.clock_out_time) && !r.client_rating && r.staff_name);
+        if (unrated.length === 0) {
+          if (unratedContainer) {
+            unratedContainer.innerHTML = `
+              <div style="padding:16px 20px;background:#F8FAFC;border-radius:8px;border:1px dashed #CBD5E1;color:#64748B;font-size:13.5px;text-align:center;">
+                ✓ All completed shifts have been reviewed and rated.
+              </div>
+            `;
+          }
+        } else if (unratedContainer) {
+          unratedContainer.innerHTML = unrated.map(req => {
+            const code = req.request_code || (req.id ? req.id.toString().slice(-8) : 'REQ');
+            const role = req.role_requested || 'Staff';
+            const unit = req.unit_department || 'Unit 4B';
+            const staffName = req.staff_name || 'Caregiver';
+            const shiftType = req.shift_type || 'Shift';
+            activeCardRatings[req.id] = 5;
+
+            return `
+              <div class="request-card" style="border-left: 4px solid #F59E0B; margin-bottom: 16px;" id="unrated-card-${req.id}">
+                <div class="request-top">
+                  <div>
+                    <span class="request-id">#${code}</span>
+                    <h3 class="request-role">${role} &bull; ${unit}</h3>
+                    <p style="font-size:13px;color:#64748B;margin:2px 0 0 0;">${shiftType} &bull; Caregiver: <strong>${staffName}</strong></p>
+                  </div>
+                  <span class="badge badge-active">Completed</span>
+                </div>
+
+                <div class="rating-panel">
+                  <div style="font-weight:700;font-size:13.5px;color:#0F172A;">Rate ${staffName}'s shift performance</div>
+                  <div class="stars" id="active-stars-${req.id}">
+                    <button type="button" class="star on" onclick="rateActiveCard('${req.id}', 1)">★</button>
+                    <button type="button" class="star on" onclick="rateActiveCard('${req.id}', 2)">★</button>
+                    <button type="button" class="star on" onclick="rateActiveCard('${req.id}', 3)">★</button>
+                    <button type="button" class="star on" onclick="rateActiveCard('${req.id}', 4)">★</button>
+                    <button type="button" class="star on" onclick="rateActiveCard('${req.id}', 5)">★</button>
+                  </div>
+                  <label style="font-size:12px;font-weight:700;color:#64748B;">Feedback for caregiver <span style="font-weight:400;">(shared with caregiver)</span></label>
+                  <textarea id="active-rating-feedback-${req.id}" placeholder="e.g. Arrived on time, compassionate bedside manner, thorough charting..."></textarea>
+
+                  <div class="private-note-label">
+                    <label style="font-size:12px;font-weight:700;color:#64748B;margin:0;">Private note</label>
+                    <span class="private-tag">Visible only to Divine Fingers dispatch</span>
+                  </div>
+                  <textarea id="active-rating-private-${req.id}" placeholder="e.g. Excellent fit for Unit 4B, please prioritize for future assignments"></textarea>
+
+                  <div style="margin-top:12px;display:flex;justify-content:flex-end;">
+                    <button type="button" class="client-btn client-btn-primary client-btn-sm" id="btn-rate-active-${req.id}" onclick="submitActiveCardRating('${req.id}')">
+                      Submit rating
+                    </button>
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+
+        // 2. All facility shifts
+        if (allContainer) {
+          if (requests.length === 0) {
+            allContainer.innerHTML = '<div style="color:#64748B;padding:1.5rem;text-align:center;">No shifts found for this facility.</div>';
+          } else {
+            allContainer.innerHTML = requests.map(req => {
+              const code = req.request_code || (req.id ? req.id.toString().slice(-8) : 'REQ');
+              const role = req.role_requested || 'Staff';
+              const unit = req.unit_department || 'Unit 4B';
+              const shiftType = req.shift_type || 'Shift';
+              const status = req.status || 'pending';
+              const isPending = status === 'pending';
+              const isDispatched = Boolean(req.staff_name && status !== 'cancelled' && status !== 'completed');
+
+              return `
+                <div class="request-card" style="margin-bottom:12px;">
+                  <div class="request-top">
+                    <div>
+                      <span class="request-id">#${code}</span>
+                      <h3 class="request-role">${role} &bull; ${unit}</h3>
+                      <p style="font-size:13px;color:#64748B;margin:2px 0 0 0;">${shiftType} &bull; Status: <strong style="color:#0F172A;text-transform:capitalize;">${status}</strong></p>
+                    </div>
+                    <div>
+                      ${req.client_rating ? `
+                        <span style="color:#F59E0B;font-weight:800;font-size:14px;">${'★'.repeat(req.client_rating)}${'☆'.repeat(5 - req.client_rating)} (${req.client_rating}.0)</span>
+                      ` : ''}
+                    </div>
+                  </div>
+                  ${req.staff_name ? `
+                    <div style="margin-top:10px;font-size:13px;color:#334155;">
+                      Assigned Caregiver: <strong>${req.staff_name}</strong> (${req.staff_role || role}) ${req.staff_phone ? `&bull; <a href="tel:${req.staff_phone}" style="color:#0284C7;font-weight:600;text-decoration:none;">${req.staff_phone}</a>` : ''}
+                    </div>
+                  ` : ''}
+                  ${(isPending || isDispatched) ? `
+                    <div style="margin-top:12px;display:flex;justify-content:flex-end;">
+                      <button type="button" class="client-btn client-btn-ghost client-btn-sm" onclick="openCancelModal('${req.id}', '${code}', '${status}')">
+                        Cancel shift
+                      </button>
+                    </div>
+                  ` : ''}
+                </div>
+              `;
+            }).join('');
+          }
+        }
+
+        if (window.lucide) lucide.createIcons();
+
+      } catch (err) {
+        console.error('Failed to load active shifts:', err);
+      }
+    }
+
+    function rateActiveCard(reqId, starVal) {
+      activeCardRatings[reqId] = starVal;
+      const stars = document.querySelectorAll(`#active-stars-${reqId} .star`);
+      stars.forEach((s, idx) => {
+        if (idx < starVal) s.classList.add('on');
+        else s.classList.remove('on');
+      });
+    }
+
+    async function submitActiveCardRating(reqId) {
+      const btn = document.getElementById(`btn-rate-active-${reqId}`);
+      const feedback = (document.getElementById(`active-rating-feedback-${reqId}`)?.value || '').trim();
+      const privateNote = (document.getElementById(`active-rating-private-${reqId}`)?.value || '').trim();
+      const rating = activeCardRatings[reqId] || 5;
+
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'Submitting...';
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}/requests/${reqId}/rate`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ rating, feedback, private_note: privateNote })
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          alert(`✅ Rating submitted!\n${data.message || 'Caregiver performance recorded.'}`);
+          loadClientActiveShifts();
+          loadClientOverview();
+        } else {
+          alert(`❌ Rating failed: ${data.error || 'Server error.'}`);
+        }
+      } catch (err) {
+        console.error('Rating error:', err);
+        alert('❌ Network error submitting rating.');
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = 'Submit rating';
+        }
+      }
+    }
+
+    async function loadClientRoster() {
+      const tbody = document.getElementById('client-facility-roster-tbody');
+      if (!tbody) return;
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#64748B;padding:1.5rem;">Loading verified facility caregiver roster...</td></tr>';
+
+      try {
+        const res = await fetch(`${API_BASE}/requests/facility-roster`, { credentials: 'include' });
+        let roster = [];
+        if (res.ok) {
+          const data = await res.json();
+          roster = Array.isArray(data) ? data : (data.roster || []);
+        }
+
+        if (roster.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#64748B;padding:2rem;">No caregivers have completed shifts for your facility yet. Assigned caregivers will appear here with live compliance accreditations.</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = roster.map(caregiver => {
+          const initials = (caregiver.full_name || 'Caregiver')
+            .split(' ')
+            .map(n => n[0])
+            .slice(0, 2)
+            .join('')
+            .toUpperCase();
+          const role = caregiver.role || caregiver.role_requested || 'Registered Nurse';
+          const code = caregiver.staff_code || 'DF-STAFF';
+
+          return `
+            <tr>
+              <td>
+                <div style="display:flex;align-items:center;gap:10px;">
+                  <div class="caregiver-avatar" style="width:32px;height:32px;font-size:11.5px;">${initials}</div>
+                  <div>
+                    <strong style="color:#0F172A;font-size:13.5px;">${caregiver.full_name}</strong>
+                    <div style="font-size:12px;color:#64748B;">${code} &bull; Dispatched ${caregiver.shift_count || 1}x</div>
+                  </div>
+                </div>
+              </td>
+              <td><strong style="font-size:13px;color:#334155;">${role}</strong></td>
+              <td><span class="cred-badge cred-verified">✓ CNO Verified</span></td>
+              <td><span class="cred-badge cred-verified">✓ Current · VSS</span></td>
+              <td><span class="cred-badge cred-verified">✓ Current · CPR/BLS</span></td>
+              <td>
+                <button type="button" class="doc-link" onclick="viewComplianceDocs('${caregiver.staff_id || caregiver.id}')" style="background:none;border:none;padding:0;">
+                  View documents &rarr;
+                </button>
+              </td>
+            </tr>
+          `;
+        }).join('');
+
+        if (window.lucide) lucide.createIcons();
+
+      } catch (err) {
+        console.error('Failed to load roster:', err);
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#E11D48;padding:1.5rem;">Failed to load facility roster.</td></tr>';
+      }
+    }
+
+    async function viewComplianceDocs(staffId) {
+      const modal = document.getElementById('client-compliance-modal');
+      const body = document.getElementById('compliance-modal-body');
+      if (modal) modal.style.display = 'flex';
+      if (body) body.innerHTML = '<div style="text-align:center;color:#64748B;padding:2rem;">Fetching verified Canadian clinical compliance dossier...</div>';
+
+      try {
+        const res = await fetch(`${API_BASE}/requests/staff/${staffId}/compliance`, { credentials: 'include' });
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+          if (body) body.innerHTML = `<div style="text-align:center;color:#E11D48;padding:2rem;">${data.error || 'Compliance file not found or unauthorized.'}</div>`;
+          return;
+        }
+
+        const staff = data.staff || {};
+        const initials = (staff.full_name || 'Caregiver').split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
+
+        if (body) {
+          body.innerHTML = `
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:1.25rem;padding-bottom:1rem;border-bottom:1px solid #E2E8F0;">
+              <div class="caregiver-avatar" style="width:48px;height:48px;font-size:16px;">${initials}</div>
+              <div>
+                <h4 style="margin:0 0 3px 0;font-size:16px;color:#0F172A;font-weight:800;">${staff.full_name}</h4>
+                <p style="margin:0;font-size:12.5px;color:#64748B;">
+                  ${staff.role || 'Clinical Professional'} &bull; Staff Code: <strong>${staff.staff_code || 'DF-VERIFIED'}</strong> &bull; Standing: <span style="color:#059669;font-weight:700;">Active Dispatch</span>
+                </p>
+              </div>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;">
+                <div>
+                  <strong style="font-size:13.5px;color:#0F172A;display:block;">1. College of Nurses of Ontario (CNO) Registration</strong>
+                  <span style="font-size:12px;color:#64748B;">License verified in Good Standing &bull; Annual renewal active</span>
+                </div>
+                <span class="cred-badge cred-verified">✓ Verified</span>
+              </div>
+
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;">
+                <div>
+                  <strong style="font-size:13.5px;color:#0F172A;display:block;">2. Police Vulnerable Sector Screening (VSS)</strong>
+                  <span style="font-size:12px;color:#64748B;">Level 3 Police Record Check on file &bull; Clearance verified</span>
+                </div>
+                <span class="cred-badge cred-verified">✓ Clear</span>
+              </div>
+
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;">
+                <div>
+                  <strong style="font-size:13.5px;color:#0F172A;display:block;">3. Basic Life Support (BLS) / CPR Level C</strong>
+                  <span style="font-size:12px;color:#64748B;">Heart & Stroke Foundation / Canadian Red Cross accredited</span>
+                </div>
+                <span class="cred-badge cred-verified">✓ Current</span>
+              </div>
+
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;">
+                <div>
+                  <strong style="font-size:13.5px;color:#0F172A;display:block;">4. N95 Respirator Mask Fit Test</strong>
+                  <span style="font-size:12px;color:#64748B;">Quantitative fit test (3M 1860 / Aura 1870+) valid</span>
+                </div>
+                <span class="cred-badge cred-verified">✓ Certified</span>
+              </div>
+
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;">
+                <div>
+                  <strong style="font-size:13.5px;color:#0F172A;display:block;">5. Immunization & TB Two-Step Screening</strong>
+                  <span style="font-size:12px;color:#64748B;">Mantoux TB negative &bull; Hep B, MMR, Varicella confirmed</span>
+                </div>
+                <span class="cred-badge cred-verified">✓ Complete</span>
+              </div>
+
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;">
+                <div>
+                  <strong style="font-size:13.5px;color:#0F172A;display:block;">6. WHMIS & Workplace Violence Prevention</strong>
+                  <span style="font-size:12px;color:#64748B;">Hospital clinical orientation modules completed</span>
+                </div>
+                <span class="cred-badge cred-verified">✓ Verified</span>
+              </div>
+            </div>
+          `;
+        }
+
+        if (window.lucide) lucide.createIcons();
+
+      } catch (err) {
+        console.error('Compliance error:', err);
+        if (body) body.innerHTML = '<div style="text-align:center;color:#E11D48;padding:2rem;">Network error fetching compliance records.</div>';
+      }
+    }
+
+    function closeComplianceModal() {
+      const modal = document.getElementById('client-compliance-modal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    async function loadClientBilling() {
+      const tbody = document.getElementById('client-billing-table-body');
+      const title = document.getElementById('billing-month-title');
+      if (!tbody) return;
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#64748B;padding:1.5rem;">Loading monthly shift billing ledger...</td></tr>';
+
+      try {
+        const res = await fetch(`${API_BASE}/requests/billing-summary`, { credentials: 'include' });
+        let shifts = [];
+        let totalHours = 0;
+        let totalSpend = 0;
+
+        if (res.ok) {
+          const data = await res.json();
+          shifts = data.shifts || [];
+          totalHours = Number(data.total_hours_billed || 0);
+          totalSpend = Number(data.total_spend || 0);
+        }
+
+        cachedBillingData = shifts;
+
+        const now = new Date();
+        if (title) {
+          title.textContent = now.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+        }
+
+        if (shifts.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#64748B;padding:2rem;">No billable shifts logged for this billing period.</td></tr>';
+          return;
+        }
+
+        const rows = shifts.map(s => {
+          const code = s.request_code || (s.id ? s.id.toString().slice(-8) : 'REQ');
+          const hours = Number(s.hours_billed || 8.0);
+          const rate = Number(s.billing_hourly_rate || 55.00);
+          const subtotal = hours * rate;
+          const dateStr = s.shift_date || 'Recent';
+
+          return `
+            <tr>
+              <td><strong style="font-family:monospace;color:#0284C7;">#${code}</strong> <span style="color:#64748B;font-size:12px;">(${s.role_requested || 'Staff'})</span></td>
+              <td>${s.staff_name || 'Assigned Staff'}</td>
+              <td>${dateStr}</td>
+              <td>${hours.toFixed(1)}h</td>
+              <td>$${rate.toFixed(2)}/hr</td>
+              <td><strong>$${subtotal.toFixed(2)}</strong></td>
+            </tr>
+          `;
+        }).join('');
+
+        const totalRow = `
+          <tr class="billing-total-row">
+            <td colspan="3"><strong>Month to date total</strong></td>
+            <td><strong>${totalHours.toFixed(1)}h</strong></td>
+            <td>—</td>
+            <td><strong style="color:#0284C7;font-size:14.5px;">$${totalSpend.toFixed(2)}</strong></td>
+          </tr>
+        `;
+
+        tbody.innerHTML = rows + totalRow;
+
+      } catch (err) {
+        console.error('Failed to load billing:', err);
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#E11D48;padding:1.5rem;">Failed to load billing summary.</td></tr>';
+      }
+    }
+
+    function exportBillingCSV() {
+      if (!cachedBillingData || cachedBillingData.length === 0) {
+        alert('No billing data available to export.');
+        return;
+      }
+
+      let csv = 'Shift Code,Caregiver,Role,Date,Hours,Hourly Rate ($),Subtotal ($)\n';
+      cachedBillingData.forEach(s => {
+        const code = s.request_code || (s.id ? s.id.toString().slice(-8) : 'REQ');
+        const caregiver = (s.staff_name || 'Assigned Staff').replace(/,/g, '');
+        const role = (s.role_requested || 'Staff').replace(/,/g, '');
+        const date = s.shift_date || '';
+        const hours = Number(s.hours_billed || 8.0).toFixed(1);
+        const rate = Number(s.billing_hourly_rate || 55.00).toFixed(2);
+        const subtotal = (hours * rate).toFixed(2);
+        csv += `"${code}","${caregiver}","${role}","${date}",${hours},${rate},${subtotal}\n`;
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `DivineFingers_Billing_${new Date().toISOString().split('T')[0]}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    function openCancelModal(reqId, reqCode, currentStatus) {
+      const modal = document.getElementById('client-cancel-modal');
+      const idInput = document.getElementById('cancel-modal-req-id');
+      const notice = document.getElementById('cancel-policy-notice');
+      const reasonInput = document.getElementById('cancel-modal-reason');
+
+      if (idInput) idInput.value = reqId;
+      if (reasonInput) reasonInput.value = '';
+
+      const isDispatchedOrConfirmed = (currentStatus === 'dispatched' || currentStatus === 'confirmed');
+
+      if (notice) {
+        if (isDispatchedOrConfirmed) {
+          notice.style.background = '#FFF1F2';
+          notice.style.border = '1px solid #FDA4AF';
+          notice.style.color = '#9F1239';
+          notice.innerHTML = `
+            <div style="font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:6px;">
+              <i data-lucide="alert-triangle" style="width:16px;height:16px;color:#E11D48;"></i> Short-Notice Cancellation Policy Applies
+            </div>
+            A caregiver has already been matched and dispatched for shift <strong>#${reqCode}</strong>.
+            Cancelling after dispatch incurs a standard 4-hour cancellation charge per facility contract.
+          `;
+        } else {
+          notice.style.background = '#ECFDF5';
+          notice.style.border = '1px solid #A7F3D0';
+          notice.style.color = '#065F46';
+          notice.innerHTML = `
+            <div style="font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:6px;">
+              <i data-lucide="check-circle" style="width:16px;height:16px;color:#059669;"></i> Free Cancellation
+            </div>
+            Shift <strong>#${reqCode}</strong> is currently pending dispatch. Cancelling this request is completely free with no cancellation charge.
+          `;
+        }
+      }
+
+      if (modal) modal.style.display = 'flex';
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function closeCancelModal() {
+      const modal = document.getElementById('client-cancel-modal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    async function submitCancelShift() {
+      const reqId = document.getElementById('cancel-modal-req-id')?.value;
+      const reason = (document.getElementById('cancel-modal-reason')?.value || '').trim();
+      const btn = document.getElementById('btn-confirm-cancel');
+
+      if (!reqId) return;
+
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'Cancelling...';
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}/requests/${reqId}/cancel`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ cancellation_reason: reason })
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          alert(`✅ ${data.message || 'Shift request successfully cancelled.'}`);
+          closeCancelModal();
+          loadClientOverview();
+          loadClientActiveShifts();
+        } else {
+          alert(`❌ Could not cancel shift: ${data.error || 'Server error.'}`);
+        }
+      } catch (err) {
+        console.error('Cancellation error:', err);
+        alert('❌ Network error cancelling shift.');
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = 'Confirm Cancellation';
+        }
+      }
+    }
+
+    function startClientOnSiteTimerLoop() {
+      if (clientOnSiteTimerInterval) clearInterval(clientOnSiteTimerInterval);
+
+      const updateTimers = () => {
+        const badges = document.querySelectorAll('.live-badge[data-clock-in]');
+        badges.forEach(badge => {
+          const clockInStr = badge.getAttribute('data-clock-in');
+          if (!clockInStr) return;
+          const startTime = new Date(clockInStr).getTime();
+          if (isNaN(startTime)) return;
+
+          const elapsedSec = Math.max(0, Math.floor((Date.now() - startTime) / 1000));
+          const hrs = Math.floor(elapsedSec / 3600);
+          const mins = Math.floor((elapsedSec % 3600) / 60);
+          const secs = elapsedSec % 60;
+
+          const textSpan = badge.querySelector('.elapsed-timer-text');
+          if (textSpan) {
+            textSpan.textContent = `On-site · ${hrs}h ${mins}m ${secs}s`;
+          }
+        });
+      };
+
+      updateTimers();
+      clientOnSiteTimerInterval = setInterval(updateTimers, 1000);
+    }
+
     // Render portal based on user role
     function renderPortalView(user) {
+      if (user.role === 'client') {
+        const clientApp = document.getElementById('client-workspace-app');
+        const workerApp = document.getElementById('worker-workspace-app');
+        if (clientApp) clientApp.style.display = 'flex';
+        if (workerApp) workerApp.style.display = 'none';
+        initClientWorkspace(user);
+        if (window.lucide) lucide.createIcons();
+        return;
+      }
+
+      // HEALTHCARE WORKER DASHBOARD
+      const clientApp = document.getElementById('client-workspace-app');
+      const workerApp = document.getElementById('worker-workspace-app');
+      if (clientApp) clientApp.style.display = 'none';
+      if (workerApp) workerApp.style.display = 'block';
+
       // User chip
       document.getElementById('user-display-name').textContent = user.full_name || user.email;
-      const roleText = user.role === 'client' ? 'Healthcare Facility' : 'Healthcare Professional';
-      document.getElementById('user-display-role').textContent = roleText;
+      document.getElementById('user-display-role').textContent = 'Healthcare Professional';
 
       // Avatar initials
       const initials = (user.full_name || 'DF')
@@ -2717,147 +4904,74 @@
       document.getElementById('profile-phone').textContent = user.phone || '+1 (647) 555-0100';
 
       const orgContainer = document.getElementById('profile-org-container');
-      if (user.role === 'client' && user.organization_name) {
-        orgContainer.style.display = 'block';
-        document.getElementById('profile-org').textContent = user.organization_name;
-      } else if (user.role === 'client') {
-        orgContainer.style.display = 'block';
-        document.getElementById('profile-org').textContent = 'Toronto Central General Hospital';
-      } else {
-        orgContainer.style.display = 'none';
-      }
+      if (orgContainer) orgContainer.style.display = 'none';
 
       const bannerHeading = document.getElementById('banner-welcome-heading');
       const bannerSub = document.getElementById('banner-welcome-sub');
       const bannerActions = document.getElementById('banner-action-buttons');
       const metricsContainer = document.getElementById('portal-metrics-container');
 
-      if (user.role === 'client') {
-        // CLIENT DASHBOARD
-        bannerHeading.textContent = `Welcome, ${user.full_name}`;
-        bannerSub.textContent = user.organization_name 
-          ? `Coordinating on-demand clinical dispatch for ${user.organization_name}.`
-          : 'Coordinating on-demand clinical dispatch across your hospital or facility.';
+      bannerHeading.textContent = `Welcome, ${user.full_name}`;
+      bannerSub.textContent = 'Browse open hospital and community nursing shifts, confirm assignments, log shift hours, and manage clinical licenses.';
 
-        bannerActions.innerHTML = `
-          <a href="clients.html" class="btn-banner-action">
-            <i data-lucide="plus-circle" style="width: 16px; height: 16px;"></i> Request Staff
-          </a>
-          <a href="bulk-staffing.html" class="btn-banner-secondary">
-            <i data-lucide="layers" style="width: 16px; height: 16px;"></i> Enterprise Bulk Staffing
-          </a>
-        `;
+      bannerActions.innerHTML = `
+        <a href="#worker-shifts-panel" class="btn-banner-action">
+          <i data-lucide="search" style="width: 16px; height: 16px;"></i> View Open Shifts
+        </a>
+        <a href="#worker-credentials-panel" class="btn-banner-secondary">
+          <i data-lucide="award" style="width: 16px; height: 16px;"></i> Manage Credentials &amp; Licenses
+        </a>
+      `;
 
-        metricsContainer.innerHTML = `
-          <div class="metric-card">
-            <div class="metric-icon-wrap teal">
-              <i data-lucide="users" style="width: 24px; height: 24px;"></i>
-            </div>
-            <div class="metric-data-group">
-              <span class="metric-val">0</span>
-              <span class="metric-label">Active Staff Dispatched</span>
-            </div>
+      metricsContainer.innerHTML = `
+        <div class="metric-card">
+          <div class="metric-icon-wrap teal">
+            <i data-lucide="check-circle" style="width: 24px; height: 24px;"></i>
           </div>
-          <div class="metric-card">
-            <div class="metric-icon-wrap blue">
-              <i data-lucide="clock" style="width: 24px; height: 24px;"></i>
-            </div>
-            <div class="metric-data-group">
-              <span class="metric-val">On-Demand</span>
-              <span class="metric-label">Average Match SLA</span>
-            </div>
+          <div class="metric-data-group">
+            <span class="metric-val">0</span>
+            <span class="metric-label">Upcoming Shifts Confirmed</span>
           </div>
-          <div class="metric-card">
-            <div class="metric-icon-wrap purple">
-              <i data-lucide="calendar" style="width: 24px; height: 24px;"></i>
-            </div>
-            <div class="metric-data-group">
-              <span class="metric-val">100%</span>
-              <span class="metric-label">Shift Fulfillment Rate</span>
-            </div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-icon-wrap blue">
+            <i data-lucide="hourglass" style="width: 24px; height: 24px;"></i>
           </div>
-          <div class="metric-card">
-            <div class="metric-icon-wrap orange">
-              <i data-lucide="shield-check" style="width: 24px; height: 24px;"></i>
-            </div>
-            <div class="metric-data-group">
-              <span class="metric-val">Active</span>
-              <span class="metric-label">CNO Verified Roster</span>
-            </div>
+          <div class="metric-data-group">
+            <span class="metric-val">0h</span>
+            <span class="metric-label">Logged Hours This Week</span>
           </div>
-        `;
-
-        document.getElementById('client-requests-panel').style.display = 'block';
-        document.getElementById('worker-shifts-panel').style.display = 'none';
-        const credsPanel = document.getElementById('worker-credentials-panel');
-        if (credsPanel) credsPanel.style.display = 'none';
-
-        loadClientRequests();
-
-      } else {
-        // HEALTHCARE WORKER DASHBOARD
-        bannerHeading.textContent = `Welcome, ${user.full_name}`;
-        bannerSub.textContent = 'Browse open hospital and community nursing shifts, confirm assignments, log shift hours, and manage clinical licenses.';
-
-        bannerActions.innerHTML = `
-          <a href="#worker-shifts-panel" class="btn-banner-action">
-            <i data-lucide="search" style="width: 16px; height: 16px;"></i> View Open Shifts
-          </a>
-          <a href="#worker-credentials-panel" class="btn-banner-secondary">
-            <i data-lucide="award" style="width: 16px; height: 16px;"></i> Manage Credentials &amp; Licenses
-          </a>
-        `;
-
-        metricsContainer.innerHTML = `
-          <div class="metric-card">
-            <div class="metric-icon-wrap teal">
-              <i data-lucide="check-circle" style="width: 24px; height: 24px;"></i>
-            </div>
-            <div class="metric-data-group">
-              <span class="metric-val">0</span>
-              <span class="metric-label">Upcoming Shifts Confirmed</span>
-            </div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-icon-wrap purple">
+            <i data-lucide="badge-check" style="width: 24px; height: 24px;"></i>
           </div>
-          <div class="metric-card">
-            <div class="metric-icon-wrap blue">
-              <i data-lucide="hourglass" style="width: 24px; height: 24px;"></i>
-            </div>
-            <div class="metric-data-group">
-              <span class="metric-val">0h</span>
-              <span class="metric-label">Logged Hours This Week</span>
-            </div>
+          <div class="metric-data-group">
+            <span class="metric-val">Verified</span>
+            <span class="metric-label">CNO / PSW Standing</span>
           </div>
-          <div class="metric-card">
-            <div class="metric-icon-wrap purple">
-              <i data-lucide="badge-check" style="width: 24px; height: 24px;"></i>
-            </div>
-            <div class="metric-data-group">
-              <span class="metric-val">Verified</span>
-              <span class="metric-label">CNO / PSW Standing</span>
-            </div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-icon-wrap orange">
+            <i data-lucide="wallet" style="width: 24px; height: 24px;"></i>
           </div>
-          <div class="metric-card">
-            <div class="metric-icon-wrap orange">
-              <i data-lucide="wallet" style="width: 24px; height: 24px;"></i>
-            </div>
-            <div class="metric-data-group">
-              <span class="metric-val">Active</span>
-              <span class="metric-label">Dispatch Standing</span>
-            </div>
+          <div class="metric-data-group">
+            <span class="metric-val">Active</span>
+            <span class="metric-label">Dispatch Standing</span>
           </div>
-        `;
+        </div>
+      `;
 
-        document.getElementById('client-requests-panel').style.display = 'none';
-        document.getElementById('worker-shifts-panel').style.display = 'block';
-        const credsPanel = document.getElementById('worker-credentials-panel');
-        if (credsPanel) credsPanel.style.display = 'block';
-        const clockPanel = document.getElementById('worker-clock-panel');
-        if (clockPanel) clockPanel.style.display = 'block';
+      document.getElementById('client-requests-panel').style.display = 'none';
+      document.getElementById('worker-shifts-panel').style.display = 'block';
+      const credsPanel = document.getElementById('worker-credentials-panel');
+      if (credsPanel) credsPanel.style.display = 'block';
+      const clockPanel = document.getElementById('worker-clock-panel');
+      if (clockPanel) clockPanel.style.display = 'block';
 
-        loadWorkerShifts();
-        initClockStation();
-        loadStaffDocuments();
-      }
+      loadWorkerShifts();
+      initClockStation();
+      loadStaffDocuments();
 
       if (window.lucide) lucide.createIcons();
     }

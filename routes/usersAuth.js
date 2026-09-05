@@ -283,7 +283,7 @@ router.get('/me', async (req, res) => {
     }
 
     let [rows] = await pool.query(
-      'SELECT id, email, full_name, role, organization_name, phone, is_active, created_at FROM users WHERE id = ? LIMIT 1',
+      'SELECT id, email, full_name, role, organization_name, facility_id, client_role, phone, is_active, created_at FROM users WHERE id = ? LIMIT 1',
       [decoded.id]
     );
 
@@ -311,12 +311,122 @@ router.get('/me', async (req, res) => {
         full_name: user.full_name,
         role: user.role,
         organization_name: user.organization_name,
+        facility_id: user.facility_id || null,
+        client_role: user.client_role || 'requester',
         phone: user.phone,
         created_at: user.created_at
       }
     });
   } catch (err) {
     return res.json({ success: false, user: null });
+  }
+});
+
+// ── GET /api/users/facility-team ────────────────────────────────────────────
+router.get('/facility-team', async (req, res, next) => {
+  try {
+    const token = req.cookies[USER_COOKIE_NAME];
+    if (!token) return res.status(401).json({ success: false, error: 'Authentication required' });
+
+    let decoded;
+    try {
+      decoded = jwt.verify(token, JWT_SECRET);
+    } catch {
+      return res.status(401).json({ success: false, error: 'Invalid session' });
+    }
+
+    if (!decoded.organization_name) {
+      return res.status(400).json({ success: false, error: 'User does not belong to a healthcare facility organization' });
+    }
+
+    const [team] = await pool.query(
+      `SELECT id, email, full_name, client_role, organization_name, phone, created_at, last_login 
+       FROM users 
+       WHERE organization_name = ? AND role = 'client' 
+       ORDER BY created_at ASC`,
+      [decoded.organization_name]
+    );
+
+    res.json({
+      success: true,
+      organization_name: decoded.organization_name,
+      count: team.length,
+      team
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// ── POST /api/users/facility-team ───────────────────────────────────────────
+const addTeamMemberSchema = z.object({
+  full_name: z.string().min(2),
+  email: z.string().email(),
+  password: z.string().min(6),
+  client_role: z.enum(['requester', 'billing_admin', 'facility_director']).default('requester'),
+  phone: z.string().optional()
+});
+
+router.post('/facility-team', async (req, res, next) => {
+  try {
+    const token = req.cookies[USER_COOKIE_NAME];
+    if (!token) return res.status(401).json({ success: false, error: 'Authentication required' });
+
+    let decoded;
+    try {
+      decoded = jwt.verify(token, JWT_SECRET);
+    } catch {
+      return res.status(401).json({ success: false, error: 'Invalid session' });
+    }
+
+    if (decoded.role !== 'client' || !decoded.organization_name) {
+      return res.status(403).json({ success: false, error: 'Only facility clients can manage team members' });
+    }
+
+    const validated = addTeamMemberSchema.parse(req.body);
+    const emailClean = validated.email.toLowerCase().trim();
+
+    // Check if email already taken
+    const [existing] = await pool.query('SELECT id FROM users WHERE email = ? LIMIT 1', [emailClean]);
+    if (existing.length > 0) {
+      return res.status(409).json({ success: false, error: 'An account with this email address already exists.' });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const password_hash = await bcrypt.hash(validated.password, salt);
+    const newUserId = 'u-' + crypto.randomUUID();
+
+    await pool.query(
+      `INSERT INTO users (id, email, password_hash, full_name, role, organization_name, facility_id, client_role, phone, is_active, email_verified)
+       VALUES (?, ?, ?, ?, 'client', ?, ?, ?, ?, 1, 1)`,
+      [
+        newUserId,
+        emailClean,
+        password_hash,
+        validated.full_name.trim(),
+        decoded.organization_name,
+        decoded.facility_id || null,
+        validated.client_role,
+        validated.phone || null
+      ]
+    );
+
+    res.status(201).json({
+      success: true,
+      message: `Team member ${validated.full_name} (${validated.client_role}) added successfully to ${decoded.organization_name}.`,
+      user: {
+        id: newUserId,
+        email: emailClean,
+        full_name: validated.full_name.trim(),
+        client_role: validated.client_role,
+        organization_name: decoded.organization_name
+      }
+    });
+  } catch (err) {
+    if (err instanceof z.ZodError) {
+      return res.status(400).json({ success: false, error: err.errors[0].message });
+    }
+    next(err);
   }
 });
 
