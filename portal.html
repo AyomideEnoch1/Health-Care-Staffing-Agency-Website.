@@ -809,6 +809,178 @@
       box-shadow: 0 0 0 3px rgba(27, 174, 207, 0.15);
     }
 
+    /* Dispatched Shift Allocation Card */
+    .allocated-shift-card {
+      background: #FFFFFF;
+      border: 1.5px solid #0284C7;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(2, 132, 199, 0.08);
+      margin-bottom: 1.25rem;
+    }
+
+    .shift-card-header {
+      background: linear-gradient(135deg, #0284C7 0%, #0369A1 100%);
+      color: #FFFFFF;
+      padding: 0.75rem 1.25rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .shift-badge-dispatched {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-size: 0.75rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      background: rgba(255, 255, 255, 0.22);
+      padding: 0.28rem 0.75rem;
+      border-radius: 9999px;
+    }
+
+    .shift-code-tag {
+      font-family: monospace;
+      font-size: 0.82rem;
+      font-weight: 700;
+      background: rgba(0, 0, 0, 0.2);
+      padding: 0.2rem 0.55rem;
+      border-radius: 4px;
+    }
+
+    .shift-card-body {
+      padding: 1.25rem;
+    }
+
+    .shift-facility-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--navy);
+      margin: 0 0 0.3rem 0;
+    }
+
+    .shift-unit-role {
+      font-size: 0.92rem;
+      color: #0284C7;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+
+    .shift-details-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 0.85rem;
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      border-radius: 8px;
+      padding: 0.95rem;
+      margin-bottom: 1.15rem;
+    }
+
+    .shift-detail-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.65rem;
+    }
+
+    .shift-detail-item i {
+      color: #0284C7;
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .shift-detail-label {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #64748B;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .shift-detail-val {
+      font-size: 0.88rem;
+      font-weight: 800;
+      color: var(--navy);
+    }
+
+    .instructions-callout {
+      background: #EFF6FF;
+      border-left: 3.5px solid #3B82F6;
+      padding: 0.75rem 1rem;
+      border-radius: 4px;
+      font-size: 0.82rem;
+      color: #1E40AF;
+      margin-bottom: 1.15rem;
+      line-height: 1.45;
+    }
+
+    /* Zero Allocation Notice */
+    .no-shift-assigned-card {
+      background: #F8FAFC;
+      border: 1.5px dashed #CBD5E1;
+      border-radius: 12px;
+      padding: 2.25rem 1.5rem;
+      text-align: center;
+      margin-bottom: 1.25rem;
+    }
+
+    .no-shift-icon-circle {
+      width: 54px;
+      height: 54px;
+      background: #E2E8F0;
+      color: #64748B;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 0.9rem auto;
+    }
+
+    .no-shift-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--navy);
+      margin: 0 0 0.4rem 0;
+    }
+
+    .no-shift-desc {
+      font-size: 0.86rem;
+      color: #64748B;
+      max-width: 520px;
+      margin: 0 auto 1.15rem auto;
+      line-height: 1.5;
+    }
+
+    .dispatch-contact-strip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      padding: 0.45rem 1.1rem;
+      border-radius: 9999px;
+      font-size: 0.82rem;
+      color: var(--navy);
+      font-weight: 600;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    }
+
+    .dispatch-contact-strip a {
+      color: #0284C7;
+      font-weight: 800;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
     .btn-clock-in {
       width: 100%;
       background: linear-gradient(135deg, #10B981 0%, #059669 100%);
@@ -1011,62 +1183,79 @@
             </div>
           </div>
 
-          <!-- Shift Selection & Clock In Form (When Off Duty) -->
+          <!-- Admin-Allocated Shift & Clock In (When Off Duty) -->
           <div id="clock-in-form-container">
-            <div class="clock-form-grid">
-              <div>
-                <label class="clock-form-label">Healthcare Facility / Hospital *</label>
-                <select id="clockin-facility-select" class="clock-form-input" onchange="toggleCustomFacility(this)">
-                  <option value="Scarborough Health Network - General Hospital">Scarborough Health Network - General Hospital</option>
-                  <option value="Sunnybrook Health Sciences Centre">Sunnybrook Health Sciences Centre</option>
-                  <option value="Toronto Central General Hospital">Toronto Central General Hospital</option>
-                  <option value="North York General Hospital">North York General Hospital</option>
-                  <option value="St. Michael's Hospital (Unity Health)">St. Michael's Hospital (Unity Health)</option>
-                  <option value="Michael Garron Hospital (Toronto East)">Michael Garron Hospital (Toronto East)</option>
-                  <option value="Trillium Health Partners - Mississauga">Trillium Health Partners - Mississauga</option>
-                  <option value="Extendicare Guildwood Long Term Care">Extendicare Guildwood Long Term Care</option>
-                  <option value="custom">Other Facility (Specify Name)...</option>
-                </select>
-                <input type="text" id="clockin-custom-facility" class="clock-form-input" placeholder="Type Facility / Hospital Name" style="display: none; margin-top: 0.5rem;">
+
+            <!-- State 1: Displayed when Admin has Allocated a Shift to this Staff -->
+            <div class="allocated-shift-card" id="allocated-shift-card" style="display: none;">
+              <div class="shift-card-header">
+                <div class="shift-badge-dispatched">
+                  <span class="pulse-dot"></span> DISPATCHED BY ADMIN
+                </div>
+                <span class="shift-code-tag" id="allocated-shift-code">REQ-DISPATCHED</span>
               </div>
-              <div>
-                <label class="clock-form-label">Hospital Unit / Department *</label>
-                <select id="clockin-unit-select" class="clock-form-input">
-                  <option value="Emergency Department (ED)">Emergency Department (ED)</option>
-                  <option value="Intensive Care Unit (ICU)">Intensive Care Unit (ICU)</option>
-                  <option value="General Medicine / Med-Surg">General Medicine / Med-Surg</option>
-                  <option value="Long Term Care / Geriatrics">Long Term Care / Geriatrics</option>
-                  <option value="Cardiology &amp; Telemetry">Cardiology &amp; Telemetry</option>
-                  <option value="Pediatrics &amp; NICU">Pediatrics &amp; NICU</option>
-                  <option value="Complex Continuing Care">Complex Continuing Care</option>
-                  <option value="Specialized Float Pool">Specialized Float Pool</option>
-                </select>
+              <div class="shift-card-body">
+                <h3 class="shift-facility-title" id="allocated-facility-name">Healthcare Partner Facility</h3>
+                <div class="shift-unit-role" id="allocated-unit-role">Clinical Unit • Healthcare Role</div>
+
+                <div class="shift-details-grid">
+                  <div class="shift-detail-item">
+                    <i data-lucide="calendar"></i>
+                    <div>
+                      <span class="shift-detail-label">Scheduled Date</span>
+                      <span class="shift-detail-val" id="allocated-shift-date">Today</span>
+                    </div>
+                  </div>
+                  <div class="shift-detail-item">
+                    <i data-lucide="clock"></i>
+                    <div>
+                      <span class="shift-detail-label">Shift Hours</span>
+                      <span class="shift-detail-val" id="allocated-shift-hours">Day Shift</span>
+                    </div>
+                  </div>
+                  <div class="shift-detail-item">
+                    <i data-lucide="user-check"></i>
+                    <div>
+                      <span class="shift-detail-label">Facility Contact</span>
+                      <span class="shift-detail-val" id="allocated-facility-contact">Clinical Dispatch</span>
+                    </div>
+                  </div>
+                  <div class="shift-detail-item">
+                    <i data-lucide="shield-check"></i>
+                    <div>
+                      <span class="shift-detail-label">Dispatch Status</span>
+                      <span class="shift-detail-val" style="color: #059669;">Verified / Confirmed</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="instructions-callout" id="allocated-instructions-box" style="display: none;">
+                  <strong>Reporting Instructions: </strong>
+                  <span id="allocated-instructions-text">Report to nursing supervisor upon arrival.</span>
+                </div>
+
+                <button type="button" class="btn-clock-in" id="btn-clock-in" onclick="handleClockIn()">
+                  <i data-lucide="play-circle" style="width: 20px; height: 20px;"></i>
+                  <span>🟢 Clock In to Dispatched Shift</span>
+                </button>
               </div>
             </div>
 
-            <div class="clock-form-grid" style="margin-top: 0.75rem;">
-              <div>
-                <label class="clock-form-label">Staff Practicing Role *</label>
-                <select id="clockin-role-select" class="clock-form-input">
-                  <option value="Registered Nurse (RN)">Registered Nurse (RN)</option>
-                  <option value="Registered Practical Nurse (RPN)">Registered Practical Nurse (RPN)</option>
-                  <option value="Personal Support Worker (PSW)">Personal Support Worker (PSW)</option>
-                  <option value="Travel Nurse">Travel Nurse</option>
-                  <option value="Clinical Companion">Clinical Companion</option>
-                </select>
+            <!-- State 2: Displayed when NO Shift is currently allocated by Admin -->
+            <div class="no-shift-assigned-card" id="no-shift-assigned-card" style="display: none;">
+              <div class="no-shift-icon-circle">
+                <i data-lucide="calendar-x" style="width: 26px; height: 26px;"></i>
               </div>
-              <div>
-                <label class="clock-form-label">Shift Verification Notes (Optional)</label>
-                <input type="text" id="clockin-notes" class="clock-form-input" placeholder="e.g. Unit 4B Coverage / Charge Nurse Sarah">
+              <h3 class="no-shift-title">No Active Shift Dispatched for Today</h3>
+              <p class="no-shift-desc">
+                The Admin Clinical Dispatch desk has not allocated an active healthcare placement to your profile for today. Once a coordinator schedules and dispatches your shift, all hospital parameters, unit reporting details, and your 1-tap Clock-In button will appear right here.
+              </p>
+              <div class="dispatch-contact-strip">
+                <span>Need shift assignment or scheduling update?</span>
+                <a href="tel:+16472106463"><i data-lucide="phone-call" style="width: 14px; height: 14px;"></i> Call Dispatch: (647) 210-6463</a>
               </div>
             </div>
 
-            <div style="margin-top: 1.25rem;">
-              <button type="button" class="btn-clock-in" id="btn-clock-in" onclick="handleClockIn()">
-                <i data-lucide="play-circle" style="width: 20px; height: 20px;"></i>
-                <span>🟢 1-Tap Clock In to Shift</span>
-              </button>
-            </div>
           </div>
 
           <!-- Recent Timecard & Punches Table -->
@@ -1525,18 +1714,7 @@
     let deviceClockInterval = null;
     let shiftDurationInterval = null;
     let currentActivePunch = null;
-
-    function toggleCustomFacility(select) {
-      const customInput = document.getElementById('clockin-custom-facility');
-      if (customInput) {
-        if (select.value === 'custom') {
-          customInput.style.display = 'block';
-          customInput.focus();
-        } else {
-          customInput.style.display = 'none';
-        }
-      }
-    }
+    let currentAssignedShift = null;
 
     function startDeviceClock() {
       if (deviceClockInterval) clearInterval(deviceClockInterval);
@@ -1599,6 +1777,8 @@
         const activeDetails  = document.getElementById('clock-active-details');
         const clockinForm    = document.getElementById('clock-in-form-container');
         const weeklyPill     = document.getElementById('weekly-hours-pill');
+        const allocatedCard  = document.getElementById('allocated-shift-card');
+        const noShiftCard    = document.getElementById('no-shift-assigned-card');
 
         if (weeklyPill && typeof data.weeklyHours !== 'undefined') {
           weeklyPill.textContent = `Week: ${data.weeklyHours} hrs`;
@@ -1645,6 +1825,52 @@
           if (shiftTimerBox) shiftTimerBox.style.display = 'none';
           if (activeDetails) activeDetails.style.display = 'none';
           if (clockinForm) clockinForm.style.display = 'block';
+
+          // Check if Admin has allocated a shift
+          if (data.assignedShift) {
+            currentAssignedShift = data.assignedShift;
+            if (allocatedCard) allocatedCard.style.display = 'block';
+            if (noShiftCard) noShiftCard.style.display = 'none';
+
+            const codeEl    = document.getElementById('allocated-shift-code');
+            const facEl     = document.getElementById('allocated-facility-name');
+            const unitEl    = document.getElementById('allocated-unit-role');
+            const dateEl    = document.getElementById('allocated-shift-date');
+            const hoursEl   = document.getElementById('allocated-shift-hours');
+            const contactEl = document.getElementById('allocated-facility-contact');
+            const instBox   = document.getElementById('allocated-instructions-box');
+            const instText  = document.getElementById('allocated-instructions-text');
+
+            if (codeEl) codeEl.textContent = currentAssignedShift.request_code || 'SHIFT-DISPATCHED';
+            if (facEl) facEl.textContent = currentAssignedShift.facility_name || 'Partner Facility';
+            if (unitEl) unitEl.textContent = `${currentAssignedShift.unit_department || 'General Care'} • ${currentAssignedShift.role_requested || 'Healthcare Professional'}`;
+
+            if (dateEl) {
+              if (currentAssignedShift.start_date) {
+                const sDate = new Date(currentAssignedShift.start_date);
+                dateEl.textContent = sDate.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+              } else {
+                dateEl.textContent = 'Today / Immediate';
+              }
+            }
+
+            if (hoursEl) hoursEl.textContent = currentAssignedShift.shift_type || 'Standard Shift';
+            if (contactEl) {
+              contactEl.textContent = `${currentAssignedShift.contact_name || 'Clinical Dispatch'} ${currentAssignedShift.contact_phone ? '• ' + currentAssignedShift.contact_phone : ''}`;
+            }
+
+            if (currentAssignedShift.special_instructions && currentAssignedShift.special_instructions.trim()) {
+              if (instBox) instBox.style.display = 'block';
+              if (instText) instText.textContent = currentAssignedShift.special_instructions.trim();
+            } else if (instBox) {
+              instBox.style.display = 'none';
+            }
+
+          } else {
+            currentAssignedShift = null;
+            if (allocatedCard) allocatedCard.style.display = 'none';
+            if (noShiftCard) noShiftCard.style.display = 'block';
+          }
         }
 
         if (window.lucide) lucide.createIcons();
@@ -1656,22 +1882,9 @@
 
     async function handleClockIn() {
       const btn = document.getElementById('btn-clock-in');
-      const facilitySelect = document.getElementById('clockin-facility-select');
-      const customFacility = document.getElementById('clockin-custom-facility');
-      const unitSelect = document.getElementById('clockin-unit-select');
-      const roleSelect = document.getElementById('clockin-role-select');
-      const notesInput = document.getElementById('clockin-notes');
 
-      let facilityName = facilitySelect ? facilitySelect.value : 'Scarborough Health Network';
-      if (facilityName === 'custom' && customFacility && customFacility.value.trim()) {
-        facilityName = customFacility.value.trim();
-      }
-      const unitDepartment = unitSelect ? unitSelect.value : 'General Medicine';
-      const role = roleSelect ? roleSelect.value : 'RN';
-      const notes = notesInput ? notesInput.value.trim() : '';
-
-      if (!facilityName) {
-        alert('Please select or specify a healthcare facility to clock into.');
+      if (!currentAssignedShift) {
+        alert('No active shift has been allocated to you by Clinical Dispatch yet.\nPlease check with your dispatch coordinator.');
         return;
       }
 
@@ -1686,10 +1899,10 @@
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
           body: JSON.stringify({
-            facility_name: facilityName,
-            unit_department: unitDepartment,
-            role: role,
-            notes: notes
+            shift_id: currentAssignedShift.id,
+            facility_name: currentAssignedShift.facility_name,
+            unit_department: currentAssignedShift.unit_department,
+            role: currentAssignedShift.role_requested
           })
         });
 
@@ -1706,7 +1919,7 @@
       } finally {
         if (btn) {
           btn.disabled = false;
-          btn.innerHTML = '<i data-lucide="play-circle" style="width: 20px; height: 20px;"></i> <span>🟢 1-Tap Clock In to Shift</span>';
+          btn.innerHTML = '<i data-lucide="play-circle" style="width: 20px; height: 20px;"></i> <span>🟢 Clock In to Dispatched Shift</span>';
           if (window.lucide) lucide.createIcons();
         }
       }

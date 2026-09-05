@@ -53,7 +53,7 @@ router.get('/', async (req, res, next) => {
 
 /**
  * GET /api/shifts/clock-status
- * Check current active punch status and weekly logged hours for the authenticated staff
+ * Check current active punch status, weekly logged hours, and admin-allocated shifts for the authenticated staff
  */
 router.get('/clock-status', async (req, res, next) => {
   try {
@@ -67,22 +67,47 @@ router.get('/clock-status', async (req, res, next) => {
       `SELECT id, staff_id, staff_name, shift_id, facility_name, unit_department, role,
               clock_in_time, status, notes
        FROM shift_punches
-       WHERE staff_id = ? AND status = 'active'
+       WHERE (staff_id = ? OR staff_email = ?) AND status = 'active'
        ORDER BY clock_in_time DESC
        LIMIT 1`,
-      [user.id]
+      [user.id, user.email || '']
     );
 
     const activePunch = (activeRows && activeRows.length > 0) ? activeRows[0] : null;
 
-    // 2. Compute weekly hours (last 7 days)
+    // 2. Fetch shifts allocated/dispatched by Admin to this staff member
+    let allocatedShifts = [];
+    try {
+      const [assignedRows] = await pool.query(
+        `SELECT r.id, r.request_code, r.facility_name, r.unit_department, r.role_requested,
+                r.shift_type, r.start_date, r.urgency_level, r.status, r.special_instructions,
+                r.contact_name, r.contact_phone, r.created_at
+         FROM staffing_requests r
+         WHERE (r.assigned_staff_id = ? OR r.assigned_staff_id IN (SELECT id FROM staff_roster WHERE email = ?))
+           AND r.status IN ('dispatched', 'in_session', 'confirmed')
+         ORDER BY CASE 
+           WHEN r.status = 'in_session' THEN 1 
+           WHEN r.status = 'dispatched' THEN 2 
+           ELSE 3 END,
+           r.start_date ASC, r.created_at DESC
+         LIMIT 10`,
+        [user.id, user.email || '']
+      );
+      allocatedShifts = assignedRows || [];
+    } catch (e) {
+      console.warn('[Allocated Shifts Query Warning]:', e.message);
+    }
+
+    const assignedShift = allocatedShifts.length > 0 ? allocatedShifts[0] : null;
+
+    // 3. Compute weekly hours (last 7 days)
     let weeklyHours = 0;
     try {
       const [sumRows] = await pool.query(
         `SELECT COALESCE(SUM(total_hours), 0) AS total_weekly_hours
          FROM shift_punches
-         WHERE staff_id = ? AND status = 'completed' AND clock_in_time >= DATE_SUB(NOW(), INTERVAL 7 DAY)`,
-        [user.id]
+         WHERE (staff_id = ? OR staff_email = ?) AND status = 'completed' AND clock_in_time >= DATE_SUB(NOW(), INTERVAL 7 DAY)`,
+        [user.id, user.email || '']
       );
       if (sumRows && sumRows.length > 0 && sumRows[0].total_weekly_hours) {
         weeklyHours = parseFloat(sumRows[0].total_weekly_hours) || 0;
@@ -93,6 +118,8 @@ router.get('/clock-status', async (req, res, next) => {
       success: true,
       onShift: Boolean(activePunch),
       activePunch,
+      assignedShift,
+      allocatedShifts,
       weeklyHours: Number(weeklyHours.toFixed(1))
     });
   } catch (err) {
@@ -101,8 +128,43 @@ router.get('/clock-status', async (req, res, next) => {
 });
 
 /**
+ * GET /api/shifts/my-assigned
+ * Returns all shifts allocated by admin to the authenticated staff member
+ */
+router.get('/my-assigned', async (req, res, next) => {
+  try {
+    const user = getAuthUser(req);
+    if (!user) {
+      return res.status(401).json({ success: false, error: 'Authentication required.' });
+    }
+
+    const [rows] = await pool.query(
+      `SELECT r.id, r.request_code, r.facility_name, r.unit_department, r.role_requested,
+              r.shift_type, r.start_date, r.urgency_level, r.status, r.special_instructions,
+              r.contact_name, r.contact_phone, r.created_at, r.clock_in_time, r.clock_out_time
+       FROM staffing_requests r
+       WHERE (r.assigned_staff_id = ? OR r.assigned_staff_id IN (SELECT id FROM staff_roster WHERE email = ?))
+       ORDER BY CASE 
+         WHEN r.status = 'in_session' THEN 1 
+         WHEN r.status = 'dispatched' THEN 2 
+         WHEN r.status = 'confirmed' THEN 3 
+         ELSE 4 END,
+         r.start_date ASC, r.created_at DESC`,
+      [user.id, user.email || '']
+    );
+
+    res.json({
+      success: true,
+      shifts: rows || []
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+/**
  * POST /api/shifts/clock-in
- * Healthcare staff clocks into a shift
+ * Healthcare staff clocks into an allocated shift
  */
 router.post('/clock-in', async (req, res, next) => {
   try {
@@ -113,8 +175,8 @@ router.post('/clock-in', async (req, res, next) => {
 
     // Check if already clocked in
     const [existing] = await pool.query(
-      `SELECT id, facility_name, clock_in_time FROM shift_punches WHERE staff_id = ? AND status = 'active' LIMIT 1`,
-      [user.id]
+      `SELECT id, facility_name, clock_in_time FROM shift_punches WHERE (staff_id = ? OR staff_email = ?) AND status = 'active' LIMIT 1`,
+      [user.id, user.email || '']
     );
 
     if (existing && existing.length > 0) {
@@ -125,13 +187,50 @@ router.post('/clock-in', async (req, res, next) => {
       });
     }
 
-    const {
+    let {
       shift_id,
-      facility_name = 'Divine Fingers Partner Facility',
-      unit_department = 'General Floor',
-      role = 'RN',
+      facility_name,
+      unit_department,
+      role,
       notes = null
     } = req.body || {};
+
+    // If shift_id was passed, look up the shift details directly from staffing_requests
+    if (shift_id) {
+      const [shiftRows] = await pool.query(
+        `SELECT id, request_code, facility_name, unit_department, role_requested, shift_type, status
+         FROM staffing_requests WHERE id = ?`,
+        [shift_id]
+      );
+      if (shiftRows && shiftRows.length > 0) {
+        const s = shiftRows[0];
+        facility_name = s.facility_name || facility_name;
+        unit_department = s.unit_department || unit_department;
+        role = s.role_requested || role;
+      }
+    } else {
+      // If no shift_id was passed, automatically find the latest allocated shift for this user!
+      const [allocated] = await pool.query(
+        `SELECT id, request_code, facility_name, unit_department, role_requested, shift_type, status
+         FROM staffing_requests
+         WHERE (assigned_staff_id = ? OR assigned_staff_id IN (SELECT id FROM staff_roster WHERE email = ?))
+           AND status IN ('dispatched', 'confirmed')
+         ORDER BY start_date ASC, created_at DESC
+         LIMIT 1`,
+        [user.id, user.email || '']
+      );
+      if (allocated && allocated.length > 0) {
+        const s = allocated[0];
+        shift_id = s.id;
+        facility_name = s.facility_name;
+        unit_department = s.unit_department;
+        role = s.role_requested;
+      }
+    }
+
+    facility_name = facility_name || 'Divine Fingers Partner Facility';
+    unit_department = unit_department || 'General Floor';
+    role = role || user.role || 'RN';
 
     const punchId = crypto.randomUUID();
     const staffName = user.full_name || 'Staff Member';
@@ -145,7 +244,7 @@ router.post('/clock-in', async (req, res, next) => {
       [punchId, user.id, staffName, staffEmail, shift_id || null, facility_name, unit_department, role, notes]
     );
 
-    // If shift_id was linked, update staffing_requests
+    // If shift_id was linked, update staffing_requests to 'in_session'
     if (shift_id) {
       await pool.query(
         `UPDATE staffing_requests SET status = 'in_session', clock_in_time = NOW() WHERE id = ?`,

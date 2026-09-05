@@ -1892,10 +1892,53 @@
   box-shadow: 0 8px 22px rgba(124, 194, 66, 0.45) !important;
 }
 
-@media (max-width: 860px) {
-  .header-cta-right .nav-cta-btn {
-    padding: 0.55rem 1.15rem !important;
-    font-size: 0.75rem !important;
+/* Mobile Nav Action Button (hidden on desktop, visible inside mobile drawer) */
+.mobile-nav-action {
+  display: none !important;
+}
+
+@media (max-width: 991px) {
+  /* Hide the top navbar header action button on mobile/tablet so it moves into drawer */
+  .header-cta-right {
+    display: none !important;
+  }
+
+  /* Show the action button inside the mobile drawer menu list */
+  .mobile-nav-action {
+    display: block !important;
+    width: 100% !important;
+    margin-top: 0.6rem !important;
+    padding-top: 1rem !important;
+    border-top: 1px solid rgba(26, 58, 99, 0.1) !important;
+  }
+
+  .mobile-nav-action .mobile-nav-btn {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    text-align: center !important;
+    padding: 0.82rem 1.6rem !important;
+    font-family: var(--font-heading) !important;
+    font-size: 0.88rem !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.5px !important;
+    background: linear-gradient(135deg, #3CAF8A 0%, #1BAECF 100%) !important;
+    color: #FFFFFF !important;
+    border: 1.5px solid #3CAF8A !important;
+    border-radius: var(--radius-pill) !important;
+    box-shadow: 0 4px 16px rgba(60, 175, 138, 0.35) !important;
+    text-decoration: none !important;
+    transition: all 0.25s ease !important;
+  }
+
+  .mobile-nav-action .mobile-nav-btn:hover,
+  .mobile-nav-action .mobile-nav-btn:active {
+    background: linear-gradient(135deg, #7CC242 0%, #3CAF8A 100%) !important;
+    border-color: var(--lime-green) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 6px 20px rgba(124, 194, 66, 0.45) !important;
   }
 }
 

@@ -260,6 +260,11 @@ ul {
   color: var(--cyan-turquoise);
 }
 
+/* Mobile Nav Action (hidden on desktop) */
+.mobile-nav-action {
+  display: none !important;
+}
+
 /* Mobile Nav Toggle */
 .mobile-toggle {
   display: none;
@@ -268,6 +273,8 @@ ul {
   cursor: pointer;
   flex-direction: column;
   gap: 5px;
+  padding: 0.4rem;
+  z-index: 1000;
 }
 
 .mobile-toggle span {
@@ -276,6 +283,18 @@ ul {
   background-color: var(--primary-blue);
   border-radius: 2px;
   transition: var(--transition-fast);
+}
+
+.mobile-toggle.active span:nth-child(1) {
+  transform: translateY(8px) rotate(45deg);
+}
+
+.mobile-toggle.active span:nth-child(2) {
+  opacity: 0;
+}
+
+.mobile-toggle.active span:nth-child(3) {
+  transform: translateY(-8px) rotate(-45deg);
 }
 
 /* ==========================================================================
@@ -2749,11 +2768,48 @@ ul {
 
   .mobile-toggle {
     display: flex;
+    margin-left: auto;
   }
 
   .header-cta-right {
-    margin-left: auto;
-    margin-right: 0.5rem;
+    display: none !important;
+  }
+
+  .mobile-nav-action {
+    display: block !important;
+    width: 100% !important;
+    margin-top: 0.6rem !important;
+    padding-top: 1rem !important;
+    border-top: 1px solid rgba(26, 58, 99, 0.08) !important;
+  }
+
+  .mobile-nav-action .mobile-nav-btn {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    text-align: center !important;
+    padding: 0.82rem 1.6rem !important;
+    font-family: var(--font-heading) !important;
+    font-size: 0.88rem !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.5px !important;
+    background: linear-gradient(135deg, #3CAF8A 0%, #1BAECF 100%) !important;
+    color: #FFFFFF !important;
+    border: 1.5px solid #3CAF8A !important;
+    border-radius: var(--radius-pill) !important;
+    box-shadow: 0 4px 16px rgba(60, 175, 138, 0.35) !important;
+    text-decoration: none !important;
+    transition: all 0.25s ease !important;
+  }
+
+  .mobile-nav-action .mobile-nav-btn:hover,
+  .mobile-nav-action .mobile-nav-btn:active {
+    background: linear-gradient(135deg, #7CC242 0%, #3CAF8A 100%) !important;
+    border-color: var(--lime-green) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 6px 20px rgba(124, 194, 66, 0.45) !important;
   }
 
   .hero-section {

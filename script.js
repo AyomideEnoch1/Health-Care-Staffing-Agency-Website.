@@ -11,9 +11,20 @@ document.addEventListener('DOMContentLoaded', () => {
   const navList = document.querySelector('.nav-list');
 
   if (mobileToggle && navList) {
-    mobileToggle.addEventListener('click', () => {
+    mobileToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
       navList.classList.toggle('open');
       mobileToggle.classList.toggle('active');
+    });
+
+    // Close mobile nav when tapping outside
+    document.addEventListener('click', (e) => {
+      if (navList.classList.contains('open')) {
+        if (!navList.contains(e.target) && !mobileToggle.contains(e.target)) {
+          navList.classList.remove('open');
+          mobileToggle.classList.remove('active');
+        }
+      }
     });
   }
 
