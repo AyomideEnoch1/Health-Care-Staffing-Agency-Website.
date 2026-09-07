@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Member Portal | Divine Fingers Healthcare Services Inc.</title>
-  <meta name="description" content="Manage clinical staffing requests, shift schedules, and healthcare assignments.">
+  <title>Member Portal | Divine Fingers Health Care Services Inc.</title>
+  <meta name="description" content="Manage clinical staffing requests, shift schedules, and health care assignments.">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -448,7 +448,7 @@
       color: #991B1B;
     }
 
-    /* Shift Cards for Healthcare Workers */
+    /* Shift Cards for Health Care Workers */
     .shift-card-item {
       border: 1.5px solid #E2E8F0;
       border-radius: 10px;
@@ -2610,7 +2610,7 @@
     }
 
     /* =========================================================================
-       EXECUTIVE HEALTHCARE PROFESSIONAL WORKSPACE STYLES
+       EXECUTIVE HEALTH CARE PROFESSIONAL WORKSPACE STYLES
        ========================================================================= */
     .avail-calendar-wrap {
       background: #FFFFFF;
@@ -3857,7 +3857,7 @@
        ENTERPRISE CLIENT WORKSPACE APP (CONCEPT LAYOUT)
        ======================================================================== -->
   <!-- ========================================================================= -->
-  <!-- HEALTHCARE FACILITY: SEGMENTED MULTI-PAGE WORKSPACE WITH COLLAPSIBLE SIDEBAR-->
+  <!-- HEALTH CARE FACILITY: SEGMENTED MULTI-PAGE WORKSPACE WITH COLLAPSIBLE SIDEBAR-->
   <!-- ========================================================================= -->
   <div id="client-workspace-app" class="portal-app-shell" style="display: none;">
 
@@ -3896,7 +3896,7 @@
 
         <button type="button" class="nav-item-btn" id="client-nav-request" data-page="client-page-request" onclick="switchClientPage('client-page-request', 'Request Staff')">
           <span class="nav-icon"><i data-lucide="plus-circle"></i></span>
-          <span class="nav-label">Request Healthcare Staff</span>
+          <span class="nav-label">Request Health Care Staff</span>
         </button>
 
         <button type="button" class="nav-item-btn" id="client-nav-active" data-page="client-page-active" onclick="switchClientPage('client-page-active', 'Active Shifts & EVV')">
@@ -3979,7 +3979,7 @@
           <div class="portal-welcome-banner" style="margin-bottom: 1.5rem;">
             <div class="welcome-title-group">
               <h1 id="client-greeting-title">Welcome back, Facility Coordinator</h1>
-              <p id="client-overview-sub">Real-time clinical shift dispatch, verified caregiver attendance tracking, and staffing coordination for your healthcare facility.</p>
+              <p id="client-overview-sub">Real-time clinical shift dispatch, verified caregiver attendance tracking, and staffing coordination for your health care facility.</p>
             </div>
             <div class="welcome-actions">
               <button type="button" class="btn-banner-action" onclick="switchClientPage('client-page-request', 'Request Staff')" style="background: #059669; border-color: #047857;">
@@ -4125,7 +4125,7 @@
           <div class="portal-panel" style="max-width: 800px; margin: 0 auto;">
             <div class="panel-header" style="flex-direction: column; align-items: flex-start; gap: 0.35rem; margin-bottom: 1.5rem;">
               <div class="panel-title" style="display: flex; align-items: center; gap: 0.55rem; font-size: 1.15rem;">
-                <i data-lucide="plus-circle" style="color: #059669;"></i> Request Healthcare Staffing Placement
+                <i data-lucide="plus-circle" style="color: #059669;"></i> Request Health Care Staffing Placement
               </div>
               <span id="client-request-eyebrow" style="font-size: 0.8rem; color: #64748B;">
                 Submit shift requirements directly into the automated dispatch queue.
@@ -4264,7 +4264,7 @@
           <div class="portal-panel">
             <div class="panel-header" style="flex-direction: column; align-items: flex-start; gap: 0.35rem; margin-bottom: 1.25rem;">
               <div class="panel-title" style="display: flex; align-items: center; gap: 0.55rem;">
-                <i data-lucide="users" style="color: #059669;"></i> Facility Healthcare Professional Roster
+                <i data-lucide="users" style="color: #059669;"></i> Facility Health Care Professional Roster
               </div>
               <span id="client-roster-eyebrow" style="font-size: 0.8rem; color: #64748B;">
                 Verified personnel dispatched to your hospital or long-term care facility with College of Nurses of Ontario standing.
@@ -4338,7 +4338,7 @@
   </div>
 
   <!-- ========================================================================= -->
-  <!-- HEALTHCARE WORKER: SEGMENTED MULTI-PAGE WORKSPACE WITH COLLAPSIBLE SIDEBAR -->
+  <!-- HEALTH CARE WORKER: SEGMENTED MULTI-PAGE WORKSPACE WITH COLLAPSIBLE SIDEBAR -->
   <!-- ========================================================================= -->
   <div id="worker-workspace-app" class="portal-app-shell" style="display: none;">
 
@@ -4418,7 +4418,7 @@
         <div class="sidebar-user-pill">
           <div class="sidebar-avatar-initials" id="portal-avatar-initials">DF</div>
           <div class="sidebar-user-meta">
-            <span class="sidebar-user-name" id="user-display-name">Healthcare Professional</span>
+            <span class="sidebar-user-name" id="user-display-name">Health Care Professional</span>
             <span class="sidebar-user-role" id="user-display-role">RN • Greater Toronto Area</span>
           </div>
         </div>
@@ -4472,7 +4472,7 @@
           <!-- Welcome Hero Banner -->
           <div class="portal-welcome-banner" style="margin-bottom: 1.5rem;">
             <div class="welcome-title-group">
-              <h1 id="banner-welcome-heading">Welcome, <span id="banner-staff-firstname">Healthcare Professional</span></h1>
+              <h1 id="banner-welcome-heading">Welcome, <span id="banner-staff-firstname">Health Care Professional</span></h1>
               <p id="banner-welcome-sub">Welcome to your Divine Fingers clinical command centre. Manage your EVV shift punches, explore broadcasted hospital shifts, and track your bi-weekly payroll.</p>
             </div>
             <div class="welcome-actions" id="banner-action-buttons">
@@ -5474,7 +5474,7 @@
       } catch (e) {}
       initHashRouting('client');
   
-      const facility = user.organization_name || user.facility_name || user.full_name || 'Healthcare Facility';
+      const facility = user.organization_name || user.facility_name || user.full_name || 'Health Care Facility';
       const unit = user.unit_department || 'Unit 4B · Medical/Surgical';
 
       const sideFac = document.getElementById('client-side-facility-name');
@@ -6384,7 +6384,7 @@
         return;
       }
 
-      // HEALTHCARE WORKER DASHBOARD
+      // HEALTH CARE WORKER DASHBOARD
       const clientApp = document.getElementById('client-workspace-app');
       const workerApp = document.getElementById('worker-workspace-app');
       if (clientApp) clientApp.style.display = 'none';
@@ -6711,7 +6711,7 @@ function initHashRouting(role) {
     if (role === 'client') {
       const clientMap = {
         'overview': { id: 'client-page-overview', title: 'Dashboard Overview' },
-        'request': { id: 'client-page-request', title: 'Request Healthcare Staff' },
+        'request': { id: 'client-page-request', title: 'Request Health Care Staff' },
         'active': { id: 'client-page-active', title: 'Active Shifts & EVV' },
         'roster': { id: 'client-page-roster', title: 'Facility Staff Roster' },
         'billing': { id: 'client-page-billing', title: 'Invoices & Billing' }
@@ -6738,7 +6738,7 @@ function initHashRouting(role) {
 }
 
 // ========================================================================
-// HEALTHCARE WORKER EXECUTIVE DASHBOARD CONTROLLER (SEGMENTED MULTI-PAGE)
+// HEALTH CARE WORKER EXECUTIVE DASHBOARD CONTROLLER (SEGMENTED MULTI-PAGE)
 // ========================================================================
 
 let currentStaffUser = null;
@@ -6767,7 +6767,7 @@ function initStaffWorkspace(user) {
   const avatarEl = document.getElementById('portal-avatar-initials');
   const bannerFirst = document.getElementById('banner-staff-firstname');
 
-  if (nameEl) nameEl.textContent = user.full_name || user.email || 'Healthcare Professional';
+  if (nameEl) nameEl.textContent = user.full_name || user.email || 'Health Care Professional';
   if (roleEl) roleEl.textContent = `${user.staff_role || 'RN'} • ${user.region || 'Greater Toronto Area'}`;
 
   const initials = (user.full_name || 'DF')
@@ -6994,7 +6994,7 @@ async function checkClockStatus() {
 
         const code = currentAssignedShift.request_code || 'SHIFT-DISPATCHED';
         const fac = currentAssignedShift.facility_name || 'Partner Health Facility';
-        const unit = `${currentAssignedShift.unit_department || 'General Care'} • ${currentAssignedShift.role_requested || 'Healthcare Professional'}`;
+        const unit = `${currentAssignedShift.unit_department || 'General Care'} • ${currentAssignedShift.role_requested || 'Health Care Professional'}`;
         const time = `${currentAssignedShift.shift_type || 'Day Shift'} (${currentAssignedShift.duration_hours || 12} hrs)`;
 
         if (codeEl) codeEl.textContent = code;
@@ -7303,7 +7303,7 @@ async function loadStaffOpenShifts() {
   const container = document.getElementById('worker-shifts-container');
   const countBadge = document.getElementById('staff-open-shifts-count-badge');
   if (!container) return;
-  container.innerHTML = '<div style="text-align: center; color: #64748B; padding: 2rem;">Scanning Ontario healthcare facilities for available shifts...</div>';
+  container.innerHTML = '<div style="text-align: center; color: #64748B; padding: 2rem;">Scanning Ontario health care facilities for available shifts...</div>';
 
   try {
     const res = await fetch(`${API_BASE}/shifts`, { credentials: 'include' });
@@ -7423,7 +7423,7 @@ function renderFilteredOpenShifts() {
 }
 
 async function claimShift(shiftId) {
-  if (!confirm('Confirm you want to claim and commit to this healthcare shift?')) return;
+  if (!confirm('Confirm you want to claim and commit to this health care shift?')) return;
 
   try {
     const res = await fetch(`${API_BASE}/shifts/${shiftId}/claim`, {

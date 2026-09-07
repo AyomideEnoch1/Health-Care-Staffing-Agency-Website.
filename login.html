@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sign In &amp; Sign Up | Divine Fingers Healthcare Services Inc.</title>
-  <meta name="description" content="Sign in to your Divine Fingers Healthcare portal to coordinate staffing requests, shifts, and clinical dispatch.">
+  <title>Sign In &amp; Sign Up | Divine Fingers Health Care Services Inc.</title>
+  <meta name="description" content="Sign in to your Divine Fingers Health Care portal to coordinate staffing requests, shifts, and clinical dispatch.">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -519,11 +519,11 @@
       
       <div class="auth-card-header">
         <a href="index.html" class="auth-brand-badge">
-          <img src="assets/images/brand_emblem.png" alt="Divine Fingers Healthcare">
+          <img src="assets/images/brand_emblem.png" alt="Divine Fingers Health Care">
           <span class="name">Divine Fingers Portal</span>
         </a>
         <h1 class="auth-title" id="auth-main-title">Welcome Back</h1>
-        <p class="auth-subtitle" id="auth-main-subtitle">Sign in to coordinate shifts, manage staffing requests, or view healthcare assignments.</p>
+        <p class="auth-subtitle" id="auth-main-subtitle">Sign in to coordinate shifts, manage staffing requests, or view health care assignments.</p>
       </div>
 
       <!-- TABS SWITCHER -->
@@ -595,12 +595,12 @@
               <div class="role-selector-grid">
                 <div class="role-option-card selected" id="role-client-card" onclick="selectRole('client')">
                   <i data-lucide="building-2"></i>
-                  <div class="role-option-title">Healthcare Facility</div>
+                  <div class="role-option-title">Health Care Facility</div>
                   <div class="role-option-desc">Hospital, LTC, or Clinic</div>
                 </div>
                 <div class="role-option-card" id="role-worker-card" onclick="selectRole('healthcare_worker')">
                   <i data-lucide="stethoscope"></i>
-                  <div class="role-option-title">Healthcare Professional</div>
+                  <div class="role-option-title">Health Care Professional</div>
                   <div class="role-option-desc">RN, RPN, PSW, Caregiver</div>
                 </div>
               </div>
@@ -743,14 +743,14 @@
         loginContent.classList.add('active');
         regContent.classList.remove('active');
         title.textContent = 'Welcome Back';
-        subtitle.textContent = 'Sign in to coordinate shifts, manage staffing requests, or view healthcare assignments.';
+        subtitle.textContent = 'Sign in to coordinate shifts, manage staffing requests, or view health care assignments.';
       } else {
         loginTabBtn.classList.remove('active');
         regTabBtn.classList.add('active');
         loginContent.classList.remove('active');
         regContent.classList.add('active');
         title.textContent = 'Create an Account';
-        subtitle.textContent = 'Register your facility for rapid staffing or join our network of premier healthcare professionals.';
+        subtitle.textContent = 'Register your facility for rapid staffing or join our network of premier health care professionals.';
       }
       if (window.lucide) lucide.createIcons();
     }
