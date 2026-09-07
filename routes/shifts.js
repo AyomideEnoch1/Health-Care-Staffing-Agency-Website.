@@ -158,7 +158,8 @@ router.get('/my-assigned', async (req, res, next) => {
 
     res.json({
       success: true,
-      shifts: rows || []
+      shifts: rows || [],
+      assignments: rows || []
     });
   } catch (err) {
     next(err);
@@ -307,8 +308,8 @@ router.post('/clock-out', async (req, res, next) => {
     }
 
     const [activeRows] = await pool.query(
-      `SELECT id, shift_id, facility_name, unit_department, clock_in_time FROM shift_punches WHERE staff_id = ? AND status = 'active' ORDER BY clock_in_time DESC LIMIT 1`,
-      [user.id]
+      `SELECT id, shift_id, facility_name, unit_department, clock_in_time FROM shift_punches WHERE (staff_id = ? OR staff_email = ?) AND status = 'active' ORDER BY clock_in_time DESC LIMIT 1`,
+      [user.id, user.email || '']
     );
 
     if (!activeRows || activeRows.length === 0) {
@@ -391,10 +392,10 @@ router.get('/my-punches', async (req, res, next) => {
     const [rows] = await pool.query(
       `SELECT id, shift_id, facility_name, unit_department, role, clock_in_time, clock_out_time, total_hours, status, notes
        FROM shift_punches
-       WHERE staff_id = ?
+       WHERE (staff_id = ? OR staff_email = ?)
        ORDER BY clock_in_time DESC
        LIMIT 20`,
-      [user.id]
+      [user.id, user.email || '']
     );
 
     res.json({ success: true, punches: rows || [] });
@@ -973,8 +974,8 @@ router.get('/availability', (req, res) => {
   const user = getAuthUser(req);
   if (!user) return res.status(401).json({ success: false, error: 'Authentication required.' });
   const key = user.id || user.email;
-  const avail = staffAvailabilityStore[key] || [0, 1, 0, 1, 1, 0, 0];
-  res.json({ success: true, availability: avail });
+  const avail = (typeof staffAvailabilityStore !== 'undefined' && staffAvailabilityStore[key]) ? staffAvailabilityStore[key] : [true, true, false, true, true, false, true];
+  res.json({ success: true, availability: avail, days: avail });
 });
 
 /**
@@ -984,10 +985,12 @@ router.get('/availability', (req, res) => {
 router.post('/availability', (req, res) => {
   const user = getAuthUser(req);
   if (!user) return res.status(401).json({ success: false, error: 'Authentication required.' });
-  const { availability } = req.body || {};
-  if (Array.isArray(availability)) {
+  const days = req.body && (req.body.days || req.body.availability);
+  if (Array.isArray(days)) {
     const key = user.id || user.email;
-    staffAvailabilityStore[key] = availability;
+    if (typeof staffAvailabilityStore !== 'undefined') {
+      staffAvailabilityStore[key] = days;
+    }
   }
   res.json({ success: true, message: 'Availability saved successfully.' });
 });

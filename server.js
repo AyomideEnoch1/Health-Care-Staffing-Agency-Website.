@@ -96,7 +96,7 @@ app.use(cors({
     return callback(new Error(`CORS: origin ${origin} not allowed.`));
   },
   credentials: true, // Required for cookies to be sent cross-origin
-  methods: ['GET', 'POST', 'PATCH', 'OPTIONS'],
+  methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'X-CSRF-Token']
 }));
 
@@ -133,6 +133,13 @@ function verifyCsrfToken(req, res, next) {
 // ── Body Parsers ──────────────────────────────────────────────────────────────
 app.use(express.json({ limit: '2mb' }));
 app.use(express.urlencoded({ extended: true, limit: '2mb' }));
+
+app.use((req, res, next) => {
+  if (req.url.startsWith('/api')) {
+    console.log(`[API ${req.method}] ${req.url}`);
+  }
+  next();
+});
 
 // ── Server-Side Gate for Admin Dashboard (Zero Unauthenticated Markup) ────────
 const jwt = require('jsonwebtoken');

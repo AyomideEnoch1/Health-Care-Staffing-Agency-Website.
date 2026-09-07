@@ -624,6 +624,21 @@
               </div>
             </div>
 
+            <!-- Clinical Role (Shown for Healthcare Professional) -->
+            <div class="form-group" id="group-clinical-role" style="display: none;">
+              <label class="form-label" for="reg-clinical-role">Clinical Designation</label>
+              <div class="input-wrapper">
+                <i data-lucide="award" class="field-icon"></i>
+                <select id="reg-clinical-role" class="auth-input" style="padding-left: 2.85rem; appearance: auto;">
+                  <option value="RN">Registered Nurse (RN)</option>
+                  <option value="RPN">Registered Practical Nurse (RPN)</option>
+                  <option value="PSW">Personal Support Worker (PSW)</option>
+                  <option value="Companion">Caregiver / Companion</option>
+                  <option value="Travel Nurse">Travel Nurse</option>
+                </select>
+              </div>
+            </div>
+
             <div class="form-group">
               <label class="form-label" for="reg-email">Email Address</label>
               <div class="input-wrapper">
@@ -699,29 +714,48 @@
 
     // Check if user is already authenticated
     async function checkCurrentSession() {
+      const urlParams = new URLSearchParams(window.location.search);
+      // If user came to login page because of explicit sign-out, ensure we clear any local cache and do not auto-redirect
+      if (urlParams.get('logout') === 'true' || urlParams.get('signout') === 'true') {
+        sessionStorage.removeItem('df_portal_user');
+        sessionStorage.removeItem('df_admin_user');
+        try {
+          localStorage.removeItem('df_portal_user');
+          localStorage.removeItem('df_admin_user');
+        } catch (e) {}
+        return;
+      }
+
       try {
         const res = await fetch(`${API_BASE}/users/me`, { credentials: 'include' });
         if (res.ok) {
           const data = await res.json();
           if (data && data.success && data.user) {
             sessionStorage.setItem('df_portal_user', JSON.stringify(data.user));
-            const params = new URLSearchParams(window.location.search);
-            const redirectUrl = params.get('redirect') || 'portal.html';
+            try { localStorage.setItem('df_portal_user', JSON.stringify(data.user)); } catch (e) {}
+            const redirectUrl = urlParams.get('redirect') || (data.user.role === 'super-admin' || data.user.role === 'admin' ? 'admin.html' : 'portal.html');
             window.location.href = redirectUrl;
             return;
+          } else {
+            // Not authenticated on server; ensure local state is cleaned
+            sessionStorage.removeItem('df_portal_user');
+            try { localStorage.removeItem('df_portal_user'); } catch (e) {}
           }
         }
       } catch (e) {
-        // Fallback to local session if on static preview
-        const stored = sessionStorage.getItem('df_portal_user');
-        if (stored) {
-          try {
-            const u = JSON.parse(stored);
-            if (u && u.email) {
-              const params = new URLSearchParams(window.location.search);
-              window.location.href = params.get('redirect') || 'portal.html';
-            }
-          } catch {}
+        // Fallback to local session only if on pure offline static preview
+        const isFile = window.location.protocol === 'file:';
+        if (isFile) {
+          const stored = sessionStorage.getItem('df_portal_user');
+          if (stored) {
+            try {
+              const u = JSON.parse(stored);
+              if (u && u.email) {
+                const redirectUrl = urlParams.get('redirect') || 'portal.html';
+                window.location.href = redirectUrl;
+              }
+            } catch {}
+          }
         }
       }
     }
@@ -761,15 +795,18 @@
       const clientCard = document.getElementById('role-client-card');
       const workerCard = document.getElementById('role-worker-card');
       const orgGroup = document.getElementById('group-org-name');
+      const clinicalGroup = document.getElementById('group-clinical-role');
 
       if (role === 'client') {
         clientCard.classList.add('selected');
         workerCard.classList.remove('selected');
-        orgGroup.style.display = 'block';
+        if (orgGroup) orgGroup.style.display = 'block';
+        if (clinicalGroup) clinicalGroup.style.display = 'none';
       } else {
         clientCard.classList.remove('selected');
         workerCard.classList.add('selected');
-        orgGroup.style.display = 'none';
+        if (orgGroup) orgGroup.style.display = 'none';
+        if (clinicalGroup) clinicalGroup.style.display = 'block';
       }
     }
 
@@ -912,6 +949,7 @@
       const phone = document.getElementById('reg-phone').value.trim();
       const password = document.getElementById('reg-password').value;
       const organization_name = role === 'client' ? document.getElementById('reg-orgname').value.trim() : null;
+      const clinical_role = role === 'healthcare_worker' ? (document.getElementById('reg-clinical-role') ? document.getElementById('reg-clinical-role').value : 'RN') : null;
       const submitBtn = document.getElementById('btn-register-submit');
 
       if (!full_name || !email || !password) {
@@ -938,7 +976,8 @@
             email,
             phone,
             password,
-            organization_name
+            organization_name,
+            clinical_role
           })
         });
 

@@ -600,6 +600,7 @@ router.get('/facility-roster', async (req, res, next) => {
         st.id AS staff_id,
         st.staff_code,
         st.name,
+        st.name AS full_name,
         st.role,
         st.specialty,
         st.rating,
@@ -730,6 +731,7 @@ router.get('/staff/:staffId/compliance', async (req, res, next) => {
     res.json({
       success: true,
       staff_name: st.name,
+      staff: dossier,
       compliance_dossier: dossier
     });
   } catch (err) {
