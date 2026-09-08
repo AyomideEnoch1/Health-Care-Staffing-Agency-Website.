@@ -69,7 +69,7 @@ router.post('/', publicFormLimiter, async (req, res, next) => {
     res.status(201).json({
       success: true,
       message: 'Staffing request submitted successfully.',
-      data: { request_code: requestCode }
+      data: { id, request_code: requestCode }
     });
   } catch (err) {
     if (err instanceof z.ZodError) {

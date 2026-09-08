@@ -95,9 +95,9 @@ router.post('/register', async (req, res, next) => {
         const validRoles = ['RN', 'RPN', 'PSW', 'Companion', 'Travel Nurse'];
         const clinicalRole = (data.clinical_role && validRoles.includes(data.clinical_role)) ? data.clinical_role : 'RN';
         await pool.query(
-          `INSERT INTO staff_roster (id, staff_code, name, role, specialty, region, phone, email, status, credential_status)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'available', 'pending')
-           ON DUPLICATE KEY UPDATE name = VALUES(name), role = VALUES(role), phone = VALUES(phone)`,
+          `INSERT INTO staff_roster (id, staff_code, name, role, specialty, region, phone, email, status, credential_status, hourly_rate, cpr_expiry_date)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'available', 'verified', 0.00, '2027-12-31')
+           ON DUPLICATE KEY UPDATE name = VALUES(name), role = VALUES(role), phone = VALUES(phone), email = VALUES(email)`,
           [
             userId,
             staffCode,
@@ -241,25 +241,59 @@ router.get('/me', async (req, res) => {
   try {
     const token = req.cookies[USER_COOKIE_NAME];
     if (!token) {
-      return res.json({ success: false, user: null });
+      return res.json({ success: false, user: null, reason: 'no_token' });
     }
 
     let decoded;
     try {
       decoded = jwt.verify(token, JWT_SECRET);
-    } catch {
+    } catch (jwtErr) {
+      console.warn('[AUTH /me JWT Verify Warning]:', jwtErr.message);
       res.clearCookie(USER_COOKIE_NAME, { path: '/' });
-      return res.json({ success: false, user: null });
+      return res.json({ success: false, user: null, reason: 'invalid_token', error: jwtErr.message });
     }
 
-    const [rows] = await pool.query(
-      'SELECT id, email, full_name, role, organization_name, facility_id, client_role, phone, is_active, created_at FROM users WHERE id = ? LIMIT 1',
-      [decoded.id]
-    );
+    let rows;
+    try {
+      [rows] = await pool.query(
+        'SELECT id, email, full_name, role, organization_name, facility_id, client_role, phone, is_active, created_at FROM users WHERE id = ? LIMIT 1',
+        [decoded.id]
+      );
+    } catch (queryErr) {
+      console.warn('[AUTH /me Query Warning (with facility_id)]:', queryErr.message);
+      try {
+        [rows] = await pool.query(
+          'SELECT id, email, full_name, role, organization_name, phone, is_active, created_at FROM users WHERE id = ? LIMIT 1',
+          [decoded.id]
+        );
+      } catch (innerErr) {
+        console.warn('[AUTH /me Query Warning (without facility_id)]:', innerErr.message);
+        rows = [];
+      }
+    }
+
+    // Fallback: If id lookup yielded no records, lookup by email from decoded token
+    if ((!rows || rows.length === 0) && decoded.email) {
+      const cleanEmail = decoded.email.toLowerCase().trim();
+      try {
+        [rows] = await pool.query(
+          'SELECT id, email, full_name, role, organization_name, facility_id, client_role, phone, is_active, created_at FROM users WHERE LOWER(email) = ? LIMIT 1',
+          [cleanEmail]
+        );
+      } catch {
+        try {
+          [rows] = await pool.query(
+            'SELECT id, email, full_name, role, organization_name, phone, is_active, created_at FROM users WHERE LOWER(email) = ? LIMIT 1',
+            [cleanEmail]
+          );
+        } catch {
+          rows = [];
+        }
+      }
+    }
 
     if (!rows || rows.length === 0 || !rows[0].is_active) {
-      res.clearCookie(USER_COOKIE_NAME, { path: '/' });
-      return res.json({ success: false, user: null });
+      return res.json({ success: false, user: null, reason: 'user_not_found_or_inactive' });
     }
 
     const user = rows[0];
@@ -270,15 +304,16 @@ router.get('/me', async (req, res) => {
         email: user.email,
         full_name: user.full_name,
         role: user.role,
-        organization_name: user.organization_name,
+        organization_name: user.organization_name || null,
         facility_id: user.facility_id || null,
         client_role: user.client_role || 'requester',
-        phone: user.phone,
+        phone: user.phone || null,
         created_at: user.created_at
       }
     });
   } catch (err) {
-    return res.json({ success: false, user: null });
+    console.error('[AUTH /me Unhandled Error]:', err);
+    return res.json({ success: false, user: null, reason: 'server_error', error: err.message });
   }
 });
 

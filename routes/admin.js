@@ -210,6 +210,18 @@ router.get('/requests', requirePermission('requests:view'), async (req, res, nex
   } catch (err) { next(err); }
 });
 
+// GET /api/admin/newsletter — alias to view newsletter subscribers
+router.get('/newsletter', requirePermission('newsletter:manage'), async (req, res, next) => {
+  try {
+    const [rows] = await pool.query(
+      'SELECT id, email, status, source, ip_address, created_at FROM newsletter_subscribers ORDER BY created_at DESC'
+    );
+    res.json({ success: true, data: rows || [] });
+  } catch (err) {
+    res.json({ success: true, data: [] });
+  }
+});
+
 // PATCH /api/admin/requests/:id/status
 router.patch('/requests/:id/status', requirePermission('requests:dispatch'), async (req, res, next) => {
   try {

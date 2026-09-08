@@ -41,10 +41,75 @@ try {
   });
 
   realPool.getConnection()
-    .then(conn => {
+    .then(async conn => {
       isMySqlAvailable = true;
       console.log(`✅ [Database] Connected to MySQL (${host}:${port}/${database})`);
-      conn.release();
+
+      // Auto-heal / verify schema integrity across all deployment targets
+      try {
+        await conn.query(`
+          CREATE TABLE IF NOT EXISTS shift_punches (
+            id VARCHAR(64) NOT NULL,
+            staff_id VARCHAR(64) NOT NULL,
+            staff_name VARCHAR(120) NOT NULL DEFAULT 'Staff Member',
+            staff_email VARCHAR(191) NOT NULL DEFAULT '',
+            shift_id VARCHAR(64) NULL DEFAULT NULL,
+            facility_name VARCHAR(150) NOT NULL DEFAULT 'Unknown Facility',
+            unit_department VARCHAR(100) NOT NULL DEFAULT 'General Floor',
+            role VARCHAR(60) NOT NULL DEFAULT 'RN',
+            clock_in_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            clock_out_time DATETIME NULL DEFAULT NULL,
+            total_hours DECIMAL(5,2) NOT NULL DEFAULT 0.00,
+            notes TEXT NULL DEFAULT NULL,
+            status ENUM('active','completed','cancelled') NOT NULL DEFAULT 'active',
+            created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY (id),
+            INDEX idx_punches_staff (staff_id),
+            INDEX idx_punches_status (status)
+          ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+        `);
+
+        await conn.query(`
+          CREATE TABLE IF NOT EXISTS staff_documents (
+            id VARCHAR(64) NOT NULL,
+            staff_id VARCHAR(64) NOT NULL,
+            doc_type ENUM('cpr','n95','vss','license','other') NOT NULL DEFAULT 'other',
+            title VARCHAR(200) NOT NULL,
+            file_path VARCHAR(500) NOT NULL,
+            file_name VARCHAR(255) NOT NULL,
+            file_size INT UNSIGNED NOT NULL DEFAULT 0,
+            mime_type VARCHAR(100) NOT NULL DEFAULT 'application/pdf',
+            expiry_date DATE NULL DEFAULT NULL,
+            uploaded_by VARCHAR(100) NOT NULL DEFAULT 'Staff',
+            created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (id),
+            INDEX idx_docs_staff (staff_id)
+          ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+        `);
+
+        await conn.query(`
+          CREATE TABLE IF NOT EXISTS newsletter_subscribers (
+            id VARCHAR(64) NOT NULL,
+            email VARCHAR(191) NOT NULL,
+            status ENUM('active','unsubscribed') NOT NULL DEFAULT 'active',
+            source VARCHAR(50) NOT NULL DEFAULT 'homepage_strip',
+            ip_address VARCHAR(45) NULL,
+            created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (id),
+            UNIQUE KEY idx_newsletter_email (email)
+          ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+        `);
+
+        try { await conn.query('ALTER TABLE users MODIFY COLUMN id VARCHAR(64) NOT NULL'); } catch (_) {}
+        try { await conn.query('ALTER TABLE staffing_requests ADD COLUMN clock_in_time DATETIME NULL DEFAULT NULL'); } catch (_) {}
+        try { await conn.query('ALTER TABLE staffing_requests ADD COLUMN clock_out_time DATETIME NULL DEFAULT NULL'); } catch (_) {}
+        try { await conn.query(`ALTER TABLE staffing_requests MODIFY COLUMN status ENUM('pending','confirmed','dispatched','in_session','completed','cancelled') NOT NULL DEFAULT 'pending'`); } catch (_) {}
+      } catch (schemaNotice) {
+        console.warn('⚠️ [Database Schema Verification Notice]:', schemaNotice.message);
+      } finally {
+        conn.release();
+      }
     })
     .catch(err => {
       isMySqlAvailable = false;
@@ -104,6 +169,7 @@ const inMemoryStore = {
   contact_inquiries: [],
   audit_logs: [],
   staff_documents: [],
+  shift_punches: [],
   newsletter_subscribers: [],
   // IMPORTANT: users[] must NEVER contain administrator emails.
   // Admins live exclusively in admins[]. Mixing them here bypasses the
@@ -198,19 +264,78 @@ function handleInMemoryQuery(sql, params = []) {
   // 5. STAFF_ROSTER
   if (normalized.includes('staff_roster')) {
     if (normalized.startsWith('select')) {
+      if (normalized.includes('count(*)')) {
+        return [[{ total: inMemoryStore.staff_roster.length, count: inMemoryStore.staff_roster.length }]];
+      }
       if (normalized.includes('where id = ?')) {
-        return [inMemoryStore.staff_roster.filter(s => s.id === params[0])];
+        return [inMemoryStore.staff_roster.filter(s => s.id === params[0] || s.email === params[0])];
+      }
+      if (normalized.includes('where id = ? or email = ?') || normalized.includes('where email = ? or id = ?')) {
+        return [inMemoryStore.staff_roster.filter(s => s.id === params[0] || s.email === params[0] || s.id === params[1] || s.email === params[1])];
+      }
+      if (normalized.includes('where email = ?')) {
+        return [inMemoryStore.staff_roster.filter(s => s.email === params[0])];
       }
       return [inMemoryStore.staff_roster];
     }
     if (normalized.startsWith('insert')) {
-      const newStaff = { id: params[0] || crypto.randomUUID(), name: params[2] || 'Staff Member', role: params[3] || 'RN', created_at: new Date().toISOString() };
-      inMemoryStore.staff_roster.push(newStaff);
+      // INSERT INTO staff_roster (id, staff_code, name, role, specialty, region, phone, email, status, credential_status)
+      const existingIdx = inMemoryStore.staff_roster.findIndex(s => s.id === params[0] || s.email === params[7]);
+      const newStaff = {
+        id: params[0] || crypto.randomUUID(),
+        staff_code: params[1] || ('STF-' + String(inMemoryStore.staff_roster.length + 1).padStart(3, '0')),
+        name: params[2] || 'Staff Member',
+        role: params[3] || 'RN',
+        specialty: params[4] || 'General Care',
+        region: params[5] || 'Greater Toronto Area',
+        phone: params[6] || null,
+        email: params[7] || null,
+        status: params[8] || 'available',
+        credential_status: params[9] || 'pending',
+        rating: 5.00,
+        shifts_completed: 0,
+        hourly_rate: 0.00,
+        cpr_expiry_date: '2027-12-31',
+        vss_status: 'Clear',
+        n95_fit_test: '3M Valid',
+        cno_registration_num: null,
+        avatar_url: null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+      if (existingIdx >= 0) {
+        // ON DUPLICATE KEY UPDATE
+        const existing = inMemoryStore.staff_roster[existingIdx];
+        existing.name = newStaff.name;
+        existing.role = newStaff.role;
+        existing.phone = newStaff.phone;
+        existing.updated_at = newStaff.updated_at;
+      } else {
+        inMemoryStore.staff_roster.push(newStaff);
+      }
       return [{ affectedRows: 1, insertId: inMemoryStore.staff_roster.length }];
     }
+    if (normalized.startsWith('update')) {
+      const targetParam = params[params.length - 1];
+      const staff = inMemoryStore.staff_roster.find(s => s.id === targetParam || s.email === targetParam);
+      if (staff) {
+        if (normalized.includes("status = 'on-shift'")) staff.status = 'on-shift';
+        if (normalized.includes("status = 'available'")) staff.status = 'available';
+        if (normalized.includes("status = 'off-duty'")) staff.status = 'off-duty';
+        if (normalized.includes('shifts_completed')) staff.shifts_completed = (staff.shifts_completed || 0) + 1;
+        if (normalized.includes('cpr_expiry_date') && params[0]) staff.cpr_expiry_date = params[0];
+        if (normalized.includes('credential_status') && params[0]) staff.credential_status = params[0];
+        staff.updated_at = new Date().toISOString();
+      }
+      return [{ affectedRows: staff ? 1 : 0 }];
+    }
     if (normalized.startsWith('delete')) {
-      inMemoryStore.staff_roster = [];
-      return [{ affectedRows: 0 }];
+      if (params.length > 0) {
+        inMemoryStore.staff_roster = inMemoryStore.staff_roster.filter(s => s.id !== params[0] && s.email !== params[0]);
+      } else {
+        inMemoryStore.staff_roster = [];
+      }
+      return [{ affectedRows: 1 }];
     }
   }
 
@@ -219,6 +344,15 @@ function handleInMemoryQuery(sql, params = []) {
     if (normalized.startsWith('select')) {
       if (normalized.includes('where id = ?')) {
         return [inMemoryStore.staffing_requests.filter(r => r.id === params[0])];
+      }
+      if (normalized.includes('contact_email = ?')) {
+        return [inMemoryStore.staffing_requests.filter(r => r.contact_email === params[0])];
+      }
+      if (normalized.includes('assigned_staff_id = ?') || normalized.includes('assigned_staff_id in')) {
+        return [inMemoryStore.staffing_requests.filter(r => r.assigned_staff_id === params[0] || (params[1] && r.assigned_staff_email === params[1]))];
+      }
+      if (normalized.includes("where r.status in ('pending', 'confirmed', 'dispatched')") || normalized.includes("where status in ('pending', 'confirmed', 'dispatched')")) {
+        return [inMemoryStore.staffing_requests.filter(r => ['pending', 'confirmed', 'dispatched'].includes(r.status))];
       }
       return [inMemoryStore.staffing_requests];
     }
@@ -238,11 +372,43 @@ function handleInMemoryQuery(sql, params = []) {
         start_date: hasBatch ? params[10] : null,
         urgency_level: hasBatch ? params[11] : params[9] || 'routine',
         status: 'pending',
+        assigned_staff_id: null,
+        assigned_staff_email: null,
+        clock_in_time: null,
+        clock_out_time: null,
         special_instructions: hasBatch ? params[12] : params[10] || null,
-        created_at: new Date().toISOString()
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
       };
       inMemoryStore.staffing_requests.push(newReq);
-      return [{ affectedRows: 1, insertId: 1 }];
+      return [{ affectedRows: 1, insertId: newReq.id }];
+    }
+    if (normalized.startsWith('update')) {
+      const targetId = params[params.length - 1];
+      const reqItem = inMemoryStore.staffing_requests.find(r => r.id === targetId || r.request_code === targetId);
+      if (reqItem) {
+        if (normalized.includes("status = 'in_session'")) {
+          reqItem.status = 'in_session';
+          reqItem.clock_in_time = new Date().toISOString();
+        } else if (normalized.includes("status = 'completed'")) {
+          reqItem.status = 'completed';
+          reqItem.clock_out_time = new Date().toISOString();
+        } else if (normalized.includes("status = 'cancelled'")) {
+          reqItem.status = 'cancelled';
+          reqItem.cancelled_at = new Date().toISOString();
+          reqItem.cancellation_reason = params[0] || 'Cancelled by client';
+        } else if (normalized.includes('status = ?')) {
+          reqItem.status = params[0];
+          if (params.length > 2 && params[1]) reqItem.assigned_staff_id = params[1];
+        }
+        if (normalized.includes('client_rating = ?')) {
+          reqItem.client_rating = params[0];
+          reqItem.client_feedback = params[1] || null;
+          reqItem.client_rated_at = new Date().toISOString();
+        }
+        reqItem.updated_at = new Date().toISOString();
+      }
+      return [{ affectedRows: reqItem ? 1 : 0 }];
     }
     if (normalized.startsWith('delete')) {
       inMemoryStore.staffing_requests = [];
@@ -377,6 +543,8 @@ function handleInMemoryQuery(sql, params = []) {
         role: params[4] || 'client',
         organization_name: params[5] || null,
         phone: params[6] || null,
+        facility_id: null,
+        client_role: 'requester',
         is_active: 1,
         email_verified: 1,
         last_login: new Date().toISOString(),
@@ -400,17 +568,26 @@ function handleInMemoryQuery(sql, params = []) {
   // 13. SHIFT_PUNCHES
   if (normalized.includes('shift_punches') || normalized.includes('`shift_punches`')) {
     if (normalized.startsWith('select')) {
+      if (normalized.includes('sum(total_hours)')) {
+        const staffId = params[0] || '';
+        const email = params[1] || '';
+        const punches = (inMemoryStore.shift_punches || []).filter(p => (p.staff_id === staffId || p.staff_email === email) && p.status === 'completed');
+        const sum = punches.reduce((acc, p) => acc + (parseFloat(p.total_hours) || 0), 0);
+        return [[{ total_weekly_hours: sum }]];
+      }
       if (normalized.includes("status = 'active'")) {
-        const staffIdParam = params[0];
-        const active = inMemoryStore.shift_punches.filter(p => p.staff_id === staffIdParam && p.status === 'active');
+        const staffIdParam = params[0] || '';
+        const emailParam = params[1] || '';
+        const active = (inMemoryStore.shift_punches || []).filter(p => (p.staff_id === staffIdParam || p.staff_email === emailParam) && p.status === 'active');
         return [active];
       }
-      if (normalized.includes('where staff_id = ?')) {
-        const staffIdParam = params[0];
-        const list = inMemoryStore.shift_punches.filter(p => p.staff_id === staffIdParam);
+      if (normalized.includes('staff_id') || normalized.includes('staff_email')) {
+        const staffIdParam = params[0] || '';
+        const emailParam = params[1] || '';
+        const list = (inMemoryStore.shift_punches || []).filter(p => p.staff_id === staffIdParam || p.staff_email === emailParam);
         return [list];
       }
-      return [inMemoryStore.shift_punches];
+      return [inMemoryStore.shift_punches || []];
     }
     if (normalized.startsWith('insert')) {
       const punch = {
@@ -430,18 +607,20 @@ function handleInMemoryQuery(sql, params = []) {
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       };
+      if (!inMemoryStore.shift_punches) inMemoryStore.shift_punches = [];
       inMemoryStore.shift_punches.unshift(punch);
       return [{ affectedRows: 1, insertId: punch.id }];
     }
     if (normalized.startsWith('update')) {
       if (params.length > 0) {
         const targetId = params[params.length - 1];
-        const punch = inMemoryStore.shift_punches.find(p => p.id === targetId);
+        const punch = (inMemoryStore.shift_punches || []).find(p => p.id === targetId);
         if (punch) {
           punch.status = 'completed';
           punch.clock_out_time = new Date().toISOString();
           punch.total_hours = params[0] || 0;
           punch.notes = params[1] || punch.notes;
+          punch.updated_at = new Date().toISOString();
         }
       }
       return [{ affectedRows: 1 }];
