@@ -345,8 +345,9 @@ function handleInMemoryQuery(sql, params = []) {
       if (normalized.includes('where id = ?')) {
         return [inMemoryStore.staffing_requests.filter(r => r.id === params[0])];
       }
-      if (normalized.includes('contact_email = ?')) {
-        return [inMemoryStore.staffing_requests.filter(r => r.contact_email === params[0])];
+      if (normalized.includes('contact_email')) {
+        const email = (params[0] || '').toLowerCase().trim();
+        return [inMemoryStore.staffing_requests.filter(r => (r.contact_email || '').toLowerCase() === email)];
       }
       if (normalized.includes('assigned_staff_id = ?') || normalized.includes('assigned_staff_id in')) {
         return [inMemoryStore.staffing_requests.filter(r => r.assigned_staff_id === params[0] || (params[1] && r.assigned_staff_email === params[1]))];
@@ -662,7 +663,8 @@ const pool = {
   },
   isMySqlAvailable() {
     return isMySqlAvailable || Boolean(realPool);
-  }
+  },
+  inMemoryStore
 };
 
 module.exports = pool;

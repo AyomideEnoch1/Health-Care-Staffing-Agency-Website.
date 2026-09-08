@@ -120,7 +120,8 @@ router.post('/register', async (req, res, next) => {
       email: emailClean,
       full_name: data.full_name.trim(),
       role: data.role,
-      organization_name: data.organization_name || null
+      organization_name: data.organization_name || null,
+      phone: data.phone || null
     };
 
     const token = jwt.sign(tokenPayload, JWT_SECRET, { expiresIn: '7d' });
@@ -200,7 +201,8 @@ router.post('/login', authLoginLimiter, async (req, res, next) => {
           email: user.email,
           full_name: user.full_name,
           role: user.role,
-          organization_name: user.organization_name
+          organization_name: user.organization_name,
+          phone: user.phone || null
         };
 
         const token = jwt.sign(tokenPayload, JWT_SECRET, { expiresIn: '7d' });
@@ -292,11 +294,51 @@ router.get('/me', async (req, res) => {
       }
     }
 
-    if (!rows || rows.length === 0 || !rows[0].is_active) {
-      return res.json({ success: false, user: null, reason: 'user_not_found_or_inactive' });
+    let user = (rows && rows.length > 0 && rows[0].is_active) ? rows[0] : null;
+
+    if (!user) {
+      if (decoded && decoded.id && decoded.email) {
+        // Re-hydrate session from verified cryptographic JWT
+        user = {
+          id: decoded.id,
+          email: decoded.email,
+          full_name: decoded.full_name || 'Portal User',
+          role: decoded.role || 'client',
+          organization_name: decoded.organization_name || null,
+          facility_id: decoded.facility_id || null,
+          client_role: decoded.client_role || 'requester',
+          phone: decoded.phone || null,
+          created_at: new Date().toISOString()
+        };
+
+        // If user is healthcare_worker, also ensure they are in staff_roster so admin roster sees them
+        if (decoded.role === 'healthcare_worker' && pool.inMemoryStore?.staff_roster) {
+          const roster = pool.inMemoryStore.staff_roster;
+          if (!roster.some(s => s.id === decoded.id || s.email === decoded.email)) {
+            roster.push({
+              id: decoded.id,
+              staff_code: 'STF-' + String(roster.length + 1).padStart(3, '0'),
+              name: decoded.full_name || 'Staff Member',
+              role: 'RN',
+              specialty: 'General Care',
+              region: 'Greater Toronto Area',
+              phone: decoded.phone || null,
+              email: decoded.email,
+              status: 'available',
+              credential_status: 'verified',
+              rating: 5.00,
+              shifts_completed: 0,
+              hourly_rate: 0.00,
+              cpr_expiry_date: '2027-12-31',
+              created_at: new Date().toISOString()
+            });
+          }
+        }
+      } else {
+        return res.json({ success: false, user: null, reason: 'user_not_found_or_inactive' });
+      }
     }
 
-    const user = rows[0];
     return res.json({
       success: true,
       user: {
