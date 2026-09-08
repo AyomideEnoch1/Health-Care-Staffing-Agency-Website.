@@ -105,8 +105,16 @@ const inMemoryStore = {
   audit_logs: [],
   staff_documents: [],
   newsletter_subscribers: [],
+  // IMPORTANT: users[] must NEVER contain administrator emails.
+  // Admins live exclusively in admins[]. Mixing them here bypasses the
+  // /api/users/login 403 rejection check and lets admins access the public portal.
   users: []
 };
+
+// Set of admin emails for fast O(1) lookup — used to guard users[] queries.
+const _adminEmailSet = new Set(
+  inMemoryStore.admins.map(a => a.email.toLowerCase())
+);
 
 // ── In-Memory Query Router ────────────────────────────────────────────────────
 function handleInMemoryQuery(sql, params = []) {
@@ -348,15 +356,17 @@ function handleInMemoryQuery(sql, params = []) {
     if (normalized.startsWith('select')) {
       if (normalized.includes('where email = ?') || normalized.includes('where lower(email) = ?')) {
         const emailParam = (params[0] || '').toLowerCase().trim();
+        // Guard: never return a user row for an admin email address
+        if (_adminEmailSet.has(emailParam)) return [[]];
         const found = inMemoryStore.users.filter(u => u.email.toLowerCase() === emailParam);
         return [found];
       }
       if (normalized.includes('where id = ?')) {
         const idParam = params[0];
-        const found = inMemoryStore.users.filter(u => u.id === idParam);
+        const found = inMemoryStore.users.filter(u => u.id === idParam && !_adminEmailSet.has(u.email.toLowerCase()));
         return [found];
       }
-      return [inMemoryStore.users];
+      return [inMemoryStore.users.filter(u => !_adminEmailSet.has(u.email.toLowerCase()))];
     }
     if (normalized.startsWith('insert')) {
       const newUser = {
