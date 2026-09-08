@@ -586,6 +586,21 @@ router.patch('/roster/:id', requirePermission('roster:manage'), async (req, res,
 // CLINICAL CREDENTIALS & STAFF DOCUMENTS
 // ============================================================================
 
+// GET /api/admin/staff/:id/availability — Retrieve caregiver's submitted 7-day availability
+router.get('/staff/:id/availability', async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const [staffRows] = await pool.query('SELECT id, email, name FROM staff_roster WHERE id = ?', [id]);
+    let email = '';
+    if (staffRows.length > 0 && staffRows[0].email) {
+      email = staffRows[0].email.toLowerCase().trim();
+    }
+    const store = global.staffAvailabilityStore || {};
+    const avail = store[email] || store[id] || [true, true, true, true, true, false, false];
+    res.json({ success: true, availability: avail, days: avail });
+  } catch (err) { next(err); }
+});
+
 // GET /api/admin/staff/:id/documents — Retrieve all documents for a staff member
 router.get('/staff/:id/documents', async (req, res, next) => {
   try {

@@ -970,11 +970,13 @@ router.get('/pay-summary', async (req, res, next) => {
  * GET /api/shifts/availability
  * Retrieve 7-day availability preference
  */
+if (!global.staffAvailabilityStore) global.staffAvailabilityStore = {};
+
 router.get('/availability', (req, res) => {
   const user = getAuthUser(req);
   if (!user) return res.status(401).json({ success: false, error: 'Authentication required.' });
-  const key = user.id || user.email;
-  const avail = (typeof staffAvailabilityStore !== 'undefined' && staffAvailabilityStore[key]) ? staffAvailabilityStore[key] : [true, true, false, true, true, false, true];
+  const key = (user.email || user.id || '').toLowerCase().trim();
+  const avail = global.staffAvailabilityStore[key] || global.staffAvailabilityStore[user.id] || [true, true, true, true, true, false, false];
   res.json({ success: true, availability: avail, days: avail });
 });
 
@@ -985,12 +987,11 @@ router.get('/availability', (req, res) => {
 router.post('/availability', (req, res) => {
   const user = getAuthUser(req);
   if (!user) return res.status(401).json({ success: false, error: 'Authentication required.' });
-  const days = req.body && (req.body.days || req.body.availability);
+  const days = req.body && (req.body.days || req.body.availability || req.body.available_dates);
   if (Array.isArray(days)) {
-    const key = user.id || user.email;
-    if (typeof staffAvailabilityStore !== 'undefined') {
-      staffAvailabilityStore[key] = days;
-    }
+    const key = (user.email || user.id || '').toLowerCase().trim();
+    global.staffAvailabilityStore[key] = days;
+    if (user.id) global.staffAvailabilityStore[user.id] = days;
   }
   res.json({ success: true, message: 'Availability saved successfully.' });
 });

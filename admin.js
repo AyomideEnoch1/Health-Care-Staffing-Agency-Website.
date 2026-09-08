@@ -3247,10 +3247,46 @@
             </div>`).join('');
     } else if (tabName === 'tab-profile-avail') {
       drawerContent.innerHTML = `
-        <div style="background:var(--bg-surface);padding:1.25rem;border-radius:10px;border:1px solid var(--border-subtle);">
-          <h5 style="font-weight:700;margin-bottom:0.5rem;">Weekly Availability Schedule</h5>
-          <p style="font-size:0.82rem;color:var(--text-muted);">Caregiver is registered on-call for GTA dispatch with guaranteed 2-hour surge response.</p>
+        <div style="background:var(--bg-surface);padding:1.25rem;border-radius:10px;border:1px solid var(--border-subtle);margin-bottom:1rem;">
+          <h5 style="font-weight:700;margin-bottom:0.4rem;display:flex;align-items:center;gap:6px;">
+            <i data-lucide="calendar" style="width:16px;height:16px;color:var(--brand-cyan);"></i> Live Availability Schedule
+          </h5>
+          <p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:1rem;">Submitted directly by caregiver via Staff Portal.</p>
+          <div id="admin-staff-avail-grid" style="display:grid;grid-template-columns:repeat(7, 1fr);gap:0.4rem;">
+            <div style="grid-column:1/-1;text-align:center;padding:1rem;color:var(--text-muted);font-size:0.8rem;">Loading availability...</div>
+          </div>
         </div>`;
+
+      (async () => {
+        const grid = document.getElementById('admin-staff-avail-grid');
+        if (!grid) return;
+        try {
+          const res = await apiRequest(`/admin/staff/${staff.id}/availability`);
+          const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+          const today = new Date();
+          const availDays = res.days || res.availability || [true, true, true, true, true, false, false];
+
+          grid.innerHTML = availDays.map((isAvail, idx) => {
+            const targetDate = new Date();
+            targetDate.setDate(today.getDate() + idx);
+            const dayName = days[targetDate.getDay()];
+            const dateNum = targetDate.getDate();
+            const bg = isAvail ? 'rgba(16, 185, 129, 0.12)' : 'rgba(239, 68, 68, 0.08)';
+            const border = isAvail ? 'rgba(16, 185, 129, 0.3)' : 'rgba(239, 68, 68, 0.2)';
+            const color = isAvail ? '#10B981' : '#EF4444';
+            const label = isAvail ? 'Available' : 'Off';
+
+            return `
+              <div style="background:${bg};border:1px solid ${border};border-radius:6px;padding:0.6rem 0.3rem;text-align:center;">
+                <div style="font-size:0.7rem;font-weight:700;color:var(--text-muted);">${dayName}</div>
+                <div style="font-size:0.95rem;font-weight:800;color:var(--text-primary);margin:2px 0;">${dateNum}</div>
+                <span style="font-size:0.65rem;font-weight:800;color:${color};display:inline-block;">${label}</span>
+              </div>`;
+          }).join('');
+        } catch {
+          grid.innerHTML = '<div style="grid-column:1/-1;color:var(--text-muted);font-size:0.8rem;">Caregiver is on-call for general dispatch.</div>';
+        }
+      })();
     }
 
     if (window.lucide) lucide.createIcons();
