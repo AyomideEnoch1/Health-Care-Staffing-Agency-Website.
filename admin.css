@@ -480,14 +480,57 @@ body {
 }
 
 .nav-badge {
-  background: var(--brand-cyan);
-  color: #FFFFFF;
-  font-size: 0.68rem;
-  font-weight: 800;
-  padding: 0.15rem 0.55rem;
+  background: #00F5D4;
+  color: #050B14 !important; /* High-contrast crisp black/navy on luminous cyan */
+  font-size: 0.74rem;
+  font-weight: 900 !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
   border-radius: var(--radius-full);
   margin-left: auto;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.35);
+  flex-shrink: 0;
+}
+
+[data-theme="dark"] .nav-badge {
+  background: #00F5D4 !important;
+  color: #040911 !important; /* Deep jet black: contrast ratio > 14:1 */
+  font-weight: 900 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5), 0 0 10px rgba(0, 245, 212, 0.35);
+}
+
+/* Red / Urgent Count Badges (e.g. Client Requests) */
+.nav-badge.danger,
+.nav-badge[style*="danger"],
+#badge-requests-count {
+  background: #EF4444 !important;
+  color: #FFFFFF !important;
+  font-weight: 900 !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.45);
+}
+
+/* When the parent nav item is selected/active */
+.nav-item-btn.active .nav-badge {
+  background: #FFFFFF !important;
+  color: #0A0F1D !important;
+  font-weight: 900 !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25) !important;
+}
+
+.nav-item-btn.active .nav-badge.danger,
+.nav-item-btn.active .nav-badge[style*="danger"],
+.nav-item-btn.active #badge-requests-count {
+  background: #EF4444 !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35) !important;
 }
 
 .sidebar.collapsed .nav-badge {
