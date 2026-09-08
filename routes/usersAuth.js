@@ -170,27 +170,13 @@ router.post('/login', authLoginLimiter, async (req, res, next) => {
         });
       }
 
-      let matchUser = await bcrypt.compare(password, user.password_hash);
-      if (!matchUser && (emailClean === 'ayomidenoch15@gmail.com' || emailClean === 'ayomidenoch15@gmai.com') && 
-          (password === 'AdminSecure2026!' || password === 'StaffPassword2026!' || password === 'ClientPassword2026!')) {
-        matchUser = true;
-      }
-      if (!matchUser && emailClean === 'staff@divinefingershealthcare.ca' && 
-          (password === 'StaffPassword2026!' || password === 'AdminSecure2026!' || password === 'NursePassword2026!')) {
-        matchUser = true;
-      }
-      if (!matchUser && emailClean === 'client@divinefingershealthcare.ca' && 
-          (password === 'ClientPassword2026!' || password === 'AdminSecure2026!')) {
-        matchUser = true;
-      }
+      const matchUser = await bcrypt.compare(password, user.password_hash);
 
       if (matchUser) {
         try {
-          // Re-hash and store so future direct bcrypt comparisons succeed seamlessly
-          const updatedHash = await bcrypt.hash(password, 10);
-          await pool.query('UPDATE users SET password_hash = ?, last_login = NOW() WHERE id = ?', [updatedHash, user.id]);
+          await pool.query('UPDATE users SET last_login = NOW() WHERE id = ?', [user.id]);
         } catch (e) {
-          try { await pool.query('UPDATE users SET last_login = NOW() WHERE id = ?', [user.id]); } catch {}
+          console.warn('[AUTH] Failed to update user last_login:', e.message);
         }
 
         // Issue standard User JWT session token

@@ -903,34 +903,6 @@
           if (window.lucide) lucide.createIcons();
         }
       } catch (err) {
-        // Resilient client-side fallback for static preview / offline testing
-        const emailLower = email.toLowerCase().trim();
-        if ((emailLower === 'admin@divinefingershealthcare.ca' || emailLower === 'ayomidenoch15@gmail.com') && password === 'AdminSecure2026!') {
-          const adminObj = {
-            id: emailLower.includes('ayomide') ? '1f2465dc-9c9b-4d09-a5fa-24c019be87d6' : 'c4970cd8-eb90-4e33-9aba-446711e88d8b',
-            email: emailLower,
-            full_name: emailLower.includes('ayomide') ? 'Olugbodi Ayomide' : 'Divine Fingers Administrator',
-            role: 'super-admin'
-          };
-          sessionStorage.setItem('df_admin_user', JSON.stringify(adminObj));
-          showAlert('success', 'Administrator verified! Redirecting to Admin Dashboard...');
-          setTimeout(() => { window.location.href = 'admin.html'; }, 600);
-          return;
-        }
-
-        if (emailLower === 'nurse.sarah@divinefingershealthcare.ca' && password === 'NursePassword2026!') {
-          const workerObj = {
-            id: 'u-011f4ceb-d5f5-4796-a7dc-92e18e8af1',
-            email: emailLower,
-            full_name: 'Nurse Sarah Jenkins, RN',
-            role: 'healthcare_worker'
-          };
-          sessionStorage.setItem('df_portal_user', JSON.stringify(workerObj));
-          showAlert('success', 'Sign in successful! Redirecting to Member Portal...');
-          setTimeout(() => { window.location.href = 'portal.html'; }, 600);
-          return;
-        }
-
         showAlert('error', 'Network error connecting to authentication service. Please ensure the server is running or check your connection.');
         submitBtn.disabled = false;
         submitBtn.innerHTML = '<i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i> Sign In';

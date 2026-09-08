@@ -214,19 +214,7 @@
     }
 
     if (endpoint === '/auth/login' && method === 'POST') {
-      const email = (body.email || '').toLowerCase().trim();
-      const password = body.password || '';
-      if ((email === 'admin@divinefingershealthcare.ca' || email === 'ayomidenoch15@gmail.com') && password === 'AdminSecure2026!') {
-        const admin = {
-          id: email.includes('ayomide') ? '1f2465dc-9c9b-4d09-a5fa-24c019be87d6' : 'c4970cd8-eb90-4e33-9aba-446711e88d8b',
-          email: email,
-          full_name: email.includes('ayomide') ? 'Olugbodi Ayomide' : 'Divine Fingers Administrator',
-          role: 'super-admin'
-        };
-        sessionStorage.setItem('df_admin_user', JSON.stringify(admin));
-        return { success: true, admin, csrfToken: 'demo-csrf-token' };
-      }
-      throw new Error('Invalid email or password.');
+      throw new Error('Authentication service unreachable. Please ensure the server is online.');
     }
 
     if (endpoint === '/auth/email/verify' || endpoint === '/auth/mfa/verify') {
@@ -1973,45 +1961,62 @@
     }
   };
 
+  window.handleCreateAdminSubmit = async function(e) {
+    if (e) e.preventDefault();
+    const submitBtn = document.getElementById('dedicated-create-admin-submit-btn') || document.getElementById('create-admin-submit-btn');
+    const nameInput = document.getElementById('dedicated-new-admin-name') || document.getElementById('new-admin-name');
+    const emailInput = document.getElementById('dedicated-new-admin-email') || document.getElementById('new-admin-email');
+    const roleInput = document.getElementById('dedicated-new-admin-role') || document.getElementById('new-admin-role');
+    const passwordInput = document.getElementById('dedicated-new-admin-password') || document.getElementById('new-admin-password');
+
+    const name = nameInput?.value.trim();
+    const email = emailInput?.value.trim();
+    const role = roleInput?.value;
+    const password = passwordInput?.value;
+
+    if (!name || !email || !role || !password) {
+      showToast('Please fill in all required fields.', 'warning');
+      return;
+    }
+
+    if (password.length < 8) {
+      showToast('Password must be at least 8 characters long.', 'warning');
+      return;
+    }
+
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="spinner" style="display:inline-block;width:12px;height:12px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:spin 0.6s linear infinite;margin-right:6px;"></span> Creating Account...';
+    }
+
+    try {
+      const res = await apiRequest('/admin/admins', {
+        method: 'POST',
+        body: JSON.stringify({ full_name: name, email, role, password })
+      });
+      showToast(`✅ Admin account created for ${name} (${role})`, 'success');
+      const form = document.getElementById('create-admin-form-dedicated') || document.getElementById('create-admin-form');
+      if (form) form.reset();
+      await fetchAndRenderAdminAccounts();
+      await fetchAndRenderAudit();
+    } catch (err) {
+      showToast(`Failed to create admin: ${err.message}`, 'warning');
+    } finally {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i data-lucide="user-plus" style="width: 15px; height: 15px;"></i> Create Administrator';
+        if (window.lucide) lucide.createIcons();
+      }
+    }
+  };
+
+  const dedicatedAdminForm = document.getElementById('create-admin-form-dedicated');
+  if (dedicatedAdminForm) {
+    dedicatedAdminForm.addEventListener('submit', window.handleCreateAdminSubmit);
+  }
   const createAdminForm = document.getElementById('create-admin-form');
   if (createAdminForm) {
-    createAdminForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const submitBtn = document.getElementById('create-admin-submit-btn');
-      const name = document.getElementById('new-admin-name')?.value.trim();
-      const email = document.getElementById('new-admin-email')?.value.trim();
-      const role = document.getElementById('new-admin-role')?.value;
-      const password = document.getElementById('new-admin-password')?.value;
-
-      if (!name || !email || !role || !password) {
-        showToast('Please fill in all required fields.', 'warning');
-        return;
-      }
-
-      if (submitBtn) {
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = 'Creating Account...';
-      }
-
-      try {
-        const res = await apiRequest('/admin/admins', {
-          method: 'POST',
-          body: JSON.stringify({ full_name: name, email, role, password })
-        });
-        showToast(`✅ Admin account created for ${name} (${role})`, 'success');
-        createAdminForm.reset();
-        await fetchAndRenderAdminAccounts();
-        await fetchAndRenderAudit();
-      } catch (err) {
-        showToast(`Failed to create admin: ${err.message}`, 'warning');
-      } finally {
-        if (submitBtn) {
-          submitBtn.disabled = false;
-          submitBtn.innerHTML = '<i data-lucide="user-plus" style="width: 15px; height: 15px;"></i> Create Administrator';
-          if (window.lucide) lucide.createIcons();
-        }
-      }
-    });
+    createAdminForm.addEventListener('submit', window.handleCreateAdminSubmit);
   }
 
   // G. Compliance Matrix

@@ -60,7 +60,7 @@ const inMemoryStore = {
     {
       id: 'c4970cd8-eb90-4e33-9aba-446711e88d8b',
       email: 'admin@divinefingershealthcare.ca',
-      password_hash: '$2b$10$1oEclFJn89BCoy4g9ITlyuZRcfSP8c5mrO1NR9wFDX57JwiTbWaGC',
+      password_hash: '$2b$10$ICqO6AZ.OprBLcm5OT5Nm.aWhldo4q3dLx6tHzcaFg6PwaX23uUPG',
       full_name: 'Divine Fingers Administrator',
       role: 'super-admin',
       permissions: ['requests:view', 'requests:dispatch', 'roster:view', 'roster:manage', 'applications:view', 'applications:manage', 'inquiries:manage', 'reports:view', 'reports:export', 'newsletter:manage', 'audit:view', 'admins:manage'],
@@ -80,7 +80,7 @@ const inMemoryStore = {
     {
       id: '1f2465dc-9c9b-4d09-a5fa-24c019be87d6',
       email: 'ayomidenoch15@gmail.com',
-      password_hash: '$2b$10$1oEclFJn89BCoy4g9ITlyuZRcfSP8c5mrO1NR9wFDX57JwiTbWaGC',
+      password_hash: '$2b$10$ICqO6AZ.OprBLcm5OT5Nm.aWhldo4q3dLx6tHzcaFg6PwaX23uUPG',
       full_name: 'Olugbodi Ayomide',
       role: 'super-admin',
       permissions: ['requests:view', 'requests:dispatch', 'roster:view', 'roster:manage', 'applications:view', 'applications:manage', 'inquiries:manage', 'reports:view', 'reports:export', 'newsletter:manage', 'audit:view', 'admins:manage'],

@@ -1076,23 +1076,30 @@ router.post('/admins', requirePermission('admins:manage'), async (req, res, next
     const hashedOtp = crypto.createHash('sha256').update(emailOtp).digest('hex');
     const initialPermissions = normalizePermissions(validated.role, req.body.permissions);
 
+    const isEmailVerified = hasTypedPassword ? 1 : 0;
     await pool.query(
       `INSERT INTO admins (id, email, password_hash, full_name, role, permissions, is_active, failed_login_attempts, email_verified, email_verification_token, email_verification_expires)
-       VALUES (?, ?, ?, ?, ?, ?, 1, 0, 0, ?, DATE_ADD(NOW(), INTERVAL 24 HOUR))`,
-      [newId, emailLower, passwordHash, validated.full_name.trim(), validated.role, JSON.stringify(initialPermissions), hashedOtp]
+       VALUES (?, ?, ?, ?, ?, ?, 1, 0, ?, ?, DATE_ADD(NOW(), INTERVAL 24 HOUR))`,
+      [newId, emailLower, passwordHash, validated.full_name.trim(), validated.role, JSON.stringify(initialPermissions), isEmailVerified, hasTypedPassword ? null : hashedOtp]
     );
 
-    // Send invitation email and verification OTP to new administrator's corporate email
-    const inviteToken = crypto.randomBytes(24).toString('hex');
-    await sendAdminInviteEmail(emailLower, validated.full_name.trim(), inviteToken, validated.role);
-    await sendAdminEmailVerificationOtp(emailLower, validated.full_name.trim(), emailOtp);
+    // Send invitation email and verification OTP to new administrator's corporate email if mailer configured
+    try {
+      const inviteToken = crypto.randomBytes(24).toString('hex');
+      await sendAdminInviteEmail(emailLower, validated.full_name.trim(), inviteToken, validated.role);
+      if (!isEmailVerified) {
+        await sendAdminEmailVerificationOtp(emailLower, validated.full_name.trim(), emailOtp);
+      }
+    } catch (mailErr) {
+      console.warn('[Admin Creation Mailer Intercept]:', mailErr.message);
+    }
 
     await pool.query(
       `INSERT INTO audit_logs (id, admin_id, actor_name, action, target_entity, target_id, details, severity, ip_address)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [crypto.randomUUID(), req.admin.id, req.admin.full_name,
        'ADMIN_ACCOUNT_CREATED', 'admins', newId,
-       `Super-admin ${req.admin.full_name} provisioned new ${validated.role} account for ${validated.full_name} (${emailLower}) with ${hasTypedPassword ? 'temporary password' : 'secure activation invite'} requirement`,
+       `Super-admin ${req.admin.full_name} provisioned new ${validated.role} account for ${validated.full_name} (${emailLower}) with ${hasTypedPassword ? 'direct credential access' : 'activation invite'}`,
        'info', req.ip]
     );
 
@@ -1107,7 +1114,7 @@ router.post('/admins', requirePermission('admins:manage'), async (req, res, next
 
     res.status(201).json({
       success: true,
-      message: `Admin account provisioned for ${validated.full_name}. A secure activation invitation and verification token have been dispatched to ${emailLower}.`,
+      message: `Admin account provisioned for ${validated.full_name}. ${hasTypedPassword ? 'Account is active and ready to sign in.' : 'Activation invite dispatched.'}`,
       data: {
         id: newId,
         email: emailLower,
@@ -1115,7 +1122,7 @@ router.post('/admins', requirePermission('admins:manage'), async (req, res, next
         role: validated.role,
         permissions: initialPermissions,
         is_active: 1,
-        email_verified: 0,
+        email_verified: isEmailVerified,
         invite_dispatched: true
       }
     });

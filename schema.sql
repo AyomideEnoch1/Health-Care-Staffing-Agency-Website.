@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS `admins` (
   `email` VARCHAR(191) NOT NULL,
   `password_hash` VARCHAR(255) NOT NULL,
   `full_name` VARCHAR(100) NOT NULL,
-  `role` ENUM('super-admin', 'dispatch', 'care-coordinator') NOT NULL DEFAULT 'care-coordinator',
+  `role` ENUM('super-admin', 'dispatch', 'care-coordinator', 'recruiter', 'auditor', 'custom') NOT NULL DEFAULT 'care-coordinator',
   `failed_login_attempts` INT UNSIGNED NOT NULL DEFAULT 0,
   `lock_until` DATETIME NULL DEFAULT NULL,
   `totp_secret` VARCHAR(128) NULL DEFAULT NULL,
