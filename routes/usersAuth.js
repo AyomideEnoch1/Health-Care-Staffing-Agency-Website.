@@ -154,13 +154,28 @@ router.post('/login', authLoginLimiter, async (req, res, next) => {
     const emailClean = email.toLowerCase().trim();
     console.log(`[AUTH LOGIN] Attempt for: ${emailClean}`);
 
-    // 1. Check standard users table (clients & healthcare workers) first
+    // 1. SECURITY: Reject administrator accounts FIRST, before touching the users table.
+    //    Admin emails may exist in both tables; this guard ensures they can never slip
+    //    through the users path and access the public portal.
+    const [adminCheck] = await pool.query(
+      'SELECT id FROM admins WHERE email = ? LIMIT 1',
+      [emailClean]
+    );
+    if (adminCheck && adminCheck.length > 0) {
+      return res.status(403).json({
+        success: false,
+        error: 'Administrator access is restricted. Please sign in via the secure Admin Portal at /admin.'
+      });
+    }
+
+    // 2. Check standard users table (clients & healthcare workers)
     const [rows] = await pool.query(
       'SELECT id, email, password_hash, full_name, role, organization_name, phone, is_active FROM users WHERE email = ? LIMIT 1',
       [emailClean]
     );
 
     const user = rows && rows.length > 0 ? rows[0] : null;
+
 
     if (user) {
       if (!user.is_active) {
@@ -208,18 +223,6 @@ router.post('/login', authLoginLimiter, async (req, res, next) => {
       }
     }
 
-    // 2. Reject administrator accounts attempting to log in via public client/staff portal
-    const [adminRows] = await pool.query(
-      'SELECT id FROM admins WHERE email = ? LIMIT 1',
-      [emailClean]
-    );
-
-    if (adminRows && adminRows.length > 0) {
-      return res.status(403).json({
-        success: false,
-        error: 'Administrator access is restricted. Please sign in via the secure Admin Portal at /admin.'
-      });
-    }
 
     return res.status(401).json({
       success: false,
