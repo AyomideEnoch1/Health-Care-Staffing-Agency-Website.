@@ -208,57 +208,17 @@ router.post('/login', authLoginLimiter, async (req, res, next) => {
       }
     }
 
-    // 2. Check if an administrator is logging in with these credentials
+    // 2. Reject administrator accounts attempting to log in via public client/staff portal
     const [adminRows] = await pool.query(
-      'SELECT id, email, password_hash, full_name, role, is_active FROM admins WHERE email = ? LIMIT 1',
+      'SELECT id FROM admins WHERE email = ? LIMIT 1',
       [emailClean]
     );
 
     if (adminRows && adminRows.length > 0) {
-      const admin = adminRows[0];
-      const matchAdmin = await bcrypt.compare(password, admin.password_hash);
-      if (matchAdmin) {
-        if (!admin.is_active) {
-          return res.status(403).json({
-            success: false,
-            error: 'Administrator account is disabled. Please contact system support.'
-          });
-        }
-
-        const adminPayload = {
-          id: admin.id,
-          email: admin.email,
-          role: admin.role,
-          full_name: admin.full_name
-        };
-        const adminToken = jwt.sign(adminPayload, JWT_SECRET, { expiresIn: '8h' });
-        const isProd = process.env.NODE_ENV === 'production';
-        res.cookie('df_admin_session', adminToken, {
-          httpOnly: true,
-          secure: isProd,
-          sameSite: isProd ? 'Strict' : 'Lax',
-          maxAge: 8 * 60 * 60 * 1000,
-          path: '/'
-        });
-        res.cookie(USER_COOKIE_NAME, adminToken, buildUserCookieOptions());
-
-        try {
-          await pool.query('UPDATE admins SET failed_login_attempts = 0, lock_until = NULL, last_login = NOW() WHERE id = ?', [admin.id]);
-        } catch {}
-
-        return res.json({
-          success: true,
-          isAdmin: true,
-          redirectTo: 'admin.html',
-          message: 'Administrator verified. Redirecting to Admin Dashboard...',
-          user: {
-            id: admin.id,
-            email: admin.email,
-            full_name: admin.full_name,
-            role: admin.role
-          }
-        });
-      }
+      return res.status(403).json({
+        success: false,
+        error: 'Administrator access is restricted. Please sign in via the secure Admin Portal at /admin.'
+      });
     }
 
     return res.status(401).json({
@@ -276,7 +236,7 @@ router.post('/login', authLoginLimiter, async (req, res, next) => {
 // ── GET /api/users/me ───────────────────────────────────────────────────────
 router.get('/me', async (req, res) => {
   try {
-    const token = req.cookies[USER_COOKIE_NAME] || req.cookies['df_admin_session'];
+    const token = req.cookies[USER_COOKIE_NAME];
     if (!token) {
       return res.json({ success: false, user: null });
     }
@@ -289,20 +249,10 @@ router.get('/me', async (req, res) => {
       return res.json({ success: false, user: null });
     }
 
-    let [rows] = await pool.query(
+    const [rows] = await pool.query(
       'SELECT id, email, full_name, role, organization_name, facility_id, client_role, phone, is_active, created_at FROM users WHERE id = ? LIMIT 1',
       [decoded.id]
     );
-
-    if (!rows || rows.length === 0) {
-      const [adminRows] = await pool.query(
-        'SELECT id, email, full_name, role, is_active, created_at FROM admins WHERE id = ? LIMIT 1',
-        [decoded.id]
-      );
-      if (adminRows && adminRows.length > 0) {
-        rows = adminRows;
-      }
-    }
 
     if (!rows || rows.length === 0 || !rows[0].is_active) {
       res.clearCookie(USER_COOKIE_NAME, { path: '/' });

@@ -878,24 +878,16 @@
         const result = await response.json();
 
         if (response.ok && result.success) {
-          if (result.isAdmin || result.redirectTo === 'admin.html') {
-            showAlert('success', 'Administrator credentials verified! Redirecting to Admin Dashboard...');
-            sessionStorage.setItem('df_admin_user', JSON.stringify(result.user || {}));
-            setTimeout(() => {
-              window.location.href = 'admin.html';
-            }, 600);
-          } else {
-            showAlert('success', 'Sign in successful! Redirecting to your portal...');
-            if (result.user) {
-              sessionStorage.setItem('df_portal_user', JSON.stringify(result.user));
-              try { localStorage.setItem('df_portal_user', JSON.stringify(result.user)); } catch (e) {}
-            }
-            const params = new URLSearchParams(window.location.search);
-            const redirectUrl = params.get('redirect') || (result.redirectTo || 'portal.html');
-            setTimeout(() => {
-              window.location.href = redirectUrl;
-            }, 600);
+          showAlert('success', 'Sign in successful! Redirecting to your portal...');
+          if (result.user) {
+            sessionStorage.setItem('df_portal_user', JSON.stringify(result.user));
+            try { localStorage.setItem('df_portal_user', JSON.stringify(result.user)); } catch (e) {}
           }
+          const params = new URLSearchParams(window.location.search);
+          const redirectUrl = params.get('redirect') || (result.redirectTo || 'portal.html');
+          setTimeout(() => {
+            window.location.href = redirectUrl;
+          }, 600);
         } else {
           showAlert('error', result.error || 'Invalid email or password. Please verify your credentials.');
           submitBtn.disabled = false;
