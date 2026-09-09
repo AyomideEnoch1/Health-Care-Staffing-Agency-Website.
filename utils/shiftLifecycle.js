@@ -57,15 +57,12 @@ async function evaluateShiftLifecycles() {
     for (const shift of activeShifts) {
       const { startDate, endDate } = parseShiftWindow(shift);
 
-      // 1. Check if shift should transition to 'in_session'
-      if (now >= startDate && now < endDate && (shift.status === 'dispatched' || shift.status === 'confirmed')) {
-        console.log(`[SHIFT AUTOMATION] 🟢 Transitioning ${shift.request_code} at ${shift.facility_name} to IN_SESSION`);
-        
+      // 1. A shift should ONLY transition to 'in_session' if a clock-in was recorded
+      // Never synthesize fake clock-ins without worker EVV or admin action
+      if (shift.clock_in_time && (shift.status === 'dispatched' || shift.status === 'confirmed')) {
+        console.log(`[SHIFT AUTOMATION] 🟢 Verified clock-in found for ${shift.request_code} at ${shift.facility_name}. Setting IN_SESSION.`);
         await pool.query(
-          `UPDATE staffing_requests 
-           SET status = 'in_session', 
-               clock_in_time = COALESCE(clock_in_time, NOW()) 
-           WHERE id = ?`,
+          `UPDATE staffing_requests SET status = 'in_session' WHERE id = ?`,
           [shift.id]
         );
 
@@ -73,13 +70,13 @@ async function evaluateShiftLifecycles() {
           entity: 'staffing_requests',
           id: shift.id,
           status: 'in_session',
-          clock_in_time: new Date().toISOString()
+          clock_in_time: shift.clock_in_time
         });
       }
 
-      // 2. Check if shift has concluded -> transition to 'completed'
-      else if (now >= endDate && (shift.status === 'dispatched' || shift.status === 'confirmed' || shift.status === 'in_session')) {
-        console.log(`[SHIFT AUTOMATION] ✅ Transitioning ${shift.request_code} at ${shift.facility_name} to COMPLETED`);
+      // 2. Check if a shift that was actually IN_SESSION has now concluded
+      else if (shift.status === 'in_session' && now >= endDate) {
+        console.log(`[SHIFT AUTOMATION] ✅ Shift ${shift.request_code} at ${shift.facility_name} concluded -> COMPLETED`);
 
         await pool.query(
           `UPDATE staffing_requests 

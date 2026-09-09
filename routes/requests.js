@@ -766,6 +766,7 @@ router.get('/billing-summary', async (req, res, next) => {
         sr.hours_billed,
         sr.billing_hourly_rate,
         sr.invoice_status,
+        sr.cancellation_fee_applied,
         st.name AS staff_name,
         st.staff_code,
         st.role AS staff_role,
@@ -774,7 +775,7 @@ router.get('/billing-summary', async (req, res, next) => {
         sp.total_hours AS punch_hours
       FROM staffing_requests sr
       LEFT JOIN staff_roster st ON sr.assigned_staff_id = st.id
-      LEFT JOIN shift_punches sp ON sp.shift_id = sr.id OR (sp.staff_id = st.id AND DATE(sp.clock_in_time) = DATE(sr.created_at))
+      LEFT JOIN shift_punches sp ON sp.shift_id = sr.id
     `;
 
     const params = [];
@@ -786,6 +787,7 @@ router.get('/billing-summary', async (req, res, next) => {
         sql += ` WHERE LOWER(sr.contact_email) = ?`;
         params.push(clientEmail);
       }
+      // Include all statuses for billing (clients want to see everything)
     } else if (req.query.facility) {
       sql += ` WHERE LOWER(sr.facility_name) LIKE ?`;
       params.push(`%${req.query.facility.toLowerCase().trim()}%`);

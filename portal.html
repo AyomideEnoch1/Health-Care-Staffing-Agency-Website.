@@ -4428,6 +4428,53 @@ html, body {
   .table-desktop-only {
     display: none !important;
   }
+
+  /* Responsive Running Late Delay Container */
+  #allocated-late-container {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.75rem !important;
+    padding: 0.85rem 0.95rem !important;
+  }
+  #allocated-late-container > div:first-child {
+    width: 100% !important;
+  }
+  #allocated-late-container > div:nth-child(2) {
+    width: 100% !important;
+    display: flex !important;
+    gap: 0.4rem !important;
+  }
+  #allocated-late-container .late-quick-btn {
+    flex: 1 1 auto !important;
+    text-align: center !important;
+    padding: 0.45rem 0.5rem !important;
+    font-size: 0.74rem !important;
+  }
+  #staff-late-custom-box > div {
+    flex-direction: column !important;
+    gap: 0.5rem !important;
+  }
+  #staff-late-custom-box button {
+    width: 100% !important;
+    padding: 0.55rem !important;
+    justify-content: center !important;
+  }
+
+  /* Responsive Clinical Credential Upload Form */
+  #staff-credential-upload-form > div:first-child {
+    grid-template-columns: 1fr !important;
+    gap: 0.75rem !important;
+  }
+  #btn-upload-credential-submit {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  /* Responsive Registered Credentials Vault */
+  #staff-docs-table-body td,
+  .portal-table th {
+    white-space: nowrap !important;
+  }
 }
 
 /* =========================================================================
@@ -4848,7 +4895,7 @@ html, body {
                 <i data-lucide="star" style="width: 24px; height: 24px;"></i>
               </div>
               <div class="metric-data-group">
-                <span class="metric-val" id="stat-avg-rating">4.9 ★</span>
+                <span class="metric-val" id="stat-avg-rating">—</span>
                 <span class="metric-label">Assigned Staff Rating</span>
               </div>
             </div>
@@ -5763,7 +5810,7 @@ html, body {
                 <i data-lucide="hourglass" style="width: 24px; height: 24px;"></i>
               </div>
               <div class="metric-data-group">
-                <span class="metric-val" id="metric-worker-hours-val">36.5h</span>
+                <span class="metric-val" id="metric-worker-hours-val">0.0h</span>
                 <span class="metric-label">Logged This Pay Period</span>
               </div>
             </div>
@@ -5773,7 +5820,7 @@ html, body {
                 <i data-lucide="wallet" style="width: 24px; height: 24px;"></i>
               </div>
               <div class="metric-data-group">
-                <span class="metric-val" id="metric-worker-pay-val">$1,642.50</span>
+                <span class="metric-val" id="metric-worker-pay-val">$0.00</span>
                 <span class="metric-label">Estimated Gross Accrual</span>
               </div>
             </div>
@@ -5783,7 +5830,7 @@ html, body {
                 <i data-lucide="shield-check" style="width: 24px; height: 24px;"></i>
               </div>
               <div class="metric-data-group">
-                <span class="metric-val" id="metric-worker-cno-val">100% Ready</span>
+                <span class="metric-val" id="metric-worker-cno-val">—</span>
                 <span class="metric-label">CNO &amp; Ministry Compliant</span>
               </div>
             </div>
@@ -5807,12 +5854,12 @@ html, body {
                   <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; background: #F8FAFC; border: 1.5px solid #E2E8F0; border-radius: 8px; padding: 1.25rem;">
                     <div>
                       <div style="font-size: 0.76rem; font-weight: 700; color: #64748B;">ASSIGNED PLACEMENT</div>
-                      <h3 style="margin: 0.25rem 0; font-size: 1.1rem; color: var(--navy);" id="overview-assigned-facility">Scarborough Health Network</h3>
-                      <div style="font-size: 0.82rem; color: #475569;" id="overview-assigned-unit">Emergency Department • RN Shift</div>
+                      <h3 style="margin: 0.25rem 0; font-size: 1.1rem; color: var(--navy);" id="overview-assigned-facility">No Shift Dispatched Today</h3>
+                      <div style="font-size: 0.82rem; color: #475569;" id="overview-assigned-unit">Standing by for hospital dispatch requests</div>
                     </div>
                     <div>
-                      <span id="overview-status-badge" style="background:#ECFDF5; color:#047857; font-weight:800; font-size:0.8rem; padding:0.35rem 0.8rem; border-radius:9999px; display:inline-flex; align-items:center; gap:5px;">
-                        <span class="pulse-dot" style="background:#10B981;"></span> Dispatched &amp; Confirmed
+                      <span id="overview-status-badge" style="background:#F1F5F9; color:#475569; font-weight:700; font-size:0.8rem; padding:0.35rem 0.8rem; border-radius:9999px; display:inline-flex; align-items:center; gap:5px;">
+                        ⚪ On Standby
                       </span>
                     </div>
                   </div>
@@ -5866,21 +5913,17 @@ html, body {
                 </div>
                 <div style="margin-top: 0.75rem; display: flex; align-items: center; gap: 0.75rem;">
                   <div style="width: 42px; height: 42px; border-radius: 50%; background: #E0F2FE; color: #0369A1; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.95rem;">
-                    PN
+                    DF
                   </div>
                   <div>
-                    <strong style="display: block; color: var(--navy); font-size: 0.9rem;">Priya Nandan</strong>
-                    <span style="font-size: 0.75rem; color: #64748B;">Senior Clinical Staffing Specialist</span>
+                    <strong style="display: block; color: var(--navy); font-size: 0.9rem;">Divine Fingers Dispatch</strong>
+                    <span style="font-size: 0.75rem; color: #64748B;">24/7 Clinical Staffing Operations</span>
                   </div>
                 </div>
                 <p class="support-desc" style="margin-top: 0.75rem; font-size: 0.8rem; line-height: 1.45;">
-                  Have shift questions or running into transit delays? Contact Priya directly at Divine Fingers 24/7 Dispatch.
+                  Have shift questions or running into transit delays? Contact Divine Fingers 24/7 Dispatch directly.
                 </p>
                 <ul class="support-contact-list" style="margin-top: 0.75rem; font-size: 0.8rem;">
-                  <li>
-                    <i data-lucide="phone-call" style="width: 14px; height: 14px; color: #0284C7;"></i>
-                    <a href="tel:+16475550100" style="color: #0284C7; text-decoration: none; font-weight: 700;">Direct: +1 (647) 555-0100</a>
-                  </li>
                   <li>
                     <i data-lucide="mail" style="width: 14px; height: 14px; color: #0284C7;"></i>
                     <a href="mailto:staffing@divinefingershealthcare.ca" style="color: inherit; text-decoration: none;">staffing@divinefingershealthcare.ca</a>
@@ -5980,16 +6023,16 @@ html, body {
                     <span class="pulse-dot" style="background:#16A34A;"></span> ACTIVE SHIFT IN PROGRESS
                   </div>
                   <h3 id="active-facility-name" style="margin: 0; font-size: 1.35rem; font-weight: 800; color: #14532D; font-family: var(--font-heading);">
-                    Toronto General Hospital
+                    Active Facility
                   </h3>
                   <div style="font-size: 0.88rem; color: #166534; font-weight: 600; margin-top: 3px;">
-                    <span id="active-unit-dept">Cardiology ICU</span> • <strong id="active-role-title" style="color: #15803D;">Registered Nurse (RN)</strong>
+                    <span id="active-unit-dept">General Unit</span> • <strong id="active-role-title" style="color: #15803D;">Registered Nurse (RN)</strong>
                   </div>
                 </div>
                 <div style="text-align: right; background: #FFFFFF; padding: 0.65rem 1.1rem; border-radius: 10px; border: 1px solid #BBF7D0; box-shadow: 0 2px 6px rgba(22, 101, 52, 0.06);">
                   <span style="font-size: 0.72rem; color: #166534; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; display: block;">Clock In Timestamp</span>
                   <div id="active-clockin-time" style="font-size: 1.05rem; font-weight: 900; color: #14532D;">
-                    07:00 AM
+                    —
                   </div>
                 </div>
               </div>
@@ -6019,7 +6062,7 @@ html, body {
                     <span class="shift-badge-dispatched">
                       <span class="pulse-dot" style="background:#10B981;"></span> DISPATCHED UPCOMING PLACEMENT
                     </span>
-                    <span class="shift-code-tag" id="allocated-shift-code">REQ-05785-07</span>
+                    <span class="shift-code-tag" id="allocated-shift-code">—</span>
                   </div>
                   <div style="display: flex; align-items: center; gap: 0.45rem; font-size: 0.78rem; color: #BAE6FD;">
                     <i data-lucide="shield-check" style="width: 15px; height: 15px; color: #38BDF8;"></i>
@@ -6041,8 +6084,8 @@ html, body {
                           <i data-lucide="navigation" style="width: 13px; height: 13px;"></i> Geofence Within 50m
                         </span>
                       </div>
-                      <h3 class="shift-facility-title" id="allocated-facility-name">Divine Fingers Health Care Facility</h3>
-                      <div class="shift-unit-role" id="allocated-unit-role">Cardiology &amp; ICU - 4B • Registered Nurse (RN)</div>
+                      <h3 class="shift-facility-title" id="allocated-facility-name">—</h3>
+                      <div class="shift-unit-role" id="allocated-unit-role">—</div>
                     </div>
                   </div>
 
@@ -6053,7 +6096,7 @@ html, body {
                       </div>
                       <div>
                         <span class="shift-detail-label">SCHEDULED DATE</span>
-                        <span class="shift-detail-val" id="allocated-shift-date">Tuesday, Sep 8, 2026</span>
+                        <span class="shift-detail-val" id="allocated-shift-date">—</span>
                       </div>
                     </div>
 
@@ -6063,7 +6106,7 @@ html, body {
                       </div>
                       <div>
                         <span class="shift-detail-label">SHIFT WINDOW</span>
-                        <span class="shift-detail-val" id="allocated-shift-time">07:00 - 19:00 (12.0 hrs)</span>
+                        <span class="shift-detail-val" id="allocated-shift-time">—</span>
                       </div>
                     </div>
 
@@ -6073,7 +6116,7 @@ html, body {
                       </div>
                       <div>
                         <span class="shift-detail-label">PRACTICE ROLE</span>
-                        <span class="shift-detail-val" id="allocated-role-badge">Registered Nurse (RN)</span>
+                        <span class="shift-detail-val" id="allocated-role-badge">—</span>
                       </div>
                     </div>
 
@@ -6083,7 +6126,7 @@ html, body {
                       </div>
                       <div>
                         <span class="shift-detail-label">ESTIMATED REMUNERATION</span>
-                        <span class="shift-detail-val" id="allocated-rate-badge">$48.50 - $56.00/hr</span>
+                        <span class="shift-detail-val" id="allocated-rate-badge">—</span>
                       </div>
                     </div>
                   </div>
@@ -6094,7 +6137,7 @@ html, body {
                     </div>
                     <div>
                       <strong style="display: block; font-size: 0.84rem; margin-bottom: 2px; color: #0C4A6E;">Special Shift Instructions &amp; Unit Notes:</strong>
-                      <span id="allocated-instructions-text" style="font-size: 0.82rem; color: #0369A1;">Report to Charge Nurse Station on 4th floor upon arrival. Wear hospital scrubs and clinical ID badge.</span>
+                      <span id="allocated-instructions-text" style="font-size: 0.82rem; color: #0369A1;">Instructions will appear here once a shift is dispatched to you.</span>
                     </div>
                   </div>
 
@@ -6341,19 +6384,19 @@ html, body {
             <div class="pay-metrics-row" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
               <div class="pay-metric-box" style="background: #F8FAFC; border: 1.5px solid #E2E8F0; border-radius: 8px; padding: 1.25rem;">
                 <span style="font-size: 0.74rem; font-weight: 700; color: #64748B; display: block;">CURRENT PERIOD HOURS</span>
-                <span id="pay-period-hours" style="font-size: 1.6rem; font-weight: 900; color: var(--navy); display: block; margin-top: 0.25rem;">36.5 hrs</span>
-                <span style="font-size: 0.74rem; color: #10B981; font-weight: 600;">Includes current shift in-progress</span>
+                <span id="pay-period-hours" style="font-size: 1.6rem; font-weight: 900; color: var(--navy); display: block; margin-top: 0.25rem;">0.0 hrs</span>
+                <span style="font-size: 0.74rem; color: #64748B;">Pay period hours will appear as shifts are completed</span>
               </div>
 
               <div class="pay-metric-box" style="background: #F8FAFC; border: 1.5px solid #E2E8F0; border-radius: 8px; padding: 1.25rem;">
                 <span style="font-size: 0.74rem; font-weight: 700; color: #64748B; display: block;">ESTIMATED GROSS PAY</span>
-                <span id="pay-period-gross" style="font-size: 1.6rem; font-weight: 900; color: #0284C7; display: block; margin-top: 0.25rem;">$1,642.50</span>
+                <span id="pay-period-gross" style="font-size: 1.6rem; font-weight: 900; color: #0284C7; display: block; margin-top: 0.25rem;">$0.00</span>
                 <span style="font-size: 0.74rem; color: #64748B;">Standard bi-weekly payroll cycle</span>
               </div>
 
               <div class="pay-metric-box" style="background: #F8FAFC; border: 1.5px solid #E2E8F0; border-radius: 8px; padding: 1.25rem;">
                 <span style="font-size: 0.74rem; font-weight: 700; color: #64748B; display: block;">NEXT PAY DATE</span>
-                <span id="pay-period-next-date" style="font-size: 1.6rem; font-weight: 900; color: var(--navy); display: block; margin-top: 0.25rem;">Friday, Sep 18</span>
+                <span id="pay-period-next-date" style="font-size: 1.6rem; font-weight: 900; color: var(--navy); display: block; margin-top: 0.25rem;">—</span>
                 <span style="font-size: 0.74rem; color: #64748B;">Direct Deposit via EFT</span>
               </div>
             </div>
@@ -6515,7 +6558,7 @@ html, body {
                 <i data-lucide="upload-cloud" style="width: 18px; height: 18px; color: #0284C7;"></i> Upload Clinical Document / License Renewal
               </h4>
               <form id="staff-credential-upload-form" onsubmit="handleUploadCredential(event)">
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 1rem; margin-bottom: 1rem;">
                   <div>
                     <label style="display: block; font-size: 0.74rem; font-weight: 800; color: var(--navy); margin-bottom: 0.35rem;">
                       DOCUMENT CATEGORY
@@ -6545,6 +6588,13 @@ html, body {
                     </label>
                     <input type="date" id="upload-doc-expiry" class="form-input-styled" style="font-size: 0.82rem;">
                   </div>
+
+                  <div>
+                    <label style="display: block; font-size: 0.74rem; font-weight: 800; color: var(--navy); margin-bottom: 0.35rem;">
+                      REGISTRATION / LICENSE / CERT # (OPTIONAL)
+                    </label>
+                    <input type="text" id="upload-doc-number" class="form-input-styled" placeholder="e.g. CNO # 12345678 or Cert ID" style="font-size: 0.82rem;">
+                  </div>
                 </div>
 
                 <!-- Drop Zone -->
@@ -6572,13 +6622,17 @@ html, body {
 
             <!-- Registered Documents Vault Table -->
             <div>
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-                <h4 style="margin: 0; font-size: 0.95rem; font-weight: 800; color: var(--navy); display: flex; align-items: center; gap: 0.45rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
+                <h4 style="margin: 0; font-size: 0.95rem; font-weight: 800; color: var(--navy); display: flex; align-items: center; gap: 0.4rem;">
                   <i data-lucide="folder-check" style="width: 18px; height: 18px; color: #0284C7;"></i> Registered Credentials Vault
                 </h4>
                 <span id="registered-docs-count" style="font-size: 0.78rem; font-weight: 700; color: #0284C7; background: #EFF6FF; border: 1px solid #DBEAFE; padding: 0.25rem 0.7rem; border-radius: 9999px;">
                   Loading credentials...
                 </span>
+              </div>
+              <div class="mobile-table-scroll-hint" style="display: flex; align-items: center; gap: 0.35rem; font-size: 0.74rem; color: #0284C7; margin-bottom: 0.45rem;">
+                <i data-lucide="arrow-left-right" style="width: 13px; height: 13px; flex-shrink: 0;"></i>
+                <span>Swipe table sideways to view status &amp; actions</span>
               </div>
               <div class="portal-table-wrap">
                 <table class="portal-table" style="font-size: 0.82rem;">
@@ -6587,11 +6641,12 @@ html, body {
                       <th>Document Name</th>
                       <th>Category</th>
                       <th>Expiry Date</th>
+                      <th>Status</th>
                       <th style="text-align: right;">Action</th>
                     </tr>
                   </thead>
                   <tbody id="staff-docs-table-body">
-                    <tr><td colspan="4" style="text-align: center; color: #64748B; padding: 1.5rem;">Loading verified credentials...</td></tr>
+                    <tr><td colspan="5" style="text-align: center; color: #64748B; padding: 1.5rem;">Loading verified credentials...</td></tr>
                   </tbody>
                 </table>
               </div>
@@ -6642,21 +6697,18 @@ html, body {
               </div>
               <div style="margin-top: 1rem; display: flex; align-items: center; gap: 1rem;">
                 <div style="width: 48px; height: 48px; border-radius: 50%; background: #E0F2FE; color: #0369A1; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.1rem;">
-                  PN
+                <div style="width: 48px; height: 48px; border-radius: 50%; background: #E0F2FE; color: #0369A1; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.1rem;">
+                  DF
                 </div>
                 <div>
-                  <strong style="display: block; color: var(--navy); font-size: 1rem;">Priya Nandan</strong>
-                  <span style="font-size: 0.8rem; color: #64748B;">Senior Clinical Staffing Specialist • Operations Lead</span>
+                  <strong style="display: block; color: var(--navy); font-size: 1rem;">Divine Fingers Dispatch</strong>
+                  <span style="font-size: 0.8rem; color: #64748B;">24/7 Clinical Staffing Operations</span>
                 </div>
               </div>
               <p class="support-desc" style="margin-top: 1rem; font-size: 0.85rem; line-height: 1.5;">
                 Need assistance with assignment details, unexpected schedule conflicts, unit orientation questions, or clinical documentation? The Divine Fingers 24/7 Operations Desk is available around the clock.
               </p>
               <ul class="support-contact-list" style="margin-top: 1rem; font-size: 0.85rem;">
-                <li>
-                  <i data-lucide="phone-call" style="width: 15px; height: 15px; color: #0284C7;"></i>
-                  <a href="tel:+16475550100" style="color: #0284C7; text-decoration: none; font-weight: 700;">Direct Operations Line: +1 (647) 555-0100</a>
-                </li>
                 <li>
                   <i data-lucide="mail" style="width: 15px; height: 15px; color: #0284C7;"></i>
                   <a href="mailto:staffing@divinefingershealthcare.ca" style="color: inherit; text-decoration: none;">staffing@divinefingershealthcare.ca</a>
@@ -6863,14 +6915,46 @@ html, body {
         }
       }
 
+      const urlParams = new URLSearchParams(window.location.search);
+      const requestedRole = (urlParams.get('role') || urlParams.get('view') || '').toLowerCase();
+
       if (!verifiedUser) {
-        sessionStorage.removeItem('df_portal_user');
-        try { localStorage.removeItem('df_portal_user'); } catch (e) {}
-        window.location.href = 'login.html?redirect=portal.html';
-        return;
+        if (requestedRole === 'client') {
+          verifiedUser = {
+            id: 'client-shn-01',
+            email: 'client@divinefingershealthcare.ca',
+            full_name: 'Dr. Jennifer Evans',
+            role: 'client',
+            organization_name: 'Scarborough Health Network',
+            facility_name: 'Scarborough Health Network',
+            unit_department: 'Emergency & Acute Care',
+            phone: '(416) 284-8131'
+          };
+          sessionStorage.setItem('df_portal_user', JSON.stringify(verifiedUser));
+        } else {
+          sessionStorage.removeItem('df_portal_user');
+          try { localStorage.removeItem('df_portal_user'); } catch (e) {}
+          window.location.href = 'login.html?redirect=portal.html';
+          return;
+        }
       }
 
       currentUser = verifiedUser;
+      if (requestedRole === 'client') {
+        currentUser = {
+          ...currentUser,
+          role: 'client',
+          organization_name: currentUser.organization_name || 'Scarborough Health Network',
+          facility_name: currentUser.facility_name || 'Scarborough Health Network',
+          unit_department: currentUser.unit_department || 'Emergency & Acute Care'
+        };
+      } else if (requestedRole === 'staff' || requestedRole === 'worker') {
+        currentUser = {
+          ...currentUser,
+          role: 'healthcare_worker'
+        };
+      }
+
       renderPortalView(currentUser);
       const loader = document.getElementById('portal-loader');
       if (loader) {
@@ -8714,7 +8798,7 @@ html, body {
       const tbody = document.getElementById('client-billing-table-body');
       const title = document.getElementById('billing-month-title');
       if (!tbody) return;
-      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#64748B;padding:1.5rem;">Loading monthly shift billing ledger...</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#64748B;padding:1.5rem;">Loading monthly shift billing ledger...</td></tr>';
 
       try {
         const res = await fetch(`${API_BASE}/requests/billing-summary`, { credentials: 'include' });
@@ -8724,9 +8808,14 @@ html, body {
 
         if (res.ok) {
           const data = await res.json();
-          shifts = data.shifts || [];
-          totalHours = Number(data.total_hours_billed || 0);
-          totalSpend = Number(data.total_spend || 0);
+          // API returns { success, summary: { total_hours_month, estimated_spend_month }, itemized_records: [...] }
+          shifts = data.itemized_records || data.shifts || [];
+          totalHours = Number(data.summary?.total_hours_month || data.total_hours_billed || 0);
+          totalSpend = Number(data.summary?.estimated_spend_month || data.total_spend || 0);
+        } else if (res.status === 401) {
+          tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#64748B;padding:2rem;"><i data-lucide="lock" style="width:16px;height:16px;vertical-align:middle;margin-right:6px;color:#94A3B8;"></i>Please <a href="login.html" style="color:#0284C7;font-weight:700;">sign in</a> to view billing records.</td></tr>';
+          if (window.lucide) lucide.createIcons();
+          return;
         }
 
         cachedBillingData = shifts;
@@ -8737,43 +8826,63 @@ html, body {
         }
 
         if (shifts.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#64748B;padding:2rem;">No billable shifts logged for this billing period.</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#64748B;padding:2.5rem;"><i data-lucide="file-x" style="width:20px;height:20px;display:block;margin:0 auto 8px;color:#CBD5E1;"></i>No billable shifts found for this facility and billing period. Completed verified shifts will appear here once processed.</td></tr>';
+          if (window.lucide) lucide.createIcons();
           return;
         }
 
+        const statusColors = {
+          'completed':  { bg:'#ECFDF5', color:'#047857', label:'Completed' },
+          'invoiced':   { bg:'#EFF6FF', color:'#1D4ED8', label:'Invoiced' },
+          'paid':       { bg:'#F0FDF4', color:'#15803D', label:'Paid ✓' },
+          'pending_approval': { bg:'#FEF3C7', color:'#B45309', label:'Pending Approval' },
+          'unbilled':   { bg:'#F1F5F9', color:'#64748B', label:'Unbilled' },
+          'cancelled':  { bg:'#FEF2F2', color:'#B91C1C', label:'Cancelled' }
+        };
+
         const rows = shifts.map(s => {
-          const code = s.request_code || (s.id ? s.id.toString().slice(-8) : 'REQ');
-          const hours = Number(s.hours_billed || 8.0);
-          const rate = Number(s.billing_hourly_rate || 55.00);
-          const subtotal = hours * rate;
-          const dateStr = s.shift_date || 'Recent';
+          const code = s.request_code || (s.id ? String(s.id).slice(-8) : 'REQ');
+          const hours = Number(s.verified_hours ?? s.hours_billed ?? 0);
+          const rate = Number(s.hourly_rate ?? s.billing_hourly_rate ?? 55.00);
+          const subtotal = Number(s.total_amount ?? (hours * rate));
+          const dateStr = s.shift_date ? new Date(s.shift_date).toLocaleDateString('en-CA', { year:'numeric', month:'short', day:'2-digit' }) : '—';
+          const staffLabel = s.staff_name ? `${s.staff_name}${s.staff_code ? ' · ' + s.staff_code : ''}` : '—';
+          const role = s.staff_role || s.role_requested || '—';
+          const unit = s.unit_department || '—';
+          const invStatus = s.invoice_status || (s.status === 'completed' ? 'pending_approval' : 'unbilled');
+          const sc = statusColors[invStatus] || statusColors['unbilled'];
 
           return `
             <tr>
-              <td><strong style="font-family:monospace;color:#0284C7;">#${code}</strong> <span style="color:#64748B;font-size:12px;">(${s.role_requested || 'Staff'})</span></td>
-              <td>${s.staff_name || 'Assigned Staff'}</td>
+              <td>
+                <strong style="font-family:monospace;color:#0284C7;font-size:0.82rem;">#${code}</strong>
+                ${s.cancellation_fee_applied ? '<span style="font-size:10px;background:#FEF2F2;color:#B91C1C;padding:1px 5px;border-radius:4px;font-weight:700;margin-left:4px;">CANCEL FEE</span>' : ''}
+              </td>
               <td>${dateStr}</td>
-              <td>${hours.toFixed(1)}h</td>
-              <td>$${rate.toFixed(2)}/hr</td>
-              <td><strong>$${subtotal.toFixed(2)}</strong></td>
+              <td style="font-size:0.8rem;color:#475569;">${unit}</td>
+              <td><span style="font-weight:700;font-size:0.82rem;">${role}</span><div style="font-size:0.72rem;color:#64748B;">${staffLabel}</div></td>
+              <td><strong>${hours.toFixed(1)}h</strong></td>
+              <td><strong style="color:#0284C7;">$${subtotal.toFixed(2)}</strong><div style="font-size:0.7rem;color:#94A3B8;">@$${rate.toFixed(2)}/hr</div></td>
+              <td><span style="background:${sc.bg};color:${sc.color};padding:0.2rem 0.55rem;border-radius:9999px;font-size:0.7rem;font-weight:700;white-space:nowrap;">${sc.label}</span></td>
             </tr>
           `;
         }).join('');
 
         const totalRow = `
-          <tr class="billing-total-row">
-            <td colspan="3"><strong>Month to date total</strong></td>
-            <td><strong>${totalHours.toFixed(1)}h</strong></td>
-            <td>—</td>
-            <td><strong style="color:#0284C7;font-size:14.5px;">$${totalSpend.toFixed(2)}</strong></td>
+          <tr style="background:#F8FAFC;border-top:2px solid #E2E8F0;">
+            <td colspan="4"><strong style="font-size:0.82rem;color:#334155;">Month-to-Date Total</strong></td>
+            <td><strong style="font-size:0.88rem;">${totalHours.toFixed(1)}h</strong></td>
+            <td><strong style="color:#0284C7;font-size:0.92rem;">$${totalSpend.toFixed(2)}</strong></td>
+            <td><span style="background:#ECFDF5;color:#047857;padding:0.2rem 0.55rem;border-radius:9999px;font-size:0.7rem;font-weight:700;">Summary</span></td>
           </tr>
         `;
 
         tbody.innerHTML = rows + totalRow;
+        if (window.lucide) lucide.createIcons();
 
       } catch (err) {
         console.error('Failed to load billing:', err);
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#E11D48;padding:1.5rem;">Failed to load billing summary.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#E11D48;padding:1.5rem;">Failed to load billing summary. Please check your connection and try again.</td></tr>';
       }
     }
 
@@ -9057,7 +9166,23 @@ function switchStaffPage(pageId, pageTitle) {
   // 6. Scroll smoothly to top
   window.scrollTo({ top: 0, behavior: 'smooth' });
 
-  // 7. Refresh icons
+  // 7. Refresh page-specific data on tab activation
+  if (pageId === 'staff-page-pay') {
+    loadStaffPaySummary();
+  } else if (pageId === 'staff-page-clock') {
+    checkClockStatus();
+    loadPunchHistory();
+  } else if (pageId === 'staff-page-shifts') {
+    loadStaffOpenShifts();
+  } else if (pageId === 'staff-page-schedule') {
+    loadStaffSchedule();
+    loadStaffAvailability();
+  } else if (pageId === 'staff-page-overview') {
+    checkClockStatus();
+    loadStaffPaySummary();
+  }
+
+  // 8. Refresh icons
   if (window.lucide) lucide.createIcons();
 }
 
@@ -9758,8 +9883,10 @@ async function submitStaffRunningLate(mins) {
       alert(`Delay Notice Transmitted! Divine Fingers Dispatch and ${facility} have been notified.`);
       const customBox = document.getElementById('staff-late-custom-box');
       if (customBox) customBox.style.display = 'none';
+      const customIn = document.getElementById('staff-late-custom-reason');
+      if (customIn) customIn.value = '';
     } else {
-      alert('Delay notice recorded locally. Dispatch alerted.');
+      alert(data.message || 'Delay notice recorded. Dispatch alerted.');
     }
   } catch (err) {
     alert('Delay notice submitted to dispatch coordinator.');
@@ -9799,7 +9926,8 @@ async function loadPunchHistory() {
           ? outDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' (' + outDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) + ')'
           : '<span style="color:#16A34A;font-weight:700;">In Progress...</span>';
 
-        const durationStr = p.duration_hours ? `${Number(p.duration_hours).toFixed(1)} hrs` : (outDate ? '--' : '<span style="color:#16A34A;font-weight:700;">Live</span>');
+        const dHours = p.duration_hours ?? p.total_hours;
+        const durationStr = dHours ? `${Number(dHours).toFixed(1)} hrs` : (outDate ? '--' : '<span style="color:#16A34A;font-weight:700;">Live</span>');
         const statusStr = outDate 
           ? '<span style="background:#EFF6FF;color:#1D4ED8;padding:0.25rem 0.6rem;border-radius:9999px;font-size:0.75rem;font-weight:700;display:inline-block;white-space:nowrap;">Completed</span>'
           : '<span style="background:#DCFCE7;color:#15803D;padding:0.25rem 0.6rem;border-radius:9999px;font-size:0.75rem;font-weight:700;display:inline-block;white-space:nowrap;">Active</span>';
@@ -9829,7 +9957,8 @@ async function loadPunchHistory() {
         const outStr = outDate 
           ? outDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' (' + outDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) + ')'
           : '<span style="color:#16A34A;font-weight:700;">In Progress...</span>';
-        const durationStr = p.duration_hours ? `${Number(p.duration_hours).toFixed(1)} hrs` : (outDate ? '--' : 'Live');
+        const dHours = p.duration_hours ?? p.total_hours;
+        const durationStr = dHours ? `${Number(dHours).toFixed(1)} hrs` : (outDate ? '--' : 'Live');
         const statusStr = outDate 
           ? '<span style="background:#EFF6FF;color:#1D4ED8;padding:0.2rem 0.55rem;border-radius:9999px;font-size:0.72rem;font-weight:700;">Completed</span>'
           : '<span style="background:#DCFCE7;color:#15803D;padding:0.2rem 0.55rem;border-radius:9999px;font-size:0.72rem;font-weight:700;">Active</span>';
@@ -9981,15 +10110,15 @@ function renderFilteredOpenShifts() {
             <span style="font-size: 0.76rem; font-weight: 700; color: #64748B;">#${(s.request_code || s.id || 'SHIFT').toString().slice(-8)}</span>
           </div>
           <h4 style="margin: 0; font-size: 1.05rem; font-weight: 800; color: var(--navy); font-family: var(--font-heading);">
-            ${s.facility_name || 'Scarborough General Hospital'}
+            ${s.facility_name || s.facility || 'Healthcare Facility'}
           </h4>
           <div style="font-size: 0.82rem; color: #475569; margin-top: 0.25rem; font-weight: 600;">
-            <span>${s.unit_department || 'General Medicine'}</span> • <strong style="color: #0284C7;">${s.role_requested || 'Registered Nurse (RN)'}</strong>
+            <span>${s.unit_department || s.department || 'General Care'}</span> • <strong style="color: #0284C7;">${s.role_requested || s.role || 'Staff'}</strong>
           </div>
           <div style="display: flex; gap: 1rem; margin-top: 0.4rem; font-size: 0.78rem; color: #64748B; flex-wrap: wrap;">
             <span><i data-lucide="calendar" style="width: 13px; height: 13px; display: inline-block; vertical-align: middle;"></i> ${dateStr}</span>
             <span><i data-lucide="clock" style="width: 13px; height: 13px; display: inline-block; vertical-align: middle;"></i> ${s.shift_type || 'Day Shift'} (${s.duration_hours || 12}h)</span>
-            <span><i data-lucide="map-pin" style="width: 13px; height: 13px; display: inline-block; vertical-align: middle;"></i> ${s.location || 'Scarborough, ON'}</span>
+            <span><i data-lucide="map-pin" style="width: 13px; height: 13px; display: inline-block; vertical-align: middle;"></i> ${s.location || s.region || 'Ontario'}</span>
             <span style="color: #15803D; font-weight: 800;">Est: ${rate}</span>
           </div>
         </div>
@@ -10010,16 +10139,20 @@ async function claimShift(shiftId) {
   if (!confirm('Confirm you want to claim and commit to this health care shift?')) return;
 
   try {
-    const res = await fetch(`${API_BASE}/shifts/${shiftId}/claim`, {
+    const res = await fetch(`${API_BASE}/shifts/${encodeURIComponent(shiftId)}/claim`, {
       method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': typeof getCsrfToken === 'function' ? getCsrfToken() : ''
+      },
       credentials: 'include'
     });
     const data = await res.json();
     if (!res.ok || !data.success) {
-      throw new Error(data.message || 'Unable to claim shift.');
+      throw new Error(data.error || data.message || 'Unable to claim shift.');
     }
 
-    alert('Shift Claim Confirmed! Shift has been added to your confirmed assignments.');
+    alert(data.message || 'Shift Claim Confirmed! Shift has been added to your confirmed assignments.');
     await loadStaffOpenShifts();
     await checkClockStatus();
     await loadStaffSchedule();
@@ -10159,9 +10292,12 @@ async function loadStaffPaySummary() {
       payData = await res.json();
     }
 
-    const hours = (payData && payData.total_hours) ? Number(payData.total_hours).toFixed(1) : '36.5';
-    const gross = (payData && payData.gross_pay) ? `$${Number(payData.gross_pay).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '$1,642.50';
-    const nextDate = (payData && payData.next_pay_date) || 'Friday, Sep 18';
+    const rawHours = (payData && (payData.total_hours ?? payData.hours_this_period ?? payData.summary?.total_hours)) ?? 0;
+    const rawGross = (payData && (payData.gross_pay ?? payData.estimated_pay ?? payData.summary?.estimated_pay ?? payData.summary?.gross_pay)) ?? 0;
+    const numH = Number(rawHours) || 0;
+    const hours = (numH > 0 && numH < 0.1) ? numH.toFixed(2) : numH.toFixed(1);
+    const gross = `$${Number(rawGross).toLocaleString('en-CA', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    const nextDate = (payData && (payData.next_pay_date || payData.summary?.next_pay_date)) || 'Sun, Sep 20, 2026';
 
     if (hoursEl) hoursEl.textContent = `${hours} hrs`;
     if (grossEl) grossEl.textContent = gross;
@@ -10170,50 +10306,60 @@ async function loadStaffPaySummary() {
     if (topHoursEl) topHoursEl.textContent = `${hours}h`;
     if (topPayEl) topPayEl.textContent = gross;
 
-    const shifts = (payData && payData.shifts) || [
-      { code: 'SHIFT-2026-088', facility: 'Scarborough Health Network', date: '2026-09-03', hours: 12.0, rate: 45.0, total: 540.0, status: 'Verified' },
-      { code: 'SHIFT-2026-082', facility: 'Toronto General Hospital', date: '2026-09-01', hours: 12.0, rate: 45.0, total: 540.0, status: 'Verified' },
-      { code: 'SHIFT-2026-077', facility: 'Sunnybrook Health Sciences', date: '2026-08-29', hours: 12.5, rate: 45.0, total: 562.5, status: 'Verified' }
-    ];
+    const shifts = (payData && (payData.shifts || payData.timecards || payData.records)) ? (payData.shifts || payData.timecards || payData.records) : [];
 
     currentStaffPayShifts = shifts;
 
     if (tbody) {
-      tbody.innerHTML = shifts.map(s => `
-        <tr>
-          <td><strong style="color:var(--navy);">${s.code || 'SHIFT'}</strong><div style="font-size:0.75rem;color:#64748B;">${s.facility || 'Hospital Facility'}</div></td>
-          <td>${s.date || '2026-09-01'}</td>
-          <td>${Number(s.hours || 12).toFixed(1)} hrs</td>
-          <td>$${Number(s.rate || 45).toFixed(2)}/hr</td>
-          <td><strong style="color:#0284C7;">$${Number(s.total || 540).toFixed(2)}</strong></td>
-          <td><span style="background:#ECFDF5;color:#047857;font-size:0.75rem;font-weight:700;padding:0.2rem 0.55rem;border-radius:9999px;">${s.status || 'Verified'}</span></td>
-        </tr>
-      `).join('');
+      if (shifts.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #64748B; padding: 2rem;">No verified pay records yet. Completed and verified shifts will appear here.</td></tr>';
+      } else {
+        tbody.innerHTML = shifts.map(s => {
+          const sH = Number(s.raw_hours ?? s.hours ?? 0);
+          const sHDisplay = (sH > 0 && sH < 0.1) ? `${sH.toFixed(2)} hrs` : (typeof s.hours === 'string' && s.hours.includes('hrs') ? s.hours : `${sH.toFixed(1)} hrs`);
+          const sRateDisplay = typeof s.rate === 'string' ? s.rate : `$${Number(s.raw_rate ?? s.rate ?? 48.5).toFixed(2)}/hr`;
+          const sTotalDisplay = typeof s.total === 'string' ? s.total : `$${Number(s.raw_total ?? s.total ?? 0).toFixed(2)}`;
+
+          return `
+            <tr>
+              <td><strong style="color:var(--navy);">${s.code || s.request_code || 'SHIFT'}</strong><div style="font-size:0.75rem;color:#64748B;">${s.facility || 'Hospital Facility'} &bull; ${s.unit || 'General'}</div></td>
+              <td>${s.date || s.date_label || '—'}</td>
+              <td><strong>${sHDisplay}</strong></td>
+              <td>${sRateDisplay}</td>
+              <td><strong style="color:#0284C7;">${sTotalDisplay}</strong></td>
+              <td><span style="background:#ECFDF5;color:#047857;font-size:0.75rem;font-weight:700;padding:0.2rem 0.55rem;border-radius:9999px;">${s.status || 'Verified'}</span></td>
+            </tr>
+          `;
+        }).join('');
+      }
     }
 
   } catch (err) {
-    if (hoursEl) hoursEl.textContent = '36.5 hrs';
-    if (grossEl) grossEl.textContent = '$1,642.50';
+    if (hoursEl) hoursEl.textContent = '0.0 hrs';
+    if (grossEl) grossEl.textContent = '$0.00';
+    if (nextDateEl) nextDateEl.textContent = 'Sun, Sep 20, 2026';
+    if (tbody) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #64748B; padding: 2rem;">No verified pay records yet.</td></tr>';
+    }
   }
 }
 
 function exportStaffPayStub() {
+  if (!currentStaffPayShifts || currentStaffPayShifts.length === 0) {
+    alert('No verified pay records available to export.');
+    return;
+  }
+
   const headers = ['Shift Code', 'Facility', 'Date', 'Hours', 'Hourly Rate', 'Gross Amount', 'Status'];
-  const dataRows = (currentStaffPayShifts && currentStaffPayShifts.length > 0)
-    ? currentStaffPayShifts.map(s => [
-        `"${s.code || 'SHIFT'}"`,
-        `"${(s.facility || 'Hospital Facility').replace(/"/g, '""')}"`,
-        `"${s.date || '2026-09-01'}"`,
-        Number(s.hours || 12).toFixed(1),
-        Number(s.rate || 45).toFixed(2),
-        Number(s.total || 540).toFixed(2),
-        `"${s.status || 'Verified'}"`
-      ])
-    : [
-        ['SHIFT-2026-088', '"Scarborough Health Network"', '2026-09-03', '12.0', '45.00', '540.00', 'Verified'],
-        ['SHIFT-2026-082', '"Toronto General Hospital"', '2026-09-01', '12.0', '45.00', '540.00', 'Verified'],
-        ['SHIFT-2026-077', '"Sunnybrook Health Sciences"', '2026-08-29', '12.5', '45.00', '562.50', 'Verified']
-      ];
+  const dataRows = currentStaffPayShifts.map(s => [
+    `"${s.code || 'SHIFT'}"`,
+    `"${(s.facility || 'Hospital Facility').replace(/"/g, '""')}"`,
+    `"${s.date || '—'}"`,
+    Number(s.hours || 0).toFixed(1),
+    Number(s.rate || 0).toFixed(2),
+    Number(s.total || 0).toFixed(2),
+    `"${s.status || 'Verified'}"`
+  ]);
 
   let csvContent = 'data:text/csv;charset=utf-8,' + headers.join(',') + '\n';
   dataRows.forEach(r => {
@@ -10301,12 +10447,9 @@ async function loadStaffDocuments() {
     }
 
     if (!docs || docs.length === 0) {
-      docs = [
-        { id: 'cno', document_name: 'CNO License 2026-2027.pdf', document_type: 'cno_license', expiry_date: '2027-03-31', file_size: 245000 },
-        { id: 'cpr', document_name: 'Heart & Stroke BLS Certificate.pdf', document_type: 'cpr_bls', expiry_date: '2027-05-15', file_size: 180000 },
-        { id: 'vss', document_name: 'Toronto Police VSS Record.pdf', document_type: 'vss', expiry_date: '2026-11-20', file_size: 512000 },
-        { id: 'n95', document_name: '3M 1860 N95 Fit Test Card.pdf', document_type: 'n95_mask_fit', expiry_date: '2027-01-10', file_size: 120000 }
-      ];
+      if (countEl) countEl.textContent = '0 Documents';
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#64748B;padding:1.5rem;">No clinical documents uploaded yet. Use the upload form below to add your credentials.</td></tr>';
+      return;
     }
 
     if (countEl) countEl.textContent = `${docs.length} Documents`;
@@ -10321,6 +10464,12 @@ async function loadStaffDocuments() {
           <td><strong style="color:var(--navy);">${docName}</strong></td>
           <td><span style="background:#F1F5F9;color:#334155;padding:0.2rem 0.5rem;border-radius:4px;font-size:0.72rem;font-weight:700;">${catLabel}</span></td>
           <td><span style="color:#15803D;font-weight:700;">${expStr}</span></td>
+          <td>
+            ${d.status === 'verified'
+              ? '<span style="background:#DCFCE7;color:#15803D;padding:0.2rem 0.55rem;border-radius:9999px;font-size:0.7rem;font-weight:700;display:inline-flex;align-items:center;gap:3px;"><i data-lucide="check-circle" style="width:11px;height:11px;"></i> Recorded</span>'
+              : '<span style="background:#FEF3C7;color:#92400E;padding:0.2rem 0.55rem;border-radius:9999px;font-size:0.7rem;font-weight:700;display:inline-flex;align-items:center;gap:3px;"><i data-lucide="clock" style="width:11px;height:11px;"></i> Pending Admin</span>'
+            }
+          </td>
           <td style="text-align: right;">
             <button type="button" onclick="deleteStaffDocument('${d.id}')" style="background:transparent;border:none;color:#EF4444;font-size:0.78rem;font-weight:700;cursor:pointer;">
               Remove
@@ -10333,7 +10482,7 @@ async function loadStaffDocuments() {
     if (window.lucide) lucide.createIcons();
 
   } catch (err) {
-    tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #64748B; padding: 1.5rem;">Verified clinical credentials active.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #64748B; padding: 1.5rem;">Verified clinical credentials active.</td></tr>';
   }
 }
 
@@ -10344,17 +10493,27 @@ async function handleUploadCredential(e) {
   const typeSelect = document.getElementById('upload-doc-type');
   const titleInput = document.getElementById('upload-doc-title');
   const expiryInput = document.getElementById('upload-doc-expiry');
+  const numInput = document.getElementById('upload-doc-number');
 
   if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
     alert('Please select a clinical document file to upload.');
     return;
   }
 
+  const docTypeVal = typeSelect ? typeSelect.value : 'other';
+  const docTitleVal = (titleInput && titleInput.value.trim()) ? titleInput.value.trim() : fileInput.files[0].name;
+  const expiryVal = expiryInput ? expiryInput.value : '';
+  const numVal = numInput ? numInput.value.trim() : '';
+
   const formData = new FormData();
   formData.append('document', fileInput.files[0]);
-  formData.append('document_type', typeSelect ? typeSelect.value : 'other');
-  formData.append('document_title', titleInput ? titleInput.value : fileInput.files[0].name);
-  formData.append('expiry_date', expiryInput ? expiryInput.value : '');
+  formData.append('document_type', docTypeVal);
+  formData.append('doc_type', docTypeVal);
+  formData.append('document_title', docTitleVal);
+  formData.append('title', docTitleVal);
+  formData.append('expiry_date', expiryVal);
+  formData.append('credential_number', numVal);
+  formData.append('credential_value', numVal);
 
   const btn = document.getElementById('btn-upload-credential-submit');
   if (btn) {

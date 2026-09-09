@@ -786,6 +786,9 @@
             showToast(`💬 Dispatch Communication Updated`, 'info');
             fetchAndRenderInquiries().then(renderChatInbox);
           } else if (msg.type === 'status:changed') {
+            if (msg.payload && msg.payload.action === 'running_late') {
+              showToast(`⏱️ Delay Notice: ${msg.payload.staff_name || 'Caregiver'} running ${msg.payload.minutes_late || 15}m late. Reason: "${msg.payload.reason || 'Delayed'}"`, 'warning');
+            }
             loadAllDashboardData();
           }
         } catch { /* Ignore unparseable frames */ }
@@ -862,6 +865,15 @@
         title: `⚠️ Credential Alert: ${s.name}`,
         sub: `Status: ${s.credential_status.toUpperCase()} (CPR Expiry: ${s.cpr_expiry_date ? s.cpr_expiry_date.slice(0,10) : 'None'})`,
         action: () => { switchTab('compliance-tab', 'Compliance & Credentials'); window.openStaffDrawer(s.id); }
+      });
+    });
+
+    // Check for running late delay notices from caregivers
+    LiveStore.requests.filter(r => (r.delay_minutes > 0 || r.delay_reason) && r.status !== 'completed' && r.status !== 'cancelled').forEach(r => {
+      alerts.push({
+        title: `⏱️ Running Late: ${r.assigned_staff_name || 'Caregiver'} (+${r.delay_minutes || 15}m)`,
+        sub: `${r.facility_name} • Note: "${r.delay_reason || 'Delayed on commute.'}"`,
+        action: () => { switchTab('requests-tab', 'Client Requests'); window.openRequestDrawer(r.id); }
       });
     });
 
@@ -1176,6 +1188,12 @@
                     </div>
                     <div style="font-size:0.78rem;color:var(--text-secondary);margin-bottom:0.4rem;">${r.unit_department || 'General Care'} &bull; ${r.shift_type || 'Day Shift'}</div>
                     ${r.urgency_level === 'emergency_surge' || r.urgency_level === 'urgent' ? `<div style="margin-bottom:0.4rem;"><span class="status-pill urgent" style="font-size:0.65rem;padding:0.15rem 0.5rem;"><i data-lucide="alert-triangle" style="width:10px;height:10px;"></i> EMERGENCY SURGE</span></div>` : ''}
+                    ${(r.delay_minutes > 0 || r.delay_reason) ? `
+                      <div style="background:#FFFBEB;border:1px solid #F59E0B;border-radius:6px;padding:0.25rem 0.5rem;margin-bottom:0.4rem;font-size:0.72rem;color:#92400E;display:flex;align-items:center;gap:4px;">
+                        <i data-lucide="clock-alert" style="width:12px;height:12px;color:#D97706;flex-shrink:0;"></i>
+                        <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><strong>+${r.delay_minutes || 15}m:</strong> ${escapeHTML(r.delay_reason || 'Delayed')}</span>
+                      </div>
+                    ` : ''}
                     <div style="display:flex;align-items:center;justify-content:space-between;padding-top:0.4rem;border-top:1px solid var(--border-subtle);font-size:0.72rem;color:var(--text-muted);margin-top:0.35rem;">
                       <span>${r.request_code}</span>
                       ${r.assigned_staff_name ? `<span style="font-weight:700;color:var(--brand-cyan);display:inline-flex;align-items:center;gap:3px;"><i data-lucide="user-check" style="width:11px;height:11px;"></i> ${r.assigned_staff_name}</span>` : '<span style="color:#B45309;font-weight:700;">Unassigned</span>'}
@@ -1205,6 +1223,14 @@
             <td class="cell-subtitle" data-label="Facility & Unit">
               <div class="meta-label">Facility &amp; Unit</div>
               <div class="meta-value"><strong>${r.facility_name}</strong> &bull; <span style="font-size:.78rem;color:var(--text-muted);">${r.unit_department || 'General Care'}</span></div>
+              ${(r.delay_minutes > 0 || r.delay_reason) ? `
+                <div style="margin-top:4px;">
+                  <span class="badge" style="background:#FEF3C7;color:#92400E;border:1px solid #F59E0B;font-size:0.68rem;padding:2px 6px;border-radius:4px;display:inline-flex;align-items:center;gap:3px;" title="${escapeHTML(r.delay_reason || '')}">
+                    <i data-lucide="clock-alert" style="width:10px;height:10px;color:#D97706;"></i>
+                    <strong>+${r.delay_minutes || 15}m Late:</strong> ${escapeHTML(r.delay_reason || 'Delayed')}
+                  </span>
+                </div>
+              ` : ''}
             </td>
             <td class="cell-grid-item" data-label="Role Requested">
               <div class="meta-label">Role Requested</div>
@@ -2181,6 +2207,14 @@
             <td class="cell-subtitle" data-label="Facility & Unit">
               <div class="meta-label">Facility & Unit</div>
               <div class="meta-value"><strong>${escapeHTML(r.facility_name)}</strong> &bull; <span style="font-size: 0.73rem; color: var(--text-muted);">📍 ${escapeHTML(r.unit_department || 'General Care')}</span></div>
+              ${(r.delay_minutes > 0 || r.delay_reason) ? `
+                <div style="margin-top: 3px;">
+                  <span class="badge" style="background: #FEF3C7; color: #92400E; border: 1px solid #F59E0B; font-size: 0.68rem; padding: 2px 6px; border-radius: 4px; display: inline-flex; align-items: center; gap: 3px;" title="${escapeHTML(r.delay_reason || '')}">
+                    <i data-lucide="clock-alert" style="width: 10px; height: 10px; color: #D97706;"></i>
+                    <strong>+${r.delay_minutes || 15}m Late:</strong> ${escapeHTML(r.delay_reason || 'Delayed')}
+                  </span>
+                </div>
+              ` : ''}
             </td>
             <td class="cell-grid-item" data-label="Role Requested">
               <div class="meta-label">Role Requested</div>
@@ -2608,11 +2642,18 @@
               <i data-lucide="plus" style="width: 12px; height: 12px;"></i> Dispatch
             </button>
           </td>
-          ${weekDays.map((d, dayIndex) => {
-            const dayShifts = fac.shifts.filter((s, idx) => {
-              const sDate = s.start_date || s.shift_date || (s.created_at ? getLocalDateIsoString(parseUtcDate(s.created_at) || new Date()) : '');
-              if (sDate && sDate.slice(0, 10) === d.isoDate) return true;
-              return (fac.shifts.length > 0 && (idx % 7 === dayIndex));
+          ${weekDays.map((d) => {
+            const dayShifts = fac.shifts.filter((s) => {
+              const raw = s.start_date || s.shift_date || s.created_at;
+              if (!raw) return false;
+              let sIso = '';
+              if (typeof raw === 'string' && raw.length >= 10 && raw[4] === '-' && raw[7] === '-') {
+                sIso = raw.slice(0, 10);
+              } else {
+                const dateObj = new Date(raw);
+                sIso = !isNaN(dateObj.getTime()) ? getLocalDateIsoString(dateObj) : '';
+              }
+              return sIso === d.isoDate;
             });
 
             if (dayShifts.length === 0) {
@@ -3172,12 +3213,75 @@
         </form>`;
     } else if (tabName === 'tab-profile-docs') {
       drawerContent.innerHTML = `
-        <div style="display:flex;flex-direction:column;gap:0.75rem;margin-bottom:1.25rem;">
-          <div class="detail-item-box"><label>CNO Registration</label><span>${staff.cno_registration_num || 'Not Recorded'}</span></div>
-          <div class="detail-item-box"><label>BLS / CPR Expiry</label><span>${staff.cpr_expiry_date ? staff.cpr_expiry_date.slice(0,10) : 'Not Recorded'}</span></div>
-          <div class="detail-item-box"><label>Vulnerable Sector Police Check</label><span>${staff.vss_status || 'Clear'}</span></div>
-          <div class="detail-item-box"><label>N95 Mask Fit Test</label><span>${staff.n95_fit_test || '3M Valid'}</span></div>
-          <div class="detail-item-box"><label>Audit Status</label><span class="status-pill ${staff.credential_status}">${staff.credential_status.toUpperCase()}</span></div>
+        <div style="background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:10px;padding:1rem 1.15rem;margin-bottom:1.25rem;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.85rem;flex-wrap:wrap;gap:0.5rem;">
+            <h5 style="margin:0;font-size:0.88rem;font-weight:700;color:var(--text-primary);display:flex;align-items:center;gap:0.4rem;">
+              <i data-lucide="shield-check" style="width:16px;height:16px;color:var(--brand-cyan);"></i> Active Credential Standing
+            </h5>
+            <button type="button" class="btn-secondary-action" style="padding:0.25rem 0.65rem;font-size:0.73rem;height:auto;" onclick="window.toggleQuickCredForm()">
+              <i data-lucide="edit-3" style="width:12px;height:12px;"></i> Quick Edit Credentials
+            </button>
+          </div>
+
+          <div id="quick-cred-form-box" style="display:none;background:var(--bg-surface-elevated);border:1px solid var(--border-subtle);border-radius:8px;padding:0.85rem;margin-bottom:1rem;">
+            <form onsubmit="window.handleQuickSaveCredentials(event, '${staff.id}')">
+              <div class="quick-cred-grid-2">
+                <div>
+                  <label style="font-size:0.7rem;font-weight:700;color:var(--text-muted);display:block;margin-bottom:2px;">CNO REGISTRATION #</label>
+                  <input type="text" id="quick-cno-input" class="modal-input" style="padding:0.45rem;font-size:0.8rem;" value="${staff.cno_registration_num || ''}" placeholder="e.g. CNO-RN-884920">
+                </div>
+                <div>
+                  <label style="font-size:0.7rem;font-weight:700;color:var(--text-muted);display:block;margin-bottom:2px;">CPR / BLS EXPIRY</label>
+                  <input type="date" id="quick-cpr-input" class="modal-input" style="padding:0.45rem;font-size:0.8rem;" value="${staff.cpr_expiry_date ? staff.cpr_expiry_date.slice(0,10) : ''}">
+                </div>
+              </div>
+              <div class="quick-cred-grid-3">
+                <div>
+                  <label style="font-size:0.7rem;font-weight:700;color:var(--text-muted);display:block;margin-bottom:2px;">POLICE VSS</label>
+                  <select id="quick-vss-input" class="filter-select" style="width:100%;padding:0.45rem;font-size:0.8rem;">
+                    <option value="Clear" ${staff.vss_status === 'Clear' ? 'selected' : ''}>Clear</option>
+                    <option value="Pending" ${staff.vss_status === 'Pending' ? 'selected' : ''}>Pending</option>
+                    <option value="Review Required" ${staff.vss_status === 'Review Required' ? 'selected' : ''}>Review Required</option>
+                  </select>
+                </div>
+                <div>
+                  <label style="font-size:0.7rem;font-weight:700;color:var(--text-muted);display:block;margin-bottom:2px;">N95 MASK FIT</label>
+                  <select id="quick-n95-input" class="filter-select" style="width:100%;padding:0.45rem;font-size:0.8rem;">
+                    <option value="3M Valid" ${staff.n95_fit_test === '3M Valid' ? 'selected' : ''}>3M Valid</option>
+                    <option value="Passed" ${staff.n95_fit_test === 'Passed' ? 'selected' : ''}>Passed</option>
+                    <option value="Expired" ${staff.n95_fit_test === 'Expired' ? 'selected' : ''}>Expired</option>
+                  </select>
+                </div>
+                <div>
+                  <label style="font-size:0.7rem;font-weight:700;color:var(--text-muted);display:block;margin-bottom:2px;">AUDIT STATUS</label>
+                  <select id="quick-status-input" class="filter-select" style="width:100%;padding:0.45rem;font-size:0.8rem;">
+                    <option value="verified" ${staff.credential_status === 'verified' ? 'selected' : ''}>Verified</option>
+                    <option value="expiring" ${staff.credential_status === 'expiring' ? 'selected' : ''}>Expiring Soon</option>
+                    <option value="expired" ${staff.credential_status === 'expired' ? 'selected' : ''}>Expired</option>
+                    <option value="pending" ${staff.credential_status === 'pending' ? 'selected' : ''}>Pending</option>
+                  </select>
+                </div>
+              </div>
+              <div class="quick-cred-actions">
+                <button type="button" class="btn-secondary-action" style="font-size:0.75rem;padding:0.35rem 0.75rem;" onclick="window.toggleQuickCredForm()">Cancel</button>
+                <button type="submit" class="btn-primary-action" style="font-size:0.75rem;padding:0.35rem 0.95rem;"><i data-lucide="check" style="width:12px;height:12px;"></i> Save Recorded Values</button>
+              </div>
+            </form>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:0.65rem;">
+            <div class="detail-item-box">
+              <label>CNO Registration</label>
+              <span style="${staff.cno_registration_num ? 'color:var(--brand-cyan);font-weight:700;' : 'color:var(--text-muted);'}">${staff.cno_registration_num ? '✅ ' + staff.cno_registration_num : '⚠️ Not Recorded'}</span>
+            </div>
+            <div class="detail-item-box">
+              <label>BLS / CPR Expiry</label>
+              <span style="${staff.cpr_expiry_date ? 'color:#10B981;font-weight:700;' : 'color:var(--text-muted);'}">${staff.cpr_expiry_date ? '✅ ' + staff.cpr_expiry_date.slice(0,10) : '⚠️ Not Recorded'}</span>
+            </div>
+            <div class="detail-item-box"><label>Vulnerable Sector Police Check</label><span>${staff.vss_status || 'Clear'}</span></div>
+            <div class="detail-item-box"><label>N95 Mask Fit Test</label><span>${staff.n95_fit_test || '3M Valid'}</span></div>
+            <div class="detail-item-box"><label>Audit Status</label><span class="status-pill ${staff.credential_status || 'verified'}">${(staff.credential_status || 'verified').toUpperCase()}</span></div>
+          </div>
         </div>
 
         <div style="background:var(--bg-surface-elevated);border:1px solid var(--border-subtle);border-radius:8px;padding:1rem;margin-bottom:1.25rem;">
@@ -3292,6 +3396,89 @@
     if (window.lucide) lucide.createIcons();
   };
 
+  window.toggleQuickCredForm = function() {
+    const el = document.getElementById('quick-cred-form-box');
+    if (el) {
+      el.style.display = el.style.display === 'none' ? 'block' : 'none';
+      if (window.lucide) lucide.createIcons();
+    }
+  };
+
+  window.handleQuickSaveCredentials = async function(e, staffId) {
+    e.preventDefault();
+    const cno = document.getElementById('quick-cno-input')?.value;
+    const cpr = document.getElementById('quick-cpr-input')?.value;
+    const vss = document.getElementById('quick-vss-input')?.value;
+    const n95 = document.getElementById('quick-n95-input')?.value;
+    const status = document.getElementById('quick-status-input')?.value;
+
+    try {
+      const res = await apiRequest(`/admin/staff/${staffId}/quick-credentials`, {
+        method: 'PATCH',
+        body: JSON.stringify({
+          cno_registration_num: cno,
+          cpr_expiry_date: cpr || null,
+          vss_status: vss,
+          n95_fit_test: n95,
+          credential_status: status
+        })
+      });
+
+      showToast(res.message || 'Staff credentials recorded successfully!', 'success');
+      await fetchAndRenderRoster();
+      renderCompliance();
+      await fetchAndRenderAudit();
+
+      const updatedStaff = LiveStore.staff.find(s => s.id === staffId);
+      if (updatedStaff) {
+        renderStaffDrawerTab('tab-profile-docs', updatedStaff);
+      }
+    } catch (err) {
+      showToast(`Update failed: ${err.message}`, 'warning');
+    }
+  };
+
+  window.handleApproveStaffDocument = async function(docId, staffId, docType, docTitle, currentVal, currentExpiry) {
+    let credValue = currentVal;
+    let expDate = currentExpiry;
+
+    if (docType === 'cno_license' || !credValue) {
+      const promptVal = window.prompt(`Approve & Record Credential for "${docTitle}":\nEnter CNO Registration / License Number:`, credValue || 'CNO-RN-884920');
+      if (promptVal === null) return; // User pressed Cancel
+      credValue = promptVal.trim();
+    }
+
+    if (docType === 'cpr_card' && !expDate) {
+      const promptExp = window.prompt(`Enter BLS / CPR Expiry Date (YYYY-MM-DD):`, '2027-12-31');
+      if (promptExp === null) return;
+      expDate = promptExp.trim();
+    }
+
+    try {
+      const res = await apiRequest(`/admin/staff/documents/${docId}/verify`, {
+        method: 'PATCH',
+        body: JSON.stringify({
+          status: 'verified',
+          doc_type: docType,
+          credential_value: credValue,
+          expiry_date: expDate || null
+        })
+      });
+
+      showToast(res.message || 'Credential verified and recorded successfully!', 'success');
+      await fetchAndRenderRoster();
+      renderCompliance();
+      await fetchAndRenderAudit();
+
+      const updatedStaff = LiveStore.staff.find(s => s.id === staffId);
+      if (updatedStaff) {
+        renderStaffDrawerTab('tab-profile-docs', updatedStaff);
+      }
+    } catch (err) {
+      showToast(`Approval failed: ${err.message}`, 'warning');
+    }
+  };
+
   window.fetchStaffDocuments = async function(staffId) {
     const container = document.getElementById('staff-documents-list-container');
     if (!container) return;
@@ -3303,7 +3490,7 @@
       if (docs.length === 0) {
         container.innerHTML = `
           <div style="background:var(--bg-surface);padding:1.25rem;text-align:center;border-radius:8px;border:1px dashed var(--border-subtle);color:var(--text-muted);font-size:0.8rem;">
-            📄 No documents uploaded for this staff member yet.<br>Use the upload form above to attach credentials.
+            📄 No documents uploaded for this staff member yet.<br>Use the upload form above or wait for staff portal uploads.
           </div>`;
         return;
       }
@@ -3314,6 +3501,7 @@
         'vss_check': '🛡️ Police VSS',
         'n95_fit': '😷 N95 Fit Test',
         'immunization': '💉 Immunization',
+        'driver_license': '🪪 Photo ID',
         'other': '📄 Certificate'
       };
 
@@ -3321,23 +3509,39 @@
         const sizeKb = Math.round((doc.file_size || 0) / 1024);
         const sizeDisplay = sizeKb > 1024 ? `${(sizeKb/1024).toFixed(1)} MB` : `${sizeKb} KB`;
         const expDisplay = doc.expiry_date ? `Expires: ${formatUserDate(doc.expiry_date)}` : 'No Expiry Set';
+        const isVerified = doc.status === 'verified';
+        const credVal = doc.credential_value ? ` • Reg #: ${escapeHTML(doc.credential_value)}` : '';
 
         return `
-          <div style="background:var(--bg-surface);padding:0.75rem;border-radius:8px;margin-bottom:0.6rem;border:1px solid var(--border-subtle);display:flex;justify-content:space-between;align-items:center;gap:0.5rem;flex-wrap:wrap;">
-            <div style="min-width:180px;flex:1;">
-              <div style="display:flex;align-items:center;gap:0.4rem;margin-bottom:2px;">
-                <span class="status-pill verified" style="font-size:0.65rem;padding:0.1rem 0.4rem;">
+          <div class="staff-doc-card" style="border-color:${isVerified ? 'var(--border-subtle)' : '#FDE68A'};">
+            <div class="staff-doc-info">
+              <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:3px;flex-wrap:wrap;">
+                <span class="status-pill verified" style="font-size:0.65rem;padding:0.15rem 0.45rem;">
                   ${typeIconMap[doc.doc_type] || '📄 Document'}
                 </span>
-                <strong style="font-size:0.82rem;color:var(--text-primary);">${escapeHTML(doc.title)}</strong>
+                <strong style="font-size:0.84rem;color:var(--text-primary);">${escapeHTML(doc.title)}</strong>
+                ${isVerified
+                  ? '<span style="background:rgba(16,185,129,0.12);color:#10B981;border:1px solid rgba(16,185,129,0.3);padding:0.15rem 0.5rem;border-radius:9999px;font-size:0.68rem;font-weight:700;display:inline-flex;align-items:center;gap:3px;"><i data-lucide="check-circle" style="width:11px;height:11px;"></i> Recorded &amp; Verified</span>'
+                  : '<span style="background:#FEF3C7;color:#92400E;border:1px solid #F59E0B;padding:0.15rem 0.5rem;border-radius:9999px;font-size:0.68rem;font-weight:700;display:inline-flex;align-items:center;gap:3px;"><i data-lucide="clock" style="width:11px;height:11px;"></i> Pending Approval</span>'
+                }
               </div>
-              <div style="font-size:0.72rem;color:var(--text-muted);">
-                ${escapeHTML(doc.file_name)} &bull; ${sizeDisplay} &bull; <span style="color:var(--brand-cyan);">${expDisplay}</span>
+              <div style="font-size:0.73rem;color:var(--text-muted);">
+                ${escapeHTML(doc.file_name)} &bull; ${sizeDisplay} &bull; <span style="color:var(--brand-cyan);">${expDisplay}</span>${credVal}
               </div>
+              ${doc.verified_at ? `<div style="font-size:0.68rem;color:#10B981;margin-top:2px;">Verified on ${formatUserDateTime(doc.verified_at)} by ${escapeHTML(doc.verified_by || 'Admin')}</div>` : ''}
             </div>
-            <div style="display:flex;gap:0.4rem;align-items:center;">
+            <div class="staff-doc-actions">
+              ${!isVerified ? `
+                <button type="button" class="btn-primary-action" style="padding:0.35rem 0.75rem;font-size:0.75rem;background:#10B981;border-color:#10B981;display:inline-flex;align-items:center;gap:4px;height:auto;" onclick="window.handleApproveStaffDocument('${doc.id}', '${staffId}', '${doc.doc_type || 'cno_license'}', '${escapeHTML(doc.title || '')}', '${escapeHTML(doc.credential_value || '')}', '${doc.expiry_date ? doc.expiry_date.slice(0,10) : ''}')">
+                  <i data-lucide="check-circle" style="width:13px;height:13px;"></i> Approve &amp; Record Credential
+                </button>
+              ` : `
+                <button type="button" class="btn-secondary-action" style="padding:0.25rem 0.55rem;font-size:0.72rem;display:inline-flex;align-items:center;gap:3px;" onclick="window.handleApproveStaffDocument('${doc.id}', '${staffId}', '${doc.doc_type || 'cno_license'}', '${escapeHTML(doc.title || '')}', '${escapeHTML(doc.credential_value || '')}', '${doc.expiry_date ? doc.expiry_date.slice(0,10) : ''}')" title="Re-approve or edit recorded credential value">
+                  <i data-lucide="edit-3" style="width:11px;height:11px;"></i> Edit Value
+                </button>
+              `}
               <a href="${API_BASE}/admin/staff/documents/${doc.id}/download" target="_blank" class="btn-secondary-action" style="padding:0.25rem 0.55rem;font-size:0.72rem;display:inline-flex;align-items:center;gap:3px;text-decoration:none;">
-                <i data-lucide="external-link" style="width:12px;height:12px;"></i> View
+                <i data-lucide="external-link" style="width:12px;height:12px;"></i> View File
               </a>
               <button type="button" class="btn-secondary-action danger-btn" style="padding:0.25rem 0.55rem;font-size:0.72rem;display:inline-flex;align-items:center;gap:3px;" onclick="window.handleDeleteStaffDocument('${doc.id}', '${staffId}')">
                 <i data-lucide="trash-2" style="width:12px;height:12px;"></i> Delete
@@ -3459,14 +3663,73 @@
 
     const staffOptions = LiveStore.staff.map(s => {
       const activeShift = LiveStore.requests.find(r => r.assigned_staff_id === s.id && r.status === 'dispatched' && r.id !== req.id);
-      const conflictTag = activeShift ? ` [⚠️ ON SHIFT: ${activeShift.request_code}]` : ' [Available]';
-      return `<option value="${s.id}" ${req.assigned_staff_id === s.id ? 'selected' : ''}>${s.name} (${s.role} - ${s.region})${conflictTag}</option>`;
+      let statusTag = '';
+
+      if (activeShift) {
+        statusTag = ` [⚠️ ON SHIFT: ${activeShift.request_code}]`;
+      } else if (s.status === 'suspended') {
+        statusTag = ' [⛔ SUSPENDED]';
+      } else {
+        let availDays = null;
+        if (Array.isArray(s.availability_schedule)) {
+          availDays = s.availability_schedule;
+        } else if (typeof s.availability_schedule === 'string') {
+          try { availDays = JSON.parse(s.availability_schedule); } catch (e) {}
+        }
+
+        const hasAnyAvail = availDays ? availDays.some(Boolean) : true;
+        let isDateOff = false;
+        let shiftDateStr = '';
+
+        if (availDays && availDays.length === 7) {
+          const shiftDate = new Date(req.start_date || req.shift_date || req.created_at || new Date());
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          shiftDate.setHours(0, 0, 0, 0);
+          const diffDays = Math.round((shiftDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+          if (diffDays >= 0 && diffDays < 7) {
+            isDateOff = !availDays[diffDays];
+            shiftDateStr = shiftDate.toLocaleDateString(undefined, { weekday: 'short', month: 'numeric', day: 'numeric' });
+          }
+        }
+
+        if (!hasAnyAvail) {
+          statusTag = ' [⛔ OFF-DUTY: Availability Off]';
+        } else if (isDateOff) {
+          statusTag = ` [⛔ OFF-DUTY: Off on ${shiftDateStr}]`;
+        } else if (s.status === 'off-duty') {
+          statusTag = ' [⛔ OFF-DUTY]';
+        } else {
+          statusTag = ' [✓ Available]';
+        }
+      }
+
+      return `<option value="${s.id}" ${req.assigned_staff_id === s.id ? 'selected' : ''}>${s.name} (${s.role} - ${s.region})${statusTag}</option>`;
     }).join('');
 
     const clockInDisplay = req.clock_in_time ? formatUserDateTime(req.clock_in_time) : '—';
     const clockOutDisplay = req.clock_out_time ? formatUserDateTime(req.clock_out_time) : '—';
 
+    const runningLateBanner = (req.delay_minutes > 0 || req.delay_reason) ? `
+      <div style="background: #FFFBEB; border: 1.5px solid #F59E0B; border-radius: 10px; padding: 1.1rem 1.25rem; margin-bottom: 1.25rem; box-shadow: 0 3px 10px rgba(245, 158, 11, 0.12);">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.4rem;">
+          <div style="display: flex; align-items: center; gap: 0.5rem; color: #92400E; font-weight: 800; font-size: 0.9rem;">
+            <i data-lucide="clock-alert" style="width: 19px; height: 19px; color: #D97706; flex-shrink: 0;"></i>
+            <span>Caregiver Running Behind Schedule (+${req.delay_minutes || 15} min delay)</span>
+          </div>
+          ${req.delay_notified_at ? `<span style="font-size: 0.72rem; color: #B45309; font-weight: 700; background: #FEF3C7; padding: 0.2rem 0.6rem; border-radius: 9999px;">Reported: ${formatUserDateTime(req.delay_notified_at)}</span>` : ''}
+        </div>
+        <div style="font-size: 0.84rem; color: #78350F; background: #FFFFFF; border: 1px solid #FDE68A; border-radius: 8px; padding: 0.75rem 0.95rem; line-height: 1.45;">
+          <div style="font-size: 0.72rem; font-weight: 800; color: #B45309; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 3px;">
+            <i data-lucide="message-square" style="width: 12px; height: 12px; vertical-align: middle; margin-right: 3px;"></i> Caregiver Comment / Reason for Delay:
+          </div>
+          <div style="font-weight: 600; color: #1E293B;">"${escapeHTML(req.delay_reason || 'Delayed on commute.')}"</div>
+        </div>
+      </div>
+    ` : '';
+
     drawerContent.innerHTML = `
+      ${runningLateBanner}
       <div style="display: flex; flex-direction: column; gap: 0.85rem; margin-bottom: 1.5rem;">
         <div class="detail-item-box"><label>Healthcare Facility</label><span>${req.facility_name}</span></div>
         <div class="detail-item-box"><label>Department / Unit</label><span>${req.unit_department || 'General Care'}</span></div>
@@ -3475,7 +3738,22 @@
         <div class="detail-item-box"><label>Role Requested</label><span>${req.role_requested}</span></div>
         <div class="detail-item-box"><label>Shift Duration</label><span>${req.shift_type}</span></div>
         <div class="detail-item-box"><label>Urgency Level</label><span class="status-pill ${req.urgency_level === 'emergency_surge' ? 'urgent' : 'verified'}" style="width: fit-content;">${req.urgency_level.toUpperCase()}</span></div>
-        ${req.special_instructions ? `<div class="detail-item-box"><label>Special Instructions</label><span>${req.special_instructions}</span></div>` : ''}
+        ${req.special_instructions ? `
+          <div class="detail-item-box" style="background:#FFFBEB;border:1px solid #FDE68A;border-radius:8px;padding:0.9rem 1rem;">
+            <label style="color:#B45309;display:flex;align-items:center;gap:5px;"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg> Client Special Instructions</label>
+            <span style="white-space:pre-wrap;word-break:break-word;font-size:0.84rem;line-height:1.5;color:#1E293B;">${escapeHTML(req.special_instructions)}</span>
+          </div>` : ''}
+        ${req.cancellation_reason ? `
+          <div class="detail-item-box" style="background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;padding:0.9rem 1rem;">
+            <label style="color:#B91C1C;display:flex;align-items:center;gap:5px;"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> Cancellation Reason (from Client)</label>
+            <span style="white-space:pre-wrap;word-break:break-word;font-size:0.84rem;line-height:1.5;color:#1E293B;">${escapeHTML(req.cancellation_reason)}</span>
+          </div>` : ''}
+        ${req.client_rating || req.client_feedback ? `
+          <div class="detail-item-box" style="background:#F0FDF4;border:1px solid #86EFAC;border-radius:8px;padding:0.9rem 1rem;">
+            <label style="color:#15803D;display:flex;align-items:center;gap:5px;"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Client Post-Shift Review</label>
+            ${req.client_rating ? `<div style="font-size:1rem;margin-bottom:4px;color:#F59E0B;">${'★'.repeat(Number(req.client_rating))}${'☆'.repeat(5 - Number(req.client_rating))} <span style="font-size:0.8rem;font-weight:700;color:#334155;">${req.client_rating}.0 / 5.0</span>${ req.client_rated_at ? ` <span style="font-size:0.72rem;color:#94A3B8;font-weight:500;">· Submitted ${formatUserDateTime(req.client_rated_at)}</span>` : ''}</div>` : ''}
+            ${req.client_feedback ? `<div style="white-space:pre-wrap;word-break:break-word;font-size:0.84rem;line-height:1.55;color:#1E293B;background:#fff;border:1px solid #D1FAE5;border-radius:6px;padding:0.65rem 0.85rem;margin-top:4px;">"${escapeHTML(req.client_feedback)}"</div>` : ''}
+          </div>` : ''}
       </div>
       
       <div style="background: var(--bg-surface); padding: 1.25rem 1.35rem; border-radius: 10px; margin: 1.5rem 0; border: 1.5px solid var(--border-subtle); box-shadow: 0 2px 6px rgba(0,0,0,0.03);">
@@ -3724,7 +4002,11 @@
   window.openNewRequestModal = function(facilityName = '', unitName = '', targetDate = '') {
     if (reqAssignStaffSelect) {
       reqAssignStaffSelect.innerHTML = '<option value="">— Unassigned (Pending Dispatch) —</option>' + 
-        LiveStore.staff.map(s => `<option value="${s.id}">${s.name} (${s.role} - ${s.region})</option>`).join('');
+        LiveStore.staff.map(s => {
+          const isOff = s.status === 'off-duty';
+          const tag = s.status === 'suspended' ? ' [⛔ SUSPENDED]' : (isOff ? ' [⛔ OFF-DUTY]' : ' [✓ Available]');
+          return `<option value="${s.id}">${s.name} (${s.role} - ${s.region})${tag}</option>`;
+        }).join('');
     }
     const facInput  = document.getElementById('req-facility-name');
     const unitInput = document.getElementById('req-unit-department');

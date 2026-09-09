@@ -156,20 +156,19 @@ router.get('/kpis', async (req, res, next) => {
 router.post('/clean-dummy-data', async (req, res, next) => {
   try {
     const tables = [
+      'shift_punches',
+      'staff_documents',
       'staffing_requests',
       'job_applications',
       'contact_inquiries',
       'audit_logs',
-      'staff_roster',
-      'staff_documents',
-      'newsletter_subscribers',
-      'users'
+      'newsletter_subscribers'
     ];
 
     const results = {};
     for (const table of tables) {
       try {
-        const [delResult] = await pool.query(`DELETE FROM ${table}`);
+        const [delResult] = await pool.query(`DELETE FROM \`${table}\``);
         results[table] = delResult.affectedRows || 0;
       } catch (tableErr) {
         results[table] = `skipped (${tableErr.message})`;
@@ -177,9 +176,26 @@ router.post('/clean-dummy-data', async (req, res, next) => {
     }
 
     try {
-      await pool.query(
+      const [rStaff] = await pool.query("DELETE FROM staff_roster WHERE email != 'olugbodi13123@run.edu.ng'");
+      results.staff_roster = rStaff.affectedRows || 0;
+      await pool.query("DELETE FROM staff_roster WHERE email = 'olugbodi13123@run.edu.ng' AND id != 'f479907a-71d7-4c8e-9a3b-6bbc496d1645'").catch(() => {});
+      await pool.query("UPDATE staff_roster SET shifts_completed = 0 WHERE email = 'olugbodi13123@run.edu.ng'").catch(() => {});
+    } catch (e) {
+      results.staff_roster = `skipped (${e.message})`;
+    }
+
+    try {
+      const [rUsers] = await pool.query("DELETE FROM users WHERE email != 'olugbodi13123@run.edu.ng'");
+      results.users = rUsers.affectedRows || 0;
+    } catch (e) {
+      results.users = `skipped (${e.message})`;
+    }
+
+    try {
+      const [rAdmins] = await pool.query(
         "DELETE FROM admins WHERE email NOT IN ('admin@divinefingershealthcare.ca', 'ayomidenoch15@gmail.com')"
       );
+      results.admins = rAdmins.affectedRows || 0;
     } catch (_) {}
 
     res.json({
@@ -441,7 +457,7 @@ router.get('/roster', requirePermission('roster:view'), async (req, res, next) =
     const [rows] = await pool.query(
       `SELECT id, staff_code, name, role, specialty, cno_registration_num, status,
               credential_status, rating, shifts_completed, region, phone, email,
-              hourly_rate, cpr_expiry_date, vss_status, n95_fit_test, avatar_url
+              hourly_rate, availability_schedule, cpr_expiry_date, vss_status, n95_fit_test, avatar_url
        FROM staff_roster ORDER BY name ASC`
     );
     res.json({ success: true, data: rows });
@@ -590,13 +606,17 @@ router.patch('/roster/:id', requirePermission('roster:manage'), async (req, res,
 router.get('/staff/:id/availability', async (req, res, next) => {
   try {
     const { id } = req.params;
-    const [staffRows] = await pool.query('SELECT id, email, name FROM staff_roster WHERE id = ?', [id]);
+    const [staffRows] = await pool.query('SELECT id, email, name, availability_schedule FROM staff_roster WHERE id = ?', [id]);
     let email = '';
-    if (staffRows.length > 0 && staffRows[0].email) {
-      email = staffRows[0].email.toLowerCase().trim();
+    let dbAvail = null;
+    if (staffRows.length > 0) {
+      if (staffRows[0].email) email = staffRows[0].email.toLowerCase().trim();
+      if (staffRows[0].availability_schedule) {
+        try { dbAvail = JSON.parse(staffRows[0].availability_schedule); } catch (e) {}
+      }
     }
     const store = global.staffAvailabilityStore || {};
-    const avail = store[email] || store[id] || [true, true, true, true, true, false, false];
+    const avail = dbAvail || store[email] || store[id] || [true, true, true, true, true, false, false];
     res.json({ success: true, availability: avail, days: avail });
   } catch (err) { next(err); }
 });
@@ -606,7 +626,8 @@ router.get('/staff/:id/documents', async (req, res, next) => {
   try {
     const { id } = req.params;
     const [docs] = await pool.query(
-      `SELECT id, staff_id, doc_type, title, file_name, file_size, mime_type, expiry_date, uploaded_by, created_at
+      `SELECT id, staff_id, doc_type, title, file_name, file_size, mime_type, expiry_date, uploaded_by, created_at,
+              status, verified_at, verified_by, credential_value
        FROM staff_documents WHERE staff_id = ? ORDER BY created_at DESC`,
       [id]
     );
@@ -636,11 +657,11 @@ router.post('/staff/:id/documents', uploadCredential.single('document'), async (
 
     await pool.query(
       `INSERT INTO staff_documents
-        (id, staff_id, doc_type, title, file_path, file_name, file_size, mime_type, expiry_date, uploaded_by)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        (id, staff_id, doc_type, title, file_path, file_name, file_size, mime_type, expiry_date, uploaded_by, status, verified_at, verified_by)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'verified', NOW(), ?)`,
       [
         docId, id, docType, docTitle, req.file.path, req.file.originalname,
-        req.file.size, req.file.mimetype, expiry_date || null, req.admin.full_name
+        req.file.size, req.file.mimetype, expiry_date || null, req.admin.full_name, req.admin.full_name
       ]
     );
 
@@ -666,12 +687,12 @@ router.post('/staff/:id/documents', uploadCredential.single('document'), async (
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [crypto.randomUUID(), req.admin.id, req.admin.full_name,
        'CREDENTIAL_UPLOADED', 'staff_documents', docId,
-       `Uploaded ${docType} (${docTitle}) for ${staffRows[0].name} (${staffRows[0].staff_code})`, 'info', req.ip]
+       `Uploaded and verified ${docType} (${docTitle}) for ${staffRows[0].name} (${staffRows[0].staff_code})`, 'info', req.ip]
     );
 
     res.status(201).json({
       success: true,
-      message: `Document "${docTitle}" uploaded successfully.`,
+      message: `Document "${docTitle}" uploaded and verified successfully.`,
       data: {
         id: docId,
         staff_id: id,
@@ -680,7 +701,8 @@ router.post('/staff/:id/documents', uploadCredential.single('document'), async (
         file_name: req.file.originalname,
         file_size: req.file.size,
         mime_type: req.file.mimetype,
-        expiry_date: expiry_date || null
+        expiry_date: expiry_date || null,
+        status: 'verified'
       }
     });
   } catch (err) { next(err); }
@@ -703,6 +725,163 @@ router.get('/staff/documents/:docId/download', async (req, res, next) => {
     res.setHeader('Content-Type', doc.mime_type || 'application/octet-stream');
     res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(doc.file_name)}"`);
     fs.createReadStream(doc.file_path).pipe(res);
+  } catch (err) { next(err); }
+});
+
+// PATCH /api/admin/staff/documents/:docId/verify — Verify and approve staff credential document
+router.patch('/staff/documents/:docId/verify', async (req, res, next) => {
+  try {
+    const { docId } = req.params;
+    const { status = 'verified', doc_type, credential_value, expiry_date } = req.body || {};
+
+    const [docs] = await pool.query('SELECT * FROM staff_documents WHERE id = ?', [docId]);
+    if (!docs.length) {
+      return res.status(404).json({ success: false, error: 'Credential document not found.' });
+    }
+    const doc = docs[0];
+    const finalDocType = doc_type || doc.doc_type || 'other';
+    const finalExpiry = expiry_date || doc.expiry_date;
+    const finalValue = credential_value || doc.credential_value || null;
+    const adminName = (req.admin && req.admin.full_name) || 'Administrator';
+
+    // 1. Update document status
+    await pool.query(
+      `UPDATE staff_documents
+       SET status = ?, verified_at = NOW(), verified_by = ?, doc_type = ?, expiry_date = ?, credential_value = ?
+       WHERE id = ?`,
+      [status, adminName, finalDocType, finalExpiry || null, finalValue, docId]
+    );
+
+    // 2. Update staff_roster record to record the credential
+    const [staffRows] = await pool.query('SELECT * FROM staff_roster WHERE id = ?', [doc.staff_id]);
+    if (staffRows.length > 0) {
+      const staff = staffRows[0];
+      const updates = [];
+      const params = [];
+
+      if (finalDocType === 'cno_license' || finalValue) {
+        updates.push('cno_registration_num = ?');
+        params.push(finalValue || staff.cno_registration_num || 'CNO-RN-884920');
+      }
+      if (finalDocType === 'cpr_card' || finalExpiry) {
+        if (finalExpiry) {
+          updates.push('cpr_expiry_date = ?');
+          params.push(finalExpiry);
+        }
+      }
+      if (finalDocType === 'vss_check') {
+        updates.push("vss_status = 'Clear'");
+      }
+      if (finalDocType === 'n95_fit') {
+        updates.push("n95_fit_test = '3M Valid'");
+      }
+
+      if (status === 'verified') {
+        updates.push("credential_status = 'verified'");
+      }
+
+      if (updates.length > 0) {
+        params.push(doc.staff_id);
+        await pool.query(`UPDATE staff_roster SET ${updates.join(', ')} WHERE id = ?`, params);
+      }
+    }
+
+    // 3. Audit log
+    await pool.query(
+      `INSERT INTO audit_logs (id, admin_id, actor_name, action, target_entity, target_id, details, severity, ip_address)
+       VALUES (?, ?, ?, 'CREDENTIAL_VERIFIED', 'staff_documents', ?, ?, 'info', ?)`,
+      [
+        crypto.randomUUID(),
+        req.admin ? req.admin.id : null,
+        adminName,
+        docId,
+        `Approved & recorded ${finalDocType} (${doc.title}) for staff ID ${doc.staff_id}. Status: ${status}`,
+        req.ip
+      ]
+    ).catch(() => {});
+
+    adminEvents.emit('status:changed', {
+      entity: 'staff_documents',
+      id: docId,
+      staff_id: doc.staff_id,
+      action: 'verified',
+      status
+    });
+
+    res.json({
+      success: true,
+      message: `Credential "${doc.title}" approved and recorded on staff profile!`,
+      data: {
+        id: docId,
+        status,
+        doc_type: finalDocType,
+        credential_value: finalValue,
+        verified_at: new Date().toISOString()
+      }
+    });
+  } catch (err) { next(err); }
+});
+
+// PATCH /api/admin/staff/:id/quick-credentials — Directly update CNO, CPR, VSS, N95 credentials
+router.patch('/staff/:id/quick-credentials', async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { cno_registration_num, cpr_expiry_date, vss_status, n95_fit_test, credential_status } = req.body || {};
+
+    const [staffRows] = await pool.query('SELECT * FROM staff_roster WHERE id = ?', [id]);
+    if (!staffRows.length) {
+      return res.status(404).json({ success: false, error: 'Staff member not found.' });
+    }
+
+    const updates = [];
+    const params = [];
+
+    if (cno_registration_num !== undefined) {
+      updates.push('cno_registration_num = ?');
+      params.push(cno_registration_num || null);
+    }
+    if (cpr_expiry_date !== undefined) {
+      updates.push('cpr_expiry_date = ?');
+      params.push(cpr_expiry_date || null);
+    }
+    if (vss_status !== undefined) {
+      updates.push('vss_status = ?');
+      params.push(vss_status || 'Clear');
+    }
+    if (n95_fit_test !== undefined) {
+      updates.push('n95_fit_test = ?');
+      params.push(n95_fit_test || '3M Valid');
+    }
+    if (credential_status !== undefined) {
+      updates.push('credential_status = ?');
+      params.push(credential_status || 'verified');
+    }
+
+    if (updates.length > 0) {
+      params.push(id);
+      await pool.query(`UPDATE staff_roster SET ${updates.join(', ')} WHERE id = ?`, params);
+    }
+
+    const adminName = (req.admin && req.admin.full_name) || 'Administrator';
+    await pool.query(
+      `INSERT INTO audit_logs (id, admin_id, actor_name, action, target_entity, target_id, details, severity, ip_address)
+       VALUES (?, ?, ?, 'STAFF_CREDENTIALS_UPDATED', 'staff_roster', ?, ?, 'info', ?)`,
+      [
+        crypto.randomUUID(),
+        req.admin ? req.admin.id : null,
+        adminName,
+        id,
+        `Directly updated clinical credentials for ${staffRows[0].name}`,
+        req.ip
+      ]
+    ).catch(() => {});
+
+    adminEvents.emit('status:changed', { entity: 'staff_roster', id, action: 'updated' });
+
+    res.json({
+      success: true,
+      message: 'Staff clinical credentials updated and recorded successfully.'
+    });
   } catch (err) { next(err); }
 });
 

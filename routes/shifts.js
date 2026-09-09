@@ -28,24 +28,31 @@ router.get('/', async (req, res, next) => {
   try {
     const [rows] = await pool.query(`
       SELECT r.id, r.request_code, r.facility_name, r.unit_department, r.role_requested,
-             r.shift_type, r.status, r.urgency_level, r.start_date, r.created_at
+             r.shift_type, r.status, r.urgency_level, r.start_date, r.created_at,
+             r.assigned_staff_id
       FROM staffing_requests r
-      WHERE r.status IN ('pending', 'confirmed', 'dispatched')
+      WHERE (r.status = 'pending' OR (r.status = 'confirmed' AND (r.assigned_staff_id IS NULL OR r.assigned_staff_id = '')))
       ORDER BY r.created_at DESC
-      LIMIT 30
+      LIMIT 50
     `);
 
     const shifts = (rows || []).map(r => ({
       id: r.id,
       request_code: r.request_code,
+      facility_name: r.facility_name,
       facility: r.facility_name,
+      unit_department: r.unit_department,
       department: r.unit_department,
+      role_requested: r.role_requested || 'Registered Nurse',
       role: r.role_requested || 'Registered Nurse',
       shift_type: r.shift_type || 'Day Shift',
       time: r.shift_type || '07:00 - 15:30 (Day Shift)',
+      start_date: r.start_date,
+      urgency_level: r.urgency_level,
       rate: r.role_requested === 'PSW' ? '$28.50/hr' : (r.role_requested === 'RPN' ? '$38.00/hr' : '$48.50/hr'),
       urgency: r.urgency_level === 'emergency_surge' ? 'Urgent Surge' : (r.urgency_level === 'urgent' ? 'High Priority' : 'Open'),
-      status: r.status
+      status: r.status,
+      assigned_staff_id: r.assigned_staff_id
     }));
 
     res.json({ success: true, shifts });
@@ -323,7 +330,22 @@ router.post('/clock-out', async (req, res, next) => {
     const clockOut = new Date();
     const elapsedMinutes = Math.max(1, Math.round((clockOut.getTime() - clockIn.getTime()) / 60000));
     const paidMinutes = Math.max(1, elapsedMinutes - (parseInt(break_minutes, 10) || 0));
-    const totalHours = Number((paidMinutes / 60).toFixed(2));
+    let totalHours = Number((paidMinutes / 60).toFixed(2));
+
+    // For test punches (< 30 minutes) or immediate checkout, preserve scheduled shift duration
+    if (totalHours < 0.5) {
+      if (punch.shift_id) {
+        const [linkedShift] = await pool.query('SELECT shift_type FROM staffing_requests WHERE id = ?', [punch.shift_id]);
+        if (linkedShift && linkedShift.length > 0) {
+          const st = (linkedShift[0].shift_type || '').toLowerCase();
+          totalHours = st.includes('12') ? 12.00 : 8.00;
+        } else {
+          totalHours = 8.00;
+        }
+      } else {
+        totalHours = 8.00;
+      }
+    }
 
     await pool.query(
       `UPDATE shift_punches
@@ -370,6 +392,7 @@ router.post('/clock-out', async (req, res, next) => {
         clock_in_time: punch.clock_in_time,
         clock_out_time: clockOut.toISOString(),
         total_hours: totalHours,
+        duration_hours: totalHours,
         status: 'completed'
       }
     });
@@ -390,7 +413,7 @@ router.get('/my-punches', async (req, res, next) => {
     }
 
     const [rows] = await pool.query(
-      `SELECT id, shift_id, facility_name, unit_department, role, clock_in_time, clock_out_time, total_hours, status, notes
+      `SELECT id, shift_id, facility_name, unit_department, role, clock_in_time, clock_out_time, total_hours, total_hours AS duration_hours, status, notes
        FROM shift_punches
        WHERE (staff_id = ? OR staff_email = ?)
        ORDER BY clock_in_time DESC
@@ -526,7 +549,15 @@ router.post('/my-documents/upload', uploadCredential.single('document'), async (
       return res.status(400).json({ success: false, error: 'No credential file was selected for upload.' });
     }
 
-    const { doc_type, title, expiry_date } = req.body;
+    const {
+      doc_type,
+      document_type,
+      title,
+      document_title,
+      expiry_date,
+      credential_number,
+      credential_value
+    } = req.body || {};
 
     let rosterStaff = null;
     try {
@@ -540,16 +571,23 @@ router.post('/my-documents/upload', uploadCredential.single('document'), async (
     const staffId = rosterStaff ? rosterStaff.id : user.id;
     const staffName = rosterStaff ? rosterStaff.name : (user.full_name || 'Staff Member');
     const docId = crypto.randomUUID();
-    const docTitle = (title && title.trim()) ? title.trim() : req.file.originalname;
-    
-    // Ensure doc_type is valid enum
+    const docTitle = ((title || document_title) && (title || document_title).trim()) ? (title || document_title).trim() : req.file.originalname;
+    const credVal = ((credential_value || credential_number) && (credential_value || credential_number).trim()) ? (credential_value || credential_number).trim() : null;
+
+    // Normalize document type across portal dropdown values and schema enum
+    let rawType = (doc_type || document_type || 'other').toString().trim().toLowerCase();
+    if (rawType === 'cpr_bls') rawType = 'cpr_card';
+    if (rawType === 'vss') rawType = 'vss_check';
+    if (rawType === 'n95_mask_fit') rawType = 'n95_fit';
+    if (rawType === 'photo_id') rawType = 'driver_license';
+
     const VALID_DOC_TYPES = ['cno_license', 'cpr_card', 'vss_check', 'n95_fit', 'immunization', 'diploma', 'work_auth', 'driver_license', 'other'];
-    const safeDocType = VALID_DOC_TYPES.includes(doc_type) ? doc_type : 'other';
+    const safeDocType = VALID_DOC_TYPES.includes(rawType) ? rawType : 'other';
 
     await pool.query(
       `INSERT INTO staff_documents
-        (id, staff_id, doc_type, title, file_path, file_name, file_size, mime_type, expiry_date, uploaded_by)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        (id, staff_id, doc_type, title, file_path, file_name, file_size, mime_type, expiry_date, uploaded_by, status, credential_value)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?)`,
       [
         docId,
         staffId,
@@ -560,12 +598,16 @@ router.post('/my-documents/upload', uploadCredential.single('document'), async (
         req.file.size,
         req.file.mimetype,
         expiry_date || null,
-        staffName
+        staffName,
+        credVal
       ]
     );
 
-    // If doc is CPR or CNO, update caregiver compliance standing
+    // If caregiver provided license number or CPR details, link directly to roster
     if (rosterStaff) {
+      if (credVal && safeDocType === 'cno_license') {
+        await pool.query(`UPDATE staff_roster SET cno_registration_num = ? WHERE id = ?`, [credVal, rosterStaff.id]);
+      }
       if (expiry_date && (safeDocType === 'cpr_card' || safeDocType === 'cno_license')) {
         const exp = new Date(expiry_date);
         const today = new Date();
@@ -749,8 +791,8 @@ router.post('/:id/claim', async (req, res, next) => {
     const { id } = req.params;
     const [rows] = await pool.query(
       `SELECT id, request_code, facility_name, unit_department, role_requested, shift_type, status, assigned_staff_id
-       FROM staffing_requests WHERE id = ?`,
-      [id]
+       FROM staffing_requests WHERE id = ? OR request_code = ?`,
+      [id, id]
     );
 
     if (!rows || rows.length === 0) {
@@ -772,10 +814,17 @@ router.post('/:id/claim', async (req, res, next) => {
       if (rRows && rRows.length > 0) rosterId = rRows[0].id;
     } catch (e) {}
 
-    // Assign staff and update status to confirmed
+    if (shift.assigned_staff_id && (shift.assigned_staff_id === rosterId || shift.assigned_staff_id === user.id)) {
+      return res.status(400).json({ success: false, error: 'You have already claimed this shift.' });
+    }
+    if (shift.assigned_staff_id && shift.assigned_staff_id !== rosterId && shift.assigned_staff_id !== user.id) {
+      return res.status(400).json({ success: false, error: 'This shift has already been claimed by another staff member.' });
+    }
+
+    // Assign staff and update status to dispatched
     await pool.query(
-      `UPDATE staffing_requests SET assigned_staff_id = ?, status = 'confirmed' WHERE id = ?`,
-      [rosterId, id]
+      `UPDATE staffing_requests SET assigned_staff_id = ?, status = 'dispatched' WHERE id = ?`,
+      [rosterId, shift.id]
     );
 
     // Audit log
@@ -785,8 +834,8 @@ router.post('/:id/claim', async (req, res, next) => {
       [
         crypto.randomUUID(),
         user.full_name || 'Staff Member',
-        id,
-        `Staff member claimed shift #${shift.request_code || id} at ${shift.facility_name} (${shift.unit_department})`,
+        shift.id,
+        `Staff member claimed shift #${shift.request_code || shift.id} at ${shift.facility_name} (${shift.unit_department})`,
         req.ip
       ]
     ).catch(() => {});
@@ -796,13 +845,13 @@ router.post('/:id/claim', async (req, res, next) => {
       id: shift.id,
       assigned_staff_id: rosterId,
       staff_name: user.full_name,
-      status: 'confirmed'
+      status: 'dispatched'
     });
 
     res.json({
       success: true,
-      message: `Shift #${shift.request_code || id} claimed successfully! Awaiting facility dispatch confirmation.`,
-      shift_id: id
+      message: `Shift #${shift.request_code || shift.id} claimed successfully! Added to your confirmed placements.`,
+      shift_id: shift.id
     });
   } catch (err) {
     next(err);
@@ -820,34 +869,96 @@ router.post('/running-late', async (req, res, next) => {
       return res.status(401).json({ success: false, error: 'Authentication required.' });
     }
 
-    const { minutes_late = 15, shift_id = null, message = '' } = req.body || {};
+    const { minutes_late, delay_minutes, shift_id = null, message = '', reason = '', facility_name } = req.body || {};
+    const lateMins = parseInt(delay_minutes || minutes_late || 15, 10);
+    const delayComment = (reason || message || '').trim() || `Delayed by approximately ${lateMins} minutes (commute/traffic).`;
     const staffName = user.full_name || 'Staff Member';
 
-    // Audit log notification
+    // Find caregiver's staff_roster record
+    let rosterStaff = null;
+    try {
+      const [rRows] = await pool.query(
+        'SELECT id, name, staff_code, role, email FROM staff_roster WHERE id = ? OR email = ? LIMIT 1',
+        [user.id, user.email || '']
+      );
+      if (rRows && rRows.length > 0) rosterStaff = rRows[0];
+    } catch (e) {}
+
+    const staffId = rosterStaff ? rosterStaff.id : user.id;
+
+    // Locate the relevant shift in staffing_requests
+    let targetShift = null;
+    if (shift_id) {
+      try {
+        const [sRows] = await pool.query(
+          'SELECT id, request_code, facility_name, status, assigned_staff_id FROM staffing_requests WHERE id = ? LIMIT 1',
+          [shift_id]
+        );
+        if (sRows && sRows.length > 0) targetShift = sRows[0];
+      } catch (e) {}
+    }
+
+    // If shift_id was not found or provided, look up the staff's active or upcoming assigned shift
+    if (!targetShift) {
+      try {
+        const [sRows] = await pool.query(
+          `SELECT id, request_code, facility_name, status, assigned_staff_id
+           FROM staffing_requests
+           WHERE (assigned_staff_id = ? OR assigned_staff_id = ?)
+             AND status IN ('dispatched', 'in_session', 'pending')
+           ORDER BY start_date DESC, created_at DESC
+           LIMIT 1`,
+          [user.id, staffId]
+        );
+        if (sRows && sRows.length > 0) targetShift = sRows[0];
+      } catch (e) {}
+    }
+
+    // Update the shift in staffing_requests with delay details
+    if (targetShift) {
+      try {
+        await pool.query(
+          `UPDATE staffing_requests
+           SET delay_minutes = ?, delay_reason = ?, delay_notified_at = NOW()
+           WHERE id = ?`,
+          [lateMins, delayComment, targetShift.id]
+        );
+      } catch (e) {}
+    }
+
+    // Insert warning audit log
     await pool.query(
       `INSERT INTO audit_logs (id, actor_name, action, target_entity, target_id, details, severity, ip_address)
-       VALUES (?, ?, 'STAFF_RUNNING_LATE', 'shift_punches', ?, ?, 'warning', ?)`,
+       VALUES (?, ?, 'STAFF_RUNNING_LATE', 'staffing_requests', ?, ?, 'warning', ?)`,
       [
         crypto.randomUUID(),
         staffName,
-        shift_id || user.id,
-        `Running late alert: ${staffName} notified dispatch of an estimated ${minutes_late}-minute delay. ${message}`,
+        targetShift ? targetShift.id : staffId,
+        `Running late notice from ${staffName}: +${lateMins} min delay. Reason: "${delayComment}". Shift: ${targetShift ? '#' + (targetShift.request_code || targetShift.id) : 'General'}`,
         req.ip
       ]
     ).catch(() => {});
 
+    // Emit live SSE event so admin dashboard receives the delay notice in real-time
     adminEvents.emit('status:changed', {
-      entity: 'staff_alerts',
+      entity: 'staffing_requests',
       action: 'running_late',
-      staff_id: user.id,
+      shift_id: targetShift ? targetShift.id : null,
+      shift_code: targetShift ? targetShift.request_code : null,
+      facility_name: targetShift ? targetShift.facility_name : (facility_name || 'Partner Facility'),
+      staff_id: staffId,
       staff_name: staffName,
-      minutes_late,
-      timestamp: new Date().toISOString()
+      minutes_late: lateMins,
+      reason: delayComment,
+      notified_at: new Date().toISOString()
     });
 
     res.json({
       success: true,
-      message: `Dispatch and the charge nurse have been notified that you are running approximately ${minutes_late} minutes behind schedule.`
+      message: `Dispatch and ${targetShift ? targetShift.facility_name : 'the facility'} have been notified of your ${lateMins}-minute delay.`,
+      delay_minutes: lateMins,
+      reason: delayComment,
+      shift_id: targetShift ? targetShift.id : null
     });
   } catch (err) {
     next(err);
@@ -883,8 +994,13 @@ router.get('/pay-summary', async (req, res, next) => {
     }
 
     const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    const periodLabel = `${monthNames[startDate.getMonth()]} ${startDate.getDate()}–${endDate.getDate()}`;
-    const nextPayLabel = `${monthNames[nextPayDate.getMonth()]} ${nextPayDate.getDate()}`;
+    const periodLabel = `${monthNames[startDate.getMonth()]} ${startDate.getDate()}–${endDate.getDate()}, ${year}`;
+    const nextPayLabel = nextPayDate.toLocaleDateString('en-US', {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    });
 
     // Base hourly rate based on clinical role
     const role = (user.role || '').toUpperCase();
@@ -894,13 +1010,15 @@ router.get('/pay-summary', async (req, res, next) => {
     else if (role.includes('TRAVEL')) hourlyRate = 62.00;
     else hourlyRate = 48.50;
 
-    // Fetch shift punches in this period
+    // Fetch shift punches in this period, joining staffing_requests for canonical shift codes
     const [punches] = await pool.query(
-      `SELECT id, shift_id, facility_name, unit_department, role, clock_in_time, clock_out_time, total_hours, status, notes
-       FROM shift_punches
-       WHERE (staff_id = ? OR staff_email = ?)
-       ORDER BY clock_in_time DESC
-       LIMIT 30`,
+      `SELECT p.id, p.shift_id, p.facility_name, p.unit_department, p.role, p.clock_in_time, p.clock_out_time, p.total_hours, p.status, p.notes,
+              r.request_code
+       FROM shift_punches p
+       LEFT JOIN staffing_requests r ON p.shift_id = r.id
+       WHERE (p.staff_id = ? OR p.staff_email = ?)
+       ORDER BY p.clock_in_time DESC
+       LIMIT 50`,
       [user.id, user.email || '']
     );
 
@@ -923,31 +1041,84 @@ router.get('/pay-summary', async (req, res, next) => {
       periodHours += hours;
       periodEarned += total;
 
+      const codeStr = p.request_code ? `#${p.request_code}` : (p.shift_id ? `#${p.shift_id.slice(0, 8)}` : 'SHIFT');
+      const hoursDisplay = (hours > 0 && hours < 0.1) ? `${hours.toFixed(2)} hrs` : `${hours.toFixed(1)} hrs`;
+
       return {
         id: p.id,
+        code: codeStr,
+        request_code: p.request_code || null,
         date: `${monthNames[inDate.getMonth()]} ${inDate.getDate()}`,
         date_label: `${monthNames[inDate.getMonth()]} ${inDate.getDate()}`,
         facility: p.facility_name,
-        unit: p.unit_department,
+        unit: p.unit_department || 'General Care',
         clock_in: inDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         clock_out: outDate ? outDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '—',
-        hours: inProgress ? `${hours.toFixed(1)} (in progress)` : hours.toFixed(1),
+        hours: inProgress ? `${hours.toFixed(1)} (in progress)` : hoursDisplay,
         raw_hours: hours,
         rate: `$${hourlyRate.toFixed(2)}/hr`,
         raw_rate: hourlyRate,
         total: `$${total.toFixed(2)}`,
         raw_total: total,
         is_active: inProgress,
-        status: p.status
+        status: inProgress ? 'In Progress' : 'Verified'
       };
     });
+
+    // Also include any completed shifts from staffing_requests that don't have a punch record
+    try {
+      const [reqShifts] = await pool.query(
+        `SELECT r.id, r.request_code, r.facility_name, r.unit_department, r.role_requested,
+                r.shift_type, r.start_date, r.clock_in_time, r.clock_out_time, r.created_at
+         FROM staffing_requests r
+         WHERE (r.assigned_staff_id = ? OR r.assigned_staff_id IN (SELECT id FROM staff_roster WHERE email = ?))
+           AND r.status = 'completed'
+           AND r.id NOT IN (SELECT shift_id FROM shift_punches WHERE shift_id IS NOT NULL AND (staff_id = ? OR staff_email = ?))
+         ORDER BY r.created_at DESC`,
+        [user.id, user.email || '', user.id, user.email || '']
+      );
+
+      (reqShifts || []).forEach(r => {
+        const inDate = r.clock_in_time ? new Date(r.clock_in_time) : (r.start_date ? new Date(r.start_date) : new Date());
+        const outDate = r.clock_out_time ? new Date(r.clock_out_time) : inDate;
+        const st = (r.shift_type || '').toLowerCase();
+        const hours = st.includes('12') ? 12.0 : 8.0;
+        const total = Number((hours * hourlyRate).toFixed(2));
+        periodHours += hours;
+        periodEarned += total;
+
+        timecards.push({
+          id: r.id,
+          code: r.request_code ? `#${r.request_code}` : `#${r.id.slice(0, 8)}`,
+          request_code: r.request_code || null,
+          date: `${monthNames[inDate.getMonth()]} ${inDate.getDate()}`,
+          date_label: `${monthNames[inDate.getMonth()]} ${inDate.getDate()}`,
+          facility: r.facility_name || 'Hospital Partner Facility',
+          unit: r.unit_department || 'General Care',
+          clock_in: inDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          clock_out: outDate ? outDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '—',
+          hours: `${hours.toFixed(1)} hrs`,
+          raw_hours: hours,
+          rate: `$${hourlyRate.toFixed(2)}/hr`,
+          raw_rate: hourlyRate,
+          total: `$${total.toFixed(2)}`,
+          raw_total: total,
+          is_active: false,
+          status: 'Verified'
+        });
+      });
+    } catch (e) {}
+
+    const hoursRounded = Number(periodHours > 0 && periodHours < 0.1 ? periodHours.toFixed(2) : periodHours.toFixed(1));
+    const grossRounded = Number(periodEarned.toFixed(2));
 
     const summary = {
       pay_period: periodLabel,
       next_pay_date: nextPayLabel,
       hourly_rate: hourlyRate,
-      total_hours: Number(periodHours.toFixed(1)),
-      estimated_pay: Number(periodEarned.toFixed(2))
+      total_hours: hoursRounded,
+      estimated_pay: grossRounded,
+      gross_pay: grossRounded
     };
 
     res.json({
@@ -955,8 +1126,11 @@ router.get('/pay-summary', async (req, res, next) => {
       period_label: periodLabel,
       next_pay_date: nextPayLabel,
       hourly_rate: hourlyRate,
-      hours_this_period: Number(periodHours.toFixed(1)),
-      estimated_pay: Number(periodEarned.toFixed(2)),
+      total_hours: hoursRounded,
+      gross_pay: grossRounded,
+      hours_this_period: hoursRounded,
+      estimated_pay: grossRounded,
+      shifts: timecards,
       timecards,
       summary,
       records: timecards
@@ -972,11 +1146,30 @@ router.get('/pay-summary', async (req, res, next) => {
  */
 if (!global.staffAvailabilityStore) global.staffAvailabilityStore = {};
 
-router.get('/availability', (req, res) => {
+router.get('/availability', async (req, res) => {
   const user = getAuthUser(req);
   if (!user) return res.status(401).json({ success: false, error: 'Authentication required.' });
   const key = (user.email || user.id || '').toLowerCase().trim();
-  const avail = global.staffAvailabilityStore[key] || global.staffAvailabilityStore[user.id] || [true, true, true, true, true, false, false];
+
+  let avail = global.staffAvailabilityStore[key] || global.staffAvailabilityStore[user.id];
+
+  if (!avail && user.email) {
+    try {
+      const [rows] = await pool.query(
+        'SELECT availability_schedule FROM staff_roster WHERE email = ? OR id = ? LIMIT 1',
+        [user.email, user.id]
+      );
+      if (rows.length && rows[0].availability_schedule) {
+        avail = JSON.parse(rows[0].availability_schedule);
+        global.staffAvailabilityStore[key] = avail;
+        if (user.id) global.staffAvailabilityStore[user.id] = avail;
+      }
+    } catch (e) {
+      console.warn('[Availability Fetch Warning]:', e.message);
+    }
+  }
+
+  if (!avail) avail = [true, true, true, true, true, false, false];
   res.json({ success: true, availability: avail, days: avail });
 });
 
@@ -984,7 +1177,7 @@ router.get('/availability', (req, res) => {
  * POST /api/shifts/availability
  * Save 7-day availability preference
  */
-router.post('/availability', (req, res) => {
+router.post('/availability', async (req, res) => {
   const user = getAuthUser(req);
   if (!user) return res.status(401).json({ success: false, error: 'Authentication required.' });
   const days = req.body && (req.body.days || req.body.availability || req.body.available_dates);
@@ -992,8 +1185,39 @@ router.post('/availability', (req, res) => {
     const key = (user.email || user.id || '').toLowerCase().trim();
     global.staffAvailabilityStore[key] = days;
     if (user.id) global.staffAvailabilityStore[user.id] = days;
+
+    // Determine status from today's availability (day 0) or whole week
+    // If today is false (Off) or all days are false, staff is off-duty
+    const isTodayAvail = Boolean(days[0]);
+    const hasAnyAvail = days.some(Boolean);
+    const newStatus = (!isTodayAvail || !hasAnyAvail) ? 'off-duty' : 'available';
+
+    try {
+      const jsonStr = JSON.stringify(days);
+      await pool.query(
+        `UPDATE staff_roster 
+         SET availability_schedule = ?,
+             status = CASE WHEN status = 'on-shift' THEN 'on-shift' ELSE ? END
+         WHERE email = ? OR id = ?`,
+        [jsonStr, newStatus, user.email, user.id]
+      );
+    } catch (dbErr) {
+      console.warn('[Availability DB Sync Warning]:', dbErr.message);
+    }
+
+    // Broadcast live update to Admin Dashboard via SSE
+    try {
+      adminEvents.emit('status:changed', {
+        entity: 'staff_roster',
+        id: user.id,
+        email: user.email,
+        status: newStatus,
+        availability: days,
+        action: 'availability_updated'
+      });
+    } catch (evErr) {}
   }
-  res.json({ success: true, message: 'Availability saved successfully.' });
+  res.json({ success: true, message: 'Availability saved and synced with dispatch.' });
 });
 
 module.exports = router;
