@@ -694,27 +694,29 @@ document.addEventListener('DOMContentLoaded', () => {
       { scaleX: 1, duration: 1.2, transformOrigin: 'left center', ease: 'power3.inOut' }
     );
 
-    // C. Slide In Section Headers
-    const sectionHeaders = document.querySelectorAll('.welcome-header, .welcome-title, .products-title-wrapper, .gallery-title, .form-title, .section-title, .page-title, .contact-card-title');
+    // C. Slide In Section Headers (excludes nested children to avoid double-animation)
+    const sectionHeaders = document.querySelectorAll('.welcome-header, .products-title-wrapper, .gallery-title, .form-title, .section-title, .page-title, .contact-card-title');
     sectionHeaders.forEach(header => {
       gsap.fromTo(header, 
-        { x: -40, opacity: 0 }, 
+        { x: -35, opacity: 0 }, 
         { 
           x: 0, 
           opacity: 1, 
-          duration: 1.0, 
+          duration: 0.9, 
           ease: 'power2.out',
+          clearProps: 'transform',
           scrollTrigger: {
             trigger: header,
             start: 'top 90%',
-            toggleActions: 'play none none none'
+            toggleActions: 'play none none none',
+            once: true
           }
         }
       );
     });
 
     // D. Alternating Slide-In for Cards
-    const animateAlternatingCards = (selector, offsetDist = 45) => {
+    const animateAlternatingCards = (selector, offsetDist = 40) => {
       const cards = document.querySelectorAll(selector);
       if (cards.length > 0) {
         cards.forEach((card, index) => {
@@ -724,13 +726,14 @@ document.addEventListener('DOMContentLoaded', () => {
             { 
               x: 0, 
               opacity: 1, 
-              duration: 1.05, 
+              duration: 0.95, 
               ease: 'power2.out',
               clearProps: 'transform',
               scrollTrigger: {
                 trigger: card,
                 start: 'top 88%',
-                toggleActions: 'play none none none'
+                toggleActions: 'play none none none',
+                once: true
               }
             }
           );
@@ -739,7 +742,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // E. Staggered Slide-In from Bottom for Core Values Cards
-    const animateBottomCards = (selector, offsetDist = 55) => {
+    const animateBottomCards = (selector, offsetDist = 45) => {
       const cards = document.querySelectorAll(selector);
       if (cards.length > 0) {
         cards.forEach((card, index) => {
@@ -748,14 +751,15 @@ document.addEventListener('DOMContentLoaded', () => {
             { 
               y: 0, 
               opacity: 1, 
-              duration: 1.0, 
-              delay: (index % 3) * 0.14,
+              duration: 0.9, 
+              delay: (index % 3) * 0.12,
               ease: 'power3.out',
               clearProps: 'transform,opacity',
               scrollTrigger: {
                 trigger: card,
                 start: 'top 88%',
-                toggleActions: 'play none none none'
+                toggleActions: 'play none none none',
+                once: true
               }
             }
           );
@@ -763,36 +767,41 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     };
 
-    animateAlternatingCards('.step-card, .sector-card, .product-card, .why-item, .team-card, .pillar-card, .service-card, .advantage-card, .perk-card, .proto-content-card, .proto-team-narrative-card', 55);
-    animateBottomCards('.proto-pillar-card, .proto-value-card-2x2, .slide-from-bottom', 60);
+    animateAlternatingCards('.step-card, .sector-card, .product-card, .why-item, .team-card, .pillar-card, .service-card, .advantage-card, .perk-card, .proto-content-card, .proto-team-narrative-card', 45);
+    animateBottomCards('.proto-pillar-card, .proto-value-card-2x2', 45);
   }
 
   // 5. Scroll-Triggered Slide-In Animations (Left, Right, Top & Bottom)
-  // Pre-mark all slide elements as hidden so they start off-screen
   const slideLeftEls = document.querySelectorAll('.slide-from-left');
   const slideRightEls = document.querySelectorAll('.slide-from-right');
   const slideTopEls = document.querySelectorAll('.slide-from-top');
   const slideBottomEls = document.querySelectorAll('.slide-from-bottom');
 
-  // Add .slide-hidden to start them invisible (JS-gated to avoid no-JS issues)
-  slideLeftEls.forEach(el => el.classList.add('slide-hidden'));
-  slideRightEls.forEach(el => el.classList.add('slide-hidden'));
-  slideTopEls.forEach(el => el.classList.add('slide-hidden'));
-  slideBottomEls.forEach(el => el.classList.add('slide-hidden'));
+  const hasGsap = typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined';
+
+  // Only apply CSS fallback class when GSAP is not present (avoids CSS transitions fighting GSAP)
+  if (!hasGsap) {
+    slideLeftEls.forEach(el => el.classList.add('slide-hidden'));
+    slideRightEls.forEach(el => el.classList.add('slide-hidden'));
+    slideTopEls.forEach(el => el.classList.add('slide-hidden'));
+    slideBottomEls.forEach(el => el.classList.add('slide-hidden'));
+  }
 
   // Responsive offset: smaller on mobile to prevent horizontal/vertical layout jump
   const getSlideOffset = () => {
     const w = window.innerWidth;
-    if (w <= 480) return 22;
-    if (w <= 767) return 35;
-    if (w <= 991) return 55;
-    return 80;
+    if (w <= 480) return 20;
+    if (w <= 767) return 30;
+    if (w <= 991) return 45;
+    return 60;
   };
 
   const setupSlideAnimation = (elements, direction) => {
     elements.forEach((el) => {
-      if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
-        // GSAP handles animation entirely via inline styles
+      if (hasGsap) {
+        // Ensure no lingering CSS transition class conflicts with GSAP frame-by-frame rendering
+        el.classList.remove('slide-hidden');
+
         const offset = getSlideOffset();
         let fromState = { opacity: 0 };
         if (direction === 'left') {
@@ -812,17 +821,14 @@ document.addEventListener('DOMContentLoaded', () => {
             x: 0,
             y: 0,
             opacity: 1,
-            duration: 1.1,
+            duration: 0.95,
             ease: 'power3.out',
             clearProps: 'transform,opacity',
             scrollTrigger: {
               trigger: el,
               start: 'top 88%',
-              toggleActions: 'play none none none'
-            },
-            onStart: () => {
-              // Remove the CSS hidden class so GSAP's inline styles take full control
-              el.classList.remove('slide-hidden');
+              toggleActions: 'play none none none',
+              once: true
             }
           }
         );
@@ -832,7 +838,6 @@ document.addEventListener('DOMContentLoaded', () => {
           (entries) => {
             entries.forEach((entry) => {
               if (entry.isIntersecting) {
-                // Transition: hidden → active-slide (CSS handles smooth animation)
                 el.classList.remove('slide-hidden');
                 el.classList.add('active-slide');
                 observer.unobserve(el);
@@ -850,6 +855,19 @@ document.addEventListener('DOMContentLoaded', () => {
   setupSlideAnimation(slideRightEls, 'right');
   setupSlideAnimation(slideTopEls, 'top');
   setupSlideAnimation(slideBottomEls, 'bottom');
+
+  // Recalculate trigger positions after images and fonts load
+  window.addEventListener('load', () => {
+    if (typeof ScrollTrigger !== 'undefined') {
+      ScrollTrigger.refresh();
+    }
+  });
+
+  setTimeout(() => {
+    if (typeof ScrollTrigger !== 'undefined') {
+      ScrollTrigger.refresh();
+    }
+  }, 400);
 
 
   // 6. Roles Stagger — queues list items one-by-one on scroll (10% threshold trigger)

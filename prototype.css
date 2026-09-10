@@ -473,6 +473,30 @@
   box-shadow: 0 10px 28px rgba(46, 155, 214, 0.45);
 }
 
+.proto-action-badge.badge-staff-portal {
+  background: linear-gradient(135deg, rgba(0, 168, 150, 0.08) 0%, rgba(2, 132, 199, 0.08) 100%);
+  border: 1.5px solid rgba(0, 168, 150, 0.35);
+}
+.proto-action-badge.badge-staff-portal .proto-badge-title {
+  color: #0B2545 !important;
+}
+.proto-action-badge.badge-staff-portal .proto-badge-eyebrow {
+  color: #00897B;
+}
+.proto-action-badge.badge-staff-portal .proto-badge-arrow {
+  color: #0284C7;
+}
+.proto-action-badge.badge-staff-portal:hover {
+  transform: translateY(-3px);
+  border-color: #00A896;
+  background: linear-gradient(135deg, rgba(0, 168, 150, 0.16) 0%, rgba(2, 132, 199, 0.16) 100%);
+  box-shadow: 0 10px 28px rgba(0, 168, 150, 0.22);
+}
+.proto-action-badge.badge-staff-portal:hover .proto-badge-arrow {
+  color: #00A896;
+  transform: translateX(3px);
+}
+
 .proto-badge-icon-box {
   width: 42px;
   height: 42px;

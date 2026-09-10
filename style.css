@@ -2143,12 +2143,12 @@ ul {
   }
 }
 
-/* IntersectionObserver fallback: smooth CSS transition when .active-slide is toggled */
+/* IntersectionObserver fallback: smooth CSS transition when .active-slide is toggled (non-GSAP) */
 .slide-from-left.slide-hidden,
 .slide-from-right.slide-hidden,
 .slide-from-top.slide-hidden,
 .slide-from-bottom.slide-hidden {
-  transition: transform 1s cubic-bezier(0.16, 1, 0.3, 1), opacity 1s ease;
+  transition: transform 0.75s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.75s ease;
 }
 
 .slide-from-left.active-slide,
@@ -2157,6 +2157,20 @@ ul {
 .slide-from-bottom.active-slide {
   opacity: 1 !important;
   transform: translate(0, 0) !important;
+  will-change: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slide-from-left,
+  .slide-from-right,
+  .slide-from-top,
+  .slide-from-bottom,
+  .slide-hidden {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+    animation: none !important;
+  }
 }
 
 

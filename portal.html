@@ -821,6 +821,73 @@
       gap: 0.5rem;
     }
 
+    .support-contact-list li.support-dispatch-item {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.45rem 0.65rem;
+    }
+
+    .support-item-icon-title {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      flex-shrink: 0;
+    }
+
+    .dispatch-phones-group {
+      display: inline-flex;
+      flex-direction: row;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.45rem 0.65rem;
+      padding-left: 0;
+    }
+
+    .dispatch-phone-sep {
+      color: #059669;
+      opacity: 0.5;
+      font-weight: 700;
+      user-select: none;
+    }
+
+    .dispatch-phone-link {
+      color: #059669 !important;
+      text-decoration: none !important;
+      font-weight: 700 !important;
+      white-space: nowrap !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 4px !important;
+      transition: color 0.15s ease !important;
+    }
+
+    .dispatch-phone-link:hover {
+      color: #047857 !important;
+      text-decoration: underline !important;
+    }
+
+    /* On smaller screens (<= 768px), align dispatch contacts in a vertical column */
+    @media (max-width: 768px) {
+      .support-contact-list li.support-dispatch-item {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 0.35rem !important;
+      }
+
+      .dispatch-phones-group {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 0.25rem !important;
+        padding-left: 1.45rem !important;
+      }
+
+      .dispatch-phone-sep {
+        display: none !important;
+      }
+    }
+
     /* Demo switcher bar */
     .demo-role-switcher {
       margin-top: 2.5rem;
@@ -2591,31 +2658,123 @@
       font-weight: 900;
       background: #ECFDF5;
     }
-    .client-tracker-pill {
-      padding: 0.38rem 0.75rem;
-      font-size: 0.76rem;
-      font-weight: 600;
-      border-radius: 20px;
-      border: 1px solid #CBD5E1;
-      background: #FFFFFF;
-      color: #475569;
-      cursor: pointer;
+    /* Modern Executive Tracker Filter Segmented Bar */
+    .tracker-filter-bar {
       display: inline-flex;
       align-items: center;
-      gap: 4px;
-      transition: all 0.15s ease;
-      user-select: none;
-    }
-    .client-tracker-pill:hover {
-      border-color: #94A3B8;
+      flex-wrap: wrap;
+      gap: 5px;
+      padding: 4px;
       background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      border-radius: 12px;
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.02);
+    }
+
+    .client-tracker-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6.5px;
+      padding: 0.42rem 0.85rem;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #475569;
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      border-radius: 9px;
+      cursor: pointer;
+      transition: all 0.16s cubic-bezier(0.16, 1, 0.3, 1);
+      user-select: none;
+      white-space: nowrap;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+    }
+
+    .client-tracker-pill .pill-icon {
+      width: 14px;
+      height: 14px;
+      flex-shrink: 0;
+      color: #64748B;
+      transition: color 0.16s ease, transform 0.16s ease;
+    }
+
+    .client-tracker-pill .pill-icon-blue {
+      color: #0284C7;
+    }
+
+    .client-tracker-pill .pill-icon-indigo {
+      color: #6366F1;
+    }
+
+    .client-tracker-pill .pill-icon-amber {
+      color: #D97706;
+    }
+
+    .client-tracker-pill .pill-icon-green {
+      color: #10B981;
+    }
+
+    .client-tracker-pill .pill-live-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #10B981;
+      box-shadow: 0 0 0 2.5px rgba(16, 185, 129, 0.25);
+      animation: clientPulse 1.8s infinite;
+      flex-shrink: 0;
+    }
+
+    .client-tracker-pill .tracker-pill-badge {
+      min-width: 19px;
+      height: 18px;
+      padding: 0 5.5px;
+      border-radius: 9999px;
+      background: #F1F5F9;
+      color: #475569;
+      font-size: 0.7rem;
+      font-weight: 700;
+      font-family: inherit;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.16s ease;
+      line-height: 1;
+      border: 1px solid #E2E8F0;
+    }
+
+    .client-tracker-pill:hover {
+      background: #F8FAFC;
+      border-color: #CBD5E1;
+      color: #0B2545;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 5px rgba(11, 37, 69, 0.05);
+    }
+
+    .client-tracker-pill:hover .tracker-pill-badge {
+      background: #E2E8F0;
       color: #0F172A;
     }
+
     .client-tracker-pill.active {
-      background: #0F172A;
-      border-color: #0F172A;
+      background: #0B2545;
+      border-color: #0B2545;
       color: #FFFFFF;
-      font-weight: 700;
+      font-weight: 600;
+      box-shadow: 0 2px 8px rgba(11, 37, 69, 0.2);
+    }
+
+    .client-tracker-pill.active .pill-icon {
+      color: #FFFFFF !important;
+    }
+
+    .client-tracker-pill.active .pill-live-dot {
+      background: #34D399;
+      box-shadow: 0 0 0 2.5px rgba(52, 211, 153, 0.45);
+    }
+
+    .client-tracker-pill.active .tracker-pill-badge {
+      background: rgba(255, 255, 255, 0.22);
+      border-color: rgba(255, 255, 255, 0.25);
+      color: #FFFFFF;
     }
     .client-btn-xs {
       padding: 0.3rem 0.65rem;
@@ -3823,15 +3982,126 @@ html, body {
 .live-clock-chip {
   display: inline-flex;
   align-items: center;
-  gap: 0.45rem;
-  background: #F8FAFC;
+  gap: 0.55rem;
+  background: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%);
   border: 1px solid #E2E8F0;
-  padding: 0.3rem 0.75rem;
-  border-radius: 6px;
-  font-size: 0.8rem;
-  font-weight: 700;
+  padding: 0.35rem 0.85rem;
+  border-radius: 9999px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04), 0 1px 2px rgba(15, 23, 42, 0.02);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+}
+
+.live-clock-chip:hover {
+  border-color: #CBD5E1;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+  transform: translateY(-1px);
+}
+
+.clock-icon-pulse-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: #059669;
+}
+
+.clock-live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10B981;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+  animation: clockPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes clockPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
+}
+
+.clock-icon {
+  width: 14px;
+  height: 14px;
+}
+
+.clock-time-display {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.2rem;
+  font-family: var(--font-heading, 'Plus Jakarta Sans', -apple-system, sans-serif);
+  font-variant-numeric: tabular-nums;
+}
+
+.clock-time-digits {
+  font-size: 0.85rem;
+  font-weight: 800;
   color: #0F172A;
-  font-family: monospace;
+  letter-spacing: -0.02em;
+}
+
+.clock-ampm {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #059669;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.clock-divider {
+  width: 1px;
+  height: 13px;
+  background: #E2E8F0;
+  display: inline-block;
+}
+
+.clock-date-text {
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: #64748B;
+  white-space: nowrap;
+}
+
+.clock-zone-badge {
+  font-size: 0.64rem;
+  font-weight: 800;
+  background: #ECFDF5;
+  color: #047857;
+  border: 1px solid #A7F3D0;
+  padding: 1px 5px;
+  border-radius: 4px;
+  letter-spacing: 0.04em;
+}
+
+/* Staff portal variant */
+#staff-workspace-app .clock-icon-pulse-wrap,
+#worker-workspace-app .clock-icon-pulse-wrap {
+  color: #0284C7;
+}
+#staff-workspace-app .clock-live-dot,
+#worker-workspace-app .clock-live-dot {
+  background: #0284C7;
+  box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.2);
+}
+#staff-workspace-app .clock-ampm,
+#worker-workspace-app .clock-ampm {
+  color: #0284C7;
+}
+#staff-workspace-app .clock-zone-badge,
+#worker-workspace-app .clock-zone-badge {
+  background: #E0F2FE;
+  color: #0369A1;
+  border-color: #BAE6FD;
+}
+
+@media (max-width: 768px) {
+  .clock-divider,
+  .clock-date-text,
+  .clock-zone-badge {
+    display: none !important;
+  }
+  .live-clock-chip {
+    padding: 0.3rem 0.65rem;
+  }
 }
 
 .view-site-link-btn {
@@ -4324,7 +4594,8 @@ html, body {
 /* Phones (<= 640px) */
 @media (max-width: 640px) {
   .live-clock-chip {
-    display: none !important;
+    padding: 0.28rem 0.5rem !important;
+    font-size: 0.72rem !important;
   }
   
   .portal-topbar {
@@ -4680,6 +4951,131 @@ html, body {
   background: #F8FAFC;
 }
 
+/* ==========================================================================
+   ENTERPRISE CLIENT & STAFF PORTAL RESPONSIVE ENGINE
+   ========================================================================== */
+#client-workspace-app,
+#worker-workspace-app {
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+#client-main-wrapper,
+#staff-main-wrapper {
+  max-width: 100%;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+/* Tablet & Laptop Adjustments (<= 1024px) */
+@media (max-width: 1024px) {
+  #client-workspace-app .portal-columns-layout,
+  #worker-workspace-app .portal-columns-layout {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 1.25rem !important;
+  }
+  #client-workspace-app .metrics-grid,
+  #worker-workspace-app .metrics-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 1rem !important;
+  }
+  #client-workspace-app .tracker-metrics-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 1rem !important;
+  }
+  .compliance-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 1rem !important;
+  }
+}
+
+/* Mobile & Small Tablet Adjustments (<= 860px) */
+@media (max-width: 860px) {
+  #client-sidebar,
+  #staff-sidebar {
+    transform: translateX(-100%) !important;
+    width: min(290px, 85vw) !important;
+    position: fixed !important;
+    top: 0; left: 0; bottom: 0;
+    z-index: 10000;
+    transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+  #client-sidebar.mobile-open,
+  #staff-sidebar.mobile-open {
+    transform: translateX(0) !important;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5) !important;
+  }
+  #client-main-wrapper,
+  #staff-main-wrapper {
+    margin-left: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  #client-mobile-menu-btn,
+  #staff-mobile-menu-btn {
+    display: inline-flex !important;
+  }
+  #client-workspace-app .portal-topbar,
+  #worker-workspace-app .portal-topbar {
+    padding: 0 1rem !important;
+    gap: 0.65rem !important;
+  }
+  #client-workspace-app .portal-content-body,
+  #worker-workspace-app .portal-content-body {
+    padding: 1.15rem 0.85rem 3rem 0.85rem !important;
+  }
+  #client-workspace-app .portal-welcome-banner,
+  #worker-workspace-app .portal-welcome-banner {
+    padding: 1.25rem 1.1rem !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 1rem !important;
+  }
+  #client-workspace-app .welcome-actions,
+  #worker-workspace-app .welcome-actions {
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.5rem !important;
+  }
+  #client-workspace-app .welcome-actions button,
+  #worker-workspace-app .welcome-actions button {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  /* Staff Clock Display Hero Box on Small Tablets & Mobile */
+  .clock-display-hero {
+    grid-template-columns: 1fr !important;
+    padding: 1.25rem 1rem !important;
+    gap: 1rem !important;
+    text-align: center;
+  }
+  .clock-hero-left, .clock-hero-center, .clock-hero-right {
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+  }
+  .clock-hero-center {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 0.85rem 0 !important;
+  }
+  .compliance-meter-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.75rem !important;
+  }
+  .compliance-meter-badge {
+    width: 100% !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+  }
+}
+
+/* Phone Layout Adjustments (<= 768px) */
 @media (max-width: 768px) {
   .bulk-mode-switcher {
     flex-direction: column !important;
@@ -4697,12 +5093,334 @@ html, body {
     align-items: stretch !important;
     gap: 0.75rem !important;
   }
+  .stepper-role-info {
+    min-width: 0 !important;
+    flex: 1 1 auto !important;
+  }
+  .stepper-role-desc {
+    font-size: 0.74rem !important;
+  }
   .stepper-shift-select {
     width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
   }
   .stepper-controls {
     width: 100% !important;
     justify-content: space-between !important;
+  }
+  .stepper-btn {
+    width: 44px !important;
+    height: 44px !important;
+  }
+  .btn-surge-preset {
+    font-size: 0.72rem !important;
+    padding: 0.4rem 0.65rem !important;
+    flex: 1 1 calc(50% - 0.5rem) !important;
+    justify-content: center !important;
+    text-align: center !important;
+  }
+
+  /* Horizontal Scrollable 5-Stage Stepper Track */
+  #client-workspace-app .stepper {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding: 8px 4px 12px 4px !important;
+    display: flex !important;
+    justify-content: flex-start !important;
+    scrollbar-width: thin;
+    scrollbar-color: #CBD5E1 #F1F5F9;
+  }
+  #client-workspace-app .stepper::-webkit-scrollbar {
+    height: 4px;
+  }
+  #client-workspace-app .stepper::-webkit-scrollbar-track {
+    background: #F1F5F9;
+    border-radius: 4px;
+  }
+  #client-workspace-app .stepper::-webkit-scrollbar-thumb {
+    background: #CBD5E1;
+    border-radius: 4px;
+  }
+  #client-workspace-app .stepper .step {
+    min-width: 96px !important;
+    flex: 0 0 96px !important;
+  }
+  #client-workspace-app .stepper .step-label {
+    font-size: 0.68rem !important;
+    line-height: 1.3 !important;
+  }
+
+  /* Horizontal Filter Pills Track */
+  #tracker-filter-pills {
+    overflow-x: auto !important;
+    flex-wrap: nowrap !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding-bottom: 6px !important;
+    width: 100% !important;
+    scrollbar-width: none;
+  }
+  #tracker-filter-pills::-webkit-scrollbar {
+    display: none;
+  }
+  .client-tracker-pill {
+    flex-shrink: 0 !important;
+    font-size: 0.75rem !important;
+    padding: 0.35rem 0.65rem !important;
+    white-space: nowrap !important;
+  }
+
+  /* Fluid Topbars (Client & Staff) */
+  #client-workspace-app .breadcrumbs a,
+  #client-workspace-app .breadcrumbs span:first-of-type,
+  #worker-workspace-app .breadcrumbs a,
+  #worker-workspace-app .breadcrumbs span:first-of-type {
+    display: none !important;
+  }
+  #client-workspace-app .breadcrumb-current,
+  #worker-workspace-app .breadcrumb-current {
+    font-size: 0.85rem !important;
+    max-width: 140px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  #client-workspace-app .view-site-link-btn span,
+  #worker-workspace-app .view-site-link-btn span {
+    display: none !important;
+  }
+  #client-workspace-app .view-site-link-btn,
+  #worker-workspace-app .view-site-link-btn {
+    padding: 0.4rem 0.55rem !important;
+  }
+  #client-workspace-app .live-clock-chip,
+  #worker-workspace-app .live-clock-chip {
+    padding: 0.28rem 0.45rem !important;
+    font-size: 0.72rem !important;
+    display: inline-flex !important;
+  }
+  #client-workspace-app .live-pulse-chip,
+  #worker-workspace-app .live-pulse-chip {
+    display: none !important;
+  }
+
+  /* Staff Shift Details Grid: 2 columns on phones */
+  .shift-details-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.75rem !important;
+  }
+
+  /* Staff Open Shifts Cards on Mobile */
+  #worker-shifts-container > div {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.85rem !important;
+  }
+  #worker-shifts-container > div > div:last-child {
+    width: 100% !important;
+    text-align: left !important;
+  }
+  .btn-claim-shift {
+    width: 100% !important;
+    justify-content: center !important;
+    padding: 0.65rem 1rem !important;
+    font-size: 0.85rem !important;
+  }
+
+  /* Staff Pay Summary Metric Cards on Mobile */
+  .pay-metrics-row {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.85rem !important;
+  }
+
+  /* Staff Availability Calendar: 4 cols for clean 2-row grid */
+  .avail-days-row {
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 0.45rem !important;
+  }
+
+  /* Active Shift Card Header & Hero Banner */
+  .shift-hero-banner {
+    padding: 1rem 0.95rem !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.75rem !important;
+  }
+
+  /* Running Late Delay Container */
+  #allocated-late-container {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.65rem !important;
+  }
+  #allocated-late-container > div:nth-child(2) {
+    width: 100% !important;
+    display: flex !important;
+    gap: 0.4rem !important;
+  }
+  .late-quick-btn {
+    flex: 1 !important;
+    text-align: center !important;
+    padding: 0.45rem 0.4rem !important;
+    font-size: 0.74rem !important;
+  }
+
+  /* Mobile Tables & Punches Cards */
+  .mobile-table-scroll-hint {
+    display: flex !important;
+  }
+  .table-desktop-only {
+    display: none !important;
+  }
+  .mobile-punches-cards {
+    display: flex !important;
+  }
+}
+
+/* Small Smartphone Layout (<= 540px) */
+@media (max-width: 540px) {
+  #client-workspace-app .metrics-grid,
+  #worker-workspace-app .metrics-grid {
+    grid-template-columns: 1fr !important;
+    gap: 0.75rem !important;
+  }
+  #client-workspace-app .tracker-metrics-grid {
+    grid-template-columns: 1fr !important;
+    gap: 0.75rem !important;
+  }
+  #client-workspace-app .metric-card,
+  #worker-workspace-app .metric-card {
+    padding: 1rem 1.1rem !important;
+  }
+  #client-workspace-app .panel-header,
+  #worker-workspace-app .panel-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.65rem !important;
+  }
+  #client-workspace-app .panel-header > *,
+  #worker-workspace-app .panel-header > * {
+    width: 100% !important;
+  }
+  #client-workspace-app .panel-header .btn-primary-action,
+  #client-workspace-app .panel-header .client-btn,
+  #worker-workspace-app .panel-header button,
+  #worker-workspace-app .panel-header a {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  /* Staff Pay Summary Metrics: 1 column on small phones */
+  .pay-metrics-row {
+    grid-template-columns: 1fr !important;
+    gap: 0.75rem !important;
+  }
+  .pay-metric-box {
+    padding: 1rem !important;
+  }
+
+  /* Staff Credentials Compliance Grid: 1 column on small phones */
+  .compliance-grid {
+    grid-template-columns: 1fr !important;
+    gap: 0.75rem !important;
+  }
+
+  /* Staff Shift Details Grid: 1 column */
+  .shift-details-grid {
+    grid-template-columns: 1fr !important;
+    gap: 0.6rem !important;
+    padding: 0 0.25rem !important;
+  }
+
+  /* Staff Availability Days: compact auto-fit on small phones */
+  .avail-days-row {
+    grid-template-columns: repeat(auto-fit, minmax(64px, 1fr)) !important;
+    gap: 0.35rem !important;
+  }
+  .avail-day-card {
+    padding: 0.6rem 0.2rem !important;
+  }
+  .avail-date-num {
+    font-size: 1.05rem !important;
+  }
+  .avail-status-tag {
+    font-size: 0.62rem !important;
+    padding: 1px 4px !important;
+  }
+
+  /* Staff Credentials Upload Form & Buttons */
+  #staff-credential-upload-form > div:first-child {
+    grid-template-columns: 1fr !important;
+    gap: 0.75rem !important;
+  }
+  #btn-upload-credential-submit {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+  #btn-clock-in-allocated,
+  #btn-clock-out {
+    width: 100% !important;
+    justify-content: center !important;
+    padding: 0.85rem !important;
+    font-size: 0.85rem !important;
+    text-align: center !important;
+  }
+
+  /* Staff Open Shift Filter Bar */
+  .shift-filters-bar label {
+    margin-left: 0 !important;
+    width: 100% !important;
+    margin-top: 0.35rem !important;
+  }
+
+  /* Staff Profile Details Grid */
+  #staff-page-profile .portal-panel > div[style*="grid-template-columns"] {
+    grid-template-columns: 1fr !important;
+    gap: 0.85rem !important;
+  }
+
+  #client-workspace-app .request-card {
+    margin-bottom: 1rem !important;
+  }
+  #client-workspace-app .request-card > div:first-child {
+    padding: 0.85rem 1rem !important;
+  }
+  #client-workspace-app .request-card > div:last-child {
+    padding: 1rem !important;
+  }
+
+  /* Modals full-width on mobile */
+  .portal-modal-overlay {
+    padding: 0.75rem !important;
+  }
+  .portal-modal-box {
+    max-height: 94vh !important;
+    border-radius: 12px !important;
+    width: 100% !important;
+  }
+  .portal-modal-footer {
+    flex-direction: column !important;
+    gap: 0.5rem !important;
+  }
+  .portal-modal-footer button {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+}
+
+/* Extra Small Devices (<= 380px) */
+@media (max-width: 380px) {
+  #client-workspace-app .live-clock-chip,
+  #worker-workspace-app .live-clock-chip {
+    display: none !important;
+  }
+  #client-workspace-app .welcome-title-group h1,
+  #worker-workspace-app .welcome-title-group h1 {
+    font-size: 1.15rem !important;
+  }
+  #client-workspace-app .portal-topbar,
+  #worker-workspace-app .portal-topbar {
+    padding: 0 0.65rem !important;
   }
 }
 
@@ -4820,9 +5538,19 @@ html, body {
             <span>24/7 Operations Desk</span>
           </div>
 
-          <div class="live-clock-chip">
-            <i data-lucide="clock" style="width: 14px; height: 14px; color: #059669;"></i>
-            <span id="client-live-datetime">--:--:--</span>
+          <div class="live-clock-chip" title="Ontario Live Time & EVV Synchronization">
+            <div class="clock-icon-pulse-wrap">
+              <span class="clock-live-dot"></span>
+              <i data-lucide="clock" class="clock-icon"></i>
+            </div>
+            <div class="clock-time-display">
+              <span class="clock-time-digits" id="client-clock-time">--:--:--</span>
+              <span class="clock-ampm" id="client-clock-ampm">--</span>
+            </div>
+            <span class="clock-divider"></span>
+            <span class="clock-date-text" id="client-clock-date">---, --- --</span>
+            <span class="clock-zone-badge">EST</span>
+            <span id="client-live-datetime" style="display: none;"></span>
           </div>
 
           <a href="index.html" class="view-site-link-btn" title="Open Public Website">
@@ -4949,19 +5677,29 @@ html, body {
                   Need urgent shift replacements, sudden surge staffing, or have emergency schedule modifications? The Divine Fingers Hospital Dispatch Desk is available 24/7.
                 </p>
                 <ul class="support-contact-list" style="margin-top: 0.75rem; font-size: 0.82rem;">
-                  <li>
-                    <i data-lucide="phone-call" style="width: 15px; height: 15px; color: #059669;"></i>
-                    <span style="font-weight: 700; color: #059669;">24/7 Dispatch:</span>
-                    <a href="tel:+16472106463" style="color: #059669; text-decoration: none; font-weight: 700;">+1 (647) 210-6463</a>
-                    <span style="color: #CBD5E1; margin: 0 2px;">|</span>
-                    <a href="tel:+16477648522" style="color: #059669; text-decoration: none; font-weight: 700;">+1 (647) 764-8522</a>
+                  <li class="support-dispatch-item">
+                    <div class="support-item-icon-title">
+                      <i data-lucide="phone-call" style="width: 15px; height: 15px; color: #059669; flex-shrink: 0;"></i>
+                      <span style="font-weight: 700; color: #059669; white-space: nowrap;">24/7 Dispatch Desk:</span>
+                    </div>
+                    <div class="dispatch-phones-group">
+                      <a href="tel:+16472106463" class="dispatch-phone-link">
+                        <i data-lucide="phone" style="width: 12px; height: 12px; opacity: 0.8;"></i>
+                        <span>+1 (647) 210-6463</span>
+                      </a>
+                      <span class="dispatch-phone-sep">·</span>
+                      <a href="tel:+16477648522" class="dispatch-phone-link">
+                        <i data-lucide="phone" style="width: 12px; height: 12px; opacity: 0.8;"></i>
+                        <span>+1 (647) 764-8522</span>
+                      </a>
+                    </div>
                   </li>
-                  <li>
-                    <i data-lucide="mail" style="width: 15px; height: 15px; color: #059669;"></i>
-                    <a href="mailto:staffing@divinefingershealthcare.ca" style="color: inherit; text-decoration: none;">staffing@divinefingershealthcare.ca</a>
+                  <li style="align-items: flex-start;">
+                    <i data-lucide="mail" style="width: 15px; height: 15px; color: #059669; flex-shrink: 0; margin-top: 2px;"></i>
+                    <a href="mailto:staffing@divinefingershealthcare.ca" style="color: inherit; text-decoration: none; word-break: break-all;">staffing@divinefingershealthcare.ca</a>
                   </li>
-                  <li>
-                    <i data-lucide="shield-check" style="width: 15px; height: 15px; color: #10B981;"></i>
+                  <li style="align-items: flex-start;">
+                    <i data-lucide="shield-check" style="width: 15px; height: 15px; color: #10B981; flex-shrink: 0; margin-top: 2px;"></i>
                     <span style="font-weight: 600;">100% CNO-Compliant Personnel Guaranteed</span>
                   </li>
                 </ul>
@@ -4974,12 +5712,12 @@ html, body {
                   </div>
                 </div>
                 <div style="display: flex; flex-direction: column; gap: 0.65rem;">
-                  <a href="bulk-staffing.html" target="_blank" class="facility-tool-link">
+                  <a href="#request" onclick="switchClientPage('client-page-request', 'Request Staff'); return false;" class="facility-tool-link">
                     <span style="display: flex; align-items: center; gap: 0.55rem;">
                       <i data-lucide="layers" style="width: 16px; height: 16px; color: #059669;"></i>
                       <span>Enterprise Multi-Week Scheduler</span>
                     </span>
-                    <i data-lucide="external-link" class="arrow-indicator" style="width: 14px; height: 14px;"></i>
+                    <i data-lucide="chevron-right" class="arrow-indicator" style="width: 14px; height: 14px;"></i>
                   </a>
                   <a href="#roster" onclick="switchClientPage('client-page-roster', 'Facility Staff Roster'); return false;" class="facility-tool-link">
                     <span style="display: flex; align-items: center; gap: 0.55rem;">
@@ -5425,69 +6163,45 @@ html, body {
         <div class="portal-view-page" id="client-page-active">
           <div style="display: flex; flex-direction: column; gap: 1.5rem;">
             
-            <!-- Live Tracking KPI Summary Grid -->
-            <div class="tracker-metrics-grid">
-              <div class="tracker-kpi-card teal" onclick="setTrackerFilter('in_session')" title="Filter by Active On-Site Staff">
-                <div class="tracker-kpi-header">
-                  <span class="tracker-kpi-title">Active On-Site Staff</span>
-                  <div class="tracker-kpi-icon-pill teal">
-                    <span class="live-dot"></span>
-                  </div>
+            <!-- Live Tracking KPI Summary Grid (Styled matching Dashboard Overview) -->
+            <div class="metrics-grid" style="margin-bottom: 1.5rem;">
+              <div class="metric-card clickable-metric-card" onclick="setTrackerFilter('in_session')" title="Filter by Active On-Site Staff">
+                <div class="metric-icon-wrap teal">
+                  <i data-lucide="user-check" style="width: 24px; height: 24px;"></i>
                 </div>
-                <div class="tracker-kpi-body">
-                  <span class="tracker-kpi-num teal" id="tracker-stat-onsite">0</span>
-                </div>
-                <div class="tracker-kpi-footer">
-                  <i data-lucide="map-pin" style="width: 14px; height: 14px; color: #10B981;"></i>
-                  <span>EVV Geofence Verified</span>
+                <div class="metric-data-group">
+                  <span class="metric-val" id="tracker-stat-onsite">0</span>
+                  <span class="metric-label">Active On-Site Staff</span>
                 </div>
               </div>
 
-              <div class="tracker-kpi-card blue" onclick="setTrackerFilter('dispatched')" title="Filter by Caregivers En Route">
-                <div class="tracker-kpi-header">
-                  <span class="tracker-kpi-title">Dispatched &amp; En Route</span>
-                  <div class="tracker-kpi-icon-pill blue">
-                    <i data-lucide="navigation" style="width: 17px; height: 17px;"></i>
-                  </div>
+              <div class="metric-card clickable-metric-card" onclick="setTrackerFilter('dispatched')" title="Filter by Caregivers En Route">
+                <div class="metric-icon-wrap blue">
+                  <i data-lucide="navigation" style="width: 24px; height: 24px;"></i>
                 </div>
-                <div class="tracker-kpi-body">
-                  <span class="tracker-kpi-num blue" id="tracker-stat-dispatched">0</span>
-                </div>
-                <div class="tracker-kpi-footer">
-                  <i data-lucide="clock" style="width: 14px; height: 14px; color: #0284C7;"></i>
-                  <span>In Transit with live ETA</span>
+                <div class="metric-data-group">
+                  <span class="metric-val" id="tracker-stat-dispatched">0</span>
+                  <span class="metric-label">Dispatched &amp; En Route</span>
                 </div>
               </div>
 
-              <div class="tracker-kpi-card amber" onclick="setTrackerFilter('pending')" title="Filter by Matching in Queue">
-                <div class="tracker-kpi-header">
-                  <span class="tracker-kpi-title">Matching in Queue</span>
-                  <div class="tracker-kpi-icon-pill amber">
-                    <i data-lucide="users" style="width: 17px; height: 17px;"></i>
-                  </div>
+              <div class="metric-card clickable-metric-card" onclick="setTrackerFilter('pending')" title="Filter by Matching in Queue">
+                <div class="metric-icon-wrap orange">
+                  <i data-lucide="users" style="width: 24px; height: 24px;"></i>
                 </div>
-                <div class="tracker-kpi-body">
-                  <span class="tracker-kpi-num amber" id="tracker-stat-matching">0</span>
-                </div>
-                <div class="tracker-kpi-footer">
-                  <i data-lucide="search" style="width: 14px; height: 14px; color: #D97706;"></i>
-                  <span>Rapid Dispatching GTA</span>
+                <div class="metric-data-group">
+                  <span class="metric-val" id="tracker-stat-matching">0</span>
+                  <span class="metric-label">Matching in Queue</span>
                 </div>
               </div>
 
-              <div class="tracker-kpi-card indigo" onclick="setTrackerFilter('completed')" title="Filter by Completed Shifts">
-                <div class="tracker-kpi-header">
-                  <span class="tracker-kpi-title">Completed Shifts</span>
-                  <div class="tracker-kpi-icon-pill indigo">
-                    <i data-lucide="check-circle-2" style="width: 17px; height: 17px;"></i>
-                  </div>
+              <div class="metric-card clickable-metric-card" onclick="setTrackerFilter('completed')" title="Filter by Completed Shifts">
+                <div class="metric-icon-wrap purple">
+                  <i data-lucide="check-circle-2" style="width: 24px; height: 24px;"></i>
                 </div>
-                <div class="tracker-kpi-body">
-                  <span class="tracker-kpi-num indigo" id="tracker-stat-completed">0</span>
-                </div>
-                <div class="tracker-kpi-footer">
-                  <i data-lucide="shield-check" style="width: 14px; height: 14px; color: #4F46E5;"></i>
-                  <span>Verified Timesheets</span>
+                <div class="metric-data-group">
+                  <span class="metric-val" id="tracker-stat-completed">0</span>
+                  <span class="metric-label">Completed Shifts</span>
                 </div>
               </div>
             </div>
@@ -5515,31 +6229,43 @@ html, body {
 
               <!-- Interactive Filter & Search Controls -->
               <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 0.75rem 0 1rem 0; border-bottom: 1px solid #E2E8F0; margin-bottom: 1rem;">
-                <div style="display: flex; flex-wrap: wrap; gap: 0.4rem;" id="tracker-filter-pills">
+                <div class="tracker-filter-bar" id="tracker-filter-pills">
                   <button type="button" class="client-tracker-pill active" onclick="setTrackerFilter('all')" data-filter="all">
-                    All Shifts (<span id="tracker-count-all">0</span>)
+                    <i data-lucide="layers" class="pill-icon"></i>
+                    <span>All Shifts</span>
+                    <span class="tracker-pill-badge" id="tracker-count-all">0</span>
                   </button>
                   <button type="button" class="client-tracker-pill" onclick="setTrackerFilter('in_session')" data-filter="in_session">
-                    <span class="live-dot" style="display: inline-block; margin-right: 3px;"></span> Active On-Site (<span id="tracker-count-onsite">0</span>)
+                    <span class="pill-live-dot"></span>
+                    <span>Active On-Site</span>
+                    <span class="tracker-pill-badge" id="tracker-count-onsite">0</span>
                   </button>
                   <button type="button" class="client-tracker-pill" onclick="setTrackerFilter('dispatched')" data-filter="dispatched">
-                    🚗 En Route (<span id="tracker-count-dispatched">0</span>)
+                    <i data-lucide="navigation" class="pill-icon pill-icon-blue"></i>
+                    <span>En Route</span>
+                    <span class="tracker-pill-badge" id="tracker-count-dispatched">0</span>
                   </button>
                   <button type="button" class="client-tracker-pill" onclick="setTrackerFilter('confirmed')" data-filter="confirmed">
-                    📋 Confirmed (<span id="tracker-count-confirmed">0</span>)
+                    <i data-lucide="calendar-check" class="pill-icon pill-icon-indigo"></i>
+                    <span>Confirmed</span>
+                    <span class="tracker-pill-badge" id="tracker-count-confirmed">0</span>
                   </button>
                   <button type="button" class="client-tracker-pill" onclick="setTrackerFilter('pending')" data-filter="pending">
-                    ⏳ Matching (<span id="tracker-count-matching">0</span>)
+                    <i data-lucide="hourglass" class="pill-icon pill-icon-amber"></i>
+                    <span>Matching</span>
+                    <span class="tracker-pill-badge" id="tracker-count-matching">0</span>
                   </button>
                   <button type="button" class="client-tracker-pill" onclick="setTrackerFilter('completed')" data-filter="completed">
-                    ✅ Completed (<span id="tracker-count-completed">0</span>)
+                    <i data-lucide="check-circle-2" class="pill-icon pill-icon-green"></i>
+                    <span>Completed</span>
+                    <span class="tracker-pill-badge" id="tracker-count-completed">0</span>
                   </button>
                 </div>
 
-                <div style="display: flex; align-items: center; gap: 0.5rem; flex: 1; max-width: 320px; min-width: 200px;">
+                <div style="display: flex; align-items: center; gap: 0.5rem; flex: 1; max-width: 320px; min-width: 210px;">
                   <div style="position: relative; width: 100%;">
-                    <i data-lucide="search" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: #94A3B8;"></i>
-                    <input type="text" id="tracker-search-input" oninput="applyTrackerSearch()" placeholder="Search caregiver, ID, unit..." style="width: 100%; padding: 0.42rem 0.75rem 0.42rem 2rem; font-size: 0.78rem; border-radius: 6px; border: 1px solid #CBD5E1; background: #FFFFFF; outline: none; box-sizing: border-box;">
+                    <i data-lucide="search" style="position: absolute; left: 11px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: #94A3B8; pointer-events: none;"></i>
+                    <input type="text" id="tracker-search-input" oninput="applyTrackerSearch()" placeholder="Search caregiver, ID, unit..." style="width: 100%; padding: 0.44rem 0.8rem 0.44rem 2.15rem; font-size: 0.78rem; font-weight: 500; border-radius: 9px; border: 1px solid #CBD5E1; background: #FFFFFF; outline: none; box-sizing: border-box; transition: border-color 0.15s ease, box-shadow 0.15s ease;">
                   </div>
                 </div>
               </div>
@@ -5758,9 +6484,19 @@ html, body {
             <span>Live GTA Dispatch</span>
           </div>
 
-          <div class="live-clock-chip">
-            <i data-lucide="clock" style="width: 14px; height: 14px; color: #0284C7;"></i>
-            <span id="topbar-live-clock-display">00:00:00</span>
+          <div class="live-clock-chip" title="Ontario Live Time & EVV Synchronization">
+            <div class="clock-icon-pulse-wrap" style="color: #0284C7;">
+              <span class="clock-live-dot" style="background:#0284C7;box-shadow:0 0 0 2px rgba(2, 132, 199, 0.2);"></span>
+              <i data-lucide="clock" class="clock-icon"></i>
+            </div>
+            <div class="clock-time-display">
+              <span class="clock-time-digits" id="staff-clock-time">--:--:--</span>
+              <span class="clock-ampm" id="staff-clock-ampm" style="color: #0284C7;">--</span>
+            </div>
+            <span class="clock-divider"></span>
+            <span class="clock-date-text" id="staff-clock-date">---, --- --</span>
+            <span class="clock-zone-badge" style="background: #E0F2FE; color: #0369A1; border-color: #BAE6FD;">EST</span>
+            <span id="topbar-live-clock-display" style="display: none;"></span>
           </div>
 
           <a href="index.html" class="view-site-link-btn" title="Open Public Website">
@@ -6191,10 +6927,10 @@ html, body {
                   The Clinical Operations Dispatch desk has not scheduled an active placement to your profile for today. Browse open hospital shifts to claim available hours, or update your 7-day availability preferences.
                 </p>
                 <div style="display: flex; gap: 0.85rem; justify-content: center; flex-wrap: wrap; margin-bottom: 1.5rem;">
-                  <button class="btn btn-primary" onclick="switchStaffTab('shifts')" style="font-size: 0.88rem; padding: 0.65rem 1.35rem; display: inline-flex; align-items: center; gap: 0.5rem; box-shadow: 0 4px 14px rgba(2, 132, 199, 0.25);">
+                  <button type="button" class="btn btn-primary" onclick="switchStaffPage('staff-page-shifts', 'Open Shifts Feed')" style="font-size: 0.88rem; padding: 0.65rem 1.35rem; display: inline-flex; align-items: center; gap: 0.5rem; box-shadow: 0 4px 14px rgba(2, 132, 199, 0.25); cursor: pointer;">
                     <i data-lucide="briefcase" style="width: 16px; height: 16px;"></i> Browse Open Shifts
                   </button>
-                  <button class="btn btn-outline" onclick="switchStaffTab('schedule')" style="font-size: 0.88rem; padding: 0.65rem 1.35rem; display: inline-flex; align-items: center; gap: 0.5rem; background: #FFFFFF;">
+                  <button type="button" class="btn btn-outline" onclick="switchStaffPage('staff-page-schedule', 'Schedule & Availability')" style="font-size: 0.88rem; padding: 0.65rem 1.35rem; display: inline-flex; align-items: center; gap: 0.5rem; background: #FFFFFF; cursor: pointer;">
                     <i data-lucide="calendar" style="width: 16px; height: 16px;"></i> Update Availability
                   </button>
                 </div>
@@ -6478,76 +7214,48 @@ html, body {
             </div>
 
             <!-- Compliance Summary Status Cards Grid -->
-            <div class="compliance-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
-              <div class="compliance-card cno-card">
-                <div class="compliance-card-header">
-                  <span>Regulatory License</span>
-                  <div class="compliance-card-icon-wrap" style="background: #E0F2FE; color: #0284C7;">
-                    <i data-lucide="shield-check" style="width: 20px; height: 20px;"></i>
-                  </div>
-                </div>
-                <div class="compliance-card-title" id="comp-cno-title">
-                  CNO License
-                </div>
-                <div class="compliance-card-subtitle">
-                  College of Nurses of Ontario
-                </div>
-                <div class="compliance-card-status verified" id="comp-cno-badge">
-                  <i data-lucide="check-circle" style="width: 14px; height: 14px;"></i> Verified Active
+            <div class="compliance-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+              <div class="pay-metric-box" style="background: #F8FAFC; border: 1.5px solid #E2E8F0; border-radius: 8px; padding: 1.25rem; display: flex; flex-direction: column;">
+                <span style="font-size: 0.74rem; font-weight: 700; color: #64748B; display: block; text-transform: uppercase; letter-spacing: 0.5px;">Regulatory License</span>
+                <span id="comp-cno-title" style="font-size: 1.3rem; font-weight: 900; color: var(--navy); display: block; margin-top: 0.35rem; font-family: var(--font-heading); line-height: 1.25;">CNO License</span>
+                <span style="font-size: 0.74rem; color: #64748B; margin-top: 0.25rem; display: block;">College of Nurses of Ontario</span>
+                <div style="margin-top: 0.85rem;">
+                  <span class="compliance-card-status verified" id="comp-cno-badge" style="font-size: 0.74rem; font-weight: 700; padding: 0.25rem 0.65rem; border-radius: 9999px; display: inline-flex; align-items: center; gap: 5px;">
+                    <i data-lucide="check-circle" style="width: 13px; height: 13px;"></i> Verified Active
+                  </span>
                 </div>
               </div>
 
-              <div class="compliance-card cpr-card">
-                <div class="compliance-card-header">
-                  <span>Life Support</span>
-                  <div class="compliance-card-icon-wrap" style="background: #FEE2E2; color: #EF4444;">
-                    <i data-lucide="heart-pulse" style="width: 20px; height: 20px;"></i>
-                  </div>
-                </div>
-                <div class="compliance-card-title">
-                  BLS / CPR Certification
-                </div>
-                <div class="compliance-card-subtitle">
-                  Heart &amp; Stroke Foundation
-                </div>
-                <div class="compliance-card-status verified">
-                  <i data-lucide="check-circle" style="width: 14px; height: 14px;"></i> Verified Active
+              <div class="pay-metric-box" style="background: #F8FAFC; border: 1.5px solid #E2E8F0; border-radius: 8px; padding: 1.25rem; display: flex; flex-direction: column;">
+                <span style="font-size: 0.74rem; font-weight: 700; color: #64748B; display: block; text-transform: uppercase; letter-spacing: 0.5px;">Life Support</span>
+                <span style="font-size: 1.3rem; font-weight: 900; color: var(--navy); display: block; margin-top: 0.35rem; font-family: var(--font-heading); line-height: 1.25;">BLS / CPR Certification</span>
+                <span style="font-size: 0.74rem; color: #64748B; margin-top: 0.25rem; display: block;">Heart &amp; Stroke Foundation</span>
+                <div style="margin-top: 0.85rem;">
+                  <span class="compliance-card-status verified" style="font-size: 0.74rem; font-weight: 700; padding: 0.25rem 0.65rem; border-radius: 9999px; display: inline-flex; align-items: center; gap: 5px;">
+                    <i data-lucide="check-circle" style="width: 13px; height: 13px;"></i> Verified Active
+                  </span>
                 </div>
               </div>
 
-              <div class="compliance-card vss-card">
-                <div class="compliance-card-header">
-                  <span>Background Check</span>
-                  <div class="compliance-card-icon-wrap" style="background: #EDE9FE; color: #7C3AED;">
-                    <i data-lucide="file-check" style="width: 20px; height: 20px;"></i>
-                  </div>
-                </div>
-                <div class="compliance-card-title">
-                  Police VSS Check
-                </div>
-                <div class="compliance-card-subtitle">
-                  Vulnerable Sector Screening
-                </div>
-                <div class="compliance-card-status verified">
-                  <i data-lucide="check-circle" style="width: 14px; height: 14px;"></i> Clear &amp; Current
+              <div class="pay-metric-box" style="background: #F8FAFC; border: 1.5px solid #E2E8F0; border-radius: 8px; padding: 1.25rem; display: flex; flex-direction: column;">
+                <span style="font-size: 0.74rem; font-weight: 700; color: #64748B; display: block; text-transform: uppercase; letter-spacing: 0.5px;">Background Check</span>
+                <span style="font-size: 1.3rem; font-weight: 900; color: var(--navy); display: block; margin-top: 0.35rem; font-family: var(--font-heading); line-height: 1.25;">Police VSS Check</span>
+                <span style="font-size: 0.74rem; color: #64748B; margin-top: 0.25rem; display: block;">Vulnerable Sector Screening</span>
+                <div style="margin-top: 0.85rem;">
+                  <span class="compliance-card-status verified" style="font-size: 0.74rem; font-weight: 700; padding: 0.25rem 0.65rem; border-radius: 9999px; display: inline-flex; align-items: center; gap: 5px;">
+                    <i data-lucide="check-circle" style="width: 13px; height: 13px;"></i> Clear &amp; Current
+                  </span>
                 </div>
               </div>
 
-              <div class="compliance-card n95-card">
-                <div class="compliance-card-header">
-                  <span>Safety Fit</span>
-                  <div class="compliance-card-icon-wrap" style="background: #FEF3C7; color: #D97706;">
-                    <i data-lucide="check-square" style="width: 20px; height: 20px;"></i>
-                  </div>
-                </div>
-                <div class="compliance-card-title">
-                  N95 Mask Fit-Test
-                </div>
-                <div class="compliance-card-subtitle">
-                  Respirator Standard
-                </div>
-                <div class="compliance-card-status verified">
-                  <i data-lucide="check-circle" style="width: 14px; height: 14px;"></i> Tested &amp; Passed
+              <div class="pay-metric-box" style="background: #F8FAFC; border: 1.5px solid #E2E8F0; border-radius: 8px; padding: 1.25rem; display: flex; flex-direction: column;">
+                <span style="font-size: 0.74rem; font-weight: 700; color: #64748B; display: block; text-transform: uppercase; letter-spacing: 0.5px;">Safety Fit</span>
+                <span style="font-size: 1.3rem; font-weight: 900; color: var(--navy); display: block; margin-top: 0.35rem; font-family: var(--font-heading); line-height: 1.25;">N95 Mask Fit-Test</span>
+                <span style="font-size: 0.74rem; color: #64748B; margin-top: 0.25rem; display: block;">Respirator Standard</span>
+                <div style="margin-top: 0.85rem;">
+                  <span class="compliance-card-status verified" style="font-size: 0.74rem; font-weight: 700; padding: 0.25rem 0.65rem; border-radius: 9999px; display: inline-flex; align-items: center; gap: 5px;">
+                    <i data-lucide="check-circle" style="width: 13px; height: 13px;"></i> Tested &amp; Passed
+                  </span>
                 </div>
               </div>
             </div>
@@ -6696,8 +7404,7 @@ html, body {
                 <i data-lucide="headphones" style="color: #0284C7;"></i> 24/7 Clinical Operations &amp; Dispatch Desk
               </div>
               <div style="margin-top: 1rem; display: flex; align-items: center; gap: 1rem;">
-                <div style="width: 48px; height: 48px; border-radius: 50%; background: #E0F2FE; color: #0369A1; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.1rem;">
-                <div style="width: 48px; height: 48px; border-radius: 50%; background: #E0F2FE; color: #0369A1; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.1rem;">
+                <div style="width: 48px; height: 48px; border-radius: 50%; background: #E0F2FE; color: #0369A1; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.1rem; flex-shrink: 0;">
                   DF
                 </div>
                 <div>
@@ -6982,12 +7689,27 @@ html, body {
     }
 
     function updateClientLiveClock() {
-      const el = document.getElementById('client-live-datetime');
-      if (el) {
-        const now = new Date();
-        const dateStr = now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
-        const timeStr = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', second: '2-digit' });
-        el.textContent = `${dateStr} · ${timeStr}`;
+      const now = new Date();
+      let hours = now.getHours();
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      const seconds = String(now.getSeconds()).padStart(2, '0');
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      hours = hours % 12;
+      hours = hours ? hours : 12;
+      const hoursStr = String(hours).padStart(2, '0');
+
+      const timeDigitsEl = document.getElementById('client-clock-time');
+      const ampmEl = document.getElementById('client-clock-ampm');
+      const dateEl = document.getElementById('client-clock-date');
+      const legacyEl = document.getElementById('client-live-datetime');
+
+      if (timeDigitsEl) timeDigitsEl.textContent = `${hoursStr}:${minutes}:${seconds}`;
+      if (ampmEl) ampmEl.textContent = ampm;
+      if (dateEl) {
+        dateEl.textContent = now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+      }
+      if (legacyEl) {
+        legacyEl.textContent = `${hoursStr}:${minutes}:${seconds} ${ampm}`;
       }
     }
 
@@ -9314,6 +10036,32 @@ window.switchClientPage = switchClientPage;
 window.toggleClientSidebarCollapse = toggleClientSidebarCollapse;
 window.toggleClientMobileSidebar = toggleClientMobileSidebar;
 
+window.switchStaffTab = function(tab) {
+  const map = {
+    'shifts': ['staff-page-shifts', 'Open Shifts Feed'],
+    'schedule': ['staff-page-schedule', 'Schedule & Availability'],
+    'clock': ['staff-page-clock', 'EVV Clock Station'],
+    'overview': ['staff-page-overview', 'Dashboard Overview'],
+    'pay': ['staff-page-pay', 'Pay & Timesheets'],
+    'credentials': ['staff-page-credentials', 'Clinical Credentials Vault'],
+    'profile': ['staff-page-profile', 'Clinical Profile & Help']
+  };
+  const target = map[tab] || ['staff-page-shifts', 'Open Shifts Feed'];
+  switchStaffPage(target[0], target[1]);
+};
+
+window.switchClientTab = function(tab) {
+  const map = {
+    'request': ['client-page-request', 'Request Staffing'],
+    'active': ['client-page-active', 'Active Shifts & EVV'],
+    'roster': ['client-page-roster', 'Facility Staff Roster'],
+    'billing': ['client-page-billing', 'Invoices & Billing'],
+    'overview': ['client-page-overview', 'Executive Overview']
+  };
+  const target = map[tab] || ['client-page-overview', 'Executive Overview'];
+  switchClientPage(target[0], target[1]);
+};
+
 // ------------------------------------------------------------------------
 // Delegated Navigation Event Listener (Resilient to All Environment Modes)
 // ------------------------------------------------------------------------
@@ -9517,6 +10265,24 @@ function startDeviceClock() {
     const timeStr = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', second: '2-digit' });
     if (timeEl) timeEl.textContent = timeStr;
     if (topClock) topClock.textContent = timeStr;
+
+    let hours = now.getHours();
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+    const hoursStr = String(hours).padStart(2, '0');
+
+    const staffTimeDigitsEl = document.getElementById('staff-clock-time');
+    const staffAmpmEl = document.getElementById('staff-clock-ampm');
+    const staffDateEl = document.getElementById('staff-clock-date');
+
+    if (staffTimeDigitsEl) staffTimeDigitsEl.textContent = `${hoursStr}:${minutes}:${seconds}`;
+    if (staffAmpmEl) staffAmpmEl.textContent = ampm;
+    if (staffDateEl) {
+      staffDateEl.textContent = now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+    }
 
     if (dateEl) {
       dateEl.textContent = now.toLocaleDateString('en-US', {
