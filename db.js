@@ -394,7 +394,7 @@ function handleInMemoryQuery(sql, params = []) {
         region: params[5] || 'Greater Toronto Area',
         phone: params[6] || null,
         email: params[7] || null,
-        status: params[8] || 'available',
+        status: params[8] || 'pending_verification',
         credential_status: params[9] || 'pending',
         rating: 5.00,
         shifts_completed: 0,
@@ -413,6 +413,8 @@ function handleInMemoryQuery(sql, params = []) {
         existing.name = newStaff.name;
         existing.role = newStaff.role;
         existing.phone = newStaff.phone;
+        if (newStaff.status) existing.status = newStaff.status;
+        if (newStaff.credential_status) existing.credential_status = newStaff.credential_status;
         existing.updated_at = newStaff.updated_at;
       } else {
         inMemoryStore.staff_roster.push(newStaff);
@@ -426,9 +428,13 @@ function handleInMemoryQuery(sql, params = []) {
         if (normalized.includes("status = 'on-shift'")) staff.status = 'on-shift';
         if (normalized.includes("status = 'available'")) staff.status = 'available';
         if (normalized.includes("status = 'off-duty'")) staff.status = 'off-duty';
+        if (normalized.includes("status = 'pending_verification'")) staff.status = 'pending_verification';
+        if (normalized.includes("credential_status = 'verified'")) staff.credential_status = 'verified';
+        if (normalized.includes("credential_status = 'pending'")) staff.credential_status = 'pending';
         if (normalized.includes('shifts_completed')) staff.shifts_completed = (staff.shifts_completed || 0) + 1;
         if (normalized.includes('cpr_expiry_date') && params[0]) staff.cpr_expiry_date = params[0];
-        if (normalized.includes('credential_status') && params[0]) staff.credential_status = params[0];
+        if (normalized.includes('credential_status = ?')) staff.credential_status = params[0];
+        if (normalized.includes('status = ?')) staff.status = params[0];
         staff.updated_at = new Date().toISOString();
       }
       return [{ affectedRows: staff ? 1 : 0 }];

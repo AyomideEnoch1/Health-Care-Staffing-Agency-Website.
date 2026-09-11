@@ -598,6 +598,47 @@ router.patch('/roster/:id', requirePermission('roster:manage'), async (req, res,
   } catch (err) { next(err); }
 });
 
+// POST /api/admin/roster/:id/approve — Verify credentials & activate staff dispatch
+router.post('/roster/:id/approve', requirePermission('roster:manage'), async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const [existing] = await pool.query('SELECT * FROM staff_roster WHERE id = ?', [id]);
+    if (!existing || existing.length === 0) {
+      return res.status(404).json({ success: false, error: 'Staff member not found.' });
+    }
+
+    const cur = existing[0];
+    await pool.query(
+      `UPDATE staff_roster SET credential_status = 'verified', status = 'available' WHERE id = ?`,
+      [id]
+    );
+
+    // Also activate corresponding users record if present
+    if (cur.email) {
+      await pool.query(
+        `UPDATE users SET is_active = 1 WHERE email = ?`,
+        [cur.email.toLowerCase().trim()]
+      ).catch(() => {});
+    }
+
+    await pool.query(
+      `INSERT INTO audit_logs (id, admin_id, actor_name, action, target_entity, target_id, details, severity, ip_address)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [crypto.randomUUID(), req.admin.id, req.admin.full_name,
+       'STAFF_APPROVED', 'staff_roster', id,
+       `Approved clinical credentials and activated dispatch for ${cur.name} (${cur.staff_code || id})`, 'info', req.ip]
+    );
+
+    adminEvents.emit('status:changed', { entity: 'staff_roster', id, action: 'verified' });
+
+    res.json({
+      success: true,
+      message: `Staff credentials for ${cur.name} have been approved and activated for clinical dispatch.`,
+      data: { id, credential_status: 'verified', status: 'available' }
+    });
+  } catch (err) { next(err); }
+});
+
 // ============================================================================
 // CLINICAL CREDENTIALS & STAFF DOCUMENTS
 // ============================================================================

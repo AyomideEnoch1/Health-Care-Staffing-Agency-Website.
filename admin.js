@@ -1078,6 +1078,12 @@
 
     tbody.innerHTML = filtered.map(s => {
       const isSelected = LiveStore.selectedStaffIds.has(s.id);
+      const isPending = s.credential_status === 'pending' || s.status === 'pending_verification';
+      const statusLabel = s.status === 'pending_verification' ? 'Pending Review' : (s.status || '').replace('-', ' ');
+      const statusClass = s.status === 'pending_verification' ? 'expiring' : s.status;
+      const credLabel = s.credential_status === 'pending' ? 'Pending Review' : (s.credential_status || 'Verified');
+      const credClass = s.credential_status === 'pending' ? 'expiring' : (s.credential_status || 'verified');
+
       return `
         <tr data-id="${s.id}" onclick="window.openStaffDrawer('${s.id}')" style="cursor:pointer;" class="table-card-row ${isSelected ? 'selected-row' : ''}">
           <td class="cell-checkbox" onclick="event.stopPropagation()" data-label="Select">
@@ -1092,7 +1098,7 @@
                   <span class="user-role-sub">${s.staff_code} &bull; ${s.phone || '—'}</span>
                 </div>
               </div>
-              <div class="row-status-top"><span class="status-pill ${s.status}">${(s.status || '').replace('-', ' ')}</span></div>
+              <div class="row-status-top"><span class="status-pill ${statusClass}">${statusLabel}</span></div>
             </div>
           </td>
           <td class="cell-grid-item" data-label="Role">
@@ -1101,11 +1107,11 @@
           </td>
           <td class="cell-status-desktop" data-label="Status">
             <div class="meta-label">Status</div>
-            <div class="meta-value"><span class="status-pill ${s.status}">${(s.status || '').replace('-', ' ')}</span></div>
+            <div class="meta-value"><span class="status-pill ${statusClass}">${statusLabel}</span></div>
           </td>
           <td class="cell-grid-item" data-label="Compliance">
             <div class="meta-label">Compliance</div>
-            <div class="meta-value"><span class="status-pill ${s.credential_status || 'verified'}">${s.credential_status || 'Verified'}</span></div>
+            <div class="meta-value"><span class="status-pill ${credClass}">${credLabel}</span></div>
           </td>
           <td class="cell-grid-item tabular-nums" data-label="Rating & Shifts">
             <div class="meta-label">Performance</div>
@@ -1116,6 +1122,11 @@
             <div class="meta-value">${s.region || 'Scarborough'}</div>
           </td>
           <td class="cell-actions" onclick="event.stopPropagation()" data-label="Actions">
+            ${isPending ? `
+              <button type="button" class="btn-primary-action" style="padding:.35rem .65rem;font-size:.75rem;display:inline-flex;align-items:center;gap:4px;width:100%;justify-content:center;background:#10B981;margin-bottom:4px;border:none;" onclick="window.handleApproveStaff('${s.id}', event)">
+                <i data-lucide="user-check" style="width:12px;height:12px;"></i> Approve &amp; Activate
+              </button>
+            ` : ''}
             <button type="button" class="btn-secondary-action" style="padding:.35rem .65rem;font-size:.75rem;display:inline-flex;align-items:center;gap:4px;width:100%;justify-content:center;" onclick="window.openStaffDrawer('${s.id}')">
               <i data-lucide="eye" style="width:12px;height:12px;"></i> View Full Profile
             </button>
@@ -3198,9 +3209,22 @@
           <div>
             <h4 style="font-size:1.15rem;font-weight:800;color:var(--text-primary);">${staff.name}</h4>
             <span class="status-pill verified">${staff.role}</span>
-            <span class="status-pill ${staff.status}" style="margin-left:.4rem;">${staff.status.toUpperCase()}</span>
+            <span class="status-pill ${staff.status === 'pending_verification' ? 'expiring' : staff.status}" style="margin-left:.4rem;">${(staff.status || '').replace('-', ' ').replace('_', ' ').toUpperCase()}</span>
           </div>
         </div>
+        ${(staff.credential_status === 'pending' || staff.status === 'pending_verification') ? `
+          <div style="background:rgba(245,158,11,0.1);border:1px solid #F59E0B;border-radius:8px;padding:0.85rem;margin-bottom:1.25rem;">
+            <div style="font-weight:700;color:#D97706;font-size:0.85rem;display:flex;align-items:center;gap:6px;margin-bottom:0.35rem;">
+              <i data-lucide="clock" style="width:15px;height:15px;"></i> Clinical Vetting In Progress
+            </div>
+            <div style="font-size:0.78rem;color:var(--text-secondary);margin-bottom:0.75rem;">
+              This clinician registered via the public Staff Portal. Open shifts and EVV clocking are locked until you verify credentials and activate their account.
+            </div>
+            <button type="button" class="btn-primary-action" style="background:#10B981;border:none;width:100%;justify-content:center;font-size:0.85rem;padding:0.5rem;" onclick="window.handleApproveStaff('${staff.id}', event)">
+              <i data-lucide="shield-check" style="width:14px;height:14px;"></i> Approve Credentials &amp; Activate Dispatch
+            </button>
+          </div>
+        ` : ''}
         <form id="drawer-staff-form" onsubmit="window.handleSaveStaffProfile(event, '${staff.id}')">
           <div class="modal-form-group" style="margin-bottom:0.75rem;">
             <label>Full Legal Name</label>
@@ -3234,6 +3258,7 @@
             <div class="modal-form-group">
               <label>Availability Status</label>
               <select class="modal-input" id="edit-staff-status">
+                <option value="pending_verification" ${staff.status==='pending_verification' ?'selected':''}>Pending Verification</option>
                 <option value="available"  ${staff.status==='available' ?'selected':''}>Available (On-Call)</option>
                 <option value="on-shift"   ${staff.status==='on-shift'  ?'selected':''}>On-Shift</option>
                 <option value="off-duty"   ${staff.status==='off-duty'  ?'selected':''}>Off-Duty</option>
@@ -3682,6 +3707,34 @@
       renderCompliance();
     } catch (err) {
       showToast(`Failed to update profile: ${err.message}`, 'warning');
+    }
+  };
+
+  window.handleApproveStaff = async function(staffId, event) {
+    if (event) event.stopPropagation();
+    const staff = LiveStore.staff.find(s => s.id === staffId);
+    const staffName = staff ? staff.name : 'this caregiver';
+    if (!confirm(`Are you sure you want to approve clinical credentials and activate dispatch for ${staffName}?`)) {
+      return;
+    }
+
+    try {
+      const res = await apiRequest(`/admin/roster/${staffId}/approve`, {
+        method: 'POST'
+      });
+      if (res.success) {
+        showToast(res.message || `✅ ${staffName} credentials approved and activated!`, 'success');
+        await fetchAndRenderRoster();
+        renderCompliance();
+        if (drawerBackdrop && drawerBackdrop.classList.contains('open')) {
+          const updated = LiveStore.staff.find(s => s.id === staffId);
+          if (updated) renderStaffDrawerTab(updated, 'tab-profile-overview');
+        }
+      } else {
+        showToast(res.error || 'Failed to approve staff credentials', 'warning');
+      }
+    } catch (err) {
+      showToast(err.message || 'Error approving staff credentials', 'warning');
     }
   };
 

@@ -35,6 +35,29 @@ function getAuthUser(req) {
  */
 router.get('/', async (req, res, next) => {
   try {
+    const authUser = getAuthUser(req) || (req.query?.staff_id ? { id: req.query.staff_id, email: req.query.staff_email } : null);
+    if (authUser && (authUser.role === 'healthcare_worker' || authUser.id)) {
+      try {
+        const [stRows] = await pool.query(
+          'SELECT credential_status, status FROM staff_roster WHERE id = ? OR email = ? LIMIT 1',
+          [authUser.id, authUser.email || '']
+        );
+        if (stRows && stRows.length > 0) {
+          const credStatus = stRows[0].credential_status;
+          const staffStatus = stRows[0].status;
+          if (credStatus !== 'verified' || staffStatus === 'pending_verification') {
+            return res.json({
+              success: true,
+              shifts: [],
+              locked: true,
+              credential_status: credStatus || 'pending',
+              message: 'Open shifts feed is locked pending clinical credential verification. Please upload required documents in your Credentials Vault.'
+            });
+          }
+        }
+      } catch (e) {}
+    }
+
     const [rows] = await pool.query(`
       SELECT r.id, r.request_code, r.facility_name, r.unit_department, r.role_requested,
              r.shift_type, r.status, r.urgency_level, r.start_date, r.created_at,
@@ -216,6 +239,22 @@ router.post('/clock-in', async (req, res, next) => {
     if (!user) {
       return res.status(401).json({ success: false, error: 'Authentication required. Please sign in.' });
     }
+
+    // Compliance Vetting Gate: only verified staff can clock in
+    try {
+      const [stRows] = await pool.query(
+        'SELECT credential_status, status FROM staff_roster WHERE id = ? OR email = ? LIMIT 1',
+        [user.id, user.email || '']
+      );
+      if (stRows && stRows.length > 0) {
+        if (stRows[0].credential_status !== 'verified' || stRows[0].status === 'pending_verification') {
+          return res.status(403).json({
+            success: false,
+            error: 'Clinical vetting required. Your credentials must be verified by an administrator before you can use the EVV Clock Station.'
+          });
+        }
+      }
+    } catch (e) {}
 
     // Check if already clocked in
     const [existing] = await pool.query(
@@ -866,18 +905,26 @@ router.post('/:id/claim', async (req, res, next) => {
     let staffName = user.full_name || 'Staff Member';
     try {
       const [rRows] = await pool.query(
-        'SELECT id, name, staff_code FROM staff_roster WHERE id = ? OR email = ? LIMIT 1',
+        'SELECT id, name, staff_code, status, credential_status FROM staff_roster WHERE id = ? OR email = ? LIMIT 1',
         [user.id, user.email || '']
       );
       if (rRows && rRows.length > 0) {
         rosterId = rRows[0].id;
         if (rRows[0].name) staffName = rRows[0].name;
+
+        // Compliance vetting check
+        if (rRows[0].credential_status !== 'verified' || rRows[0].status === 'pending_verification') {
+          return res.status(403).json({
+            success: false,
+            error: 'Your profile is currently pending clinical credential verification. You cannot claim shifts until approved by an administrator.'
+          });
+        }
       } else {
-        // Ensure staff_roster record exists so foreign key passes in MySQL
+        // Ensure staff_roster record exists with pending verification
         const staffCode = `STF-${Date.now().toString().slice(-4)}`;
         await pool.query(
           `INSERT INTO staff_roster (id, staff_code, name, role, specialty, region, phone, email, status, credential_status, hourly_rate, cpr_expiry_date)
-           VALUES (?, ?, ?, ?, 'General Care', 'Greater Toronto Area', ?, ?, 'available', 'verified', 0.00, '2027-12-31')`,
+           VALUES (?, ?, ?, ?, 'General Care', 'Greater Toronto Area', ?, ?, 'pending_verification', 'pending', 0.00, '2027-12-31')`,
           [
             user.id,
             staffCode,
@@ -887,9 +934,16 @@ router.post('/:id/claim', async (req, res, next) => {
             user.email || `${user.id}@divinefingershealthcare.ca`
           ]
         ).catch(() => {});
-        rosterId = user.id;
+        return res.status(403).json({
+          success: false,
+          error: 'Your profile is currently pending clinical credential verification. You cannot claim shifts until approved by an administrator.'
+        });
       }
-    } catch (e) {}
+    } catch (e) {
+      if (e.message && e.message.includes('pending')) {
+        return res.status(403).json({ success: false, error: e.message });
+      }
+    }
 
     if (shift.assigned_staff_id && (shift.assigned_staff_id === rosterId || shift.assigned_staff_id === user.id)) {
       return res.status(400).json({ success: false, error: 'You have already claimed this shift.' });

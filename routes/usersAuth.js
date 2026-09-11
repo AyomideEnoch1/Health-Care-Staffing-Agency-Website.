@@ -96,7 +96,7 @@ router.post('/register', async (req, res, next) => {
         const clinicalRole = (data.clinical_role && validRoles.includes(data.clinical_role)) ? data.clinical_role : 'RN';
         await pool.query(
           `INSERT INTO staff_roster (id, staff_code, name, role, specialty, region, phone, email, status, credential_status, hourly_rate, cpr_expiry_date)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'available', 'verified', 0.00, '2027-12-31')
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending_verification', 'pending', 0.00, '2027-12-31')
            ON DUPLICATE KEY UPDATE name = VALUES(name), role = VALUES(role), phone = VALUES(phone), email = VALUES(email)`,
           [
             userId,
@@ -121,7 +121,10 @@ router.post('/register', async (req, res, next) => {
       full_name: data.full_name.trim(),
       role: data.role,
       organization_name: data.organization_name || null,
-      phone: data.phone || null
+      phone: data.phone || null,
+      credential_status: data.role === 'healthcare_worker' ? 'pending' : 'verified',
+      staff_status: data.role === 'healthcare_worker' ? 'pending_verification' : 'available',
+      is_verified: data.role !== 'healthcare_worker'
     };
 
     const token = jwt.sign(tokenPayload, JWT_SECRET, { expiresIn: '7d' });
@@ -129,7 +132,9 @@ router.post('/register', async (req, res, next) => {
 
     return res.status(201).json({
       success: true,
-      message: 'Account created successfully.',
+      message: data.role === 'healthcare_worker'
+        ? 'Account created! Your clinical profile is pending verification by the compliance team.'
+        : 'Account created successfully.',
       redirectTo: 'portal.html',
       user: {
         id: userId,
@@ -137,7 +142,10 @@ router.post('/register', async (req, res, next) => {
         full_name: data.full_name.trim(),
         role: data.role,
         organization_name: data.organization_name || null,
-        phone: data.phone || null
+        phone: data.phone || null,
+        credential_status: data.role === 'healthcare_worker' ? 'pending' : 'verified',
+        staff_status: data.role === 'healthcare_worker' ? 'pending_verification' : 'available',
+        is_verified: data.role !== 'healthcare_worker'
       }
     });
   } catch (err) {
@@ -195,6 +203,28 @@ router.post('/login', authLoginLimiter, async (req, res, next) => {
           console.warn('[AUTH] Failed to update user last_login:', e.message);
         }
 
+        let credentialStatus = 'verified';
+        let staffStatus = 'available';
+        let clinicalRole = 'RN';
+        let staffCode = null;
+
+        if (user.role === 'healthcare_worker') {
+          credentialStatus = 'pending';
+          staffStatus = 'pending_verification';
+          try {
+            const [rosterRows] = await pool.query(
+              'SELECT id, staff_code, role, status, credential_status FROM staff_roster WHERE id = ? OR email = ? LIMIT 1',
+              [user.id, user.email]
+            );
+            if (rosterRows && rosterRows.length > 0) {
+              credentialStatus = rosterRows[0].credential_status || 'pending';
+              staffStatus = rosterRows[0].status || 'pending_verification';
+              clinicalRole = rosterRows[0].role || 'RN';
+              staffCode = rosterRows[0].staff_code;
+            }
+          } catch (e) {}
+        }
+
         // Issue standard User JWT session token
         const tokenPayload = {
           id: user.id,
@@ -202,7 +232,10 @@ router.post('/login', authLoginLimiter, async (req, res, next) => {
           full_name: user.full_name,
           role: user.role,
           organization_name: user.organization_name,
-          phone: user.phone || null
+          phone: user.phone || null,
+          credential_status: credentialStatus,
+          staff_status: staffStatus,
+          is_verified: credentialStatus === 'verified'
         };
 
         const token = jwt.sign(tokenPayload, JWT_SECRET, { expiresIn: '7d' });
@@ -219,7 +252,12 @@ router.post('/login', authLoginLimiter, async (req, res, next) => {
             full_name: user.full_name,
             role: user.role,
             organization_name: user.organization_name,
-            phone: user.phone
+            phone: user.phone,
+            credential_status: credentialStatus,
+            staff_status: staffStatus,
+            clinical_role: clinicalRole,
+            staff_code: staffCode,
+            is_verified: credentialStatus === 'verified'
           }
         });
       }
@@ -339,6 +377,28 @@ router.get('/me', async (req, res) => {
       }
     }
 
+    let credentialStatus = 'verified';
+    let staffStatus = 'available';
+    let clinicalRole = 'RN';
+    let staffCode = null;
+
+    if (user.role === 'healthcare_worker') {
+      credentialStatus = 'pending';
+      staffStatus = 'pending_verification';
+      try {
+        const [rosterRows] = await pool.query(
+          'SELECT id, staff_code, role, status, credential_status FROM staff_roster WHERE id = ? OR email = ? LIMIT 1',
+          [user.id, user.email]
+        );
+        if (rosterRows && rosterRows.length > 0) {
+          credentialStatus = rosterRows[0].credential_status || 'pending';
+          staffStatus = rosterRows[0].status || 'pending_verification';
+          clinicalRole = rosterRows[0].role || 'RN';
+          staffCode = rosterRows[0].staff_code;
+        }
+      } catch (e) {}
+    }
+
     return res.json({
       success: true,
       user: {
@@ -350,7 +410,12 @@ router.get('/me', async (req, res) => {
         facility_id: user.facility_id || null,
         client_role: user.client_role || 'requester',
         phone: user.phone || null,
-        created_at: user.created_at
+        created_at: user.created_at,
+        credential_status: credentialStatus,
+        staff_status: staffStatus,
+        clinical_role: clinicalRole,
+        staff_code: staffCode,
+        is_verified: credentialStatus === 'verified'
       }
     });
   } catch (err) {

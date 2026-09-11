@@ -6506,6 +6506,28 @@ html, body {
         </div>
       </header>
 
+      <!-- COMPLIANCE VETTING GATE BANNER -->
+      <div id="staff-compliance-gate-banner" style="display: none; background: linear-gradient(90deg, #FEF3C7 0%, #FFFBEB 100%); border-bottom: 2px solid #F59E0B; padding: 0.85rem 1.5rem; color: #92400E;">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="width: 36px; height: 36px; border-radius: 50%; background: #FDE68A; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0;">
+              ⏳
+            </div>
+            <div>
+              <strong style="font-size: 0.92rem; color: #92400E; display: block;">Clinical Vetting in Progress — Under Review by Compliance Team</strong>
+              <p style="margin: 0; font-size: 0.8rem; color: #78350F; line-height: 1.4;">
+                Open Shifts Feed, My Schedule, and EVV Clock Station are locked pending administrative credential verification. Please complete document upload in the Credentials Vault.
+              </p>
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <button type="button" onclick="switchStaffPage('staff-page-credentials', 'Clinical Credentials Vault')" style="background: #D97706; color: #FFFFFF; font-weight: 700; font-size: 0.82rem; padding: 0.45rem 0.9rem; border-radius: 6px; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+              <i data-lucide="shield-check" style="width: 14px; height: 14px;"></i> Credentials Vault
+            </button>
+          </div>
+        </div>
+      </div>
+
       <!-- SEGMENTED CONTENT PAGES CONTAINER -->
       <main class="portal-content-body">
 
@@ -7595,7 +7617,7 @@ html, body {
       const rawHash = (window.location.hash || '').toLowerCase();
 
       if (!verifiedUser) {
-        if (requestedRole === 'client' || rawHash.includes('client')) {
+        if (urlParams.get('demo') === 'client') {
           verifiedUser = {
             id: 'client-shn-01',
             email: 'client@divinefingershealthcare.ca',
@@ -7607,19 +7629,25 @@ html, body {
             phone: '(416) 284-8131'
           };
           sessionStorage.setItem('df_portal_user', JSON.stringify(verifiedUser));
-        } else {
-          // Default staff caregiver session for seamless operation
+        } else if (urlParams.get('demo') === 'sarah') {
           verifiedUser = {
             id: 'staff-nurse-sarah',
             email: 'sarah.jenkins@divinefingershealthcare.ca',
             full_name: 'Sarah Jenkins, RN',
             staff_role: 'RN',
             role: 'healthcare_worker',
+            credential_status: 'verified',
+            is_verified: true,
+            status: 'available',
             specialty: 'Emergency & Critical Care',
             region: 'Greater Toronto Area',
             phone: '(416) 555-0199'
           };
           sessionStorage.setItem('df_portal_user', JSON.stringify(verifiedUser));
+        } else {
+          // Unauthenticated visitors must sign in
+          window.location.replace('login.html' + (window.location.search || ''));
+          return;
         }
       }
 
@@ -10220,7 +10248,47 @@ function initStaffWorkspace(user) {
   loadStaffDocuments();
   initCredentialDropZone();
 
-  // 4. Activate Hash Routing
+  // 4. Compliance Vetting Gate evaluation
+  const isVettingPending = (user.credential_status !== 'verified' || user.is_verified === false || user.staff_status === 'pending_verification');
+
+  const gateBanner = document.getElementById('staff-compliance-gate-banner');
+  if (gateBanner) {
+    gateBanner.style.display = isVettingPending ? 'block' : 'none';
+  }
+
+  if (isVettingPending) {
+    const shiftsBadge = document.getElementById('staff-open-shifts-count-badge');
+    if (shiftsBadge) {
+      shiftsBadge.innerHTML = '🔒 Locked';
+      shiftsBadge.style.background = '#FEF3C7';
+      shiftsBadge.style.color = '#92400E';
+      shiftsBadge.style.borderColor = '#FCD34D';
+    }
+    const clockBadge = document.getElementById('staff-clock-nav-badge');
+    if (clockBadge) {
+      clockBadge.innerHTML = '🔒 Locked';
+      clockBadge.style.background = '#FEF3C7';
+      clockBadge.style.color = '#92400E';
+      clockBadge.style.borderColor = '#FCD34D';
+    }
+    const credBadge = document.querySelector('#staff-nav-credentials .nav-badge');
+    if (credBadge) {
+      credBadge.innerHTML = '⚠️ Required';
+      credBadge.style.background = '#FEF2F2';
+      credBadge.style.color = '#DC2626';
+      credBadge.style.borderColor = '#FECACA';
+    }
+
+    // Default route to credentials vault if not navigating to specific hash
+    const curHash = (window.location.hash || '').toLowerCase();
+    if (!curHash || curHash === '#' || curHash === '#overview') {
+      setTimeout(() => {
+        switchStaffPage('staff-page-credentials', 'Clinical Credentials Vault');
+      }, 50);
+    }
+  }
+
+  // 5. Activate Hash Routing
   initHashRouting('staff');
 
   if (window.lucide) lucide.createIcons();
@@ -10542,7 +10610,7 @@ async function handleStaffClockAction(action) {
 
       const data = await res.json();
       if (!res.ok || !data.success) {
-        throw new Error(data.message || 'Failed to record clock in.');
+        throw new Error(data.error || data.message || 'Failed to record clock in.');
       }
 
       alert('Shift Clock-In Verified successfully! EVV timestamp recorded.');
@@ -10815,6 +10883,25 @@ async function loadStaffOpenShifts() {
     let shifts = [];
     if (res.ok) {
       const data = await res.json();
+      if (data && data.locked) {
+        container.innerHTML = `
+          <div style="background: #FFFBEB; border: 2px solid #F59E0B; border-radius: 12px; padding: 3rem 1.5rem; text-align: center; max-width: 640px; margin: 2rem auto; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.08);">
+            <div style="width: 64px; height: 64px; border-radius: 50%; background: #FEF3C7; display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: 0 auto 1.25rem;">
+              🔒
+            </div>
+            <h3 style="font-size: 1.35rem; font-weight: 800; color: #92400E; margin: 0 0 0.5rem 0;">Open Shifts Feed Locked</h3>
+            <p style="color: #78350F; font-size: 0.92rem; line-height: 1.5; margin: 0 0 1.5rem 0;">
+              Clinical credentials vetting in progress. Public healthcare workers must be approved by an administrator before shift rates, facility details, and claiming are unlocked.
+            </p>
+            <button type="button" class="btn-primary-action" style="padding: 0.75rem 1.5rem; font-size: 0.9rem; justify-content: center; background: #D97706; margin: 0 auto; display: inline-flex;" onclick="switchStaffPage('staff-page-credentials', 'Clinical Credentials Vault')">
+              <i data-lucide="shield-check"></i> Complete Credentials Vault
+            </button>
+          </div>
+        `;
+        if (countBadge) countBadge.textContent = '🔒 Locked';
+        if (window.lucide) lucide.createIcons();
+        return;
+      }
       shifts = Array.isArray(data) ? data : (data.shifts || []);
     }
 
