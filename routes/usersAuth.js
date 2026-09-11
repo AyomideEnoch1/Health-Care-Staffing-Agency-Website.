@@ -53,6 +53,14 @@ router.post('/register', async (req, res, next) => {
     const emailClean = data.email.toLowerCase().trim();
     console.log(`[AUTH REGISTER] Request received for: ${emailClean} (role: ${data.role})`);
 
+    // Prohibit public self-registration for healthcare staff
+    if (data.role === 'healthcare_worker') {
+      return res.status(403).json({
+        success: false,
+        error: 'Public healthcare staff self-registration is disabled. Clinical staff accounts are provisioned exclusively by Divine Fingers Clinical Operations following credential vetting. To apply for our roster, please submit an application at /careers.html.'
+      });
+    }
+
     // Check if user already exists in users table
     const [existingUser] = await pool.query(
       'SELECT id FROM users WHERE email = ? LIMIT 1',

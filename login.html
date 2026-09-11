@@ -582,6 +582,14 @@
             <button type="submit" class="btn-submit-auth" id="btn-login-submit">
               <i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i> Sign In
             </button>
+
+            <div style="margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid var(--border-color); text-align: center; font-size: 0.82rem; color: var(--text-muted);">
+              Are you a nurse, RPN, or PSW looking to work with Divine Fingers?
+              <br>
+              <a href="careers.html" style="color: var(--brand-turquoise); font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; margin-top: 4px;">
+                <i data-lucide="file-text" style="width: 13px; height: 13px;"></i> Apply to Join Clinical Roster &rarr;
+              </a>
+            </div>
           </form>
         </div>
 
@@ -607,75 +615,77 @@
               <input type="hidden" id="reg-role" value="client">
             </div>
 
-            <div class="form-group">
-              <label class="form-label" for="reg-fullname">Full Name / Primary Contact</label>
-              <div class="input-wrapper">
-                <i data-lucide="user" class="field-icon"></i>
-                <input type="text" id="reg-fullname" class="auth-input" placeholder="e.g. Dr. Sarah Jenkins" required autocomplete="name">
+            <!-- Notice for Healthcare Workers: Self-registration closed, HR provisioned only -->
+            <div id="worker-application-gate" style="display: none; background: rgba(0, 168, 150, 0.06); border: 1px solid rgba(0, 168, 150, 0.3); border-radius: 12px; padding: 1.75rem 1.25rem; text-align: center; margin-top: 1rem;">
+              <div style="width: 52px; height: 52px; border-radius: 50%; background: rgba(0, 168, 150, 0.15); color: var(--brand-turquoise); display: flex; align-items: center; justify-content: center; margin: 0 auto 0.85rem;">
+                <i data-lucide="shield-alert" style="width: 26px; height: 26px;"></i>
               </div>
+              <h3 style="font-size: 1.05rem; font-weight: 800; color: var(--text-primary); margin: 0 0 0.5rem 0;">Clinical Accounts are Provisioned by HR</h3>
+              <p style="font-size: 0.83rem; color: var(--text-muted); line-height: 1.5; margin: 0 0 1.25rem 0;">
+                In accordance with Ontario health regulations (CNO &amp; MOH), healthcare workers cannot self-register accounts. All staff profiles and portal credentials are provisioned exclusively by Divine Fingers Human Resources following credential verification.
+              </p>
+              <a href="careers.html" class="btn-submit-auth" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; width: 100%; box-sizing: border-box;">
+                <i data-lucide="file-plus-2" style="width: 17px; height: 17px;"></i> Submit Clinical Application
+              </a>
             </div>
 
-            <!-- Organization Name (Shown for Client) -->
-            <div class="form-group" id="group-org-name">
-              <label class="form-label" for="reg-orgname">Facility or Organization Name</label>
-              <div class="input-wrapper">
-                <i data-lucide="building" class="field-icon"></i>
-                <input type="text" id="reg-orgname" class="auth-input" placeholder="e.g. Toronto Central Hospital" autocomplete="organization">
+            <!-- Client Facility Registration Fields -->
+            <div id="client-registration-fields">
+              <div class="form-group">
+                <label class="form-label" for="reg-fullname">Primary Contact Person</label>
+                <div class="input-wrapper">
+                  <i data-lucide="user" class="field-icon"></i>
+                  <input type="text" id="reg-fullname" class="auth-input" placeholder="e.g. Dr. Sarah Jenkins" autocomplete="name">
+                </div>
               </div>
-            </div>
 
-            <!-- Clinical Role (Shown for Healthcare Professional) -->
-            <div class="form-group" id="group-clinical-role" style="display: none;">
-              <label class="form-label" for="reg-clinical-role">Clinical Designation</label>
-              <div class="input-wrapper">
-                <i data-lucide="award" class="field-icon"></i>
-                <select id="reg-clinical-role" class="auth-input" style="padding-left: 2.85rem; appearance: auto;">
-                  <option value="RN">Registered Nurse (RN)</option>
-                  <option value="RPN">Registered Practical Nurse (RPN)</option>
-                  <option value="PSW">Personal Support Worker (PSW)</option>
-                  <option value="Companion">Caregiver / Companion</option>
-                  <option value="Travel Nurse">Travel Nurse</option>
-                </select>
+              <!-- Organization Name (Shown for Client) -->
+              <div class="form-group" id="group-org-name">
+                <label class="form-label" for="reg-orgname">Facility or Hospital Name</label>
+                <div class="input-wrapper">
+                  <i data-lucide="building" class="field-icon"></i>
+                  <input type="text" id="reg-orgname" class="auth-input" placeholder="e.g. Toronto Central Hospital" autocomplete="organization">
+                </div>
               </div>
-            </div>
 
-            <div class="form-group">
-              <label class="form-label" for="reg-email">Email Address</label>
-              <div class="input-wrapper">
-                <i data-lucide="mail" class="field-icon"></i>
-                <input type="email" id="reg-email" class="auth-input" placeholder="e.g. sjenkins@torontocentral.ca" required autocomplete="email">
+              <div class="form-group">
+                <label class="form-label" for="reg-email">Work Email Address</label>
+                <div class="input-wrapper">
+                  <i data-lucide="mail" class="field-icon"></i>
+                  <input type="email" id="reg-email" class="auth-input" placeholder="e.g. coordinator@hospital.ca" autocomplete="email">
+                </div>
               </div>
-            </div>
 
-            <div class="form-group">
-              <label class="form-label" for="reg-phone">Phone Number</label>
-              <div class="input-wrapper">
-                <i data-lucide="phone" class="field-icon"></i>
-                <input type="tel" id="reg-phone" class="auth-input" placeholder="e.g. (647) 555-0144" autocomplete="tel">
+              <div class="form-group">
+                <label class="form-label" for="reg-phone">Direct Phone Number</label>
+                <div class="input-wrapper">
+                  <i data-lucide="phone" class="field-icon"></i>
+                  <input type="tel" id="reg-phone" class="auth-input" placeholder="e.g. (647) 555-0144" autocomplete="tel">
+                </div>
               </div>
-            </div>
 
-            <div class="form-group">
-              <label class="form-label" for="reg-password">Password (Min. 6 characters)</label>
-              <div class="input-wrapper">
-                <i data-lucide="lock" class="field-icon"></i>
-                <input type="password" id="reg-password" class="auth-input" placeholder="Create a secure password" minlength="6" required autocomplete="new-password">
-                <button type="button" class="pwd-toggle-btn" onclick="togglePwdVisibility('reg-password', this)" aria-label="Toggle password">
-                  <i data-lucide="eye" style="width: 18px; height: 18px;"></i>
-                </button>
+              <div class="form-group">
+                <label class="form-label" for="reg-password">Password (Min. 6 characters)</label>
+                <div class="input-wrapper">
+                  <i data-lucide="lock" class="field-icon"></i>
+                  <input type="password" id="reg-password" class="auth-input" placeholder="Create a secure password" minlength="6" autocomplete="new-password">
+                  <button type="button" class="pwd-toggle-btn" onclick="togglePwdVisibility('reg-password', this)" aria-label="Toggle password">
+                    <i data-lucide="eye" style="width: 18px; height: 18px;"></i>
+                  </button>
+                </div>
               </div>
-            </div>
 
-            <div class="form-extras">
-              <label class="checkbox-container">
-                <input type="checkbox" id="reg-terms" required>
-                <span>I agree to the Terms of Service &amp; Privacy Policy</span>
-              </label>
-            </div>
+              <div class="form-extras">
+                <label class="checkbox-container">
+                  <input type="checkbox" id="reg-terms">
+                  <span>I agree to the Terms of Service &amp; Privacy Policy</span>
+                </label>
+              </div>
 
-            <button type="submit" class="btn-submit-auth" id="btn-register-submit">
-              <i data-lucide="user-check" style="width: 18px; height: 18px;"></i> Create My Account
-            </button>
+              <button type="submit" class="btn-submit-auth" id="btn-register-submit">
+                <i data-lucide="building-2" style="width: 18px; height: 18px;"></i> Register Facility Account
+              </button>
+            </div>
           </form>
         </div>
 
@@ -794,20 +804,21 @@
       document.getElementById('reg-role').value = role;
       const clientCard = document.getElementById('role-client-card');
       const workerCard = document.getElementById('role-worker-card');
-      const orgGroup = document.getElementById('group-org-name');
-      const clinicalGroup = document.getElementById('group-clinical-role');
+      const clientFields = document.getElementById('client-registration-fields');
+      const workerGate = document.getElementById('worker-application-gate');
 
       if (role === 'client') {
         clientCard.classList.add('selected');
         workerCard.classList.remove('selected');
-        if (orgGroup) orgGroup.style.display = 'block';
-        if (clinicalGroup) clinicalGroup.style.display = 'none';
+        if (clientFields) clientFields.style.display = 'block';
+        if (workerGate) workerGate.style.display = 'none';
       } else {
         clientCard.classList.remove('selected');
         workerCard.classList.add('selected');
-        if (orgGroup) orgGroup.style.display = 'none';
-        if (clinicalGroup) clinicalGroup.style.display = 'block';
+        if (clientFields) clientFields.style.display = 'none';
+        if (workerGate) workerGate.style.display = 'block';
       }
+      if (window.lucide) lucide.createIcons();
     }
 
     // Toggle Password Visibility
@@ -908,6 +919,10 @@
       clearAlerts();
 
       const role = document.getElementById('reg-role').value;
+      if (role === 'healthcare_worker') {
+        window.location.href = 'careers.html';
+        return;
+      }
       const full_name = document.getElementById('reg-fullname').value.trim();
       const email = document.getElementById('reg-email').value.trim();
       const phone = document.getElementById('reg-phone').value.trim();
