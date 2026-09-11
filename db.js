@@ -274,6 +274,7 @@ const inMemoryStore = {
       clinical_role: 'RN',
       phone: '(416) 555-0199',
       organization_name: null,
+      is_active: 1,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
     }
