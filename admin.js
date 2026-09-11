@@ -1463,34 +1463,71 @@
         if (LiveStore.auditLogs.length === 0) {
           tbody.innerHTML = `<tr><td colspan="7">${emptyState('🔒', 'Audit Ledger Empty', 'Immutable security events will record here.')}</td></tr>`;
         } else {
-          tbody.innerHTML = LiveStore.auditLogs.map(l => `
+          tbody.innerHTML = LiveStore.auditLogs.map(l => {
+            const sev = (l.severity || 'info').toLowerCase();
+            const sevClass = (sev === 'critical' || sev === 'danger') ? 'urgent' : (sev === 'warning' ? 'expiring' : 'verified');
+            const sevIcon = (sev === 'critical' || sev === 'danger') ? 'alert-octagon' : (sev === 'warning' ? 'alert-triangle' : 'shield-check');
+            const initials = ((l.actor_name || 'AD').trim().split(/\s+/).map(w => w[0]).join('').slice(0, 2) || 'AD').toUpperCase();
+
+            return `
             <tr class="table-card-row">
-              <td class="cell-primary" data-label="Security Action">
-                <div class="row-header-wrapper">
-                  <div class="user-meta-name">
-                    <span class="status-pill verified" style="font-weight:800;font-size:0.75rem;">${l.action}</span>
-                    <span class="user-role-sub" style="margin-top:4px;">👤 <strong>${l.actor_name}</strong> &bull; <span title="${formatUserDateTime(l.created_at, true)} (${USER_TIMEZONE})">${formatUserDateTime(l.created_at)}</span> <span style="font-size:0.72rem;color:var(--brand-cyan);font-weight:700;">(${formatRelativeTime(l.created_at)})</span></span>
-                  </div>
-                  <div class="row-status-top"><span class="status-pill ${l.severity === 'warning' || l.severity === 'critical' ? 'urgent' : 'verified'}">${l.severity.toUpperCase()}</span></div>
+              <td class="cell-grid-item tabular-nums" data-label="Log ID" style="font-family: monospace; font-size: 0.78rem; font-weight: 700; color: var(--brand-cyan);">
+                <div class="meta-label">Log ID</div>
+                <div class="meta-value">${l.id ? (l.id.length > 10 ? l.id.slice(0, 8) + '…' : l.id) : '—'}</div>
+              </td>
+              <td class="cell-grid-item" data-label="Timestamp (EST)">
+                <div class="meta-label">Timestamp</div>
+                <div class="meta-value">
+                  <div style="font-size: 0.82rem; font-weight: 600;" title="${formatUserDateTime(l.created_at, true)} (${USER_TIMEZONE})">${formatUserDateTime(l.created_at)}</div>
+                  <div style="font-size: 0.72rem; color: var(--text-muted); font-weight: 600;">${formatRelativeTime(l.created_at)}</div>
                 </div>
               </td>
-              <td class="cell-grid-item" data-label="Log ID">
-                <div class="meta-label">Audit Log ID</div>
-                <div class="meta-value tabular-nums">${l.id ? l.id.slice(0,8) : '—'}…</div>
+              <td class="cell-primary" data-label="Actor / Operator">
+                <div class="meta-label">Actor</div>
+                <div class="meta-value" style="display: flex; align-items: center; gap: 8px;">
+                  <div class="user-avatar-initials" style="width: 28px; height: 28px; font-size: 0.72rem; border-radius: 8px; flex-shrink: 0; background: rgba(0, 168, 150, 0.16); color: var(--brand-cyan); font-weight: 900; display: inline-flex; align-items: center; justify-content: center;">
+                    ${initials}
+                  </div>
+                  <div>
+                    <span style="font-weight: 700; font-size: 0.85rem; color: var(--text-primary); display: block;">${escapeHTML(l.actor_name || 'System Operator')}</span>
+                    <span style="font-size: 0.72rem; color: var(--text-muted);">${escapeHTML(l.ip_address || '127.0.0.1')}</span>
+                  </div>
+                </div>
               </td>
-              <td class="cell-grid-item" data-label="Target Entity">
-                <div class="meta-label">Target Entity</div>
-                <div class="meta-value">${l.target_entity}</div>
+              <td class="cell-grid-item" data-label="Action Executed">
+                <div class="meta-label">Action</div>
+                <div class="meta-value">
+                  <span class="status-pill" style="background: rgba(56, 189, 248, 0.14); color: #0284C7; border: 1px solid rgba(56, 189, 248, 0.35); font-weight: 800; font-size: 0.74rem;">
+                    <i data-lucide="activity" style="width: 12px; height: 12px; vertical-align: middle; margin-right: 3px;"></i>${escapeHTML(l.action || 'OPERATION')}
+                  </span>
+                </div>
               </td>
-              <td class="cell-subtitle" data-label="Event Details" style="grid-column: span 2; margin-top: 0.35rem;">
-                <div class="meta-label">Event Details</div>
-                <div class="meta-value" style="font-size:0.82rem;color:var(--text-secondary);">${l.details || '—'}</div>
+              <td class="cell-grid-item" data-label="Target Module">
+                <div class="meta-label">Target Module</div>
+                <div class="meta-value" style="font-weight: 600; font-size: 0.84rem; color: var(--text-secondary);">
+                  <span style="display: inline-flex; align-items: center; gap: 4px;">
+                    <i data-lucide="layers" style="width: 13px; height: 13px; color: var(--brand-turquoise);"></i>
+                    ${escapeHTML(l.target_entity || 'System')}
+                  </span>
+                </div>
               </td>
-              <td class="cell-status-desktop" data-label="Severity">
+              <td class="cell-subtitle" data-label="Details" style="max-width: 320px;">
+                <div class="meta-label">Details</div>
+                <div class="meta-value" style="font-size: 0.83rem; color: var(--text-secondary); line-height: 1.45; word-break: break-word;">
+                  ${escapeHTML(l.details || 'System operation executed and verified.')}
+                </div>
+              </td>
+              <td class="cell-status-desktop" data-label="Severity" style="text-align: center;">
                 <div class="meta-label">Severity</div>
-                <div class="meta-value"><span class="status-pill ${l.severity === 'warning' || l.severity === 'critical' ? 'urgent' : 'verified'}">${l.severity.toUpperCase()}</span></div>
+                <div class="meta-value">
+                  <span class="status-pill ${sevClass}" style="font-weight: 900; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px;">
+                    <i data-lucide="${sevIcon}" style="width: 12px; height: 12px; vertical-align: middle; margin-right: 3px;"></i>
+                    ${sev.toUpperCase()}
+                  </span>
+                </div>
               </td>
-            </tr>`).join('');
+            </tr>`;
+          }).join('');
         }
       }
 
@@ -1550,10 +1587,7 @@
       const admins = res.data || [];
       window._loadedAdmins = admins;
 
-      if (badge) {
-        badge.textContent = admins.length;
-        badge.style.display = admins.length > 0 ? 'inline-block' : 'none';
-      }
+      setBadge('badge-admins-count', admins.length);
 
       if (admins.length === 0) {
         const emptyHtml = `<tr><td colspan="8">${emptyState('👥', 'No Additional Admins', 'Create secondary dispatch and coordinator accounts above.')}</td></tr>`;
@@ -1564,12 +1598,12 @@
       }
 
       const roleLabelsMap = {
-        'super-admin': '<i data-lucide="shield-check" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;color:#0284C7;stroke-width:2.2px;"></i> Super Admin',
-        'dispatch': '<i data-lucide="radio" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;color:#D97706;stroke-width:2.2px;"></i> Dispatch Officer',
-        'care-coordinator': '<i data-lucide="stethoscope" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;color:#0D9488;stroke-width:2.2px;"></i> Care Coordinator',
-        'recruiter': '<i data-lucide="user-plus" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;color:#4F46E5;stroke-width:2.2px;"></i> Recruiter / HR',
-        'auditor': '<i data-lucide="file-check-2" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;color:#059669;stroke-width:2.2px;"></i> Compliance Auditor',
-        'custom': '<i data-lucide="sliders" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;color:#0284C7;stroke-width:2.2px;"></i> Custom Access'
+        'super-admin': 'Super Admin',
+        'dispatch': 'Dispatch Officer',
+        'care-coordinator': 'Care Coordinator',
+        'recruiter': 'Recruiter / HR',
+        'auditor': 'Compliance Auditor',
+        'custom': 'Custom Access'
       };
 
       const rowsHtml = admins.map(a => {
@@ -1585,10 +1619,10 @@
           : (a.role === 'auditor' ? 'role-auditor' : 'role-custom'))));
         const roleBadgeIcons = {
           'super-admin': 'shield-check',
-          'dispatch': 'send',
-          'care-coordinator': 'user-check',
-          'recruiter': 'briefcase',
-          'auditor': 'clipboard-check',
+          'dispatch': 'radio',
+          'care-coordinator': 'stethoscope',
+          'recruiter': 'user-plus',
+          'auditor': 'file-check-2',
           'custom': 'sliders'
         };
         const roleIcon = roleBadgeIcons[a.role] || 'shield';
@@ -1658,7 +1692,7 @@
             </td>
             <td class="cell-grid-item" data-label="Role">
               <div class="meta-label">Role Clearance</div>
-              <div class="meta-value"><span class="status-pill ${roleBadgeClass}"><i data-lucide="${roleIcon}" style="width:13.5px;height:13.5px;vertical-align:middle;margin-right:4px;"></i> ${roleLabel}</span></div>
+              <div class="meta-value"><span class="status-pill ${roleBadgeClass}"><i data-lucide="${roleIcon}" style="width:13.5px;height:13.5px;vertical-align:middle;margin-right:4px;"></i> ${escapeHTML(roleLabel)}</span></div>
             </td>
             <td class="cell-grid-item" data-label="Email Verification">
               <div class="meta-label">Verification</div>
@@ -4311,6 +4345,36 @@
 
   window.switchAdminTab = switchTab;
   window.LiveStore = LiveStore;
+
+  window.cleanDummyData = async function() {
+    if (!confirm('⚠️ Are you sure you want to purge all dummy/test data?\n\nThis will permanently delete all mock staffing requests, shift schedules, applicant submissions, inquiries, and test staff so you can test manually from an honest blank slate.')) {
+      return;
+    }
+    try {
+      const res = await apiRequest('/admin/clean-dummy-data', { method: 'POST' });
+      if (res && res.success) {
+        if (typeof showToast === 'function') {
+          showToast('✅ All dummy data purged! System is clean for manual testing.', 'success');
+        }
+        // Refresh all active data views immediately
+        try { if (typeof fetchAndRenderKpis === 'function') await fetchAndRenderKpis(); } catch (_) {}
+        try { if (typeof fetchAndRenderRequests === 'function') await fetchAndRenderRequests(); } catch (_) {}
+        try { if (typeof fetchAndRenderRoster === 'function') await fetchAndRenderRoster(); } catch (_) {}
+        try { if (typeof fetchAndRenderApplicants === 'function') await fetchAndRenderApplicants(); } catch (_) {}
+        try { if (typeof fetchAndRenderInquiries === 'function') await fetchAndRenderInquiries(); } catch (_) {}
+        try { if (typeof fetchAndRenderAudit === 'function') await fetchAndRenderAudit(); } catch (_) {}
+        try { if (typeof fetchAndRenderCalendarSchedule === 'function') await fetchAndRenderCalendarSchedule(); } catch (_) {}
+      } else {
+        if (typeof showToast === 'function') {
+          showToast(res.error || 'Failed to purge dummy data', 'error');
+        }
+      }
+    } catch (err) {
+      if (typeof showToast === 'function') {
+        showToast(err.message || 'Error communicating with database', 'error');
+      }
+    }
+  };
 
   if (collapseBtn && sidebar) {
     collapseBtn.addEventListener('click', () => sidebar.classList.toggle('collapsed'));

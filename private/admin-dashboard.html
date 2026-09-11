@@ -1053,6 +1053,24 @@
             </div>
           </div>
 
+          <!-- 3. Testing & Manual Verification Tools: Clear All Dummy Data -->
+          <div class="table-card" style="padding: 1.5rem; margin-bottom: 1.5rem; background: var(--bg-surface-elevated); border: 1.5px dashed rgba(239, 68, 68, 0.4); border-radius: 10px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+              <div>
+                <h3 style="font-size: 1.05rem; font-weight: 800; margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.5rem; color: #EF4444;">
+                  <i data-lucide="trash-2" style="width: 18px; height: 18px; color: #EF4444;"></i>
+                  Developer &amp; Testing Utilities: Clean Database
+                </h3>
+                <p style="color: var(--text-muted); font-size: 0.82rem; margin: 0;">
+                  Purge all mock staffing requests, test caregiver applications, dummy shifts, and sample timecard punches so you can test end-to-end workflows manually from a clean slate.
+                </p>
+              </div>
+              <button type="button" class="btn-secondary-action danger-btn" id="btn-purge-dummy-data" style="padding: 0.55rem 1.25rem; font-size: 0.85rem; font-weight: 800; border-radius: 8px; display: inline-flex; align-items: center; gap: 6px;" onclick="window.cleanDummyData()">
+                <i data-lucide="trash" style="width: 15px; height: 15px;"></i> Clear All Dummy Data
+              </button>
+            </div>
+          </div>
+
           <div class="table-card" style="padding: 1.75rem;">
             <h2 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 0.5rem;">Security &amp; System Audit Log</h2>
             <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.5rem;">

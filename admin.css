@@ -482,9 +482,10 @@ body {
 .nav-badge {
   background: #00F5D4;
   color: #050B14 !important; /* High-contrast crisp black/navy on luminous cyan */
-  font-size: 0.74rem;
+  font-size: 0.72rem;
   font-weight: 900 !important;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-variant-numeric: tabular-nums;
   min-width: 22px;
   height: 22px;
   padding: 0 6px;
@@ -493,10 +494,15 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  text-align: center;
   line-height: 1;
   letter-spacing: -0.02em;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.35);
   flex-shrink: 0;
+  align-self: center;
+  box-sizing: border-box;
+  vertical-align: middle;
+  pointer-events: none;
 }
 
 [data-theme="dark"] .nav-badge {
@@ -2366,7 +2372,7 @@ select optgroup,
 
 .scheduler-table {
   width: 100%;
-  min-width: 1250px;
+  min-width: 1720px;
   border-collapse: separate;
   border-spacing: 0;
   border: none;
@@ -2374,11 +2380,12 @@ select optgroup,
 }
 
 .scheduler-table th {
-  padding: 0.85rem 0.75rem;
+  padding: 0.95rem 0.85rem;
   background: var(--bg-subtle);
   border-bottom: 1.5px solid var(--border-color);
   border-right: 1px solid var(--border-color);
   text-align: center;
+  min-width: 210px;
 }
 
 .scheduler-table th:last-child {
@@ -2387,18 +2394,19 @@ select optgroup,
 
 .scheduler-table th.fac-col-header {
   text-align: left;
-  min-width: 220px;
-  width: 220px;
-  padding-left: 1.1rem;
+  min-width: 250px;
+  width: 250px;
+  padding-left: 1.25rem;
 }
 
 .scheduler-table td {
-  padding: 0.75rem 0.65rem;
+  padding: 0.85rem 0.75rem;
   border-bottom: 1px solid var(--border-color);
   border-right: 1px solid var(--border-color);
   vertical-align: top;
   background: var(--bg-card);
   transition: background var(--transition-fast);
+  min-width: 210px;
 }
 
 .scheduler-table td:last-child {
@@ -2407,9 +2415,9 @@ select optgroup,
 
 .scheduler-table td.fac-col-cell {
   background: var(--bg-subtle);
-  padding: 1.1rem 1rem;
-  min-width: 220px;
-  width: 220px;
+  padding: 1.25rem 1.15rem;
+  min-width: 250px;
+  width: 250px;
 }
 
 [data-theme="dark"] .scheduler-table td.fac-col-cell {

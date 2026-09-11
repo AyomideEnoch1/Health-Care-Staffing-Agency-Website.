@@ -445,9 +445,34 @@ function handleInMemoryQuery(sql, params = []) {
 
   // 9. AUDIT_LOGS
   if (normalized.includes('audit_logs')) {
-    if (normalized.startsWith('select')) return [inMemoryStore.audit_logs];
+    if (normalized.startsWith('select')) {
+      return [inMemoryStore.audit_logs.map(log => ({
+        id: log.id,
+        admin_id: log.admin_id || null,
+        actor_name: log.actor_name || 'System Operator',
+        action: log.action || 'SECURITY_EVENT',
+        target_entity: log.target_entity || 'System',
+        target_id: log.target_id || null,
+        details: log.details || 'System operation executed successfully',
+        severity: log.severity || 'info',
+        ip_address: log.ip_address || '127.0.0.1',
+        created_at: log.created_at || new Date().toISOString()
+      }))];
+    }
     if (normalized.startsWith('insert')) {
-      inMemoryStore.audit_logs.push({ id: params[0] || crypto.randomUUID(), action: params[3] || 'ACTION', created_at: new Date().toISOString() });
+      const newLog = {
+        id: params[0] || crypto.randomUUID(),
+        admin_id: params[1] || null,
+        actor_name: params[2] || 'System Operator',
+        action: params[3] || 'ACTION',
+        target_entity: params[4] || 'System',
+        target_id: params[5] || null,
+        details: params[6] || 'System operation recorded',
+        severity: params[7] || 'info',
+        ip_address: params[8] || '127.0.0.1',
+        created_at: new Date().toISOString()
+      };
+      inMemoryStore.audit_logs.unshift(newLog);
       return [{ affectedRows: 1 }];
     }
     if (normalized.startsWith('delete')) {

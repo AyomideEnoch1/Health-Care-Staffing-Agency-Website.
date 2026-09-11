@@ -6712,44 +6712,7 @@ html, body {
               </div>
             </div>
 
-            <!-- Hero Time & Telemetry Display Box -->
-            <div class="clock-display-hero">
-              <div class="clock-hero-left">
-                <div class="clock-date-tag" id="clock-device-date">Loading date...</div>
-                <div class="clock-digital-time" id="clock-device-time">00:00:00</div>
-                <div class="clock-tz-sub" id="clock-device-zone">Eastern Time (America/Toronto) • NTP Synced</div>
-              </div>
 
-              <div class="clock-hero-center">
-                <div style="font-size: 0.72rem; font-weight: 800; letter-spacing: 1.2px; text-transform: uppercase; color: #94A3B8; margin-bottom: 4px;">
-                  Ontario MOH EVV Telemetry
-                </div>
-                <div style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.95rem; font-weight: 800; color: #34D399; margin: 0.35rem 0;">
-                  <span class="pulse-dot" style="background:#10B981;"></span> Geofence GPS Active
-                </div>
-                <div style="font-size: 0.75rem; color: #CBD5E1; display: flex; align-items: center; gap: 5px;">
-                  <i data-lucide="shield-check" style="width: 14px; height: 14px; color: #38BDF8;"></i>
-                  <span>Cryptographic Geotagging • 50m Radius</span>
-                </div>
-              </div>
-
-              <div class="clock-hero-right">
-                <div class="clock-timer-container" id="clock-shift-timer-box" style="display: none; flex-direction: column;">
-                  <span class="timer-label">
-                    <span class="pulse-dot" style="background:#10B981;"></span> Active Shift Duration
-                  </span>
-                  <div class="timer-digits" id="clock-duration-timer">00:00:00</div>
-                  <span class="timer-sub" id="clock-active-facility-text">Shift in progress</span>
-                </div>
-                <div class="clock-off-duty-box" id="clock-off-duty-box" style="display: flex; flex-direction: column;">
-                  <div style="font-size: 0.72rem; font-weight: 800; letter-spacing: 1.2px; text-transform: uppercase; color: #94A3B8; margin-bottom: 4px;">
-                    Duty Status &amp; Dispatch
-                  </div>
-                  <div style="font-size: 1.15rem; font-weight: 800; color: #FFFFFF; margin: 0.2rem 0;">Ready for Dispatch</div>
-                  <span style="font-size: 0.75rem; color: #94A3B8;">Standby for 1-Tap Shift Punch</span>
-                </div>
-              </div>
-            </div>
 
             <!-- Active Shift Details (When Clocked In) -->
             <div id="clock-active-details" class="active-shift-container" style="display: none; padding: 1.6rem; margin-top: 1.25rem;">
@@ -6765,10 +6728,18 @@ html, body {
                     <span id="active-unit-dept">General Unit</span> • <strong id="active-role-title" style="color: #15803D;">Registered Nurse (RN)</strong>
                   </div>
                 </div>
-                <div style="text-align: right; background: #FFFFFF; padding: 0.65rem 1.1rem; border-radius: 10px; border: 1px solid #BBF7D0; box-shadow: 0 2px 6px rgba(22, 101, 52, 0.06);">
-                  <span style="font-size: 0.72rem; color: #166534; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; display: block;">Clock In Timestamp</span>
-                  <div id="active-clockin-time" style="font-size: 1.05rem; font-weight: 900; color: #14532D;">
-                    —
+                <div style="text-align: right; background: #FFFFFF; padding: 0.65rem 1.1rem; border-radius: 10px; border: 1px solid #BBF7D0; box-shadow: 0 2px 6px rgba(22, 101, 52, 0.06); display: flex; gap: 1.25rem; align-items: center;">
+                  <div>
+                    <span style="font-size: 0.72rem; color: #166534; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; display: block;">Clock In Time</span>
+                    <div id="active-clockin-time" style="font-size: 1.05rem; font-weight: 900; color: #14532D;">
+                      —
+                    </div>
+                  </div>
+                  <div style="border-left: 1px solid #BBF7D0; padding-left: 1.25rem;">
+                    <span style="font-size: 0.72rem; color: #166534; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; display: block;">Duration</span>
+                    <div id="clock-duration-timer" style="font-size: 1.05rem; font-weight: 900; color: #15803D; font-family: monospace;">
+                      00:00:00
+                    </div>
                   </div>
                 </div>
               </div>
