@@ -7566,6 +7566,59 @@ html, body {
     </div>
   </div>
 
+  <!-- 4. Staff Clinical Credentials Required to Claim Shift Modal -->
+  <div id="staff-credential-required-modal" class="portal-modal-overlay" style="display: none;" onclick="if(event.target === this) closeCredentialRequiredModal();">
+    <div class="portal-modal-box" style="max-width: 580px;">
+      <div class="portal-modal-header" style="background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%); border-bottom: 1.5px solid #FCD34D;">
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+          <div style="width: 42px; height: 42px; border-radius: 50%; background: #FDE68A; color: #B45309; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <i data-lucide="shield-alert" style="width: 24px; height: 24px;"></i>
+          </div>
+          <div>
+            <h3 style="margin: 0; font-size: 1.15rem; font-weight: 800; color: #92400E; font-family: var(--font-heading);">Clinical Credentials Required</h3>
+            <p style="margin: 2px 0 0; font-size: 0.8rem; color: #B45309;">Patient Safety &amp; Ministry of Health Compliance Gate</p>
+          </div>
+        </div>
+        <button type="button" class="portal-modal-close" onclick="closeCredentialRequiredModal()" aria-label="Close modal">
+          <i data-lucide="x" style="width: 18px; height: 18px; color: #78350F;"></i>
+        </button>
+      </div>
+
+      <div class="portal-modal-body" style="padding: 1.5rem;">
+        <div style="background: #FFF7ED; border: 1px solid #FFEDD5; border-radius: 8px; padding: 0.9rem 1rem; margin-bottom: 1.25rem;">
+          <div style="font-weight: 800; color: #C2410C; font-size: 0.88rem; margin-bottom: 0.25rem; display: flex; align-items: center; gap: 6px;">
+            <i data-lucide="lock" style="width: 15px; height: 15px;"></i> Shift Claiming is Blocked
+          </div>
+          <p style="margin: 0; font-size: 0.82rem; color: #7C2D12; line-height: 1.5;">
+            Under Ontario Ministry of Health and CNO regulatory standards, all healthcare providers must hold verified, active credentials before claiming or attending facility placements.
+          </p>
+        </div>
+
+        <div style="margin-bottom: 1.25rem;">
+          <div style="font-size: 0.82rem; font-weight: 800; color: var(--navy); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.65rem;">
+            Unmet Requirements for Your Profile:
+          </div>
+          <div id="claim-missing-reqs-container" style="display: flex; flex-direction: column; gap: 0.65rem;">
+            <!-- Dynamically injected items -->
+          </div>
+        </div>
+
+        <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 0.85rem 1rem; font-size: 0.78rem; color: #64748B; line-height: 1.45;">
+          💡 <strong>What to do:</strong> Click the button below to upload your missing documents into the Credentials Vault. Once submitted, our Clinical Operations Dispatch desk reviews submissions promptly to unlock full shift claiming and automated dispatch.
+        </div>
+      </div>
+
+      <div class="portal-modal-footer" style="padding: 1rem 1.5rem; background: #F8FAFC; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+        <button type="button" class="client-btn client-btn-ghost" onclick="closeCredentialRequiredModal()">
+          Close
+        </button>
+        <button type="button" class="client-btn client-btn-primary" onclick="goToCredentialsVault()" style="background: #0284C7; font-weight: 800; display: inline-flex; align-items: center; gap: 0.45rem;">
+          <i data-lucide="upload-cloud" style="width: 16px; height: 16px;"></i> Upload Missing Credentials Now &rarr;
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script>
     let currentUser = null;
 
@@ -10872,6 +10925,66 @@ async function loadPunchHistory() {
 // ------------------------------------------------------------------------
 // Open Shifts Feed & Claiming
 // ------------------------------------------------------------------------
+let currentStaffCompliance = null;
+
+function openCredentialRequiredModal(data) {
+  const modal = document.getElementById('staff-credential-required-modal');
+  const container = document.getElementById('claim-missing-reqs-container');
+  if (!modal) return;
+
+  const missing = (data && Array.isArray(data.missing_requirements)) ? data.missing_requirements : [];
+  if (container) {
+    if (missing.length === 0) {
+      container.innerHTML = `
+        <div style="background: #FEF2F2; border: 1.5px solid #FECACA; border-radius: 8px; padding: 0.9rem 1rem; font-size: 0.84rem; color: #991B1B; display: flex; align-items: flex-start; gap: 0.6rem;">
+          <i data-lucide="alert-triangle" style="width: 18px; height: 18px; flex-shrink: 0; margin-top: 2px; color: #DC2626;"></i>
+          <div>
+            <div style="font-weight: 800; color: #7F1D1D; margin-bottom: 3px;">Clinical Verification Pending</div>
+            <div style="color: #991B1B; font-size: 0.8rem; line-height: 1.45;">
+              ${escapeHTML(data?.error || data?.message || 'Your clinical documents are awaiting verification by Clinical Operations Dispatch. You will be able to claim shifts immediately upon approval.')}
+            </div>
+          </div>
+        </div>
+      `;
+    } else {
+      container.innerHTML = missing.map(m => `
+        <div style="background: #FEF2F2; border: 1.5px solid #FECACA; border-radius: 8px; padding: 0.85rem 1rem; display: flex; align-items: flex-start; gap: 0.75rem;">
+          <span style="background: #DC2626; color: #FFFFFF; font-size: 0.68rem; font-weight: 800; padding: 0.2rem 0.5rem; border-radius: 4px; flex-shrink: 0; margin-top: 2px;">
+            ACTION NEEDED
+          </span>
+          <div style="flex: 1;">
+            <div style="font-weight: 800; color: #7F1D1D; font-size: 0.88rem;">${escapeHTML(m.name || 'Required Credential')}</div>
+            <div style="color: #991B1B; font-size: 0.8rem; margin-top: 3px; line-height: 1.4;">${escapeHTML(m.reason || 'Must be uploaded to your Clinical Credentials Vault')}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+  }
+
+  modal.style.display = 'flex';
+  if (window.lucide) lucide.createIcons();
+}
+
+function closeCredentialRequiredModal() {
+  const modal = document.getElementById('staff-credential-required-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+function goToCredentialsVault() {
+  closeCredentialRequiredModal();
+  switchStaffPage('staff-page-credentials', 'Clinical Credentials Vault');
+  setTimeout(() => {
+    const form = document.getElementById('staff-credential-upload-form') || document.getElementById('worker-credentials-panel');
+    if (form) form.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, 250);
+}
+
+function handleBlockedClaimClick(shiftId) {
+  openCredentialRequiredModal(currentStaffCompliance || {
+    message: 'Your profile has unmet clinical credential requirements. Please upload all required documents to enable shift claiming.'
+  });
+}
+
 async function loadStaffOpenShifts() {
   const container = document.getElementById('worker-shifts-container');
   const countBadge = document.getElementById('staff-open-shifts-count-badge');
@@ -10883,17 +10996,37 @@ async function loadStaffOpenShifts() {
     let shifts = [];
     if (res.ok) {
       const data = await res.json();
+      if (data && data.compliance) {
+        currentStaffCompliance = data.compliance;
+      }
       if (data && data.locked) {
+        currentStaffCompliance = {
+          isCompliant: false,
+          missing_requirements: data.missing_requirements || []
+        };
+        const missingListHtml = (data.missing_requirements && data.missing_requirements.length > 0)
+          ? `<div style="text-align: left; max-width: 480px; margin: 1.25rem auto; display: flex; flex-direction: column; gap: 0.5rem;">` +
+            data.missing_requirements.map(m => `
+              <div style="background: #FEF2F2; border: 1px solid #FECACA; border-radius: 6px; padding: 0.6rem 0.85rem; font-size: 0.8rem; color: #991B1B; display: flex; align-items: flex-start; gap: 6px;">
+                <span style="background: #DC2626; color: #FFFFFF; font-size: 0.65rem; font-weight: 800; padding: 0.15rem 0.4rem; border-radius: 3px; flex-shrink: 0; margin-top: 1px;">REQUIRED</span>
+                <div>
+                  <strong>${escapeHTML(m.name)}</strong>: ${escapeHTML(m.reason)}
+                </div>
+              </div>
+            `).join('') + `</div>`
+          : '';
+
         container.innerHTML = `
-          <div style="background: #FFFBEB; border: 2px solid #F59E0B; border-radius: 12px; padding: 3rem 1.5rem; text-align: center; max-width: 640px; margin: 2rem auto; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.08);">
+          <div style="background: #FFFBEB; border: 2px solid #F59E0B; border-radius: 12px; padding: 2.5rem 1.5rem; text-align: center; max-width: 640px; margin: 2rem auto; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.08);">
             <div style="width: 64px; height: 64px; border-radius: 50%; background: #FEF3C7; display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: 0 auto 1.25rem;">
               🔒
             </div>
             <h3 style="font-size: 1.35rem; font-weight: 800; color: #92400E; margin: 0 0 0.5rem 0;">Open Shifts Feed Locked</h3>
-            <p style="color: #78350F; font-size: 0.92rem; line-height: 1.5; margin: 0 0 1.5rem 0;">
-              Clinical credentials vetting in progress. Public healthcare workers must be approved by an administrator before shift rates, facility details, and claiming are unlocked.
+            <p style="color: #78350F; font-size: 0.92rem; line-height: 1.5; margin: 0 0 1rem 0;">
+              Clinical credentials vetting in progress. Public healthcare workers must fulfill all regulatory requirements before shift rates, facility details, and claiming are unlocked.
             </p>
-            <button type="button" class="btn-primary-action" style="padding: 0.75rem 1.5rem; font-size: 0.9rem; justify-content: center; background: #D97706; margin: 0 auto; display: inline-flex;" onclick="switchStaffPage('staff-page-credentials', 'Clinical Credentials Vault')">
+            ${missingListHtml}
+            <button type="button" class="btn-primary-action" style="padding: 0.75rem 1.5rem; font-size: 0.9rem; justify-content: center; background: #D97706; margin: 1rem auto 0; display: inline-flex;" onclick="goToCredentialsVault()">
               <i data-lucide="shield-check"></i> Complete Credentials Vault
             </button>
           </div>
@@ -10960,8 +11093,36 @@ function renderFilteredOpenShifts() {
     });
   }
 
+  const isBlocked = currentStaffCompliance && currentStaffCompliance.isCompliant === false;
+  const missingCount = currentStaffCompliance?.missing_requirements?.length || 0;
+
+  const complianceBanner = isBlocked ? `
+    <div style="background: #FFFBEB; border: 1.5px solid #F59E0B; border-radius: 10px; padding: 1rem 1.25rem; margin-bottom: 1.25rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; box-shadow: 0 2px 6px rgba(245, 158, 11, 0.06);">
+      <div style="display: flex; align-items: flex-start; gap: 0.75rem; flex: 1; min-width: 260px;">
+        <div style="background: #FEF3C7; color: #D97706; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+          <i data-lucide="shield-alert" style="width: 22px; height: 22px;"></i>
+        </div>
+        <div>
+          <div style="font-weight: 800; color: #92400E; font-size: 0.95rem;">⚠️ Clinical Requirements Notice</div>
+          <div style="font-size: 0.82rem; color: #78350F; margin-top: 3px; line-height: 1.45;">
+            You have unmet clinical requirements (${missingCount} pending). You can view open shifts below, but must fulfill all credentials before claiming.
+          </div>
+        </div>
+      </div>
+      <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <button type="button" class="btn-primary-action" onclick="openCredentialRequiredModal(currentStaffCompliance)" style="background: #D97706; font-size: 0.8rem; font-weight: 700; padding: 0.5rem 0.9rem; display: inline-flex; align-items: center; gap: 5px;">
+          <i data-lucide="list-checks" style="width: 14px; height: 14px;"></i> View Requirements (${missingCount})
+        </button>
+        <button type="button" class="btn-secondary-action" onclick="goToCredentialsVault()" style="font-size: 0.8rem; font-weight: 700; padding: 0.5rem 0.9rem; display: inline-flex; align-items: center; gap: 5px;">
+          <i data-lucide="upload-cloud" style="width: 14px; height: 14px;"></i> Upload Vault
+        </button>
+      </div>
+    </div>
+  ` : '';
+
   if (!filtered || filtered.length === 0) {
     container.innerHTML = `
+      ${complianceBanner}
       <div style="text-align: center; padding: 2.5rem 1rem; background: #F8FAFC; border-radius: 8px; border: 1px dashed #CBD5E1;">
         <i data-lucide="inbox" style="width: 32px; height: 32px; color: #94A3B8; margin-bottom: 0.5rem;"></i>
         <div style="font-weight: 700; color: var(--navy); font-size: 0.95rem;">No Open Shifts Matching Filter</div>
@@ -10972,7 +11133,7 @@ function renderFilteredOpenShifts() {
     return;
   }
 
-  container.innerHTML = filtered.map(s => {
+  container.innerHTML = complianceBanner + filtered.map(s => {
     const d = s.start_date ? new Date(s.start_date) : null;
     const dateStr = d && !isNaN(d.getTime()) ? d.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' }) : 'Immediate Placement';
     const urgencyBadge = s.urgency_level === 'urgent' || s.urgency_level === 'high' 
@@ -11003,9 +11164,15 @@ function renderFilteredOpenShifts() {
         </div>
 
         <div style="text-align: right;">
-          <button type="button" class="btn-claim-shift" id="btn-claim-${s.id}" onclick="claimShift('${s.id}', this)" style="background: #0284C7; color: #FFFFFF; font-weight: 800; border: none; padding: 0.55rem 1.1rem; border-radius: 6px; font-size: 0.82rem; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; transition: all 0.2s ease;">
-            <i data-lucide="check" style="width: 15px; height: 15px;"></i> Claim Shift
-          </button>
+          ${isBlocked ? `
+            <button type="button" class="btn-claim-shift" id="btn-claim-${s.id}" onclick="handleBlockedClaimClick('${s.id}')" style="background: #D97706; color: #FFFFFF; font-weight: 800; border: none; padding: 0.55rem 1.1rem; border-radius: 6px; font-size: 0.82rem; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; transition: all 0.2s ease;">
+              <i data-lucide="shield-alert" style="width: 15px; height: 15px;"></i> Credentials Required
+            </button>
+          ` : `
+            <button type="button" class="btn-claim-shift" id="btn-claim-${s.id}" onclick="claimShift('${s.id}', this)" style="background: #0284C7; color: #FFFFFF; font-weight: 800; border: none; padding: 0.55rem 1.1rem; border-radius: 6px; font-size: 0.82rem; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; transition: all 0.2s ease;">
+              <i data-lucide="check" style="width: 15px; height: 15px;"></i> Claim Shift
+            </button>
+          `}
         </div>
       </div>
     `;
@@ -11055,6 +11222,16 @@ async function claimShift(shiftId, btn) {
     });
     const data = await res.json();
     if (!res.ok || !data.success) {
+      if (res.status === 403 || data.code === 'CREDENTIALS_REQUIRED' || (data.missing_requirements && data.missing_requirements.length > 0)) {
+        if (btn) {
+          btn.disabled = false;
+          btn.style.opacity = '1';
+          btn.innerHTML = originalHtml;
+          if (window.lucide) lucide.createIcons();
+        }
+        openCredentialRequiredModal(data);
+        return;
+      }
       throw new Error(data.error || data.message || 'Unable to claim shift.');
     }
 

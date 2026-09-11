@@ -30,31 +30,156 @@ function getAuthUser(req) {
 }
 
 /**
+ * Helper: Evaluates a clinical staff member's compliance requirements
+ * Checks CNO license, CPR/BLS expiry, Vulnerable Sector Check (VSS),
+ * N95 Mask Fit test, and uploaded verification documents.
+ */
+async function evaluateStaffCompliance(staffId, staffEmail) {
+  let rosterStaff = null;
+  try {
+    const [rRows] = await pool.query(
+      `SELECT id, name, staff_code, role, status, credential_status,
+              cno_registration_num, cpr_expiry_date, vss_status, n95_fit_test
+       FROM staff_roster
+       WHERE id = ? OR email = ?
+       ORDER BY (id = ?) DESC
+       LIMIT 1`,
+      [staffId, staffEmail || '', staffId]
+    );
+    if (rRows && rRows.length > 0) {
+      rosterStaff = rRows[0];
+    }
+  } catch (e) {
+    console.warn('[Compliance Lookup Warning]:', e.message);
+  }
+
+  // Also lookup documents in staff_documents
+  let docs = [];
+  try {
+    const queryId = rosterStaff ? rosterStaff.id : staffId;
+    const [dRows] = await pool.query(
+      `SELECT id, doc_type, title, expiry_date, created_at
+       FROM staff_documents
+       WHERE staff_id = ? OR staff_id = ?`,
+      [queryId, staffId]
+    );
+    if (dRows && Array.isArray(dRows)) {
+      docs = dRows;
+    }
+  } catch (e) {}
+
+  const missingRequirements = [];
+  const uploadedDocTypes = new Set(docs.map(d => (d.doc_type || '').toLowerCase()));
+
+  const role = (rosterStaff?.role || 'RN').toUpperCase();
+
+  // 1. Regulatory Nursing License / Professional Certification
+  const hasCnoDoc = uploadedDocTypes.has('cno_license') || uploadedDocTypes.has('license') || uploadedDocTypes.has('registration');
+  const hasCnoNum = Boolean(rosterStaff?.cno_registration_num && String(rosterStaff.cno_registration_num).trim().length > 2);
+  if (['RN', 'RPN'].includes(role)) {
+    if (!hasCnoDoc && !hasCnoNum) {
+      missingRequirements.push({
+        key: 'cno_license',
+        name: 'College of Nurses of Ontario (CNO) Registration License',
+        reason: 'Missing active CNO registration number or certificate upload for ' + role
+      });
+    }
+  } else if (role === 'PSW') {
+    const hasPswDoc = uploadedDocTypes.has('psw_certificate') || uploadedDocTypes.has('certificate') || hasCnoDoc;
+    if (!hasPswDoc && !hasCnoNum) {
+      missingRequirements.push({
+        key: 'psw_certificate',
+        name: 'Personal Support Worker (PSW) Certificate / Diploma',
+        reason: 'Missing approved Personal Support Worker certification document'
+      });
+    }
+  }
+
+  // 2. BLS / CPR Certification
+  const hasCprDoc = uploadedDocTypes.has('cpr_bls') || uploadedDocTypes.has('cpr') || uploadedDocTypes.has('bls');
+  if (!rosterStaff?.cpr_expiry_date && !hasCprDoc) {
+    missingRequirements.push({
+      key: 'cpr_bls',
+      name: 'BLS / CPR Certification Card',
+      reason: 'Current Heart & Stroke or Red Cross CPR/BLS certification card is required'
+    });
+  } else if (rosterStaff?.cpr_expiry_date) {
+    const expDate = new Date(rosterStaff.cpr_expiry_date);
+    if (!isNaN(expDate.getTime()) && expDate < new Date()) {
+      missingRequirements.push({
+        key: 'cpr_bls',
+        name: 'BLS / CPR Certification (Expired)',
+        reason: `Your CPR certification expired on ${rosterStaff.cpr_expiry_date}. Please upload your renewal card.`
+      });
+    }
+  }
+
+  // 3. Vulnerable Sector Screening (Police Record Check)
+  const hasVssDoc = uploadedDocTypes.has('vss') || uploadedDocTypes.has('police_check') || uploadedDocTypes.has('background_check');
+  const vssVal = (rosterStaff?.vss_status || '').toLowerCase();
+  const vssOk = vssVal.includes('clear') || vssVal.includes('verified') || vssVal.includes('valid');
+  if (!hasVssDoc && !vssOk) {
+    missingRequirements.push({
+      key: 'vss',
+      name: 'Vulnerable Sector Screening (Police Record Check)',
+      reason: 'Police record check issued within the last 12 months is required for patient safety'
+    });
+  }
+
+  // 4. N95 Respirator Mask Fit Test Card
+  const hasN95Doc = uploadedDocTypes.has('n95_fit') || uploadedDocTypes.has('mask_fit') || uploadedDocTypes.has('n95');
+  const n95Val = (rosterStaff?.n95_fit_test || '').toLowerCase();
+  const n95Ok = n95Val.includes('valid') || n95Val.includes('passed') || n95Val.includes('3m') || n95Val.includes('verified');
+  if (!hasN95Doc && !n95Ok) {
+    missingRequirements.push({
+      key: 'n95_fit',
+      name: 'N95 Respirator Mask Fit-Test Card',
+      reason: 'Valid 2-year mask fit test card (3M 1860 / 1870+ / Aura) is required'
+    });
+  }
+
+  // 5. Total Documents Check
+  if (docs.length === 0 && missingRequirements.length === 0 && (!rosterStaff || rosterStaff.credential_status !== 'verified')) {
+    missingRequirements.push({
+      key: 'credentials_vault',
+      name: 'Clinical Credentials Vault Submission',
+      reason: 'No clinical credential documents have been uploaded to your profile yet.'
+    });
+  }
+
+  // 6. Admin Verification Status
+  const isVerified = rosterStaff && rosterStaff.credential_status === 'verified' && rosterStaff.status !== 'pending_verification';
+  if (!isVerified && missingRequirements.length === 0) {
+    missingRequirements.push({
+      key: 'admin_verification',
+      name: 'Clinical Operations Dispatch Review',
+      reason: 'Your credentials have been uploaded and are currently under review by Clinical Operations. Shift claiming unlocks upon admin approval.'
+    });
+  }
+
+  const isCompliant = missingRequirements.length === 0 && isVerified;
+
+  return {
+    isCompliant,
+    rosterStaff,
+    docs,
+    missingRequirements,
+    credentialStatus: rosterStaff?.credential_status || 'pending',
+    status: rosterStaff?.status || 'pending_verification'
+  };
+}
+
+/**
  * GET /api/shifts
  * Returns open shifts available for claiming/working
  */
 router.get('/', async (req, res, next) => {
   try {
     const authUser = getAuthUser(req) || (req.query?.staff_id ? { id: req.query.staff_id, email: req.query.staff_email } : null);
+    let compliance = null;
     if (authUser && (authUser.role === 'healthcare_worker' || authUser.id)) {
       try {
-        const [stRows] = await pool.query(
-          'SELECT credential_status, status FROM staff_roster WHERE id = ? OR email = ? LIMIT 1',
-          [authUser.id, authUser.email || '']
-        );
-        if (stRows && stRows.length > 0) {
-          const credStatus = stRows[0].credential_status;
-          const staffStatus = stRows[0].status;
-          if (credStatus !== 'verified' || staffStatus === 'pending_verification') {
-            return res.json({
-              success: true,
-              shifts: [],
-              locked: true,
-              credential_status: credStatus || 'pending',
-              message: 'Open shifts feed is locked pending clinical credential verification. Please upload required documents in your Credentials Vault.'
-            });
-          }
-        }
+        compliance = await evaluateStaffCompliance(authUser.id, authUser.email);
       } catch (e) {}
     }
 
@@ -87,7 +212,27 @@ router.get('/', async (req, res, next) => {
       assigned_staff_id: r.assigned_staff_id
     }));
 
-    res.json({ success: true, shifts });
+    if (compliance && !compliance.isCompliant) {
+      return res.json({
+        success: true,
+        shifts,
+        locked: false,
+        can_claim: false,
+        compliance: {
+          isCompliant: false,
+          missing_requirements: compliance.missingRequirements,
+          credential_status: compliance.credentialStatus
+        },
+        message: 'You have unmet clinical compliance requirements. Please upload required documents in your Credentials Vault before claiming shifts.'
+      });
+    }
+
+    res.json({
+      success: true,
+      shifts,
+      can_claim: true,
+      compliance: { isCompliant: true }
+    });
   } catch (err) {
     next(err);
   }
@@ -569,6 +714,31 @@ router.post('/:id/clock-out', async (req, res, next) => {
 // ============================================================================
 
 /**
+ * GET /api/shifts/compliance-status
+ * Live check of caregiver clinical compliance status and missing requirements
+ */
+router.get('/compliance-status', async (req, res, next) => {
+  try {
+    const user = getAuthUser(req) || (req.query?.staff_id ? { id: req.query.staff_id, email: req.query.staff_email } : null);
+    if (!user) {
+      return res.status(401).json({ success: false, error: 'Authentication required.' });
+    }
+    const compliance = await evaluateStaffCompliance(user.id, user.email);
+    res.json({
+      success: true,
+      isCompliant: compliance.isCompliant,
+      can_claim: compliance.isCompliant,
+      credential_status: compliance.credentialStatus,
+      status: compliance.status,
+      missing_requirements: compliance.missingRequirements,
+      documents_count: compliance.docs.length
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+/**
  * GET /api/shifts/my-documents
  * Retrieve verified clinical licenses, certifications, police checks for the logged-in staff member
  */
@@ -900,49 +1070,22 @@ router.post('/:id/claim', async (req, res, next) => {
       return res.status(400).json({ success: false, error: 'This shift is no longer open for claiming.' });
     }
 
-    // Lookup staff roster ID if exists
-    let rosterId = user.id;
-    let staffName = user.full_name || 'Staff Member';
-    try {
-      const [rRows] = await pool.query(
-        'SELECT id, name, staff_code, status, credential_status FROM staff_roster WHERE id = ? OR email = ? LIMIT 1',
-        [user.id, user.email || '']
-      );
-      if (rRows && rRows.length > 0) {
-        rosterId = rRows[0].id;
-        if (rRows[0].name) staffName = rRows[0].name;
+    // Lookup staff roster ID & evaluate clinical compliance requirements
+    const compliance = await evaluateStaffCompliance(user.id, user.email);
+    let rosterId = compliance.rosterStaff ? compliance.rosterStaff.id : user.id;
+    let staffName = compliance.rosterStaff ? compliance.rosterStaff.name : (user.full_name || 'Healthcare Professional');
 
-        // Compliance vetting check
-        if (rRows[0].credential_status !== 'verified' || rRows[0].status === 'pending_verification') {
-          return res.status(403).json({
-            success: false,
-            error: 'Your profile is currently pending clinical credential verification. You cannot claim shifts until approved by an administrator.'
-          });
-        }
-      } else {
-        // Ensure staff_roster record exists with pending verification
-        const staffCode = `STF-${Date.now().toString().slice(-4)}`;
-        await pool.query(
-          `INSERT INTO staff_roster (id, staff_code, name, role, specialty, region, phone, email, status, credential_status, hourly_rate, cpr_expiry_date)
-           VALUES (?, ?, ?, ?, 'General Care', 'Greater Toronto Area', ?, ?, 'pending_verification', 'pending', 0.00, '2027-12-31')`,
-          [
-            user.id,
-            staffCode,
-            user.full_name || 'Healthcare Professional',
-            user.clinical_role || user.staff_role || 'RN',
-            user.phone || '416-555-0100',
-            user.email || `${user.id}@divinefingershealthcare.ca`
-          ]
-        ).catch(() => {});
-        return res.status(403).json({
-          success: false,
-          error: 'Your profile is currently pending clinical credential verification. You cannot claim shifts until approved by an administrator.'
-        });
-      }
-    } catch (e) {
-      if (e.message && e.message.includes('pending')) {
-        return res.status(403).json({ success: false, error: e.message });
-      }
+    if (!compliance.isCompliant) {
+      const summaryList = compliance.missingRequirements.map((m, idx) => `${idx + 1}. ${m.name}: ${m.reason}`).join('\n');
+      return res.status(403).json({
+        success: false,
+        code: 'CREDENTIALS_REQUIRED',
+        error: 'Cannot claim shift: You have unmet clinical compliance requirements.',
+        missing_requirements: compliance.missingRequirements,
+        requirements_summary: summaryList,
+        message: `Your shift claim cannot be processed because your profile has unmet clinical requirements:\n\n${summaryList}\n\nPlease upload the required credentials in your Clinical Credentials Vault before claiming shifts.`,
+        action_required: 'Please go to your Clinical Credentials Vault to upload missing credentials.'
+      });
     }
 
     if (shift.assigned_staff_id && (shift.assigned_staff_id === rosterId || shift.assigned_staff_id === user.id)) {
