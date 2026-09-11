@@ -97,7 +97,17 @@ app.use(cors({
   },
   credentials: true, // Required for cookies to be sent cross-origin
   methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'X-CSRF-Token']
+  allowedHeaders: [
+    'Content-Type',
+    'Authorization',
+    'X-CSRF-Token',
+    'X-Staff-Id',
+    'X-Staff-Email',
+    'X-Staff-Name',
+    'X-User-Session',
+    'X-Requested-With',
+    'Accept'
+  ]
 }));
 
 // ── Cookie Parser ─────────────────────────────────────────────────────────────

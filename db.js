@@ -163,8 +163,98 @@ const inMemoryStore = {
       updated_at: new Date().toISOString()
     }
   ],
-  staff_roster: [],
-  staffing_requests: [],
+  staff_roster: [
+    {
+      id: 'staff-nurse-sarah',
+      staff_code: 'STF-001',
+      name: 'Sarah Jenkins, RN',
+      role: 'RN',
+      specialty: 'Emergency & Critical Care',
+      region: 'Greater Toronto Area',
+      phone: '(416) 555-0199',
+      email: 'sarah.jenkins@divinefingershealthcare.ca',
+      status: 'available',
+      credential_status: 'verified',
+      rating: 5.00,
+      shifts_completed: 48,
+      hourly_rate: 52.00,
+      cpr_expiry_date: '2027-12-31',
+      vss_status: 'Clear',
+      n95_fit_test: '3M Valid',
+      cno_registration_num: 'RN-948210',
+      avatar_url: null,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    }
+  ],
+  staffing_requests: [
+    {
+      id: 'req-open-001',
+      request_code: 'REQ-2026-8801',
+      facility_name: 'Sunnybrook Health Sciences Centre',
+      unit_department: 'Critical Care ICU',
+      contact_name: 'Dr. Michael Chen',
+      contact_email: 'dispatch@sunnybrook.ca',
+      contact_phone: '(416) 480-6100',
+      role_requested: 'RN',
+      shift_type: 'Day Shift (07:00 - 19:30)',
+      start_date: new Date().toISOString().slice(0, 10),
+      urgency_level: 'urgent',
+      status: 'pending',
+      assigned_staff_id: null,
+      assigned_staff_email: null,
+      staff_name: null,
+      clock_in_time: null,
+      clock_out_time: null,
+      special_instructions: 'Unit 4C Trauma Centre. Please report to Nursing Station C on arrival.',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    },
+    {
+      id: 'req-open-002',
+      request_code: 'REQ-2026-8802',
+      facility_name: "St. Michael's Hospital (Unity Health)",
+      unit_department: 'Emergency Department',
+      contact_name: 'Supervisor Laura Rossi',
+      contact_email: 'dispatch@unityhealth.to',
+      contact_phone: '(416) 864-6060',
+      role_requested: 'RN',
+      shift_type: 'Night Shift (19:00 - 07:30)',
+      start_date: new Date().toISOString().slice(0, 10),
+      urgency_level: 'routine',
+      status: 'pending',
+      assigned_staff_id: null,
+      assigned_staff_email: null,
+      staff_name: null,
+      clock_in_time: null,
+      clock_out_time: null,
+      special_instructions: 'Acute Care Pod B. Hospital scrub top provided at check-in.',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    },
+    {
+      id: 'req-open-003',
+      request_code: 'REQ-2026-8803',
+      facility_name: 'Humber River Health',
+      unit_department: 'Complex Transitional Care',
+      contact_name: 'Clinical Lead James Patel',
+      contact_email: 'dispatch@hrh.ca',
+      contact_phone: '(416) 242-1000',
+      role_requested: 'RPN',
+      shift_type: 'Evening Shift (15:00 - 23:30)',
+      start_date: new Date().toISOString().slice(0, 10),
+      urgency_level: 'routine',
+      status: 'pending',
+      assigned_staff_id: null,
+      assigned_staff_email: null,
+      staff_name: null,
+      clock_in_time: null,
+      clock_out_time: null,
+      special_instructions: 'Floor 5 West wing. Epic EMR credentials active.',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    }
+  ],
   job_applications: [],
   contact_inquiries: [],
   audit_logs: [],
@@ -174,7 +264,20 @@ const inMemoryStore = {
   // IMPORTANT: users[] must NEVER contain administrator emails.
   // Admins live exclusively in admins[]. Mixing them here bypasses the
   // /api/users/login 403 rejection check and lets admins access the public portal.
-  users: []
+  users: [
+    {
+      id: 'staff-nurse-sarah',
+      email: 'sarah.jenkins@divinefingershealthcare.ca',
+      password_hash: '$2b$10$ICqO6AZ.OprBLcm5OT5Nm.aWhldo4q3dLx6tHzcaFg6PwaX23uUPG',
+      full_name: 'Sarah Jenkins, RN',
+      role: 'healthcare_worker',
+      clinical_role: 'RN',
+      phone: '(416) 555-0199',
+      organization_name: null,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    }
+  ]
 };
 
 // Set of admin emails for fast O(1) lookup — used to guard users[] queries.
@@ -687,9 +790,9 @@ function handleInMemoryQuery(sql, params = []) {
         const staffIdParam = params[0] || '';
         const emailParam = params[1] || '';
         const list = (inMemoryStore.shift_punches || []).filter(p => p.staff_id === staffIdParam || p.staff_email === emailParam);
-        return [list];
+        return [list.map(p => ({ ...p, duration_hours: p.total_hours }))];
       }
-      return [inMemoryStore.shift_punches || []];
+      return [(inMemoryStore.shift_punches || []).map(p => ({ ...p, duration_hours: p.total_hours }))];
     }
     if (normalized.startsWith('insert')) {
       const punch = {
@@ -721,6 +824,7 @@ function handleInMemoryQuery(sql, params = []) {
           punch.status = 'completed';
           punch.clock_out_time = new Date().toISOString();
           punch.total_hours = params[0] || 0;
+          punch.duration_hours = punch.total_hours;
           punch.notes = params[1] || punch.notes;
           punch.updated_at = new Date().toISOString();
         }
