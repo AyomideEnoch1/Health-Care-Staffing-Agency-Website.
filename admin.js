@@ -55,6 +55,10 @@
       .replace(/'/g, '&#039;');
   }
 
+  function isFilterAll(val) {
+    return !val || String(val).toUpperCase() === 'ALL' || val === '' || val === 'all';
+  }
+
   // ── 2B. User Device Local Datetime & Dual-Time Presentation Engine ───────────
   const USER_TIMEZONE = (() => {
     try {
@@ -1281,8 +1285,6 @@
       filterAndRenderApplicantsTable();
     } catch { /* Handle error */ }
   }
-
-  const isFilterAll = val => !val || val === 'ALL' || val === '';
 
   function filterAndRenderApplicantsTable() {
     const tbody = document.getElementById('applicants-table-body');

@@ -176,16 +176,14 @@ router.post('/clean-dummy-data', async (req, res, next) => {
     }
 
     try {
-      const [rStaff] = await pool.query("DELETE FROM staff_roster WHERE email != 'olugbodi13123@run.edu.ng'");
+      const [rStaff] = await pool.query("DELETE FROM staff_roster");
       results.staff_roster = rStaff.affectedRows || 0;
-      await pool.query("DELETE FROM staff_roster WHERE email = 'olugbodi13123@run.edu.ng' AND id != 'f479907a-71d7-4c8e-9a3b-6bbc496d1645'").catch(() => {});
-      await pool.query("UPDATE staff_roster SET shifts_completed = 0 WHERE email = 'olugbodi13123@run.edu.ng'").catch(() => {});
     } catch (e) {
       results.staff_roster = `skipped (${e.message})`;
     }
 
     try {
-      const [rUsers] = await pool.query("DELETE FROM users WHERE email != 'olugbodi13123@run.edu.ng'");
+      const [rUsers] = await pool.query("DELETE FROM users");
       results.users = rUsers.affectedRows || 0;
     } catch (e) {
       results.users = `skipped (${e.message})`;
@@ -197,6 +195,18 @@ router.post('/clean-dummy-data', async (req, res, next) => {
       );
       results.admins = rAdmins.affectedRows || 0;
     } catch (_) {}
+
+    if (pool.inMemoryStore) {
+      pool.inMemoryStore.shift_punches = [];
+      pool.inMemoryStore.staff_documents = [];
+      pool.inMemoryStore.staffing_requests = [];
+      pool.inMemoryStore.job_applications = [];
+      pool.inMemoryStore.contact_inquiries = [];
+      pool.inMemoryStore.audit_logs = [];
+      pool.inMemoryStore.newsletter_subscribers = [];
+      pool.inMemoryStore.staff_roster = [];
+      pool.inMemoryStore.users = [];
+    }
 
     res.json({
       success: true,

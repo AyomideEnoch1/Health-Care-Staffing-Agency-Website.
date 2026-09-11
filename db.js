@@ -163,98 +163,8 @@ const inMemoryStore = {
       updated_at: new Date().toISOString()
     }
   ],
-  staff_roster: [
-    {
-      id: 'staff-nurse-sarah',
-      staff_code: 'STF-001',
-      name: 'Sarah Jenkins, RN',
-      role: 'RN',
-      specialty: 'Emergency & Critical Care',
-      region: 'Greater Toronto Area',
-      phone: '(416) 555-0199',
-      email: 'sarah.jenkins@divinefingershealthcare.ca',
-      status: 'available',
-      credential_status: 'verified',
-      rating: 5.00,
-      shifts_completed: 48,
-      hourly_rate: 52.00,
-      cpr_expiry_date: '2027-12-31',
-      vss_status: 'Clear',
-      n95_fit_test: '3M Valid',
-      cno_registration_num: 'RN-948210',
-      avatar_url: null,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    }
-  ],
-  staffing_requests: [
-    {
-      id: 'req-open-001',
-      request_code: 'REQ-2026-8801',
-      facility_name: 'Sunnybrook Health Sciences Centre',
-      unit_department: 'Critical Care ICU',
-      contact_name: 'Dr. Michael Chen',
-      contact_email: 'dispatch@sunnybrook.ca',
-      contact_phone: '(416) 480-6100',
-      role_requested: 'RN',
-      shift_type: 'Day Shift (07:00 - 19:30)',
-      start_date: new Date().toISOString().slice(0, 10),
-      urgency_level: 'urgent',
-      status: 'pending',
-      assigned_staff_id: null,
-      assigned_staff_email: null,
-      staff_name: null,
-      clock_in_time: null,
-      clock_out_time: null,
-      special_instructions: 'Unit 4C Trauma Centre. Please report to Nursing Station C on arrival.',
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    },
-    {
-      id: 'req-open-002',
-      request_code: 'REQ-2026-8802',
-      facility_name: "St. Michael's Hospital (Unity Health)",
-      unit_department: 'Emergency Department',
-      contact_name: 'Supervisor Laura Rossi',
-      contact_email: 'dispatch@unityhealth.to',
-      contact_phone: '(416) 864-6060',
-      role_requested: 'RN',
-      shift_type: 'Night Shift (19:00 - 07:30)',
-      start_date: new Date().toISOString().slice(0, 10),
-      urgency_level: 'routine',
-      status: 'pending',
-      assigned_staff_id: null,
-      assigned_staff_email: null,
-      staff_name: null,
-      clock_in_time: null,
-      clock_out_time: null,
-      special_instructions: 'Acute Care Pod B. Hospital scrub top provided at check-in.',
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    },
-    {
-      id: 'req-open-003',
-      request_code: 'REQ-2026-8803',
-      facility_name: 'Humber River Health',
-      unit_department: 'Complex Transitional Care',
-      contact_name: 'Clinical Lead James Patel',
-      contact_email: 'dispatch@hrh.ca',
-      contact_phone: '(416) 242-1000',
-      role_requested: 'RPN',
-      shift_type: 'Evening Shift (15:00 - 23:30)',
-      start_date: new Date().toISOString().slice(0, 10),
-      urgency_level: 'routine',
-      status: 'pending',
-      assigned_staff_id: null,
-      assigned_staff_email: null,
-      staff_name: null,
-      clock_in_time: null,
-      clock_out_time: null,
-      special_instructions: 'Floor 5 West wing. Epic EMR credentials active.',
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    }
-  ],
+  staff_roster: [],
+  staffing_requests: [],
   job_applications: [],
   contact_inquiries: [],
   audit_logs: [],
@@ -264,21 +174,7 @@ const inMemoryStore = {
   // IMPORTANT: users[] must NEVER contain administrator emails.
   // Admins live exclusively in admins[]. Mixing them here bypasses the
   // /api/users/login 403 rejection check and lets admins access the public portal.
-  users: [
-    {
-      id: 'staff-nurse-sarah',
-      email: 'sarah.jenkins@divinefingershealthcare.ca',
-      password_hash: '$2b$10$ICqO6AZ.OprBLcm5OT5Nm.aWhldo4q3dLx6tHzcaFg6PwaX23uUPG',
-      full_name: 'Sarah Jenkins, RN',
-      role: 'healthcare_worker',
-      clinical_role: 'RN',
-      phone: '(416) 555-0199',
-      organization_name: null,
-      is_active: 1,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    }
-  ]
+  users: []
 };
 
 // Set of admin emails for fast O(1) lookup — used to guard users[] queries.
@@ -372,34 +268,39 @@ function handleInMemoryQuery(sql, params = []) {
         return [[{ total: inMemoryStore.staff_roster.length, count: inMemoryStore.staff_roster.length }]];
       }
       if (normalized.includes('where id = ? or email = ?') || normalized.includes('where email = ? or id = ?')) {
-        return [inMemoryStore.staff_roster.filter(s => s.id === params[0] || s.email === params[0] || s.id === params[1] || s.email === params[1])];
+        const p0 = (params[0] || '').toLowerCase().trim();
+        const p1 = (params[1] || '').toLowerCase().trim();
+        return [inMemoryStore.staff_roster.filter(s => 
+          s.id === params[0] || s.id === params[1] ||
+          (s.email && (s.email.toLowerCase() === p0 || s.email.toLowerCase() === p1))
+        )];
       }
       if (normalized.includes('where id = ?')) {
-        return [inMemoryStore.staff_roster.filter(s => s.id === params[0] || s.email === params[0])];
+        return [inMemoryStore.staff_roster.filter(s => s.id === params[0] || (s.email && s.email.toLowerCase() === String(params[0]).toLowerCase()))];
       }
       if (normalized.includes('where email = ?')) {
-        return [inMemoryStore.staff_roster.filter(s => s.email === params[0])];
+        const p0 = (params[0] || '').toLowerCase().trim();
+        return [inMemoryStore.staff_roster.filter(s => s.email && s.email.toLowerCase().trim() === p0)];
       }
       return [inMemoryStore.staff_roster];
     }
     if (normalized.startsWith('insert')) {
-      // INSERT INTO staff_roster (id, staff_code, name, role, specialty, region, phone, email, status, credential_status)
-      const existingIdx = inMemoryStore.staff_roster.findIndex(s => s.id === params[0] || s.email === params[7]);
+      const colMatch = sql.match(/insert\s+into\s+[`"]?staff_roster[`"]?\s*\(([^)]+)\)\s*values\s*\(([\s\S]+?)\)/i);
       const newStaff = {
-        id: params[0] || crypto.randomUUID(),
-        staff_code: params[1] || ('STF-' + String(inMemoryStore.staff_roster.length + 1).padStart(3, '0')),
-        name: params[2] || 'Staff Member',
-        role: params[3] || 'RN',
-        specialty: params[4] || 'General Care',
-        region: params[5] || 'Greater Toronto Area',
-        phone: params[6] || null,
-        email: params[7] || null,
-        status: params[8] || 'pending_verification',
-        credential_status: params[9] || 'pending',
+        id: crypto.randomUUID(),
+        staff_code: 'STF-' + String(inMemoryStore.staff_roster.length + 1).padStart(3, '0'),
+        name: 'Staff Member',
+        role: 'RN',
+        specialty: 'General Care',
+        region: 'Greater Toronto Area',
+        phone: null,
+        email: null,
+        status: 'available',
+        credential_status: 'verified',
         rating: 5.00,
         shifts_completed: 0,
-        hourly_rate: 0.00,
-        cpr_expiry_date: '2027-12-31',
+        hourly_rate: 35.00,
+        cpr_expiry_date: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
         vss_status: 'Clear',
         n95_fit_test: '3M Valid',
         cno_registration_num: null,
@@ -407,21 +308,89 @@ function handleInMemoryQuery(sql, params = []) {
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       };
+
+      if (colMatch) {
+        const cols = colMatch[1].split(',').map(c => c.trim().replace(/[`"']/g, ''));
+        const valDefs = colMatch[2].split(',').map(v => v.trim());
+        let paramIdx = 0;
+        cols.forEach((col, idx) => {
+          const valDef = valDefs[idx] ? valDefs[idx].trim() : '?';
+          if (valDef === '?') {
+            if (params[paramIdx] !== undefined) {
+              newStaff[col] = params[paramIdx];
+            }
+            paramIdx++;
+          } else if (valDef) {
+            newStaff[col] = valDef.replace(/^['"]|['"]$/g, '');
+          }
+        });
+      } else {
+        newStaff.id = params[0] || newStaff.id;
+        newStaff.staff_code = params[1] || newStaff.staff_code;
+        newStaff.name = params[2] || newStaff.name;
+        newStaff.role = params[3] || newStaff.role;
+      }
+
+      if (newStaff.hourly_rate !== undefined && newStaff.hourly_rate !== null) {
+        newStaff.hourly_rate = parseFloat(newStaff.hourly_rate) || 35.00;
+      }
+
+      const emailLower = (newStaff.email || '').toLowerCase().trim();
+      const existingIdx = inMemoryStore.staff_roster.findIndex(s => 
+        (newStaff.id && s.id === newStaff.id) || 
+        (emailLower && s.email && s.email.toLowerCase().trim() === emailLower)
+      );
       if (existingIdx >= 0) {
-        // ON DUPLICATE KEY UPDATE
-        const existing = inMemoryStore.staff_roster[existingIdx];
-        existing.name = newStaff.name;
-        existing.role = newStaff.role;
-        existing.phone = newStaff.phone;
-        if (newStaff.status) existing.status = newStaff.status;
-        if (newStaff.credential_status) existing.credential_status = newStaff.credential_status;
-        existing.updated_at = newStaff.updated_at;
+        Object.assign(inMemoryStore.staff_roster[existingIdx], newStaff, { updated_at: new Date().toISOString() });
       } else {
         inMemoryStore.staff_roster.push(newStaff);
       }
       return [{ affectedRows: 1, insertId: inMemoryStore.staff_roster.length }];
     }
     if (normalized.startsWith('update')) {
+      const setMatch = sql.match(/update\s+[`"]?staff_roster[`"]?\s+set\s+([\s\S]+?)\s+where\s+([\s\S]+)/i);
+      if (setMatch) {
+        const setClause = setMatch[1].trim();
+        const whereClause = setMatch[2].trim();
+        const setQuestionCount = (setClause.match(/\?/g) || []).length;
+        const whereParams = params.slice(setQuestionCount);
+
+        const staffList = inMemoryStore.staff_roster.filter(s => {
+          if (whereParams.some(p => p && (s.id === p || (s.email && s.email.toLowerCase() === String(p).toLowerCase()) || s.staff_code === p))) return true;
+          if (s.email && whereClause.toLowerCase().includes(s.email.toLowerCase())) return true;
+          if (s.id && whereClause.includes(s.id)) return true;
+          return false;
+        });
+
+        let updatedCount = 0;
+        for (const staff of staffList) {
+          let pIdx = 0;
+          const assignments = setClause.split(',').map(a => a.trim());
+          for (const assign of assignments) {
+            const parts = assign.split('=').map(p => p.trim());
+            if (parts.length >= 2) {
+              const col = parts[0].replace(/[`"']/g, '').trim();
+              const valExpr = parts.slice(1).join('=').trim();
+              if (valExpr === '?') {
+                staff[col] = params[pIdx++];
+              } else if (/shifts_completed/i.test(col) && /shifts_completed/i.test(valExpr)) {
+                staff.shifts_completed = (Number(staff.shifts_completed) || 0) + 1;
+              } else if (valExpr.startsWith("'") && valExpr.endsWith("'")) {
+                staff[col] = valExpr.slice(1, -1);
+              } else if (!isNaN(Number(valExpr))) {
+                staff[col] = Number(valExpr);
+              }
+            }
+          }
+          staff.updated_at = new Date().toISOString();
+          updatedCount++;
+        }
+        if (updatedCount > 0) {
+          return [{ affectedRows: updatedCount }];
+        }
+      }
+
+      // Fallback update
       const targetParam = params[params.length - 1];
       const staff = inMemoryStore.staff_roster.find(s => s.id === targetParam || s.email === targetParam);
       if (staff) {
@@ -431,10 +400,7 @@ function handleInMemoryQuery(sql, params = []) {
         if (normalized.includes("status = 'pending_verification'")) staff.status = 'pending_verification';
         if (normalized.includes("credential_status = 'verified'")) staff.credential_status = 'verified';
         if (normalized.includes("credential_status = 'pending'")) staff.credential_status = 'pending';
-        if (normalized.includes('shifts_completed')) staff.shifts_completed = (staff.shifts_completed || 0) + 1;
-        if (normalized.includes('cpr_expiry_date') && params[0]) staff.cpr_expiry_date = params[0];
-        if (normalized.includes('credential_status = ?')) staff.credential_status = params[0];
-        if (normalized.includes('status = ?')) staff.status = params[0];
+        if (normalized.includes('shifts_completed')) staff.shifts_completed = (Number(staff.shifts_completed) || 0) + 1;
         staff.updated_at = new Date().toISOString();
       }
       return [{ affectedRows: staff ? 1 : 0 }];
@@ -836,6 +802,10 @@ function handleInMemoryQuery(sql, params = []) {
           punch.updated_at = new Date().toISOString();
         }
       }
+      return [{ affectedRows: 1 }];
+    }
+    if (normalized.startsWith('delete')) {
+      inMemoryStore.shift_punches = [];
       return [{ affectedRows: 1 }];
     }
   }
