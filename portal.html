@@ -10309,7 +10309,14 @@ async function initClockStation() {
 
 async function checkClockStatus() {
   try {
-    const res = await fetch(`${API_BASE}/shifts/clock-status`, { credentials: 'include' });
+    const activeStaff = currentStaffUser || currentUser || {};
+    const headers = {};
+    if (activeStaff.id) headers['X-Staff-Id'] = activeStaff.id;
+    if (activeStaff.email) headers['X-Staff-Email'] = activeStaff.email;
+    const url = activeStaff.id 
+      ? `${API_BASE}/shifts/clock-status?staff_id=${encodeURIComponent(activeStaff.id)}` 
+      : `${API_BASE}/shifts/clock-status`;
+    const res = await fetch(url, { headers, credentials: 'include' });
     if (!res.ok) return;
 
     const data = await res.json();
@@ -10861,7 +10868,7 @@ function renderFilteredOpenShifts() {
         </div>
 
         <div style="text-align: right;">
-          <button type="button" class="btn-claim-shift" onclick="claimShift('${s.id}')" style="background: #0284C7; color: #FFFFFF; font-weight: 800; border: none; padding: 0.55rem 1.1rem; border-radius: 6px; font-size: 0.82rem; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem;">
+          <button type="button" class="btn-claim-shift" id="btn-claim-${s.id}" onclick="claimShift('${s.id}', this)" style="background: #0284C7; color: #FFFFFF; font-weight: 800; border: none; padding: 0.55rem 1.1rem; border-radius: 6px; font-size: 0.82rem; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; transition: all 0.2s ease;">
             <i data-lucide="check" style="width: 15px; height: 15px;"></i> Claim Shift
           </button>
         </div>
@@ -10872,28 +10879,58 @@ function renderFilteredOpenShifts() {
   if (window.lucide) lucide.createIcons();
 }
 
-async function claimShift(shiftId) {
+async function claimShift(shiftId, btn) {
   if (!confirm('Confirm you want to claim and commit to this health care shift?')) return;
 
+  const originalHtml = btn ? btn.innerHTML : '';
+  if (btn) {
+    btn.disabled = true;
+    btn.style.opacity = '0.75';
+    btn.innerHTML = '<i data-lucide="loader-2" class="spin-icon" style="width: 15px; height: 15px;"></i> Claiming...';
+    if (window.lucide) lucide.createIcons();
+  }
+
   try {
+    const activeStaff = currentStaffUser || currentUser || {};
     const res = await fetch(`${API_BASE}/shifts/${encodeURIComponent(shiftId)}/claim`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-CSRF-Token': typeof getCsrfToken === 'function' ? getCsrfToken() : ''
+        'X-CSRF-Token': typeof getCsrfToken === 'function' ? getCsrfToken() : '',
+        'X-Staff-Id': activeStaff.id || '',
+        'X-Staff-Email': activeStaff.email || '',
+        'X-Staff-Name': activeStaff.full_name || activeStaff.name || ''
       },
-      credentials: 'include'
+      credentials: 'include',
+      body: JSON.stringify({
+        staff_id: activeStaff.id,
+        staff_name: activeStaff.full_name || activeStaff.name,
+        staff_email: activeStaff.email
+      })
     });
     const data = await res.json();
     if (!res.ok || !data.success) {
       throw new Error(data.error || data.message || 'Unable to claim shift.');
     }
 
-    alert(data.message || 'Shift Claim Confirmed! Shift has been added to your confirmed assignments.');
+    if (btn) {
+      btn.style.background = '#16A34A';
+      btn.style.opacity = '1';
+      btn.innerHTML = '<i data-lucide="check-circle" style="width: 15px; height: 15px;"></i> Claimed!';
+      if (window.lucide) lucide.createIcons();
+    }
+
+    alert(data.message || 'Shift Claim Confirmed! Shift has been added to your confirmed assignments and EVV station.');
     await loadStaffOpenShifts();
     await checkClockStatus();
     await loadStaffSchedule();
   } catch (err) {
+    if (btn) {
+      btn.disabled = false;
+      btn.style.opacity = '1';
+      btn.innerHTML = originalHtml;
+      if (window.lucide) lucide.createIcons();
+    }
     alert(`Claim Shift Error: ${err.message}`);
   }
 }
@@ -10906,7 +10943,14 @@ async function loadStaffSchedule() {
   if (!container) return;
 
   try {
-    const res = await fetch(`${API_BASE}/shifts/my-assigned`, { credentials: 'include' });
+    const activeStaff = currentStaffUser || currentUser || {};
+    const headers = {};
+    if (activeStaff.id) headers['X-Staff-Id'] = activeStaff.id;
+    if (activeStaff.email) headers['X-Staff-Email'] = activeStaff.email;
+    const url = activeStaff.id 
+      ? `${API_BASE}/shifts/my-assigned?staff_id=${encodeURIComponent(activeStaff.id)}` 
+      : `${API_BASE}/shifts/my-assigned`;
+    const res = await fetch(url, { headers, credentials: 'include' });
     let assignments = [];
     if (res.ok) {
       const data = await res.json();

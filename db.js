@@ -262,16 +262,16 @@ function handleInMemoryQuery(sql, params = []) {
   }
 
   // 5. STAFF_ROSTER
-  if (normalized.includes('staff_roster')) {
+  if (normalized.includes('staff_roster') && !normalized.includes('staffing_requests')) {
     if (normalized.startsWith('select')) {
       if (normalized.includes('count(*)')) {
         return [[{ total: inMemoryStore.staff_roster.length, count: inMemoryStore.staff_roster.length }]];
       }
-      if (normalized.includes('where id = ?')) {
-        return [inMemoryStore.staff_roster.filter(s => s.id === params[0] || s.email === params[0])];
-      }
       if (normalized.includes('where id = ? or email = ?') || normalized.includes('where email = ? or id = ?')) {
         return [inMemoryStore.staff_roster.filter(s => s.id === params[0] || s.email === params[0] || s.id === params[1] || s.email === params[1])];
+      }
+      if (normalized.includes('where id = ?')) {
+        return [inMemoryStore.staff_roster.filter(s => s.id === params[0] || s.email === params[0])];
       }
       if (normalized.includes('where email = ?')) {
         return [inMemoryStore.staff_roster.filter(s => s.email === params[0])];
@@ -342,15 +342,44 @@ function handleInMemoryQuery(sql, params = []) {
   // 6. STAFFING_REQUESTS
   if (normalized.includes('staffing_requests')) {
     if (normalized.startsWith('select')) {
-      if (normalized.includes('where id = ?')) {
-        return [inMemoryStore.staffing_requests.filter(r => r.id === params[0])];
+      if (normalized.includes('where id = ? or request_code = ?') || normalized.includes('id = ? or request_code = ?') || normalized.includes('where (id = ?') || normalized.includes('where id = ?')) {
+        const targetId = params[0];
+        const altId = params[1] || targetId;
+        return [inMemoryStore.staffing_requests.filter(r => r.id === targetId || r.request_code === targetId || r.id === altId || r.request_code === altId)];
       }
       if (normalized.includes('contact_email')) {
         const email = (params[0] || '').toLowerCase().trim();
         return [inMemoryStore.staffing_requests.filter(r => (r.contact_email || '').toLowerCase() === email)];
       }
       if (normalized.includes('assigned_staff_id = ?') || normalized.includes('assigned_staff_id in')) {
-        return [inMemoryStore.staffing_requests.filter(r => r.assigned_staff_id === params[0] || (params[1] && r.assigned_staff_email === params[1]))];
+        const staffId = params[0];
+        const staffEmail = (params[1] || '').toLowerCase().trim();
+        const rosterMatch = inMemoryStore.staff_roster.find(s => s.id === staffId || s.staff_code === staffId || (staffEmail && s.email && s.email.toLowerCase() === staffEmail));
+        const validIds = new Set([staffId]);
+        const validEmails = new Set();
+        if (staffEmail) validEmails.add(staffEmail);
+        if (rosterMatch) {
+          validIds.add(rosterMatch.id);
+          if (rosterMatch.staff_code) validIds.add(rosterMatch.staff_code);
+          if (rosterMatch.email) validEmails.add(rosterMatch.email.toLowerCase());
+        }
+
+        const matched = inMemoryStore.staffing_requests.filter(r => {
+          const idMatch = (r.assigned_staff_id && validIds.has(r.assigned_staff_id)) || 
+                          (r.assigned_staff_email && validEmails.has(r.assigned_staff_email.toLowerCase()));
+          if (!idMatch) return false;
+          if (normalized.includes("status in ('dispatched', 'in_session', 'confirmed')") || normalized.includes("r.status in ('dispatched', 'in_session', 'confirmed')")) {
+            return ['dispatched', 'in_session', 'confirmed'].includes(r.status);
+          }
+          return true;
+        });
+        return [matched];
+      }
+      if (normalized.includes("status = 'pending'") || normalized.includes("r.status = 'pending'")) {
+        return [inMemoryStore.staffing_requests.filter(r => 
+          (r.status === 'pending' || (r.status === 'confirmed' && (!r.assigned_staff_id || r.assigned_staff_id === ''))) &&
+          r.status !== 'dispatched' && r.status !== 'in_session' && r.status !== 'completed' && r.status !== 'cancelled'
+        )];
       }
       if (normalized.includes("where r.status in ('pending', 'confirmed', 'dispatched')") || normalized.includes("where status in ('pending', 'confirmed', 'dispatched')")) {
         return [inMemoryStore.staffing_requests.filter(r => ['pending', 'confirmed', 'dispatched'].includes(r.status))];
@@ -358,29 +387,58 @@ function handleInMemoryQuery(sql, params = []) {
       return [inMemoryStore.staffing_requests];
     }
     if (normalized.startsWith('insert')) {
-      const hasBatch = normalized.includes('batch_code');
+      const colMatch = sql.match(/insert\s+into\s+[`"]?staffing_requests[`"]?\s*\(([^)]+)\)\s*values\s*\(([^)]+)\)/i);
       const newReq = {
-        id: params[0] || crypto.randomUUID(),
-        request_code: params[1] || 'REQ-' + Date.now().toString().slice(-4),
-        batch_code: hasBatch ? params[2] : null,
-        facility_name: hasBatch ? params[3] : params[2] || 'Facility',
-        unit_department: hasBatch ? params[4] : params[3] || 'General Care',
-        contact_name: hasBatch ? params[5] : params[4] || 'Contact',
-        contact_email: hasBatch ? params[6] : params[5] || 'contact@example.com',
-        contact_phone: hasBatch ? params[7] : params[6] || '416-555-0100',
-        role_requested: hasBatch ? params[8] : params[7] || 'RN',
-        shift_type: hasBatch ? params[9] : params[8] || 'Day Shift',
-        start_date: hasBatch ? params[10] : null,
-        urgency_level: hasBatch ? params[11] : params[9] || 'routine',
+        id: crypto.randomUUID(),
+        request_code: 'REQ-' + Date.now().toString().slice(-4),
+        facility_name: 'Partner Health Facility',
+        unit_department: 'General Care',
+        contact_name: 'Dispatch Coordinator',
+        contact_email: 'dispatch@example.com',
+        contact_phone: '416-555-0100',
+        role_requested: 'RN',
+        shift_type: 'Day Shift',
+        start_date: new Date().toISOString().slice(0, 10),
+        urgency_level: 'routine',
         status: 'pending',
         assigned_staff_id: null,
         assigned_staff_email: null,
+        staff_name: null,
         clock_in_time: null,
         clock_out_time: null,
-        special_instructions: hasBatch ? params[12] : params[10] || null,
+        special_instructions: null,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       };
+
+      if (colMatch) {
+        const cols = colMatch[1].split(',').map(c => c.trim().replace(/[`"']/g, ''));
+        const valDefs = colMatch[2].split(',').map(v => v.trim());
+        let paramIdx = 0;
+        cols.forEach((col, idx) => {
+          const valDef = valDefs[idx];
+          if (valDef === '?') {
+            if (params[paramIdx] !== undefined) {
+              newReq[col] = params[paramIdx];
+            }
+            paramIdx++;
+          } else if (valDef) {
+            newReq[col] = valDef.replace(/^['"]|['"]$/g, '');
+          }
+        });
+      } else {
+        newReq.id = params[0] || newReq.id;
+        newReq.request_code = params[1] || newReq.request_code;
+      }
+
+      if (newReq.assigned_staff_id) {
+        const staff = inMemoryStore.staff_roster.find(s => s.id === newReq.assigned_staff_id || s.staff_code === newReq.assigned_staff_id || s.email === newReq.assigned_staff_id);
+        if (staff) {
+          newReq.staff_name = staff.name;
+          newReq.assigned_staff_email = staff.email;
+        }
+      }
+
       inMemoryStore.staffing_requests.push(newReq);
       return [{ affectedRows: 1, insertId: newReq.id }];
     }
@@ -388,6 +446,17 @@ function handleInMemoryQuery(sql, params = []) {
       const targetId = params[params.length - 1];
       const reqItem = inMemoryStore.staffing_requests.find(r => r.id === targetId || r.request_code === targetId);
       if (reqItem) {
+        if (normalized.includes('assigned_staff_id = ?')) {
+          reqItem.assigned_staff_id = params[0];
+          const staff = inMemoryStore.staff_roster.find(s => s.id === params[0] || s.staff_code === params[0] || s.email === params[0]);
+          if (staff) {
+            reqItem.staff_name = staff.name;
+            reqItem.assigned_staff_email = staff.email;
+          }
+        }
+        if (normalized.includes("status = 'dispatched'")) {
+          reqItem.status = 'dispatched';
+        }
         if (normalized.includes("status = 'in_session'")) {
           reqItem.status = 'in_session';
           reqItem.clock_in_time = new Date().toISOString();
@@ -400,7 +469,14 @@ function handleInMemoryQuery(sql, params = []) {
           reqItem.cancellation_reason = params[0] || 'Cancelled by client';
         } else if (normalized.includes('status = ?')) {
           reqItem.status = params[0];
-          if (params.length > 2 && params[1]) reqItem.assigned_staff_id = params[1];
+          if (params.length > 2 && params[1]) {
+            reqItem.assigned_staff_id = params[1];
+            const staff = inMemoryStore.staff_roster.find(s => s.id === params[1] || s.staff_code === params[1] || s.email === params[1]);
+            if (staff) {
+              reqItem.staff_name = staff.name;
+              reqItem.assigned_staff_email = staff.email;
+            }
+          }
         }
         if (normalized.includes('client_rating = ?')) {
           reqItem.client_rating = params[0];
