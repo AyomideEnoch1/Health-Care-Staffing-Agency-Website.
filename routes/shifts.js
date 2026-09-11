@@ -96,12 +96,12 @@ async function evaluateStaffCompliance(staffId, staffEmail) {
   }
 
   // 2. BLS / CPR Certification
-  const hasCprDoc = uploadedDocTypes.has('cpr_bls') || uploadedDocTypes.has('cpr') || uploadedDocTypes.has('bls');
-  if (!rosterStaff?.cpr_expiry_date && !hasCprDoc) {
+  const hasCprDoc = uploadedDocTypes.has('cpr_card') || uploadedDocTypes.has('cpr_bls') || uploadedDocTypes.has('cpr') || uploadedDocTypes.has('bls');
+  if (!hasCprDoc) {
     missingRequirements.push({
       key: 'cpr_bls',
       name: 'BLS / CPR Certification Card',
-      reason: 'Current Heart & Stroke or Red Cross CPR/BLS certification card is required'
+      reason: 'Current Heart & Stroke or Red Cross CPR/BLS certification card upload is required'
     });
   } else if (rosterStaff?.cpr_expiry_date) {
     const expDate = new Date(rosterStaff.cpr_expiry_date);
@@ -109,32 +109,28 @@ async function evaluateStaffCompliance(staffId, staffEmail) {
       missingRequirements.push({
         key: 'cpr_bls',
         name: 'BLS / CPR Certification (Expired)',
-        reason: `Your CPR certification expired on ${rosterStaff.cpr_expiry_date}. Please upload your renewal card.`
+        reason: `Your CPR certification expired on ${new Date(rosterStaff.cpr_expiry_date).toISOString().slice(0,10)}. Please upload your renewal card.`
       });
     }
   }
 
   // 3. Vulnerable Sector Screening (Police Record Check)
-  const hasVssDoc = uploadedDocTypes.has('vss') || uploadedDocTypes.has('police_check') || uploadedDocTypes.has('background_check');
-  const vssVal = (rosterStaff?.vss_status || '').toLowerCase();
-  const vssOk = vssVal.includes('clear') || vssVal.includes('verified') || vssVal.includes('valid');
-  if (!hasVssDoc && !vssOk) {
+  const hasVssDoc = uploadedDocTypes.has('vss_check') || uploadedDocTypes.has('vss') || uploadedDocTypes.has('police_check') || uploadedDocTypes.has('background_check');
+  if (!hasVssDoc) {
     missingRequirements.push({
       key: 'vss',
       name: 'Vulnerable Sector Screening (Police Record Check)',
-      reason: 'Police record check issued within the last 12 months is required for patient safety'
+      reason: 'Police Vulnerable Sector Screening document issued within the last 12 months is required'
     });
   }
 
   // 4. N95 Respirator Mask Fit Test Card
   const hasN95Doc = uploadedDocTypes.has('n95_fit') || uploadedDocTypes.has('mask_fit') || uploadedDocTypes.has('n95');
-  const n95Val = (rosterStaff?.n95_fit_test || '').toLowerCase();
-  const n95Ok = n95Val.includes('valid') || n95Val.includes('passed') || n95Val.includes('3m') || n95Val.includes('verified');
-  if (!hasN95Doc && !n95Ok) {
+  if (!hasN95Doc) {
     missingRequirements.push({
       key: 'n95_fit',
       name: 'N95 Respirator Mask Fit-Test Card',
-      reason: 'Valid 2-year mask fit test card (3M 1860 / 1870+ / Aura) is required'
+      reason: 'Valid 2-year N95 mask fit test card (3M 1860 / 1870+ / Aura) upload is required'
     });
   }
 

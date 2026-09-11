@@ -57,7 +57,7 @@ router.post('/register', async (req, res, next) => {
     if (data.role === 'healthcare_worker') {
       return res.status(403).json({
         success: false,
-        error: 'Public healthcare staff self-registration is disabled. Clinical staff accounts are provisioned exclusively by Divine Fingers Clinical Operations following credential vetting. To apply for our roster, please submit an application at /careers.html.'
+        error: 'Public healthcare staff self-registration is disabled. Clinical staff accounts are provisioned exclusively by Divine Fingers Clinical Operations following credential vetting. To apply for our roster, please submit an application at /jobseekers.html#apply-now.'
       });
     }
 

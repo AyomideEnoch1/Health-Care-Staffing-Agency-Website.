@@ -586,7 +586,7 @@
             <div style="margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid var(--border-color); text-align: center; font-size: 0.82rem; color: var(--text-muted);">
               Are you a nurse, RPN, or PSW looking to work with Divine Fingers?
               <br>
-              <a href="careers.html" style="color: var(--brand-turquoise); font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; margin-top: 4px;">
+              <a href="jobseekers.html#apply-now" style="color: var(--brand-turquoise); font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; margin-top: 4px;">
                 <i data-lucide="file-text" style="width: 13px; height: 13px;"></i> Apply to Join Clinical Roster &rarr;
               </a>
             </div>
@@ -624,7 +624,7 @@
               <p style="font-size: 0.83rem; color: var(--text-muted); line-height: 1.5; margin: 0 0 1.25rem 0;">
                 In accordance with Ontario health regulations (CNO &amp; MOH), healthcare workers cannot self-register accounts. All staff profiles and portal credentials are provisioned exclusively by Divine Fingers Human Resources following credential verification.
               </p>
-              <a href="careers.html" class="btn-submit-auth" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; width: 100%; box-sizing: border-box;">
+              <a href="jobseekers.html#apply-now" class="btn-submit-auth" id="btn-goto-clinical-application" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; width: 100%; box-sizing: border-box;">
                 <i data-lucide="file-plus-2" style="width: 17px; height: 17px;"></i> Submit Clinical Application
               </a>
             </div>
@@ -920,7 +920,7 @@
 
       const role = document.getElementById('reg-role').value;
       if (role === 'healthcare_worker') {
-        window.location.href = 'careers.html';
+        window.location.href = 'jobseekers.html#apply-now';
         return;
       }
       const full_name = document.getElementById('reg-fullname').value.trim();

@@ -2141,11 +2141,11 @@
           </td>
           <td class="cell-grid-item" data-label="VSS Check">
             <div class="meta-label">VSS Check</div>
-            <div class="meta-value">${s.vss_status || 'Clear'}</div>
+            <div class="meta-value">${s.vss_status && s.vss_status !== 'Not Uploaded' ? (s.vss_status === 'Clear' ? '<span style="color:#10B981;font-weight:700;">Clear</span>' : s.vss_status) : '<span style="color:var(--status-warning)">Not Uploaded</span>'}</div>
           </td>
           <td class="cell-grid-item" data-label="N95 Fit Test">
             <div class="meta-label">N95 Fit Test</div>
-            <div class="meta-value">${s.n95_fit_test || '3M Valid'}</div>
+            <div class="meta-value">${s.n95_fit_test && s.n95_fit_test !== 'Not Uploaded' ? (s.n95_fit_test === '3M Valid' || s.n95_fit_test === 'Passed' ? '<span style="color:#10B981;font-weight:700;">' + s.n95_fit_test + '</span>' : s.n95_fit_test) : '<span style="color:var(--status-warning)">Not Uploaded</span>'}</div>
           </td>
           <td class="cell-status-desktop" data-label="Overall Status">
             <div class="meta-label">Status</div>
@@ -3330,18 +3330,27 @@
             </form>
           </div>
 
-          <div style="display:flex;flex-direction:column;gap:0.65rem;">
+          <div style="display:flex;flex-direction:column;gap:0.65rem;" id="drawer-active-credentials-box">
             <div class="detail-item-box">
               <label>CNO Registration</label>
-              <span style="${staff.cno_registration_num ? 'color:var(--brand-cyan);font-weight:700;' : 'color:var(--text-muted);'}">${staff.cno_registration_num ? '✅ ' + staff.cno_registration_num : '⚠️ Not Recorded'}</span>
+              <span id="cred-cno-badge" style="${staff.cno_registration_num ? 'color:var(--brand-cyan);font-weight:700;' : 'color:var(--text-muted);'}">${staff.cno_registration_num ? '✅ ' + escapeHTML(staff.cno_registration_num) : '⚠️ Not Recorded'}</span>
             </div>
             <div class="detail-item-box">
               <label>BLS / CPR Expiry</label>
-              <span style="${staff.cpr_expiry_date ? 'color:#10B981;font-weight:700;' : 'color:var(--text-muted);'}">${staff.cpr_expiry_date ? '✅ ' + staff.cpr_expiry_date.slice(0,10) : '⚠️ Not Recorded'}</span>
+              <span id="cred-cpr-badge" style="${staff.cpr_expiry_date ? 'color:#10B981;font-weight:700;' : 'color:var(--text-muted);'}">${staff.cpr_expiry_date ? '✅ ' + staff.cpr_expiry_date.slice(0,10) : '⚠️ Not Recorded'}</span>
             </div>
-            <div class="detail-item-box"><label>Vulnerable Sector Police Check</label><span>${staff.vss_status || 'Clear'}</span></div>
-            <div class="detail-item-box"><label>N95 Mask Fit Test</label><span>${staff.n95_fit_test || '3M Valid'}</span></div>
-            <div class="detail-item-box"><label>Audit Status</label><span class="status-pill ${staff.credential_status || 'verified'}">${(staff.credential_status || 'verified').toUpperCase()}</span></div>
+            <div class="detail-item-box">
+              <label>Vulnerable Sector Police Check</label>
+              <span id="cred-vss-badge">${(staff.vss_status && staff.vss_status !== 'Not Uploaded') ? (staff.vss_status === 'Clear' ? '<span style="color:#10B981;font-weight:700;">✅ Clear (Recorded)</span>' : staff.vss_status) : '<span style="color:var(--status-warning);font-weight:700;">⚠️ Not Uploaded / Pending Review</span>'}</span>
+            </div>
+            <div class="detail-item-box">
+              <label>N95 Mask Fit Test</label>
+              <span id="cred-n95-badge">${(staff.n95_fit_test && staff.n95_fit_test !== 'Not Uploaded') ? (staff.n95_fit_test === '3M Valid' || staff.n95_fit_test === 'Passed' ? '<span style="color:#10B981;font-weight:700;">✅ ' + staff.n95_fit_test + '</span>' : staff.n95_fit_test) : '<span style="color:var(--status-warning);font-weight:700;">⚠️ Not Uploaded</span>'}</span>
+            </div>
+            <div class="detail-item-box">
+              <label>Audit Status</label>
+              <span id="cred-audit-badge" class="status-pill ${staff.credential_status === 'verified' ? 'verified' : 'pending'}">${(staff.credential_status || 'pending').toUpperCase()}</span>
+            </div>
           </div>
         </div>
 
@@ -3547,6 +3556,69 @@
     try {
       const res = await apiRequest(`/admin/staff/${staffId}/documents`);
       const docs = res.data || [];
+
+      // Cross-verify actual uploaded documents against active credential standing
+      const currentStaff = LiveStore.staff.find(s => s.id === staffId);
+      const verifiedCnoDoc = docs.find(d => d.doc_type === 'cno_license' && d.status === 'verified');
+      const verifiedCprDoc = docs.find(d => d.doc_type === 'cpr_card' && d.status === 'verified');
+      const verifiedVssDoc = docs.find(d => d.doc_type === 'vss_check' && d.status === 'verified');
+      const verifiedN95Doc = docs.find(d => d.doc_type === 'n95_fit' && d.status === 'verified');
+
+      const cnoEl = document.getElementById('cred-cno-badge');
+      if (cnoEl && currentStaff) {
+        if (verifiedCnoDoc) {
+          const regVal = verifiedCnoDoc.credential_value || currentStaff.cno_registration_num || 'Verified';
+          cnoEl.innerHTML = `<span style="color:#10B981;font-weight:700;">✅ Verified (Doc on File: ${escapeHTML(verifiedCnoDoc.file_name)}${regVal ? ' • #' + escapeHTML(regVal) : ''})</span>`;
+        } else if (currentStaff.cno_registration_num) {
+          cnoEl.innerHTML = `<span style="color:var(--status-warning);font-weight:700;">⚠️ Reg #${escapeHTML(currentStaff.cno_registration_num)} (Missing Document Upload)</span>`;
+        } else {
+          cnoEl.innerHTML = `<span style="color:var(--text-muted);font-weight:700;">⚠️ Document Not Uploaded</span>`;
+        }
+      }
+
+      const cprEl = document.getElementById('cred-cpr-badge');
+      if (cprEl && currentStaff) {
+        if (verifiedCprDoc) {
+          const expStr = verifiedCprDoc.expiry_date ? formatUserDate(verifiedCprDoc.expiry_date) : (currentStaff.cpr_expiry_date ? currentStaff.cpr_expiry_date.slice(0,10) : 'Active');
+          cprEl.innerHTML = `<span style="color:#10B981;font-weight:700;">✅ Verified (Doc on File: Expires ${expStr})</span>`;
+        } else if (currentStaff.cpr_expiry_date) {
+          cprEl.innerHTML = `<span style="color:var(--status-warning);font-weight:700;">⚠️ Expiry Recorded (${currentStaff.cpr_expiry_date.slice(0,10)}) - Missing Document Upload</span>`;
+        } else {
+          cprEl.innerHTML = `<span style="color:var(--text-muted);font-weight:700;">⚠️ Document Not Uploaded</span>`;
+        }
+      }
+
+      const vssEl = document.getElementById('cred-vss-badge');
+      if (vssEl) {
+        if (verifiedVssDoc) {
+          vssEl.innerHTML = `<span style="color:#10B981;font-weight:700;">✅ Clear &amp; Verified (Doc on File: ${escapeHTML(verifiedVssDoc.file_name)})</span>`;
+        } else {
+          vssEl.innerHTML = `<span style="color:var(--status-warning);font-weight:700;">⚠️ Document Not Uploaded / Pending Review</span>`;
+        }
+      }
+
+      const n95El = document.getElementById('cred-n95-badge');
+      if (n95El) {
+        if (verifiedN95Doc) {
+          n95El.innerHTML = `<span style="color:#10B981;font-weight:700;">✅ Passed &amp; Verified (Doc on File: ${escapeHTML(verifiedN95Doc.file_name)})</span>`;
+        } else {
+          n95El.innerHTML = `<span style="color:var(--status-warning);font-weight:700;">⚠️ Document Not Uploaded</span>`;
+        }
+      }
+
+      const auditEl = document.getElementById('cred-audit-badge');
+      if (auditEl && currentStaff) {
+        const isNurse = ['RN', 'RPN'].includes(currentStaff.role);
+        const hasLicense = isNurse ? Boolean(verifiedCnoDoc) : true;
+        const allCoreVerified = hasLicense && Boolean(verifiedCprDoc) && Boolean(verifiedVssDoc) && Boolean(verifiedN95Doc);
+        if (allCoreVerified) {
+          auditEl.className = 'status-pill verified';
+          auditEl.textContent = 'VERIFIED & COMPLIANT';
+        } else {
+          auditEl.className = 'status-pill pending';
+          auditEl.textContent = 'INCOMPLETE (MISSING DOCUMENTS)';
+        }
+      }
 
       if (docs.length === 0) {
         container.innerHTML = `

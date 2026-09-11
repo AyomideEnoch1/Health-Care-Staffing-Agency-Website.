@@ -505,10 +505,10 @@ router.post('/roster', requirePermission('roster:manage'), async (req, res, next
         parseFloat(hourly_rate) || 35.00,
         cpr_expiry_date || new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
         cno_registration_num || null,
-        status || 'available',
-        credential_status || 'verified',
-        vss_status || 'Clear',
-        n95_fit_test || '3M Valid'
+        status || 'pending_verification',
+        credential_status || 'pending',
+        vss_status || 'Not Uploaded',
+        n95_fit_test || 'Not Uploaded'
       ]
     );
 
@@ -827,8 +827,26 @@ router.patch('/staff/documents/:docId/verify', async (req, res, next) => {
         updates.push("n95_fit_test = '3M Valid'");
       }
 
+      // Check all documents for this staff member to ensure all core requirements are satisfied
+      const [allStaffDocs] = await pool.query(
+        'SELECT doc_type, status FROM staff_documents WHERE staff_id = ?',
+        [doc.staff_id]
+      );
+      const verifiedTypes = new Set(
+        allStaffDocs.filter(d => d.status === 'verified' || (d.id === docId && status === 'verified')).map(d => d.doc_type)
+      );
       if (status === 'verified') {
+        verifiedTypes.add(finalDocType);
+      }
+
+      const isNurse = ['RN', 'RPN'].includes(staff.role);
+      const hasLicense = isNurse ? verifiedTypes.has('cno_license') : true;
+      const allCoreDone = hasLicense && verifiedTypes.has('cpr_card') && verifiedTypes.has('vss_check') && verifiedTypes.has('n95_fit');
+
+      if (allCoreDone) {
         updates.push("credential_status = 'verified'");
+      } else {
+        updates.push("credential_status = 'pending'");
       }
 
       if (updates.length > 0) {

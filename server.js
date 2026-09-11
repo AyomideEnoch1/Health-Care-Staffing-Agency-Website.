@@ -181,6 +181,11 @@ app.use('/private', (req, res) => {
   res.status(403).json({ error: 'Access Denied: Private Server Directory' });
 });
 
+// Redirect legacy/alternate careers URLs to candidate quick application section
+app.get(['/careers', '/careers.html'], (req, res) => {
+  res.redirect(302, '/jobseekers.html#apply-now');
+});
+
 // ── Static Assets (serves HTML, CSS, JS, images) ─────────────────────────────
 app.use(express.static(path.join(__dirname, './')));
 

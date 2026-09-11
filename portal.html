@@ -7191,18 +7191,18 @@ html, body {
                     </div>
                   </div>
                 </div>
-                <div class="compliance-meter-badge">
-                  <span class="pulse-dot"></span> 100% Eligible for Hospital &amp; LTC Dispatch
+                <div class="compliance-meter-badge" id="comp-meter-badge">
+                  <span class="pulse-dot"></span> Checking Placement Readiness...
                 </div>
               </div>
               <div class="compliance-meter-track" style="margin-top: 0.85rem;">
-                <div class="compliance-meter-bar" style="width: 100%;"></div>
+                <div class="compliance-meter-bar" id="comp-meter-bar" style="width: 0%;"></div>
               </div>
               <div class="compliance-meter-tags" style="margin-top: 0.75rem;">
-                <span class="compliance-pill-tag active"><i data-lucide="check" style="width: 12px; height: 12px;"></i> Regulatory CNO License</span>
-                <span class="compliance-pill-tag active"><i data-lucide="check" style="width: 12px; height: 12px;"></i> BLS / CPR Certification</span>
-                <span class="compliance-pill-tag active"><i data-lucide="check" style="width: 12px; height: 12px;"></i> Police Background Check (VSS)</span>
-                <span class="compliance-pill-tag active"><i data-lucide="check" style="width: 12px; height: 12px;"></i> N95 Respirator Mask Fit-Test</span>
+                <span class="compliance-pill-tag" id="tag-cno"><i data-lucide="shield" style="width: 12px; height: 12px;"></i> Regulatory CNO License</span>
+                <span class="compliance-pill-tag" id="tag-cpr"><i data-lucide="shield" style="width: 12px; height: 12px;"></i> BLS / CPR Certification</span>
+                <span class="compliance-pill-tag" id="tag-vss"><i data-lucide="shield" style="width: 12px; height: 12px;"></i> Police Background Check (VSS)</span>
+                <span class="compliance-pill-tag" id="tag-n95"><i data-lucide="shield" style="width: 12px; height: 12px;"></i> N95 Respirator Mask Fit-Test</span>
               </div>
             </div>
 
@@ -7213,8 +7213,8 @@ html, body {
                 <span id="comp-cno-title" style="font-size: 1.3rem; font-weight: 900; color: var(--navy); display: block; margin-top: 0.35rem; font-family: var(--font-heading); line-height: 1.25;">CNO License</span>
                 <span style="font-size: 0.74rem; color: #64748B; margin-top: 0.25rem; display: block;">College of Nurses of Ontario</span>
                 <div style="margin-top: 0.85rem;">
-                  <span class="compliance-card-status verified" id="comp-cno-badge" style="font-size: 0.74rem; font-weight: 700; padding: 0.25rem 0.65rem; border-radius: 9999px; display: inline-flex; align-items: center; gap: 5px;">
-                    <i data-lucide="check-circle" style="width: 13px; height: 13px;"></i> Verified Active
+                  <span class="compliance-card-status" id="comp-cno-badge" style="font-size: 0.74rem; font-weight: 700; padding: 0.25rem 0.65rem; border-radius: 9999px; display: inline-flex; align-items: center; gap: 5px; background: #FEF3C7; color: #92400E;">
+                    <i data-lucide="clock" style="width: 13px; height: 13px;"></i> Checking...
                   </span>
                 </div>
               </div>
@@ -7224,8 +7224,8 @@ html, body {
                 <span style="font-size: 1.3rem; font-weight: 900; color: var(--navy); display: block; margin-top: 0.35rem; font-family: var(--font-heading); line-height: 1.25;">BLS / CPR Certification</span>
                 <span style="font-size: 0.74rem; color: #64748B; margin-top: 0.25rem; display: block;">Heart &amp; Stroke Foundation</span>
                 <div style="margin-top: 0.85rem;">
-                  <span class="compliance-card-status verified" style="font-size: 0.74rem; font-weight: 700; padding: 0.25rem 0.65rem; border-radius: 9999px; display: inline-flex; align-items: center; gap: 5px;">
-                    <i data-lucide="check-circle" style="width: 13px; height: 13px;"></i> Verified Active
+                  <span class="compliance-card-status" id="comp-cpr-badge" style="font-size: 0.74rem; font-weight: 700; padding: 0.25rem 0.65rem; border-radius: 9999px; display: inline-flex; align-items: center; gap: 5px; background: #FEF3C7; color: #92400E;">
+                    <i data-lucide="clock" style="width: 13px; height: 13px;"></i> Checking...
                   </span>
                 </div>
               </div>
@@ -7235,8 +7235,8 @@ html, body {
                 <span style="font-size: 1.3rem; font-weight: 900; color: var(--navy); display: block; margin-top: 0.35rem; font-family: var(--font-heading); line-height: 1.25;">Police VSS Check</span>
                 <span style="font-size: 0.74rem; color: #64748B; margin-top: 0.25rem; display: block;">Vulnerable Sector Screening</span>
                 <div style="margin-top: 0.85rem;">
-                  <span class="compliance-card-status verified" style="font-size: 0.74rem; font-weight: 700; padding: 0.25rem 0.65rem; border-radius: 9999px; display: inline-flex; align-items: center; gap: 5px;">
-                    <i data-lucide="check-circle" style="width: 13px; height: 13px;"></i> Clear &amp; Current
+                  <span class="compliance-card-status" id="comp-vss-badge" style="font-size: 0.74rem; font-weight: 700; padding: 0.25rem 0.65rem; border-radius: 9999px; display: inline-flex; align-items: center; gap: 5px; background: #FEF3C7; color: #92400E;">
+                    <i data-lucide="clock" style="width: 13px; height: 13px;"></i> Checking...
                   </span>
                 </div>
               </div>
@@ -7246,8 +7246,8 @@ html, body {
                 <span style="font-size: 1.3rem; font-weight: 900; color: var(--navy); display: block; margin-top: 0.35rem; font-family: var(--font-heading); line-height: 1.25;">N95 Mask Fit-Test</span>
                 <span style="font-size: 0.74rem; color: #64748B; margin-top: 0.25rem; display: block;">Respirator Standard</span>
                 <div style="margin-top: 0.85rem;">
-                  <span class="compliance-card-status verified" style="font-size: 0.74rem; font-weight: 700; padding: 0.25rem 0.65rem; border-radius: 9999px; display: inline-flex; align-items: center; gap: 5px;">
-                    <i data-lucide="check-circle" style="width: 13px; height: 13px;"></i> Tested &amp; Passed
+                  <span class="compliance-card-status" id="comp-n95-badge" style="font-size: 0.74rem; font-weight: 700; padding: 0.25rem 0.65rem; border-radius: 9999px; display: inline-flex; align-items: center; gap: 5px; background: #FEF3C7; color: #92400E;">
+                    <i data-lucide="clock" style="width: 13px; height: 13px;"></i> Checking...
                   </span>
                 </div>
               </div>
@@ -11553,13 +11553,93 @@ async function loadStaffDocuments() {
       docs = Array.isArray(data) ? data : (data.documents || []);
     }
 
+    // Dynamic Compliance Status Calculation
+    const verifiedCno = docs.find(d => (d.doc_type === 'cno_license' || d.document_type === 'cno_license') && d.status === 'verified');
+    const pendingCno = docs.find(d => (d.doc_type === 'cno_license' || d.document_type === 'cno_license') && d.status !== 'verified');
+
+    const verifiedCpr = docs.find(d => (d.doc_type === 'cpr_card' || d.document_type === 'cpr_card') && d.status === 'verified');
+    const pendingCpr = docs.find(d => (d.doc_type === 'cpr_card' || d.document_type === 'cpr_card') && d.status !== 'verified');
+
+    const verifiedVss = docs.find(d => (d.doc_type === 'vss_check' || d.document_type === 'vss_check') && d.status === 'verified');
+    const pendingVss = docs.find(d => (d.doc_type === 'vss_check' || d.document_type === 'vss_check') && d.status !== 'verified');
+
+    const verifiedN95 = docs.find(d => (d.doc_type === 'n95_fit' || d.document_type === 'n95_fit') && d.status === 'verified');
+    const pendingN95 = docs.find(d => (d.doc_type === 'n95_fit' || d.document_type === 'n95_fit') && d.status !== 'verified');
+
+    function updateCardAndTag(badgeId, tagId, verifiedDoc, pendingDoc, verifiedText) {
+      const b = document.getElementById(badgeId);
+      const t = document.getElementById(tagId);
+      if (verifiedDoc) {
+        if (b) {
+          b.className = 'compliance-card-status verified';
+          b.style.background = '#DCFCE7';
+          b.style.color = '#15803D';
+          b.innerHTML = `<i data-lucide="check-circle" style="width:13px;height:13px;"></i> ${verifiedText}`;
+        }
+        if (t) {
+          t.className = 'compliance-pill-tag active';
+          const icon = t.querySelector('i');
+          if (icon) icon.setAttribute('data-lucide', 'check');
+        }
+      } else if (pendingDoc) {
+        if (b) {
+          b.className = 'compliance-card-status pending';
+          b.style.background = '#FEF3C7';
+          b.style.color = '#92400E';
+          b.innerHTML = `<i data-lucide="clock" style="width:13px;height:13px;"></i> Pending Admin Review`;
+        }
+        if (t) {
+          t.className = 'compliance-pill-tag';
+          const icon = t.querySelector('i');
+          if (icon) icon.setAttribute('data-lucide', 'clock');
+        }
+      } else {
+        if (b) {
+          b.className = 'compliance-card-status missing';
+          b.style.background = '#FEE2E2';
+          b.style.color = '#991B1B';
+          b.innerHTML = `<i data-lucide="alert-circle" style="width:13px;height:13px;"></i> ⚠️ Document Not Uploaded`;
+        }
+        if (t) {
+          t.className = 'compliance-pill-tag';
+          const icon = t.querySelector('i');
+          if (icon) icon.setAttribute('data-lucide', 'x');
+        }
+      }
+    }
+
+    updateCardAndTag('comp-cno-badge', 'tag-cno', verifiedCno, pendingCno, 'Verified Active');
+    updateCardAndTag('comp-cpr-badge', 'tag-cpr', verifiedCpr, pendingCpr, 'Verified Active');
+    updateCardAndTag('comp-vss-badge', 'tag-vss', verifiedVss, pendingVss, 'Clear & Current');
+    updateCardAndTag('comp-n95-badge', 'tag-n95', verifiedN95, pendingN95, 'Tested & Passed');
+
+    let completed = 0;
+    if (verifiedCno) completed++;
+    if (verifiedCpr) completed++;
+    if (verifiedVss) completed++;
+    if (verifiedN95) completed++;
+
+    const pct = Math.round((completed / 4) * 100);
+    const meterBar = document.getElementById('comp-meter-bar');
+    const meterBadge = document.getElementById('comp-meter-badge');
+    if (meterBar) meterBar.style.width = `${pct}%`;
+    if (meterBadge) {
+      if (pct === 100) {
+        meterBadge.innerHTML = `<span class="pulse-dot"></span> 100% Eligible for Hospital &amp; LTC Dispatch`;
+      } else {
+        const missingCount = 4 - completed;
+        meterBadge.innerHTML = `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#F59E0B;margin-right:4px;"></span> ${pct}% Placement Readiness (${missingCount} Document${missingCount > 1 ? 's' : ''} Pending)`;
+      }
+    }
+
     if (!docs || docs.length === 0) {
       if (countEl) countEl.textContent = '0 Documents';
       tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#64748B;padding:1.5rem;">No clinical documents uploaded yet. Use the upload form below to add your credentials.</td></tr>';
+      if (window.lucide) lucide.createIcons();
       return;
     }
 
-    if (countEl) countEl.textContent = `${docs.length} Documents`;
+    if (countEl) countEl.textContent = `${docs.length} Document${docs.length > 1 ? 's' : ''}`;
 
     tbody.innerHTML = docs.map(d => {
       const expStr = d.expiry_date ? new Date(d.expiry_date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : 'Valid / Active';
