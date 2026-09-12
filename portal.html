@@ -7029,7 +7029,12 @@ html, body {
                   Live open placements across hospitals, long-term care homes, and community clinics.
                 </span>
               </div>
-              <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                <button type="button" class="panel-action-btn" onclick="goToCredentialsVault()" title="Open Clinical Credentials Vault">
+                  <i data-lucide="shield-check" style="width: 14px; height: 14px;"></i>
+                  <span>View Credentials</span>
+                  <i data-lucide="arrow-right" class="action-btn-arrow" style="width: 13px; height: 13px;"></i>
+                </button>
                 <span style="font-size: 0.78rem; font-weight: 700; color: #10B981; display: inline-flex; align-items: center; gap: 4px;">
                   <span class="pulse-dot" style="background: #10B981;"></span> Live Updates
                 </span>
@@ -9997,6 +10002,10 @@ function switchStaffPage(pageId, pageTitle) {
   } else if (pageId === 'staff-page-overview') {
     checkClockStatus();
     loadStaffPaySummary();
+  } else if (pageId === 'staff-page-credentials') {
+    if (typeof loadStaffDocuments === 'function') {
+      loadStaffDocuments();
+    }
   }
 
   // 8. Refresh icons
@@ -10125,6 +10134,23 @@ function toggleClientMobileSidebar(open) {
 // Explicit Window Exports (Ensures Global Accessibility)
 // ------------------------------------------------------------------------
 window.switchStaffPage = switchStaffPage;
+window.goToCredentialsVault = function() {
+  if (typeof goToCredentialsVault === 'function') {
+    goToCredentialsVault();
+  } else {
+    switchStaffPage('staff-page-credentials', 'Clinical Credentials Vault');
+    if (typeof loadStaffDocuments === 'function') loadStaffDocuments();
+  }
+};
+window.openCredentialRequiredModal = function(data) {
+  if (typeof openCredentialRequiredModal === 'function') openCredentialRequiredModal(data);
+};
+window.closeCredentialRequiredModal = function() {
+  if (typeof closeCredentialRequiredModal === 'function') closeCredentialRequiredModal();
+};
+window.handleBlockedClaimClick = function(id) {
+  if (typeof handleBlockedClaimClick === 'function') handleBlockedClaimClick(id);
+};
 window.toggleStaffSidebarCollapse = toggleStaffSidebarCollapse;
 window.toggleStaffMobileSidebar = toggleStaffMobileSidebar;
 window.switchClientPage = switchClientPage;
@@ -11010,10 +11036,13 @@ function closeCredentialRequiredModal() {
 function goToCredentialsVault() {
   closeCredentialRequiredModal();
   switchStaffPage('staff-page-credentials', 'Clinical Credentials Vault');
+  if (typeof loadStaffDocuments === 'function') {
+    loadStaffDocuments();
+  }
   setTimeout(() => {
-    const form = document.getElementById('staff-credential-upload-form') || document.getElementById('worker-credentials-panel');
-    if (form) form.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }, 250);
+    const form = document.getElementById('staff-credential-upload-form') || document.getElementById('worker-credentials-panel') || document.getElementById('staff-page-credentials');
+    if (form) form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 150);
 }
 
 function handleBlockedClaimClick(shiftId) {
@@ -11147,11 +11176,11 @@ function renderFilteredOpenShifts() {
         </div>
       </div>
       <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-        <button type="button" class="btn-primary-action" onclick="openCredentialRequiredModal(currentStaffCompliance)" style="background: #D97706; font-size: 0.8rem; font-weight: 700; padding: 0.5rem 0.9rem; display: inline-flex; align-items: center; gap: 5px;">
-          <i data-lucide="list-checks" style="width: 14px; height: 14px;"></i> View Requirements (${missingCount})
+        <button type="button" class="btn-primary-action" onclick="goToCredentialsVault()" style="background: #0284C7; font-size: 0.8rem; font-weight: 700; padding: 0.5rem 0.9rem; display: inline-flex; align-items: center; gap: 5px; cursor: pointer;">
+          <i data-lucide="shield-check" style="width: 14px; height: 14px;"></i> View Credentials
         </button>
-        <button type="button" class="btn-secondary-action" onclick="goToCredentialsVault()" style="font-size: 0.8rem; font-weight: 700; padding: 0.5rem 0.9rem; display: inline-flex; align-items: center; gap: 5px;">
-          <i data-lucide="upload-cloud" style="width: 14px; height: 14px;"></i> Upload Vault
+        <button type="button" class="btn-secondary-action" onclick="openCredentialRequiredModal(currentStaffCompliance)" style="font-size: 0.8rem; font-weight: 700; padding: 0.5rem 0.9rem; display: inline-flex; align-items: center; gap: 5px; cursor: pointer;">
+          <i data-lucide="list-checks" style="width: 14px; height: 14px;"></i> View Requirements (${missingCount})
         </button>
       </div>
     </div>
