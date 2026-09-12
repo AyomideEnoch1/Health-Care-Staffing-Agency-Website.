@@ -313,31 +313,47 @@
     }
 
     .panel-action-btn {
-      background: #EFF6FF;
+      background: #F0F9FF;
       color: #0284C7;
       border: 1px solid #BAE6FD;
-      border-radius: 6px;
-      padding: 0.32rem 0.75rem;
-      font-size: 0.78rem;
+      border-radius: 8px;
+      padding: 0.38rem 0.85rem;
+      font-size: 0.8rem;
       font-weight: 700;
+      font-family: inherit;
       cursor: pointer;
       outline: none;
       display: inline-flex;
       align-items: center;
-      gap: 5px;
-      transition: all 0.18s ease;
+      gap: 6px;
+      text-decoration: none;
+      box-shadow: 0 1px 3px rgba(2, 132, 199, 0.08);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .panel-action-btn i,
+    .panel-action-btn [data-lucide] {
+      transition: transform 0.2s ease;
+      flex-shrink: 0;
     }
 
     .panel-action-btn:hover {
       background: #0284C7;
-      color: #FFFFFF;
+      color: #FFFFFF !important;
       border-color: #0284C7;
-      box-shadow: 0 2px 10px rgba(2, 132, 199, 0.25);
+      box-shadow: 0 4px 14px rgba(2, 132, 199, 0.28);
       transform: translateY(-1px);
+      text-decoration: none;
+    }
+
+    .panel-action-btn:hover i.action-btn-arrow,
+    .panel-action-btn:hover [data-lucide="arrow-right"] {
+      transform: translateX(3px);
     }
 
     .panel-action-btn:active {
       transform: translateY(0);
+      box-shadow: 0 1px 3px rgba(2, 132, 199, 0.15);
     }
 
     .facility-tool-link {
@@ -626,14 +642,31 @@
     }
 
     .panel-action-link {
-      font-size: 0.78rem;
-      font-weight: 700;
+      background: #F0F9FF;
       color: #0284C7;
+      border: 1px solid #BAE6FD;
+      border-radius: 8px;
+      padding: 0.38rem 0.85rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      outline: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
       text-decoration: none;
+      box-shadow: 0 1px 3px rgba(2, 132, 199, 0.08);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .panel-action-link:hover {
-      text-decoration: underline;
+      background: #0284C7;
+      color: #FFFFFF !important;
+      border-color: #0284C7;
+      box-shadow: 0 4px 14px rgba(2, 132, 199, 0.28);
+      transform: translateY(-1px);
+      text-decoration: none;
     }
 
     /* Tables & Lists */
@@ -6630,7 +6663,11 @@ html, body {
                   <div class="panel-title">
                     <i data-lucide="history" style="color: #0284C7;"></i> Recent Verified Timecard Punches
                   </div>
-                  <button type="button" class="panel-action-link" onclick="switchStaffPage('staff-page-clock', 'EVV Clock Station')">View All Punches</button>
+                  <button type="button" class="panel-action-btn" onclick="switchStaffPage('staff-page-clock', 'EVV Clock Station')" title="Open EVV Clock Station &amp; Full Timecard History">
+                    <i data-lucide="clock" style="width: 14px; height: 14px;"></i>
+                    <span>View All Punches</span>
+                    <i data-lucide="arrow-right" class="action-btn-arrow" style="width: 13px; height: 13px;"></i>
+                  </button>
                 </div>
 
                 <div class="mobile-table-scroll-hint">
