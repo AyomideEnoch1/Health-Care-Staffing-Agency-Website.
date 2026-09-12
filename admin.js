@@ -3271,7 +3271,40 @@
           <button type="submit" class="btn-primary-action" style="width:100%;margin-top:1.25rem;justify-content:center;">
             <i data-lucide="check"></i> Save Staff Profile Changes
           </button>
-        </form>`;
+        </form>
+
+        <div style="background:var(--bg-surface-elevated);border:1px solid var(--border-subtle);border-radius:10px;padding:1.1rem;margin-top:1.25rem;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem;">
+            <h5 style="margin:0;font-size:0.88rem;font-weight:800;color:var(--text-primary);display:flex;align-items:center;gap:0.45rem;">
+              <i data-lucide="key-round" style="width:16px;height:16px;color:var(--brand-cyan);"></i> Staff Portal Access &amp; Password
+            </h5>
+            <span class="status-pill verified" style="font-size:0.68rem;">Active Portal Account</span>
+          </div>
+          
+          <div style="font-size:0.78rem;color:var(--text-secondary);margin-bottom:0.85rem;line-height:1.5;">
+            Caregivers sign in to <code>portal.html</code> using their email: <strong>${escapeHTML(staff.email)}</strong>.
+            <div style="margin-top:0.5rem;display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
+              <span style="font-size:0.72rem;font-weight:700;color:var(--text-muted);">DEFAULT ONBOARDING PASSWORD:</span>
+              <code style="background:var(--bg-surface);padding:0.25rem 0.6rem;border-radius:6px;border:1px solid var(--border-subtle);font-weight:800;color:var(--text-primary);font-size:0.84rem;">DivineFingers2026!</code>
+              <button type="button" class="btn-secondary-action" style="padding:0.2rem 0.5rem;font-size:0.72rem;" onclick="navigator.clipboard.writeText('DivineFingers2026!');showToast('Default password copied to clipboard!','success');">
+                <i data-lucide="copy" style="width:11px;height:11px;"></i> Copy
+              </button>
+            </div>
+          </div>
+
+          <div style="border-top:1px solid var(--border-subtle);padding-top:0.75rem;">
+            <label style="font-size:0.72rem;font-weight:700;color:var(--text-muted);display:block;margin-bottom:0.35rem;">ISSUE / RESET TEMPORARY PASSWORD</label>
+            <div style="display:flex;gap:0.5rem;">
+              <input type="text" id="drawer-reset-password-input" class="modal-input" value="DivineFingers2026!" style="font-family:monospace;font-weight:700;padding:0.45rem 0.65rem;font-size:0.82rem;">
+              <button type="button" class="btn-primary-action" style="padding:0.45rem 0.85rem;font-size:0.75rem;white-space:nowrap;" onclick="window.handleResetStaffPassword('${staff.id}', '${escapeHTML(staff.name)}')">
+                <i data-lucide="send" style="width:12px;height:12px;"></i> Reset &amp; Email
+              </button>
+            </div>
+            <span style="font-size:0.7rem;color:var(--text-muted);margin-top:4px;display:block;">
+              Updates the caregiver's password in the database and sends their login credentials to their email.
+            </span>
+          </div>
+        </div>`;
     } else if (tabName === 'tab-profile-docs') {
       drawerContent.innerHTML = `
         <div style="background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:10px;padding:1rem 1.15rem;margin-bottom:1.25rem;">
@@ -3471,6 +3504,26 @@
     if (el) {
       el.style.display = el.style.display === 'none' ? 'block' : 'none';
       if (window.lucide) lucide.createIcons();
+    }
+  };
+
+  window.handleResetStaffPassword = async function(staffId, staffName) {
+    const input = document.getElementById('drawer-reset-password-input');
+    const newPassword = input ? input.value.trim() : 'DivineFingers2026!';
+    if (!newPassword || newPassword.length < 6) {
+      showToast('Password must be at least 6 characters long.', 'warning');
+      return;
+    }
+
+    try {
+      const res = await apiRequest(`/admin/staff/${staffId}/reset-password`, {
+        method: 'POST',
+        body: JSON.stringify({ new_password: newPassword })
+      });
+      showToast(res.message || `Password for ${staffName} reset successfully!`, 'success');
+      await fetchAndRenderAudit();
+    } catch (err) {
+      showToast(`Failed to reset password: ${err.message}`, 'warning');
     }
   };
 

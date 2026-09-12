@@ -561,6 +561,71 @@ router.post('/roster', requirePermission('roster:manage'), async (req, res, next
   } catch (err) { next(err); }
 });
 
+// POST /api/admin/staff/:id/reset-password — Admin resets caregiver portal password
+router.post('/staff/:id/reset-password', requirePermission('roster:manage'), async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { new_password } = req.body || {};
+    const temporaryPassword = new_password && new_password.trim() ? new_password.trim() : 'DivineFingers2026!';
+
+    // Find staff
+    const [staffRows] = await pool.query('SELECT id, name, email, staff_code FROM staff_roster WHERE id = ? LIMIT 1', [id]);
+    if (!staffRows || staffRows.length === 0) {
+      return res.status(404).json({ success: false, error: 'Staff member not found on roster.' });
+    }
+    const staff = staffRows[0];
+
+    // Hash new password
+    const salt = await bcrypt.genSalt(10);
+    const passwordHash = await bcrypt.hash(temporaryPassword, salt);
+
+    // Update in users table by email or id
+    const [updateRes] = await pool.query(
+      'UPDATE users SET password_hash = ?, is_active = 1 WHERE email = ? OR id = ?',
+      [passwordHash, staff.email, id]
+    );
+
+    if (!updateRes || updateRes.affectedRows === 0) {
+      // If user row didn't exist, create it
+      await pool.query(
+        `INSERT INTO users (id, email, password_hash, full_name, role, is_active, email_verified)
+         VALUES (?, ?, ?, ?, 'healthcare_worker', 1, 1)`,
+        [id, staff.email, passwordHash, staff.name]
+      );
+    }
+
+    if (pool.inMemoryStore && pool.inMemoryStore.users) {
+      for (const u of pool.inMemoryStore.users) {
+        if (u.email === staff.email || u.id === id) {
+          u.password_hash = passwordHash;
+          u.is_active = 1;
+        }
+      }
+    }
+
+    // Send email with new password
+    sendStaffWelcomeEmail({
+      name: staff.name,
+      email: staff.email,
+      staff_code: staff.staff_code,
+      temporary_password: temporaryPassword
+    }).catch(err => console.warn('[Mailer Error]:', err.message));
+
+    // Audit log
+    await pool.query(
+      `INSERT INTO audit_logs (id, admin_id, actor_name, action, target_entity, target_id, details, severity, ip_address)
+       VALUES (?, ?, ?, 'STAFF_PASSWORD_RESET', 'staff_roster', ?, ?, 'warn', ?)`,
+      [crypto.randomUUID(), req.admin.id, req.admin.full_name, id, `Reset portal password for ${staff.name} (${staff.email})`, req.ip]
+    ).catch(() => {});
+
+    res.json({
+      success: true,
+      message: `Temporary password for ${staff.name} reset to "${temporaryPassword}" and emailed.`,
+      temporary_password: temporaryPassword
+    });
+  } catch (err) { next(err); }
+});
+
 // PATCH /api/admin/roster/:id — Update existing staff member
 router.patch('/roster/:id', requirePermission('roster:manage'), async (req, res, next) => {
   try {
