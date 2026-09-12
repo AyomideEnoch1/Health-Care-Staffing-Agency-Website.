@@ -166,12 +166,66 @@ async function sendAdminInviteEmail(adminEmail, adminName, inviteToken, role) {
   }
 }
 
+async function sendStaffWelcomeEmail(staffData) {
+  const appUrl = process.env.APP_URL || 'http://localhost:3000';
+  const portalUrl = `${appUrl}/portal.html`;
+
+  console.log(`\n================================================================`);
+  console.log(` 📧 [NEW CLINICAL STAFF CREDENTIAL DISPATCH]`);
+  console.log(` To:                 ${staffData.name} <${staffData.email}>`);
+  console.log(` Staff Code:         ${staffData.staff_code}`);
+  console.log(` Temporary Password: ${staffData.temporary_password}`);
+  console.log(` Portal Link:        ${portalUrl}`);
+  console.log(`================================================================\n`);
+
+  const mailOptions = {
+    from: `"Divine Fingers Clinical Operations" <${process.env.SMTP_USER || 'no-reply@divinefingershealthcare.ca'}>`,
+    to: staffData.email,
+    subject: `🎉 Welcome to Divine Fingers Healthcare — Staff Portal Account Credentials`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 580px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 8px; background: #ffffff;">
+        <h2 style="color: #00a896; margin-top: 0;">Welcome to Divine Fingers Healthcare Services Inc.!</h2>
+        <p>Dear <strong>${staffData.name}</strong>,</p>
+        <p>Your clinician profile has been approved and enrolled onto our Ontario clinical staffing roster as <strong>${staffData.staff_code}</strong>.</p>
+        
+        <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-left: 4px solid #00a896; border-radius: 6px; padding: 16px; margin: 20px 0;">
+          <h4 style="margin: 0 0 10px 0; color: #0f172a; font-size: 1rem;">🔐 Your Staff Portal Sign-In Details:</h4>
+          <p style="margin: 6px 0; font-size: 0.9rem;"><strong>Portal URL:</strong> <a href="${portalUrl}" style="color: #00a896; font-weight: bold;">${portalUrl}</a></p>
+          <p style="margin: 6px 0; font-size: 0.9rem;"><strong>Email / Username:</strong> <span style="font-family: monospace; font-weight: bold;">${staffData.email}</span></p>
+          <p style="margin: 6px 0; font-size: 0.9rem;"><strong>Temporary Password:</strong> <code style="background: #e2e8f0; padding: 3px 8px; border-radius: 4px; font-weight: 800; font-size: 1rem; color: #0f172a;">${staffData.temporary_password}</code></p>
+        </div>
+
+        <h4 style="color: #0f172a; margin-bottom: 8px;">Next Steps to Begin Claiming Shifts:</h4>
+        <ol style="padding-left: 20px; font-size: 0.88rem; line-height: 1.6; color: #334155;">
+          <li>Sign into your Staff Portal using the credentials above.</li>
+          <li>Open your <strong>Credentials Vault</strong> to upload your N95 Mask Fit, BLS / CPR, and Vulnerable Sector Police Check (VSS).</li>
+          <li>Once our clinical coordinator approves your uploaded certificates, you will immediately be dispatch-ready to view and claim high-paying shifts!</li>
+        </ol>
+
+        <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 24px 0;" />
+        <p style="font-size: 12px; color: #64748b; margin: 0;">
+          Divine Fingers Healthcare Services Inc. (Corp ID: 1592082-5) &bull; 17-2 Dailing Gate, Scarborough, ON M1B 1Z8<br>
+          Direct Recruitment Lines: +1 (647) 210-6463 | +1 (647) 764-8522 &bull; <a href="https://www.divinefingershealthcare.com">www.divinefingershealthcare.com</a>
+        </p>
+      </div>
+    `
+  };
+
+  try {
+    return await transporter.sendMail(mailOptions);
+  } catch (err) {
+    console.warn(`⚠️ [SMTP Notice] Email delivery deferred: ${err.message}. Temporary password logged above.`);
+    return { mock: true, accepted: [staffData.email], temporary_password: staffData.temporary_password };
+  }
+}
+
 module.exports = {
   sendStaffingRequestAlert,
   sendApplicantConfirmation,
   sendAdminEmailVerificationOtp,
   sendAdminInviteEmail,
   sendNewsletterWelcomeEmail,
+  sendStaffWelcomeEmail,
   verifyConnection
 };
 

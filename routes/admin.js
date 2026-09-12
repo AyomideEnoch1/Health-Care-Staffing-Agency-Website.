@@ -33,7 +33,7 @@ const { z } = require('zod');
 const { uploadCredential } = require('../middleware/uploadCredentials');
 const { requireAdminAuth, requirePermission, normalizePermissions, ALL_PERMISSIONS } = require('../middleware/auth');
 const adminEvents = require('../utils/events');
-const { sendAdminEmailVerificationOtp, sendAdminInviteEmail } = require('../utils/mailer');
+const { sendAdminEmailVerificationOtp, sendAdminInviteEmail, sendStaffWelcomeEmail } = require('../utils/mailer');
 
 // All admin routes require authentication
 router.use(requireAdminAuth());
@@ -522,9 +522,17 @@ router.post('/roster', requirePermission('roster:manage'), async (req, res, next
         const passwordHash = await bcrypt.hash(plainPassword, salt);
         await pool.query(
           `INSERT INTO users (id, email, password_hash, full_name, role, phone, is_active, email_verified)
-           VALUES (?, ?, ?, ?, 'healthcare_worker', ?, 1, 1)`,
+            VALUES (?, ?, ?, ?, 'healthcare_worker', ?, 1, 1)`,
           [id, emailClean, passwordHash, name.trim(), phone ? phone.trim() : null]
         );
+
+        // Send email with portal link and temporary password
+        sendStaffWelcomeEmail({
+          name: name.trim(),
+          email: emailClean,
+          staff_code: staffCode,
+          temporary_password: plainPassword
+        }).catch(err => console.warn('[Mailer Error]:', err.message));
       } else {
         await pool.query(
           `UPDATE users SET is_active = 1, role = 'healthcare_worker' WHERE id = ?`,
@@ -547,8 +555,8 @@ router.post('/roster', requirePermission('roster:manage'), async (req, res, next
 
     res.status(201).json({
       success: true,
-      message: `Staff member ${name} onboarded successfully with portal access.`,
-      data: { id, staff_code: staffCode, email: emailClean, login_provisioned: true }
+      message: `Staff member ${name} onboarded successfully. Initial password: ${initial_password || 'DivineFingers2026!'}`,
+      data: { id, staff_code: staffCode, email: emailClean, initial_password: initial_password || 'DivineFingers2026!', login_provisioned: true }
     });
   } catch (err) { next(err); }
 });
