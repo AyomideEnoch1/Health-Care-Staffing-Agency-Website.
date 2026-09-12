@@ -58,7 +58,7 @@ async function evaluateStaffCompliance(staffId, staffEmail) {
   try {
     const queryId = rosterStaff ? rosterStaff.id : staffId;
     const [dRows] = await pool.query(
-      `SELECT id, doc_type, title, expiry_date, created_at
+      `SELECT id, doc_type, title, expiry_date, status, created_at
        FROM staff_documents
        WHERE staff_id = ? OR staff_id = ?`,
       [queryId, staffId]
@@ -761,7 +761,7 @@ router.get('/my-documents', async (req, res, next) => {
     const staffRosterId = rosterStaff ? rosterStaff.id : user.id;
 
     const [docs] = await pool.query(
-      `SELECT id, staff_id, doc_type, title, file_name, file_size, mime_type, expiry_date, uploaded_by, created_at
+      `SELECT id, staff_id, doc_type, title, file_name, file_size, mime_type, expiry_date, uploaded_by, status, credential_value, verified_at, created_at
        FROM staff_documents
        WHERE staff_id = ? OR staff_id = ?
        ORDER BY created_at DESC`,
