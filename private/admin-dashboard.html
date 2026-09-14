@@ -12,7 +12,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
 
   <!-- Core Dashboard Design System -->
-  <link rel="stylesheet" href="admin.css?v=5.8.5">
+  <link rel="stylesheet" href="admin.css?v=5.8.6">
 
   <!-- Chart.js CDN for Gradient Visualizations -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -122,6 +122,12 @@
           <span class="nav-icon"><i data-lucide="building-2"></i></span>
           <span class="nav-label">Client Requests</span>
           <span class="nav-badge danger" id="badge-requests-count" style="display:none;">0</span>
+        </button>
+
+        <button type="button" class="nav-item-btn" data-tab="facilities-tab" data-title="Facilities &amp; MSA Contracts" onclick="window.switchAdminTab('facilities-tab', 'Facilities &amp; MSA Contracts')">
+          <span class="nav-icon"><i data-lucide="file-badge"></i></span>
+          <span class="nav-label">Facilities &amp; Rates</span>
+          <span class="nav-badge" id="badge-facilities-count" style="display:none;">0</span>
         </button>
 
         <button type="button" class="nav-item-btn" data-tab="applicants-tab" data-title="Job Applications (ATS)" onclick="window.switchAdminTab('applicants-tab', 'Job Applications (ATS)')">
@@ -607,6 +613,105 @@
                   </tr>
                 </thead>
                 <tbody id="requests-table-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB: HEALTHCARE FACILITIES & MSA CONTRACT RATE CARDS -->
+        <div class="admin-view-tab" id="facilities-tab" style="display: none;">
+          <!-- Top KPI Metrics -->
+          <div class="kpi-grid">
+            <div class="kpi-card">
+              <div class="kpi-top">
+                <span class="kpi-title">Contracted Facilities</span>
+                <div class="kpi-icon-box"><i data-lucide="building-2" style="width: 18px; height: 18px;"></i></div>
+              </div>
+              <div class="kpi-value-row">
+                <span class="kpi-number tabular-nums" id="stat-active-facilities">0</span>
+                <span class="kpi-trend positive"><i data-lucide="shield-check" style="width: 12px; height: 12px;"></i> Active</span>
+              </div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-top">
+                <span class="kpi-title">Active MSA Terms</span>
+                <div class="kpi-icon-box" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;"><i data-lucide="file-check" style="width: 18px; height: 18px;"></i></div>
+              </div>
+              <div class="kpi-value-row">
+                <span class="kpi-number tabular-nums" id="stat-active-rate-cards">0</span>
+                <span class="kpi-trend positive">Terms Live</span>
+              </div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-top">
+                <span class="kpi-title">Expiring Soon (&lt;30d)</span>
+                <div class="kpi-icon-box" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;"><i data-lucide="alert-triangle" style="width: 18px; height: 18px;"></i></div>
+              </div>
+              <div class="kpi-value-row">
+                <span class="kpi-number tabular-nums" id="stat-expiring-facilities" style="color: var(--status-warning, #f59e0b);">0</span>
+                <span class="kpi-trend neutral" style="color: var(--status-warning); background: var(--status-warning-bg);">Notice</span>
+              </div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-top">
+                <span class="kpi-title">Pending Onboarding</span>
+                <div class="kpi-icon-box" style="background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%) !important;"><i data-lucide="clock" style="width: 18px; height: 18px;"></i></div>
+              </div>
+              <div class="kpi-value-row">
+                <span class="kpi-number tabular-nums" id="stat-pending-facilities">0</span>
+                <span class="kpi-trend neutral">Agency Default</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Governance Info Banner -->
+          <div style="background: rgba(0, 168, 150, 0.08); border: 1px solid rgba(0, 168, 150, 0.25); border-radius: 8px; padding: 0.9rem 1.1rem; margin-bottom: 1.25rem; display: flex; align-items: flex-start; gap: 0.85rem;">
+            <i data-lucide="shield-check" style="width: 22px; height: 22px; color: var(--brand-turquoise, #00a896); flex-shrink: 0; margin-top: 2px;"></i>
+            <div style="font-size: 0.82rem; line-height: 1.45; color: var(--text-secondary, #94a3b8);">
+              <strong style="color: var(--text-primary, #f8fafc);">Internal Rate Card Governance:</strong> Contracted MSA rates reflect the actual signed Master Service Agreement terms, managed exclusively by agency administrators. The resolution order is: <code style="background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 4px; color: var(--brand-turquoise);">1. Shift One-Off Exception</code> &rarr; <code style="background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 4px; color: var(--brand-turquoise);">2. Contracted Facility MSA Rate</code> &rarr; <code style="background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 4px; color: var(--brand-turquoise);">3. Global Agency Default</code>. Historical terms are immutably archived upon new rate insertion.
+            </div>
+          </div>
+
+          <div class="table-card">
+            <div class="table-toolbar" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.85rem; padding: 1rem 1.25rem; border-bottom: 1px solid var(--border-color, rgba(255,255,255,0.08));">
+              <div class="table-filter-group" style="display: flex; gap: 0.75rem; flex-wrap: wrap; flex: 1; min-width: 280px;">
+                <input type="text" class="search-input filter-search-box" id="facilities-search-input" placeholder="Search facility name, code, contact or region..." style="min-width: 240px; flex: 1;">
+                <select class="filter-select" id="facilities-status-filter" style="min-width: 190px;">
+                  <option value="">All MSA Statuses</option>
+                  <option value="active">Active MSA Contract</option>
+                  <option value="pending">Pending Onboarding</option>
+                  <option value="expired">Expired MSA</option>
+                </select>
+              </div>
+              <div class="table-action-group">
+                <button type="button" class="btn-primary-action" onclick="window.openFacilityModal()" style="display: flex; align-items: center; gap: 0.4rem;">
+                  <i data-lucide="plus-circle" style="width: 16px; height: 16px;"></i> Register Facility
+                </button>
+              </div>
+            </div>
+
+            <!-- Facilities Table Container -->
+            <div class="table-responsive-container">
+              <table class="data-table mobile-stacked-table" id="facilities-table">
+                <thead>
+                  <tr>
+                    <th>Facility Name &amp; Code</th>
+                    <th>Location / Region</th>
+                    <th>Primary Contact</th>
+                    <th>Contract Status</th>
+                    <th>MSA Expiry Date</th>
+                    <th>Contracted Terms</th>
+                    <th style="text-align: right;">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="facilities-table-body">
+                  <tr>
+                    <td colspan="7" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">
+                      <i data-lucide="loader-2" class="spin" style="width: 24px; height: 24px; margin-bottom: 0.5rem;"></i>
+                      <div>Loading healthcare facilities &amp; contracted rate cards...</div>
+                    </td>
+                  </tr>
+                </tbody>
               </table>
             </div>
           </div>
@@ -1545,6 +1650,288 @@
           </button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       FACILITY REGISTRATION / EDIT MODAL
+       ========================================================================== -->
+  <div class="admin-modal-overlay" id="modal-facility">
+    <div class="admin-modal-card" style="max-width: 580px;">
+      <div class="modal-header">
+        <h3 class="modal-title" id="facility-modal-title">
+          <i data-lucide="building-2" style="width: 20px; height: 20px; color: var(--brand-cyan);"></i> Register Healthcare Facility
+        </h3>
+        <button type="button" class="modal-close-btn" onclick="window.closeFacilityModal()" aria-label="Close modal"><i data-lucide="x" style="width: 20px; height: 20px;"></i></button>
+      </div>
+      <form id="form-facility" onsubmit="window.saveFacilityForm(event)">
+        <input type="hidden" id="facility-id" value="">
+        <div class="modal-form-grid">
+          <div class="modal-form-group">
+            <label for="facility-name">Facility Legal Name *</label>
+            <input type="text" class="modal-input" id="facility-name" placeholder="e.g. Scarborough Health Network" required>
+          </div>
+          <div class="modal-form-group">
+            <label for="facility-code">Facility Code (Optional)</label>
+            <input type="text" class="modal-input" id="facility-code" placeholder="Auto-generated if blank (e.g. FAC-SHN-01)">
+          </div>
+        </div>
+
+        <div class="modal-form-grid">
+          <div class="modal-form-group">
+            <label for="facility-address">Physical Address</label>
+            <input type="text" class="modal-input" id="facility-address" placeholder="e.g. 3050 Lawrence Ave E, Scarborough">
+          </div>
+          <div class="modal-form-group">
+            <label for="facility-region">Region / Territory</label>
+            <select class="modal-input" id="facility-region">
+              <option value="Greater Toronto Area">Greater Toronto Area (GTA)</option>
+              <option value="Toronto Central">Toronto Central</option>
+              <option value="Scarborough / GTA">Scarborough / GTA</option>
+              <option value="North York / GTA">North York / GTA</option>
+              <option value="Mississauga / Peel">Mississauga / Peel</option>
+              <option value="York Region">York Region</option>
+              <option value="Durham Region">Durham Region</option>
+              <option value="Halton Region">Halton Region</option>
+              <option value="Simcoe County">Simcoe County</option>
+              <option value="Hamilton Niagara">Hamilton Niagara</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="modal-form-grid">
+          <div class="modal-form-group">
+            <label for="facility-contact-name">Primary Contact Person</label>
+            <input type="text" class="modal-input" id="facility-contact-name" placeholder="e.g. Sarah Jenkins (Staffing Coord.)">
+          </div>
+          <div class="modal-form-group">
+            <label for="facility-contact-email">Contact / Billing Email</label>
+            <input type="email" class="modal-input" id="facility-contact-email" placeholder="e.g. staffing@hospital.ca">
+          </div>
+        </div>
+
+        <div class="modal-form-grid">
+          <div class="modal-form-group">
+            <label for="facility-contact-phone">Contact Phone</label>
+            <input type="tel" class="modal-input" id="facility-contact-phone" placeholder="e.g. +1 (416) 438-2911">
+          </div>
+          <div class="modal-form-group">
+            <label for="facility-status">MSA Contract Status *</label>
+            <select class="modal-input" id="facility-status" required>
+              <option value="active">Active MSA Contract</option>
+              <option value="pending" selected>Pending Onboarding (Global Fallback)</option>
+              <option value="expired">Expired MSA</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="modal-form-grid">
+          <div class="modal-form-group">
+            <label for="facility-msa-signed">MSA Execution / Signed Date</label>
+            <input type="date" class="modal-input" id="facility-msa-signed">
+          </div>
+          <div class="modal-form-group">
+            <label for="facility-msa-expiry">MSA Expiration Date</label>
+            <input type="date" class="modal-input" id="facility-msa-expiry">
+          </div>
+        </div>
+
+        <div class="modal-form-group" style="margin-bottom: 1.25rem;">
+          <label for="facility-msa-url">Executed MSA Agreement Document (URL or File Link)</label>
+          <input type="text" class="modal-input" id="facility-msa-url" placeholder="e.g. https://storage.divinefingershealthcare.ca/contracts/msa-shn-2026.pdf">
+        </div>
+
+        <div class="modal-actions" style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+          <button type="button" class="btn-secondary-action" onclick="window.closeFacilityModal()">Cancel</button>
+          <button type="submit" class="btn-primary-action" id="facility-submit-btn">
+            <i data-lucide="check"></i> Save Facility Profile
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       CONTRACTED RATE CARD TERM MODAL
+       ========================================================================== -->
+  <div class="admin-modal-overlay" id="modal-rate-card-term">
+    <div class="admin-modal-card" style="max-width: 540px;">
+      <div class="modal-header">
+        <h3 class="modal-title">
+          <i data-lucide="badge-dollar-sign" style="width: 20px; height: 20px; color: var(--brand-turquoise);"></i> Add Contracted MSA Rate Term
+        </h3>
+        <button type="button" class="modal-close-btn" onclick="window.closeRateCardModal()" aria-label="Close modal"><i data-lucide="x" style="width: 20px; height: 20px;"></i></button>
+      </div>
+      <form id="form-rate-card-term" onsubmit="window.saveRateCardTermForm(event)">
+        <input type="hidden" id="rate-card-facility-id" value="">
+
+        <div style="background: rgba(0, 168, 150, 0.08); border: 1px solid rgba(0, 168, 150, 0.25); border-radius: 6px; padding: 0.75rem 0.9rem; margin-bottom: 1rem; font-size: 0.8rem; color: var(--text-secondary);">
+          <strong style="color: var(--text-primary);" id="rate-card-modal-facility-title">Facility: Scarborough Health Network</strong>
+          <div style="margin-top: 3px; font-size: 0.74rem;">Note: Saving this term will automatically archive the previous active term for this clinical role and shift type.</div>
+        </div>
+
+        <div class="modal-form-grid">
+          <div class="modal-form-group">
+            <label for="rate-term-role">Clinical Role *</label>
+            <select class="modal-input" id="rate-term-role" required onchange="window.updateRateTermPayFloorHint()">
+              <option value="RN">RN (Registered Nurse)</option>
+              <option value="RPN">RPN (Registered Practical Nurse)</option>
+              <option value="PSW">PSW (Personal Support Worker)</option>
+              <option value="Companion">Companion Caregiver</option>
+              <option value="Travel Nurse">Travel Nurse</option>
+              <option value="Multiple">Multiple Roles</option>
+            </select>
+          </div>
+          <div class="modal-form-group">
+            <label for="rate-term-shift-type">Shift Type Category *</label>
+            <select class="modal-input" id="rate-term-shift-type" required>
+              <option value="standard" selected>Standard (Day / Evening / General)</option>
+              <option value="night">Night Shift (Premium)</option>
+              <option value="weekend">Weekend Shift</option>
+              <option value="statutory_holiday">Statutory Holiday</option>
+              <option value="critical_surge">Critical Surge</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="modal-form-grid">
+          <div class="modal-form-group">
+            <label for="rate-term-bill-rate">Contracted Bill Rate ($/hr) *</label>
+            <input type="number" class="modal-input" id="rate-term-bill-rate" step="0.50" min="1" placeholder="92.00" required>
+            <div id="rate-term-floor-hint" style="font-size: 0.73rem; color: var(--text-muted); margin-top: 3px;">Agency baseline: $85.00/hr</div>
+          </div>
+          <div class="modal-form-group">
+            <label for="rate-term-pay-rate">Target Clinician Pay ($/hr)</label>
+            <input type="number" class="modal-input" id="rate-term-pay-rate" step="0.50" min="1" placeholder="52.00">
+            <div style="font-size: 0.73rem; color: var(--text-muted); margin-top: 3px;">Default caregiver wage for this term</div>
+          </div>
+        </div>
+
+        <div class="modal-form-grid">
+          <div class="modal-form-group">
+            <label for="rate-term-overtime">Overtime Multiplier</label>
+            <input type="number" class="modal-input" id="rate-term-overtime" step="0.05" min="1.00" max="3.00" value="1.50" required>
+          </div>
+          <div class="modal-form-group">
+            <label for="rate-term-effective-date">Effective Date *</label>
+            <input type="date" class="modal-input" id="rate-term-effective-date" required>
+          </div>
+        </div>
+
+        <div class="modal-form-group" style="margin-bottom: 1.25rem;">
+          <label for="rate-term-notes">Contract / Schedule Amendment Reference</label>
+          <input type="text" class="modal-input" id="rate-term-notes" placeholder="e.g. Schedule B 2026 Annual Rate Revision">
+        </div>
+
+        <div class="modal-actions" style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+          <button type="button" class="btn-secondary-action" onclick="window.closeRateCardModal()">Cancel</button>
+          <button type="submit" class="btn-primary-action" id="rate-term-submit-btn">
+            <i data-lucide="check-circle"></i> Establish Term
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       ONE-OFF SHIFT RATE EXCEPTION MODAL (ADMIN ONLY)
+       ========================================================================== -->
+  <div class="admin-modal-overlay" id="modal-rate-exception">
+    <div class="admin-modal-card" style="max-width: 480px;">
+      <div class="modal-header">
+        <h3 class="modal-title">
+          <i data-lucide="sparkles" style="width: 20px; height: 20px; color: var(--brand-amber, #f59e0b);"></i> One-Off Shift Rate Exception
+        </h3>
+        <button type="button" class="modal-close-btn" onclick="window.closeRateExceptionModal()" aria-label="Close modal"><i data-lucide="x" style="width: 20px; height: 20px;"></i></button>
+      </div>
+      <form id="form-rate-exception" onsubmit="window.saveRateExceptionForm(event)">
+        <input type="hidden" id="rate-exception-request-id" value="">
+        <div style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 1rem;" id="rate-exception-summary-text">
+          Applying a one-off rate exception on shift request.
+        </div>
+        <div class="modal-form-group" style="margin-bottom: 1rem;">
+          <label for="rate-exception-amount">Exception Bill Rate ($/hr) — Leave blank to reset to contract</label>
+          <input type="number" class="modal-input" id="rate-exception-amount" step="0.50" min="1" placeholder="e.g. 98.00">
+        </div>
+        <div class="modal-form-group" style="margin-bottom: 1.25rem;">
+          <label for="rate-exception-reason">Internal Operational Reason *</label>
+          <input type="text" class="modal-input" id="rate-exception-reason" placeholder="e.g. Critical weekend surge approved by director" required>
+        </div>
+        <div class="modal-actions" style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+          <button type="button" class="btn-secondary-action" onclick="window.closeRateExceptionModal()">Cancel</button>
+          <button type="submit" class="btn-primary-action">
+            <i data-lucide="check"></i> Apply Rate Exception
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       FACILITY RATE CARDS & MSA CONTRACT TERMS MANAGEMENT MODAL
+       ========================================================================== -->
+  <div class="admin-modal-overlay" id="modal-manage-rate-cards">
+    <div class="admin-modal-card" style="max-width: 900px; width: 95%;">
+      <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem;">
+        <div>
+          <h3 class="modal-title" id="manage-rate-cards-title" style="display: flex; align-items: center; gap: 0.5rem; margin: 0; font-size: 1.15rem;">
+            <i data-lucide="badge-dollar-sign" style="width: 22px; height: 22px; color: var(--brand-cyan);"></i> Contracted MSA Rate Cards
+          </h3>
+          <div id="manage-rate-cards-subtitle" style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 3px;">
+            Facility: Scarborough Health Network
+          </div>
+        </div>
+        <button type="button" class="modal-close-btn" onclick="window.closeFacilityRateCardsModal()" aria-label="Close modal">
+          <i data-lucide="x" style="width: 20px; height: 20px;"></i>
+        </button>
+      </div>
+
+      <div style="padding: 1.25rem 0 0.5rem;">
+        <!-- Facility Info Bar -->
+        <div id="manage-rate-cards-facility-summary" style="background: rgba(0, 168, 150, 0.08); border: 1px solid rgba(0, 168, 150, 0.25); border-radius: 8px; padding: 0.85rem 1rem; margin-bottom: 1.25rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+          <!-- Dynamically filled -->
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem; flex-wrap: wrap; gap: 0.5rem;">
+          <div>
+            <h4 style="margin: 0; font-size: 0.95rem; font-weight: 700; color: var(--text-primary);">Contracted Rate Card Terms Ledger</h4>
+            <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">Active terms resolve for shift billing; historical terms remain archived for audit reconciliation.</div>
+          </div>
+          <button type="button" class="btn-primary-action" id="btn-add-rate-term-from-modal" style="font-size: 0.8rem; padding: 0.4rem 0.85rem; display: flex; align-items: center; gap: 0.4rem;">
+            <i data-lucide="plus" style="width: 14px; height: 14px;"></i> Add Rate Term
+          </button>
+        </div>
+
+        <div class="table-responsive-container" style="max-height: 420px; overflow-y: auto; overflow-x: auto; -webkit-overflow-scrolling: touch; border: 1px solid var(--border-color); border-radius: 8px; width: 100%;">
+          <table class="data-table" style="font-size: 0.82rem; margin: 0; min-width: 680px; width: 100%;">
+            <thead>
+              <tr>
+                <th>Role &amp; Shift Type</th>
+                <th>Contracted Bill Rate</th>
+                <th>Target Clinician Pay</th>
+                <th>Target Margin</th>
+                <th>Effective Date</th>
+                <th>Expiry Date</th>
+                <th>Status</th>
+                <th>Reference / Auditor</th>
+                <th style="text-align: right;">Action</th>
+              </tr>
+            </thead>
+            <tbody id="facility-modal-rate-cards-body">
+              <tr>
+                <td colspan="9" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                  <i data-lucide="loader-2" class="spin" style="width: 20px; height: 20px; margin-bottom: 4px;"></i>
+                  <div>Loading rate terms...</div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="modal-actions" style="display: flex; justify-content: flex-end; gap: 0.75rem; padding-top: 1rem; border-top: 1px solid var(--border-color); margin-top: 1rem;">
+        <button type="button" class="btn-secondary-action" onclick="window.closeFacilityRateCardsModal()">Close</button>
+      </div>
     </div>
   </div>
 

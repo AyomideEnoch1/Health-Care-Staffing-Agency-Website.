@@ -29,6 +29,9 @@
     auditLogs:  [],
     subscribers: [],
     activeReportType: 'shifts',
+    facilities: [],
+    facilityRateCards: {},
+    expandedFacilityId: null,
     kpis:       null,
     selectedStaffIds: new Set(),
     activeInquiryId: null,
@@ -3968,8 +3971,25 @@
             ${req.client_rating ? `<div style="font-size:1rem;margin-bottom:4px;color:#F59E0B;">${'★'.repeat(Number(req.client_rating))}${'☆'.repeat(5 - Number(req.client_rating))} <span style="font-size:0.8rem;font-weight:700;color:#334155;">${req.client_rating}.0 / 5.0</span>${ req.client_rated_at ? ` <span style="font-size:0.72rem;color:#94A3B8;font-weight:500;">· Submitted ${formatUserDateTime(req.client_rated_at)}</span>` : ''}</div>` : ''}
             ${req.client_feedback ? `<div style="white-space:pre-wrap;word-break:break-word;font-size:0.84rem;line-height:1.55;color:#1E293B;background:#fff;border:1px solid #D1FAE5;border-radius:6px;padding:0.65rem 0.85rem;margin-top:4px;">"${escapeHTML(req.client_feedback)}"</div>` : ''}
           </div>` : ''}
+      <!-- Billing Rate Resolution Card -->
+      <div style="background: rgba(0, 168, 150, 0.06); padding: 1.15rem 1.25rem; border-radius: 10px; margin: 1.25rem 0; border: 1.5px solid rgba(0, 168, 150, 0.25);">
+        <div style="font-size: 0.82rem; font-weight: 800; color: var(--brand-turquoise); margin-bottom: 0.65rem; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; justify-content: space-between;">
+          <span style="display: flex; align-items: center; gap: 6px;"><i data-lucide="badge-dollar-sign" style="width: 14px; height: 14px;"></i> Bill Rate Resolution</span>
+          <span class="status-pill verified" style="font-size: 0.7rem; padding: 2px 7px;">
+            ${req.billing_hourly_rate ? 'Admin Exception' : 'Contracted / Standard'}
+          </span>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; margin-bottom: 0.6rem;">
+          <span style="color: var(--text-muted); font-weight: 600;">Effective Bill Rate:</span>
+          <strong style="color: var(--text-primary); font-size: 1.1rem; font-weight: 800;">$${req.billing_hourly_rate ? parseFloat(req.billing_hourly_rate).toFixed(2) : (getResolvedRateHint(req)).toFixed(2)}/hr</strong>
+        </div>
+        <div style="display: flex; justify-content: flex-end;">
+          <button type="button" class="btn-secondary-action" style="font-size: 0.75rem; height: 30px; padding: 0 0.7rem; display: inline-flex; align-items: center; gap: 5px;" onclick="window.openRateExceptionModal('${req.id}', '${req.billing_hourly_rate || ''}', '${req.request_code}')">
+            <i data-lucide="sparkles" style="width: 12px; height: 12px; color: var(--brand-amber);"></i> ${req.billing_hourly_rate ? 'Edit Rate Exception' : 'Set One-Off Exception'}
+          </button>
+        </div>
       </div>
-      
+
       <div style="background: var(--bg-surface); padding: 1.25rem 1.35rem; border-radius: 10px; margin: 1.5rem 0; border: 1.5px solid var(--border-subtle); box-shadow: 0 2px 6px rgba(0,0,0,0.03);">
         <div style="font-size: 0.82rem; font-weight: 800; color: var(--brand-cyan); margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 6px;">
           <i data-lucide="clock" style="width: 14px; height: 14px;"></i> Shift Tracking &amp; Clock Timestamps
@@ -4451,6 +4471,648 @@
   if (btnExportRosterCsv)     btnExportRosterCsv.addEventListener('click', () => exportDataToCSV(LiveStore.staff, 'Staff_Roster.csv'));
   if (btnExportApplicantsCsv) btnExportApplicantsCsv.addEventListener('click', () => exportDataToCSV(LiveStore.applicants, 'Job_Applicants.csv'));
 
+  // ── 15B. Facilities & MSA Contract Rate Cards Management ────────────────────
+  const facilitiesTableBody     = document.getElementById('facilities-table-body');
+  const facilitiesSearchInput   = document.getElementById('facilities-search-input');
+  const facilitiesStatusFilter  = document.getElementById('facilities-status-filter');
+  const badgeFacilitiesCount   = document.getElementById('badge-facilities-count');
+
+  const modalFacility           = document.getElementById('modal-facility');
+  const modalRateCardTerm       = document.getElementById('modal-rate-card-term');
+  const modalRateException      = document.getElementById('modal-rate-exception');
+  const modalManageRateCards    = document.getElementById('modal-manage-rate-cards');
+
+  const ROLE_BASELINE_RATES = {
+    'RN': 85.00,
+    'RPN': 65.00,
+    'PSW': 45.00,
+    'Companion': 38.00,
+    'Travel Nurse': 105.00,
+    'Multiple': 65.00
+  };
+
+  async function fetchAndRenderFacilities() {
+    if (!facilitiesTableBody) return;
+
+    try {
+      const res = await apiRequest('/admin/facilities');
+      LiveStore.facilities = (res && res.data) ? res.data : [];
+
+      // Update KPI counters
+      const activeCount   = LiveStore.facilities.filter(f => f.effective_status === 'active').length;
+      const expiringCount = LiveStore.facilities.filter(f => f.is_expiring_soon).length;
+      const pendingCount  = LiveStore.facilities.filter(f => f.effective_status === 'pending').length;
+      const totalTerms    = LiveStore.facilities.reduce((acc, f) => acc + (f.active_rate_cards_count || 0), 0);
+
+      const elActive   = document.getElementById('stat-active-facilities');
+      const elTerms    = document.getElementById('stat-active-rate-cards');
+      const elExpiring = document.getElementById('stat-expiring-facilities');
+      const elPending  = document.getElementById('stat-pending-facilities');
+
+      if (elActive)   elActive.textContent   = activeCount;
+      if (elTerms)    elTerms.textContent    = totalTerms;
+      if (elExpiring) elExpiring.textContent = expiringCount;
+      if (elPending)  elPending.textContent  = pendingCount;
+
+      if (badgeFacilitiesCount) {
+        badgeFacilitiesCount.textContent = LiveStore.facilities.length;
+        badgeFacilitiesCount.style.display = LiveStore.facilities.length > 0 ? 'inline-block' : 'none';
+      }
+
+      renderFacilitiesList();
+    } catch (err) {
+      console.error('[Facilities Fetch Error]:', err);
+      facilitiesTableBody.innerHTML = `
+        <tr>
+          <td colspan="7" style="text-align: center; padding: 2.5rem; color: var(--status-danger);">
+            <i data-lucide="alert-circle" style="width: 28px; height: 28px; margin-bottom: 0.5rem;"></i>
+            <div>Failed to load healthcare facilities: ${escapeHTML(err.message)}</div>
+          </td>
+        </tr>
+      `;
+      if (window.lucide) lucide.createIcons();
+    }
+  }
+
+  function renderFacilitiesList() {
+    if (!facilitiesTableBody) return;
+
+    const query  = (facilitiesSearchInput?.value || '').trim().toLowerCase();
+    const status = facilitiesStatusFilter?.value || '';
+
+    const filtered = LiveStore.facilities.filter(f => {
+      const matchesSearch = !query || 
+        f.name.toLowerCase().includes(query) ||
+        (f.facility_code && f.facility_code.toLowerCase().includes(query)) ||
+        (f.region && f.region.toLowerCase().includes(query)) ||
+        (f.contact_name && f.contact_name.toLowerCase().includes(query)) ||
+        (f.contact_email && f.contact_email.toLowerCase().includes(query));
+
+      const matchesStatus = !status || f.effective_status === status;
+      return matchesSearch && matchesStatus;
+    });
+
+    if (filtered.length === 0) {
+      facilitiesTableBody.innerHTML = `
+        <tr>
+          <td colspan="7" style="text-align: center; padding: 3rem 1.5rem; color: var(--text-muted);">
+            <i data-lucide="building-2" style="width: 38px; height: 38px; opacity: 0.4; margin-bottom: 0.75rem;"></i>
+            <div style="font-weight: 600; font-size: 0.95rem; color: var(--text-primary); margin-bottom: 4px;">No Facilities Found</div>
+            <div style="font-size: 0.82rem;">No healthcare facility records match your active search or status filters.</div>
+            <button type="button" class="btn-primary-action" onclick="window.openFacilityModal()" style="margin-top: 1rem; display: inline-flex; align-items: center; gap: 6px;">
+              <i data-lucide="plus-circle" style="width: 15px; height: 15px;"></i> Register New Facility
+            </button>
+          </td>
+        </tr>
+      `;
+      if (window.lucide) lucide.createIcons();
+      return;
+    }
+
+    facilitiesTableBody.innerHTML = filtered.map(f => {
+      let statusBadge = '';
+      if (f.effective_status === 'active') {
+        statusBadge = '<span class="status-pill verified" style="font-size: 0.72rem; padding: 2px 8px;"><i data-lucide="shield-check" style="width: 12px; height: 12px;"></i> Active MSA</span>';
+      } else if (f.effective_status === 'expired') {
+        statusBadge = '<span class="status-pill danger" style="font-size: 0.72rem; padding: 2px 8px;"><i data-lucide="alert-triangle" style="width: 12px; height: 12px;"></i> Expired MSA</span>';
+      } else {
+        statusBadge = '<span class="status-pill pending" style="font-size: 0.72rem; padding: 2px 8px;"><i data-lucide="clock" style="width: 12px; height: 12px;"></i> Pending Onboarding</span>';
+      }
+
+      let expiryWarning = '';
+      if (f.is_expiring_soon && f.effective_status !== 'expired') {
+        expiryWarning = `<div style="margin-top: 4px;"><span style="background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.4); font-size: 0.68rem; font-weight: 700; padding: 1px 6px; border-radius: 4px; display: inline-flex; align-items: center; gap: 3px;">
+          <i data-lucide="clock-alert" style="width: 10px; height: 10px;"></i> Expires in ${f.days_until_expiry}d
+        </span></div>`;
+      }
+
+      const expiryStr = f.msa_expiry_date ? formatUserDateTime(f.msa_expiry_date).split(',')[0] : 'Open-Ended';
+      const docLink = f.msa_document_url ? `
+        <a href="${escapeHTML(f.msa_document_url)}" target="_blank" rel="noopener noreferrer" style="font-size: 0.72rem; color: var(--brand-turquoise); display: inline-flex; align-items: center; gap: 3px; text-decoration: underline; margin-top: 2px;" title="View Executed Agreement">
+          <i data-lucide="file-text" style="width: 11px; height: 11px;"></i> Contract PDF
+        </a>
+      ` : '';
+
+      return `
+        <tr class="table-card-row">
+          <!-- Facility Name & Code -->
+          <td class="cell-primary" data-label="Facility">
+            <div class="row-header-wrapper">
+              <div class="user-meta-name">
+                <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                  <strong class="user-display-name">${escapeHTML(f.name)}</strong>
+                  <span style="font-family: monospace; font-size: 0.72rem; background: rgba(255,255,255,0.06); padding: 1px 5px; border-radius: 4px; color: var(--text-muted); font-weight: 700;">
+                    ${escapeHTML(f.facility_code || 'FAC')}
+                  </span>
+                </div>
+                ${f.address ? `<span class="user-role-sub">${escapeHTML(f.address)}</span>` : ''}
+              </div>
+              <div class="row-status-top">${statusBadge}</div>
+            </div>
+          </td>
+
+          <!-- Location / Region -->
+          <td class="cell-grid-item" data-label="Location / Region">
+            <div class="meta-label">Location / Region</div>
+            <div class="meta-value">
+              <i data-lucide="map-pin" style="width: 13px; height: 13px; color: var(--brand-turquoise); vertical-align: middle;"></i>
+              <span>${escapeHTML(f.region || 'GTA')}</span>
+            </div>
+          </td>
+
+          <!-- Primary Contact -->
+          <td class="cell-grid-item" data-label="Primary Contact">
+            <div class="meta-label">Primary Contact</div>
+            <div class="meta-value">
+              <div style="font-weight: 600; color: var(--text-primary);">${escapeHTML(f.contact_name || '—')}</div>
+              ${f.contact_email ? `<div style="font-size: 0.74rem; color: var(--text-muted); word-break: break-all;">${escapeHTML(f.contact_email)}</div>` : ''}
+              ${f.contact_phone ? `<div style="font-size: 0.72rem; color: var(--text-muted);">${escapeHTML(f.contact_phone)}</div>` : ''}
+            </div>
+          </td>
+
+          <!-- Contract Status -->
+          <td class="cell-status-desktop" data-label="Contract Status">
+            <div class="meta-label">Status</div>
+            <div class="meta-value">
+              ${statusBadge}
+              ${expiryWarning}
+            </div>
+          </td>
+
+          <!-- MSA Expiry Date -->
+          <td class="cell-grid-item" data-label="MSA Expiry">
+            <div class="meta-label">MSA Expiry Date</div>
+            <div class="meta-value">
+              <strong>${expiryStr}</strong>
+              ${docLink}
+            </div>
+          </td>
+
+          <!-- Contracted Terms -->
+          <td class="cell-grid-item" data-label="Contracted Terms">
+            <div class="meta-label">Contracted Terms</div>
+            <div class="meta-value">
+              <span class="status-pill ${f.active_rate_cards_count > 0 ? 'verified' : ''}" style="font-size: 0.72rem; padding: 2px 7px; ${f.active_rate_cards_count > 0 ? '' : 'background: rgba(255,255,255,0.06); color: var(--text-muted);'}">
+                <strong style="color: ${f.active_rate_cards_count > 0 ? 'var(--brand-turquoise)' : 'inherit'};">${f.active_rate_cards_count || 0}</strong> active
+              </span>
+              <span style="font-size: 0.7rem; color: var(--text-muted); margin-left: 4px;">(${f.total_rate_cards_count || 0} total)</span>
+            </div>
+          </td>
+
+          <!-- Actions -->
+          <td class="cell-actions" data-label="Actions">
+            <div style="display: flex; gap: 0.5rem; justify-content: flex-end; width: 100%; flex-wrap: wrap;">
+              <button type="button" class="btn-primary-action" style="font-size: 0.76rem; padding: 0.35rem 0.75rem; display: inline-flex; align-items: center; gap: 4px; flex: 1; justify-content: center; min-width: 100px;" onclick="window.openFacilityRateCardsModal('${f.id}')" title="Manage Contracted Rates">
+                <i data-lucide="badge-dollar-sign" style="width: 13px; height: 13px;"></i> Rate Cards
+              </button>
+              <button type="button" class="btn-secondary-action" style="font-size: 0.76rem; padding: 0.35rem 0.65rem; display: inline-flex; align-items: center; gap: 4px; flex: 1; justify-content: center; min-width: 80px;" onclick="window.openFacilityModal('${f.id}')" title="Edit Profile">
+                <i data-lucide="edit-3" style="width: 13px; height: 13px;"></i> Edit
+              </button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('');
+
+    if (window.lucide) lucide.createIcons();
+  }
+
+  // Facility Rate Cards Management Modal Handlers
+  window.openFacilityRateCardsModal = async function(facilityId) {
+    const facility = LiveStore.facilities.find(f => f.id === facilityId);
+    if (!facility) return;
+
+    const subtitleEl = document.getElementById('manage-rate-cards-subtitle');
+    const summaryEl  = document.getElementById('manage-rate-cards-facility-summary');
+    const addBtn     = document.getElementById('btn-add-rate-term-from-modal');
+
+    if (subtitleEl) subtitleEl.textContent = `Facility: ${facility.name} (${facility.facility_code || 'FAC'})`;
+    if (addBtn) {
+      addBtn.onclick = () => window.openRateCardModal(facilityId, facility.name);
+    }
+
+    if (summaryEl) {
+      let statusPill = '';
+      if (facility.effective_status === 'active') {
+        statusPill = '<span class="status-pill verified" style="font-size: 0.72rem; padding: 1px 7px;">Active MSA Contract</span>';
+      } else if (facility.effective_status === 'expired') {
+        statusPill = '<span class="status-pill danger" style="font-size: 0.72rem; padding: 1px 7px;">Expired MSA</span>';
+      } else {
+        statusPill = '<span class="status-pill pending" style="font-size: 0.72rem; padding: 1px 7px;">Pending Onboarding</span>';
+      }
+
+      const signedStr = facility.msa_signed_date ? formatUserDateTime(facility.msa_signed_date).split(',')[0] : 'Not Recorded';
+      const expiryStr = facility.msa_expiry_date ? formatUserDateTime(facility.msa_expiry_date).split(',')[0] : 'Open-Ended';
+      const docLink = facility.msa_document_url ? `
+        <a href="${escapeHTML(facility.msa_document_url)}" target="_blank" rel="noopener noreferrer" style="color: var(--brand-turquoise); font-size: 0.75rem; text-decoration: underline; display: inline-flex; align-items: center; gap: 3px;">
+          <i data-lucide="external-link" style="width: 12px; height: 12px;"></i> View Executed Contract
+        </a>
+      ` : '';
+
+      summaryEl.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 0.85rem; flex-wrap: wrap;">
+          <strong style="color: var(--text-primary); font-size: 0.95rem;">${escapeHTML(facility.name)}</strong>
+          ${statusPill}
+          <span style="font-size: 0.76rem; color: var(--text-muted);"><i data-lucide="map-pin" style="width: 12px; height: 12px; vertical-align: middle;"></i> ${escapeHTML(facility.region || 'GTA')}</span>
+          <span style="font-size: 0.76rem; color: var(--text-secondary);"><strong>Signed:</strong> ${signedStr}</span>
+          <span style="font-size: 0.76rem; color: var(--text-secondary);"><strong>Term Expiry:</strong> ${expiryStr}</span>
+        </div>
+        <div>
+          ${docLink}
+        </div>
+      `;
+    }
+
+    if (modalManageRateCards) modalManageRateCards.classList.add('open');
+    if (window.lucide) lucide.createIcons();
+
+    await window.loadFacilityRateCardsIntoModal(facilityId);
+  };
+
+  window.closeFacilityRateCardsModal = function() {
+    if (modalManageRateCards) modalManageRateCards.classList.remove('open');
+  };
+
+  window.loadFacilityRateCardsIntoModal = async function(facilityId) {
+    const tableBody = document.getElementById('facility-modal-rate-cards-body');
+    if (!tableBody) return;
+
+    tableBody.innerHTML = `
+      <tr>
+        <td colspan="9" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+          <i data-lucide="loader-2" class="spin" style="width: 20px; height: 20px; margin-bottom: 4px;"></i>
+          <div>Loading contracted terms...</div>
+        </td>
+      </tr>
+    `;
+    if (window.lucide) lucide.createIcons();
+
+    try {
+      const res = await apiRequest(`/admin/facilities/${facilityId}/rate-cards`);
+      const cards = (res && res.data) ? res.data : [];
+      LiveStore.facilityRateCards[facilityId] = cards;
+
+      if (cards.length === 0) {
+        const facility = LiveStore.facilities.find(f => f.id === facilityId);
+        tableBody.innerHTML = `
+          <tr>
+            <td colspan="9" style="text-align: center; padding: 2.5rem 1rem; color: var(--text-muted);">
+              <i data-lucide="badge-dollar-sign" style="width: 32px; height: 32px; opacity: 0.4; margin-bottom: 0.5rem;"></i>
+              <div style="font-weight: 600; font-size: 0.9rem; color: var(--text-primary); margin-bottom: 4px;">No Contracted Terms Recorded</div>
+              <div style="font-size: 0.78rem; margin-bottom: 0.75rem;">This facility currently falls back to the Global Standard Agency Rate Card.</div>
+              <button type="button" class="btn-primary-action" style="font-size: 0.76rem; padding: 0.35rem 0.75rem;" onclick="window.openRateCardModal('${facilityId}', '${escapeHTML(facility?.name || '')}')">
+                <i data-lucide="plus" style="width: 13px; height: 13px;"></i> Add First Rate Term
+              </button>
+            </td>
+          </tr>
+        `;
+        if (window.lucide) lucide.createIcons();
+        return;
+      }
+
+      tableBody.innerHTML = cards.map(c => {
+        const isActive = Boolean(c.is_active);
+        const billRate = parseFloat(c.bill_rate || 0);
+        const payRate  = c.pay_rate ? parseFloat(c.pay_rate) : null;
+        const margin   = payRate ? (billRate - payRate).toFixed(2) : '—';
+        const marginPct = payRate ? Math.round(((billRate - payRate) / billRate) * 100) : null;
+
+        const effDate = c.effective_date ? c.effective_date.slice(0, 10) : '—';
+        const expDate = c.expiry_date ? c.expiry_date.slice(0, 10) : 'Current';
+
+        return `
+          <tr style="opacity: ${isActive ? '1' : '0.65'}; background: ${isActive ? 'rgba(0, 168, 150, 0.04)' : 'transparent'};">
+            <td>
+              <div style="font-weight: 800; color: var(--text-primary);">${escapeHTML(c.role)}</div>
+              <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: capitalize;">${escapeHTML(c.shift_type || 'standard')}</div>
+            </td>
+            <td>
+              <strong style="color: var(--brand-turquoise); font-size: 0.95rem;">$${billRate.toFixed(2)}/hr</strong>
+              ${c.overtime_multiplier && parseFloat(c.overtime_multiplier) !== 1.5 ? `<div style="font-size: 0.7rem; color: var(--text-muted);">OT: ${c.overtime_multiplier}x</div>` : ''}
+            </td>
+            <td>
+              <span style="color: var(--text-secondary);">${payRate ? '$' + payRate.toFixed(2) + '/hr' : '—'}</span>
+            </td>
+            <td>
+              ${payRate ? `<span style="color: var(--status-success, #22c55e); font-weight: 700;">+$${margin}/hr</span> <span style="font-size: 0.7rem; color: var(--text-muted);">(${marginPct}%)</span>` : '—'}
+            </td>
+            <td>
+              <div style="font-size: 0.78rem;">${effDate}</div>
+            </td>
+            <td>
+              <div style="font-size: 0.78rem; color: ${isActive ? 'var(--status-success)' : 'var(--text-muted)'};">${expDate}</div>
+            </td>
+            <td>
+              ${isActive 
+                ? '<span class="status-pill verified" style="font-size: 0.68rem; padding: 1px 6px;">Active</span>' 
+                : '<span class="status-pill" style="font-size: 0.68rem; padding: 1px 6px; background: rgba(255,255,255,0.06); color: var(--text-muted);">Archived</span>'
+              }
+            </td>
+            <td style="font-size: 0.74rem; color: var(--text-muted); max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${escapeHTML(c.notes || c.created_by || '')}">
+              ${escapeHTML(c.notes || c.created_by || '—')}
+            </td>
+            <td style="text-align: right;">
+              <button type="button" class="btn-secondary-action" style="padding: 2px 6px; font-size: 0.7rem; color: var(--status-danger);" onclick="window.deleteRateCardTerm('${facilityId}', '${c.id}')" title="Delete Term">
+                <i data-lucide="trash-2" style="width: 12px; height: 12px;"></i>
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      if (window.lucide) lucide.createIcons();
+    } catch (err) {
+      tableBody.innerHTML = `
+        <tr>
+          <td colspan="9" style="color: var(--status-danger); padding: 1.5rem; text-align: center; font-size: 0.85rem;">
+            Failed to load rate cards: ${escapeHTML(err.message)}
+          </td>
+        </tr>
+      `;
+      if (window.lucide) lucide.createIcons();
+    }
+  };
+
+  // Facility Modal Handlers
+  window.openFacilityModal = function(facilityId = null) {
+    const titleEl = document.getElementById('facility-modal-title');
+    const form = document.getElementById('form-facility');
+    if (!form) return;
+    form.reset();
+
+    document.getElementById('facility-id').value = facilityId || '';
+
+    if (facilityId) {
+      const f = LiveStore.facilities.find(fac => fac.id === facilityId);
+      if (f) {
+        if (titleEl) titleEl.innerHTML = `<i data-lucide="edit-3" style="width: 20px; height: 20px; color: var(--brand-cyan);"></i> Edit Facility: ${escapeHTML(f.name)}`;
+        document.getElementById('facility-name').value = f.name || '';
+        document.getElementById('facility-code').value = f.facility_code || '';
+        document.getElementById('facility-address').value = f.address || '';
+        document.getElementById('facility-region').value = f.region || 'Greater Toronto Area';
+        document.getElementById('facility-contact-name').value = f.contact_name || '';
+        document.getElementById('facility-contact-email').value = f.contact_email || '';
+        document.getElementById('facility-contact-phone').value = f.contact_phone || '';
+        document.getElementById('facility-status').value = f.status || 'pending';
+        document.getElementById('facility-msa-signed').value = f.msa_signed_date ? f.msa_signed_date.slice(0, 10) : '';
+        document.getElementById('facility-msa-expiry').value = f.msa_expiry_date ? f.msa_expiry_date.slice(0, 10) : '';
+        document.getElementById('facility-msa-url').value = f.msa_document_url || '';
+      }
+    } else {
+      if (titleEl) titleEl.innerHTML = `<i data-lucide="building-2" style="width: 20px; height: 20px; color: var(--brand-cyan);"></i> Register Healthcare Facility`;
+    }
+
+    if (modalFacility) modalFacility.classList.add('open');
+    if (window.lucide) lucide.createIcons();
+  };
+
+  window.closeFacilityModal = function() {
+    if (modalFacility) modalFacility.classList.remove('open');
+  };
+
+  window.saveFacilityForm = async function(e) {
+    if (e && e.preventDefault) e.preventDefault();
+    const facilityId = document.getElementById('facility-id').value;
+    const submitBtn  = document.getElementById('facility-submit-btn');
+
+    const payload = {
+      name: document.getElementById('facility-name').value.trim(),
+      facility_code: document.getElementById('facility-code').value.trim() || undefined,
+      address: document.getElementById('facility-address').value.trim() || null,
+      region: document.getElementById('facility-region').value,
+      contact_name: document.getElementById('facility-contact-name').value.trim() || null,
+      contact_email: document.getElementById('facility-contact-email').value.trim() || null,
+      contact_phone: document.getElementById('facility-contact-phone').value.trim() || null,
+      status: document.getElementById('facility-status').value,
+      msa_signed_date: document.getElementById('facility-msa-signed').value || null,
+      msa_expiry_date: document.getElementById('facility-msa-expiry').value || null,
+      msa_document_url: document.getElementById('facility-msa-url').value.trim() || null
+    };
+
+    if (!payload.name) {
+      showToast('Facility legal name is required.', 'error');
+      return;
+    }
+
+    try {
+      if (submitBtn) { submitBtn.disabled = true; submitBtn.innerHTML = '<i data-lucide="loader-2" class="spin"></i> Saving...'; }
+      let res;
+      if (facilityId) {
+        res = await apiRequest(`/admin/facilities/${facilityId}`, {
+          method: 'PATCH',
+          body: JSON.stringify(payload)
+        });
+      } else {
+        res = await apiRequest('/admin/facilities', {
+          method: 'POST',
+          body: JSON.stringify(payload)
+        });
+      }
+
+      if (res && res.success) {
+        showToast(res.message || 'Facility saved successfully.', 'success');
+        window.closeFacilityModal();
+        await fetchAndRenderFacilities();
+      } else {
+        showToast(res?.error || 'Failed to save facility.', 'error');
+      }
+    } catch (err) {
+      showToast(err.message || 'Failed to communicate with server.', 'error');
+    } finally {
+      if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = '<i data-lucide="check"></i> Save Facility Profile'; if (window.lucide) lucide.createIcons(); }
+    }
+  };
+
+  // Rate Card Term Modal Handlers
+  window.openRateCardModal = function(facilityId, facilityName) {
+    const form = document.getElementById('form-rate-card-term');
+    if (!form) return;
+    form.reset();
+
+    document.getElementById('rate-card-facility-id').value = facilityId;
+    const titleEl = document.getElementById('rate-card-modal-facility-title');
+    if (titleEl) titleEl.textContent = `Facility: ${facilityName || 'Selected Facility'}`;
+
+    const effInput = document.getElementById('rate-term-effective-date');
+    if (effInput) effInput.value = new Date().toISOString().slice(0, 10);
+
+    window.updateRateTermPayFloorHint();
+    if (modalRateCardTerm) modalRateCardTerm.classList.add('open');
+    if (window.lucide) lucide.createIcons();
+  };
+
+  window.closeRateCardModal = function() {
+    if (modalRateCardTerm) modalRateCardTerm.classList.remove('open');
+  };
+
+  window.updateRateTermPayFloorHint = function() {
+    const roleSelect = document.getElementById('rate-term-role');
+    const hintEl = document.getElementById('rate-term-floor-hint');
+    if (!roleSelect || !hintEl) return;
+    const role = roleSelect.value;
+    const baseline = ROLE_BASELINE_RATES[role] || 65.00;
+    hintEl.textContent = `Agency standard baseline: $${baseline.toFixed(2)}/hr`;
+  };
+
+  window.saveRateCardTermForm = async function(e) {
+    if (e && e.preventDefault) e.preventDefault();
+    const facilityId = document.getElementById('rate-card-facility-id').value;
+    const submitBtn  = document.getElementById('rate-term-submit-btn');
+
+    const billRate = parseFloat(document.getElementById('rate-term-bill-rate').value);
+    const payRateVal = document.getElementById('rate-term-pay-rate').value;
+    const payRate = payRateVal ? parseFloat(payRateVal) : null;
+    const role = document.getElementById('rate-term-role').value;
+    const shiftType = document.getElementById('rate-term-shift-type').value;
+    const overtime = parseFloat(document.getElementById('rate-term-overtime').value || '1.50');
+    const effectiveDate = document.getElementById('rate-term-effective-date').value;
+    const notes = document.getElementById('rate-term-notes').value.trim() || null;
+
+    if (!billRate || billRate <= 0) {
+      showToast('Please enter a valid bill rate.', 'error');
+      return;
+    }
+    if (!effectiveDate) {
+      showToast('Effective date is required.', 'error');
+      return;
+    }
+
+    const payload = {
+      role,
+      shift_type: shiftType,
+      bill_rate: billRate,
+      pay_rate: payRate,
+      overtime_multiplier: overtime,
+      effective_date: effectiveDate,
+      notes
+    };
+
+    try {
+      if (submitBtn) { submitBtn.disabled = true; submitBtn.innerHTML = '<i data-lucide="loader-2" class="spin"></i> Establishing...'; }
+      const res = await apiRequest(`/admin/facilities/${facilityId}/rate-cards`, {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      });
+
+      if (res && res.success) {
+        showToast(res.message || 'Rate term established successfully.', 'success');
+        window.closeRateCardModal();
+        await fetchAndRenderFacilities();
+        if (modalManageRateCards && modalManageRateCards.classList.contains('open')) {
+          await window.loadFacilityRateCardsIntoModal(facilityId);
+        }
+      } else {
+        showToast(res?.error || 'Failed to establish rate term.', 'error');
+      }
+    } catch (err) {
+      showToast(err.message || 'Server error saving rate term.', 'error');
+    } finally {
+      if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = '<i data-lucide="check-circle"></i> Establish Term'; if (window.lucide) lucide.createIcons(); }
+    }
+  };
+
+  window.deleteRateCardTerm = async function(facilityId, termId) {
+    if (!confirm('Are you sure you want to delete this rate card term? Active terms should normally be archived by setting a new term rather than deleted.')) {
+      return;
+    }
+
+    try {
+      const res = await apiRequest(`/admin/facilities/${facilityId}/rate-cards/${termId}`, {
+        method: 'DELETE'
+      });
+      if (res && res.success) {
+        showToast('Rate card term deleted.', 'success');
+        await fetchAndRenderFacilities();
+        if (modalManageRateCards && modalManageRateCards.classList.contains('open')) {
+          await window.loadFacilityRateCardsIntoModal(facilityId);
+        }
+      } else {
+        showToast(res?.error || 'Failed to delete term.', 'error');
+      }
+    } catch (err) {
+      showToast(err.message || 'Error deleting term.', 'error');
+    }
+  };
+
+  // Shift Rate Exception Modal (Admin Only)
+  window.openRateExceptionModal = function(requestId, currentRate, requestCode) {
+    const form = document.getElementById('form-rate-exception');
+    if (!form) return;
+    form.reset();
+
+    document.getElementById('rate-exception-request-id').value = requestId;
+    document.getElementById('rate-exception-amount').value = currentRate ? parseFloat(currentRate) : '';
+    const textEl = document.getElementById('rate-exception-summary-text');
+    if (textEl) {
+      textEl.textContent = `Setting one-off administrative bill rate exception for shift ${requestCode || ''}.`;
+    }
+
+    if (modalRateException) modalRateException.classList.add('open');
+    if (window.lucide) lucide.createIcons();
+  };
+
+  window.closeRateExceptionModal = function() {
+    if (modalRateException) modalRateException.classList.remove('open');
+  };
+
+  window.saveRateExceptionForm = async function(e) {
+    if (e && e.preventDefault) e.preventDefault();
+    const reqId = document.getElementById('rate-exception-request-id').value;
+    const rateVal = document.getElementById('rate-exception-amount').value;
+    const reason = document.getElementById('rate-exception-reason').value.trim();
+
+    const payload = {
+      billing_hourly_rate: rateVal ? parseFloat(rateVal) : null,
+      reason
+    };
+
+    try {
+      const res = await apiRequest(`/admin/requests/${reqId}/rate-exception`, {
+        method: 'PATCH',
+        body: JSON.stringify(payload)
+      });
+
+      if (res && res.success) {
+        showToast(res.message || 'Rate exception applied.', 'success');
+        window.closeRateExceptionModal();
+
+        // Update local LiveStore request item
+        const shift = LiveStore.requests.find(r => r.id === reqId);
+        if (shift) {
+          shift.billing_hourly_rate = payload.billing_hourly_rate;
+          window.openRequestDrawer(reqId);
+        }
+      } else {
+        showToast(res?.error || 'Failed to apply exception.', 'error');
+      }
+    } catch (err) {
+      showToast(err.message || 'Error updating shift rate exception.', 'error');
+    }
+  };
+
+  // Helper to get estimated rate for a shift in drawer
+  function getResolvedRateHint(req) {
+    if (req.billing_hourly_rate) return parseFloat(req.billing_hourly_rate);
+    const fac = LiveStore.facilities.find(f => 
+      (req.facility_id && f.id === req.facility_id) || 
+      (f.name && f.name.toLowerCase() === (req.facility_name || '').toLowerCase())
+    );
+    if (fac && LiveStore.facilityRateCards[fac.id]) {
+      const cards = LiveStore.facilityRateCards[fac.id];
+      const match = cards.find(c => Boolean(c.is_active) && c.role === req.role_requested);
+      if (match) return parseFloat(match.bill_rate);
+    }
+    return ROLE_BASELINE_RATES[req.role_requested] || 65.00;
+  }
+
+  // Bind filter events for facilities tab
+  if (facilitiesSearchInput) {
+    facilitiesSearchInput.addEventListener('input', () => renderFacilitiesList());
+  }
+  if (facilitiesStatusFilter) {
+    facilitiesStatusFilter.addEventListener('change', () => renderFacilitiesList());
+  }
+
   // ── 16. Navigation & View Switching ─────────────────────────────────────────
   const sidebar       = document.getElementById('sidebar');
   const collapseBtn   = document.getElementById('sidebar-collapse-btn');
@@ -4462,6 +5124,7 @@
 
   const TAB_PERMISSION_REQUIREMENTS = {
     'requests-tab': 'requests:view',
+    'facilities-tab': 'requests:view',
     'scheduler-tab': 'requests:view',
     'roster-tab': 'roster:view',
     'compliance-tab': 'roster:view',
@@ -4486,6 +5149,9 @@
     // Ensure all modals/drawers are closed when switching tabs so nothing blocks the screen
     if (modalAddStaff) modalAddStaff.classList.remove('open');
     if (modalNewRequest) modalNewRequest.classList.remove('open');
+    if (modalFacility) modalFacility.classList.remove('open');
+    if (modalRateCardTerm) modalRateCardTerm.classList.remove('open');
+    if (modalRateException) modalRateException.classList.remove('open');
     if (drawerBackdrop) drawerBackdrop.classList.remove('open');
 
     // Update active nav buttons
@@ -4511,6 +5177,7 @@
       if (targetTab === 'overview-tab') renderCharts();
       else if (targetTab === 'roster-tab') fetchAndRenderRoster();
       else if (targetTab === 'requests-tab') fetchAndRenderRequests();
+      else if (targetTab === 'facilities-tab') fetchAndRenderFacilities();
       else if (targetTab === 'applicants-tab') fetchAndRenderApplicants();
       else if (targetTab === 'scheduler-tab') renderShiftScheduler();
       else if (targetTab === 'compliance-tab') renderCompliance();

@@ -28,15 +28,29 @@ router.post('/', publicFormLimiter, async (req, res, next) => {
     const id = crypto.randomUUID();
     const requestCode = `REQ-${Date.now().toString().slice(-4)}${Math.floor(10 + Math.random() * 90)}`;
 
+    let facilityId = req.body.facility_id || null;
+    if (!facilityId && validated.facility_name) {
+      try {
+        const [facMatch] = await pool.query(
+          'SELECT id FROM facilities WHERE LOWER(TRIM(name)) = LOWER(TRIM(?)) LIMIT 1',
+          [validated.facility_name]
+        );
+        if (facMatch && facMatch.length > 0) {
+          facilityId = facMatch[0].id;
+        }
+      } catch (_) {}
+    }
+
     const query = `
       INSERT INTO staffing_requests 
-        (id, request_code, facility_name, unit_department, contact_name, contact_email, contact_phone, role_requested, shift_type, urgency_level, status, special_instructions, ip_address)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?)
+        (id, request_code, facility_id, facility_name, unit_department, contact_name, contact_email, contact_phone, role_requested, shift_type, urgency_level, status, special_instructions, ip_address)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?)
     `;
 
     await pool.query(query, [
       id,
       requestCode,
+      facilityId,
       validated.facility_name,
       validated.unit_department || 'General Care',
       validated.contact_name,
@@ -755,6 +769,7 @@ router.get('/billing-summary', async (req, res, next) => {
       SELECT 
         sr.id,
         sr.request_code,
+        sr.facility_id,
         sr.facility_name,
         sr.unit_department,
         sr.role_requested,
@@ -797,7 +812,22 @@ router.get('/billing-summary', async (req, res, next) => {
 
     const [rows] = await pool.query(sql, params);
 
-    // Default rate card by clinical role
+    // Fetch active contracted rate cards for MSA resolution
+    let rateCardRows = [];
+    try {
+      const [cards] = await pool.query(`
+        SELECT frc.facility_id, LOWER(TRIM(f.name)) AS facility_name, frc.role, frc.shift_type, frc.bill_rate, frc.effective_date, frc.expiry_date
+        FROM facility_rate_cards frc
+        LEFT JOIN facilities f ON f.id = frc.facility_id
+        WHERE (frc.expiry_date IS NULL OR frc.expiry_date >= CURDATE())
+        ORDER BY frc.effective_date DESC
+      `);
+      rateCardRows = cards || [];
+    } catch (rcErr) {
+      console.warn('[Rate Card Query Notice]:', rcErr.message);
+    }
+
+    // Global default agency fallback rate card by clinical role
     const defaultRates = {
       'RN': 85.00,
       'RPN': 65.00,
@@ -813,7 +843,37 @@ router.get('/billing-summary', async (req, res, next) => {
     let pendingApprovalCount = 0;
 
     const itemized = rows.map(r => {
-      const rate = r.billing_hourly_rate ? parseFloat(r.billing_hourly_rate) : (defaultRates[r.role_requested] || 65.00);
+      // Rate Resolution Hierarchy:
+      // 1. One-off admin exception on specific shift
+      // 2. Contracted MSA facility rate card
+      // 3. Global standard agency fallback
+      let rate = defaultRates[r.role_requested] || 65.00;
+      let rateSource = 'agency_default';
+
+      if (r.billing_hourly_rate && !isNaN(parseFloat(r.billing_hourly_rate))) {
+        rate = parseFloat(r.billing_hourly_rate);
+        rateSource = 'admin_exception';
+      } else {
+        const facId = r.facility_id;
+        const facName = r.facility_name ? r.facility_name.trim().toLowerCase() : '';
+        const role = r.role_requested;
+        const shiftType = (r.shift_type || 'standard').trim().toLowerCase();
+
+        const match = rateCardRows.find(c =>
+          ((facId && c.facility_id === facId) || (facName && c.facility_name === facName)) &&
+          c.role === role &&
+          (c.shift_type || 'standard').trim().toLowerCase() === shiftType
+        ) || rateCardRows.find(c =>
+          ((facId && c.facility_id === facId) || (facName && c.facility_name === facName)) &&
+          c.role === role &&
+          (c.shift_type || 'standard').trim().toLowerCase() === 'standard'
+        );
+
+        if (match && match.bill_rate != null) {
+          rate = parseFloat(match.bill_rate);
+          rateSource = 'contracted_msa';
+        }
+      }
       let hours = 0;
       if (r.hours_billed) {
         hours = parseFloat(r.hours_billed);
@@ -848,6 +908,7 @@ router.get('/billing-summary', async (req, res, next) => {
         clock_out: r.punch_out || r.clock_out_time || '—',
         verified_hours: hours,
         hourly_rate: rate,
+        rate_source: rateSource,
         total_amount: totalAmount,
         status: r.status,
         cancellation_fee_applied: Boolean(r.cancellation_fee_applied),

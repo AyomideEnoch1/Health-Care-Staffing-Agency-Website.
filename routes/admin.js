@@ -1617,5 +1617,402 @@ router.delete('/admins/:id', requirePermission('admins:manage'), async (req, res
   } catch (err) { next(err); }
 });
 
+// ============================================================================
+// FACILITIES & MSA RATE CARDS (INTERNAL ADMIN / ACCOUNT MANAGEMENT ONLY)
+// ============================================================================
+
+const facilitySchema = z.object({
+  name: z.string().min(2).max(255),
+  facility_code: z.string().max(20).optional(),
+  address: z.string().max(255).optional().nullable(),
+  region: z.string().max(80).optional().nullable(),
+  contact_name: z.string().max(100).optional().nullable(),
+  contact_email: z.string().email().max(191).optional().nullable().or(z.literal('')),
+  contact_phone: z.string().max(30).optional().nullable(),
+  msa_signed_date: z.string().max(10).optional().nullable(),
+  msa_expiry_date: z.string().max(10).optional().nullable(),
+  msa_document_url: z.string().max(500).optional().nullable(),
+  status: z.enum(['active', 'pending', 'expired']).optional().default('pending')
+});
+
+const rateCardTermSchema = z.object({
+  role: z.enum(['RN', 'RPN', 'PSW', 'Companion', 'Travel Nurse', 'Multiple']),
+  shift_type: z.string().max(60).optional().default('standard'),
+  bill_rate: z.number().positive(),
+  pay_rate: z.number().positive().optional().nullable(),
+  overtime_multiplier: z.number().positive().optional().default(1.50),
+  effective_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  notes: z.string().max(1000).optional().nullable()
+});
+
+// GET /api/admin/facilities — List all facilities with MSA status & rate card stats
+router.get('/facilities', async (req, res, next) => {
+  try {
+    const [facilities] = await pool.query(`
+      SELECT 
+        f.*,
+        COUNT(DISTINCT CASE WHEN (frc.expiry_date IS NULL OR frc.expiry_date >= CURDATE()) THEN frc.id END) AS active_rate_cards_count,
+        COUNT(DISTINCT frc.id) AS total_rate_cards_count,
+        MAX(frc.created_at) AS last_rate_updated_at
+      FROM facilities f
+      LEFT JOIN facility_rate_cards frc ON frc.facility_id = f.id
+      GROUP BY f.id
+      ORDER BY f.name ASC
+    `);
+
+    // Enhance facilities with MSA expiry alert flags
+    const today = new Date();
+    const formatted = (facilities || []).map(fac => {
+      let isExpired = fac.status === 'expired';
+      let isExpiringSoon = false;
+      let daysUntilExpiry = null;
+
+      if (fac.msa_expiry_date) {
+        const expDate = new Date(fac.msa_expiry_date);
+        const diffDays = Math.ceil((expDate - today) / (1000 * 60 * 60 * 24));
+        daysUntilExpiry = diffDays;
+        if (diffDays <= 0) {
+          isExpired = true;
+        } else if (diffDays <= 30) {
+          isExpiringSoon = true;
+        }
+      }
+
+      return {
+        ...fac,
+        effective_status: isExpired ? 'expired' : fac.status,
+        is_expiring_soon: isExpiringSoon,
+        days_until_expiry: daysUntilExpiry,
+        active_rate_cards_count: Number(fac.active_rate_cards_count || 0),
+        total_rate_cards_count: Number(fac.total_rate_cards_count || 0)
+      };
+    });
+
+    res.json({
+      success: true,
+      data: formatted,
+      count: formatted.length
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// POST /api/admin/facilities — Create a new healthcare facility profile
+router.post('/facilities', async (req, res, next) => {
+  try {
+    const parsed = facilitySchema.parse(req.body);
+    const id = crypto.randomUUID();
+    let facilityCode = parsed.facility_code;
+
+    if (!facilityCode) {
+      const prefix = parsed.name.replace(/[^A-Za-z]/g, '').slice(0, 3).toUpperCase() || 'FAC';
+      facilityCode = `FAC-${prefix}-${Math.floor(10 + Math.random() * 90)}`;
+    }
+
+    await pool.query(`
+      INSERT INTO facilities 
+        (id, name, facility_code, address, region, contact_name, contact_email, contact_phone, msa_signed_date, msa_expiry_date, msa_document_url, status)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `, [
+      id,
+      parsed.name,
+      facilityCode,
+      parsed.address || null,
+      parsed.region || 'Greater Toronto Area',
+      parsed.contact_name || null,
+      parsed.contact_email || null,
+      parsed.contact_phone || null,
+      parsed.msa_signed_date || null,
+      parsed.msa_expiry_date || null,
+      parsed.msa_document_url || null,
+      parsed.status || 'pending'
+    ]);
+
+    // Audit log
+    await pool.query(`
+      INSERT INTO audit_logs (id, admin_id, actor_name, action, target_entity, target_id, details, severity, ip_address)
+      VALUES (?, ?, ?, 'FACILITY_CREATED', 'facilities', ?, ?, 'info', ?)
+    `, [
+      crypto.randomUUID(),
+      req.admin.id,
+      req.admin.full_name,
+      id,
+      `Created facility profile ${parsed.name} (${facilityCode}) with MSA status '${parsed.status}'`,
+      req.ip
+    ]);
+
+    res.status(201).json({
+      success: true,
+      message: `Facility "${parsed.name}" created successfully.`,
+      data: { id, facility_code: facilityCode, ...parsed }
+    });
+  } catch (err) {
+    if (err.name === 'ZodError') {
+      return res.status(400).json({ success: false, error: 'Validation failed', details: err.errors });
+    }
+    next(err);
+  }
+});
+
+// PATCH /api/admin/facilities/:id — Update facility details & MSA metadata
+router.patch('/facilities/:id', async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const [existing] = await pool.query('SELECT * FROM facilities WHERE id = ?', [id]);
+    if (!existing || existing.length === 0) {
+      return res.status(404).json({ success: false, error: 'Facility not found' });
+    }
+
+    const current = existing[0];
+    const updates = [];
+    const params = [];
+
+    const allowed = ['name', 'address', 'region', 'contact_name', 'contact_email', 'contact_phone', 'msa_signed_date', 'msa_expiry_date', 'msa_document_url', 'status'];
+    for (const key of allowed) {
+      if (req.body[key] !== undefined) {
+        updates.push(`${key} = ?`);
+        params.push(req.body[key] === '' ? null : req.body[key]);
+      }
+    }
+
+    if (updates.length === 0) {
+      return res.status(400).json({ success: false, error: 'No fields provided to update' });
+    }
+
+    params.push(id);
+    await pool.query(`UPDATE facilities SET ${updates.join(', ')} WHERE id = ?`, params);
+
+    // Audit log
+    await pool.query(`
+      INSERT INTO audit_logs (id, admin_id, actor_name, action, target_entity, target_id, details, severity, ip_address)
+      VALUES (?, ?, ?, 'FACILITY_UPDATED', 'facilities', ?, ?, 'info', ?)
+    `, [
+      crypto.randomUUID(),
+      req.admin.id,
+      req.admin.full_name,
+      id,
+      `Updated facility ${current.name}: modified ${updates.map(u => u.split(' =')[0]).join(', ')}`,
+      req.ip
+    ]);
+
+    const [updated] = await pool.query('SELECT * FROM facilities WHERE id = ?', [id]);
+    res.json({
+      success: true,
+      message: 'Facility details updated successfully.',
+      data: updated[0]
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// GET /api/admin/facilities/:facilityId/rate-cards — List rate cards for a facility
+router.get('/facilities/:facilityId/rate-cards', async (req, res, next) => {
+  try {
+    const { facilityId } = req.params;
+    const [cards] = await pool.query(`
+      SELECT 
+        frc.*,
+        CASE 
+          WHEN (frc.expiry_date IS NULL OR frc.expiry_date >= CURDATE()) THEN 1 
+          ELSE 0 
+        END AS is_active
+      FROM facility_rate_cards frc
+      WHERE frc.facility_id = ?
+      ORDER BY is_active DESC, frc.role ASC, frc.shift_type ASC, frc.effective_date DESC
+    `, [facilityId]);
+
+    res.json({
+      success: true,
+      data: cards || [],
+      count: (cards || []).length
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// POST /api/admin/facilities/:facilityId/rate-cards — Add new contracted rate term with auto-expiry
+router.post('/facilities/:facilityId/rate-cards', async (req, res, next) => {
+  const { facilityId } = req.params;
+  const conn = await pool.getConnection();
+
+  try {
+    const parsed = rateCardTermSchema.parse(req.body);
+
+    const [facCheck] = await conn.query('SELECT id, name, status FROM facilities WHERE id = ?', [facilityId]);
+    if (!facCheck || facCheck.length === 0) {
+      return res.status(404).json({ success: false, error: 'Facility not found' });
+    }
+    const facility = facCheck[0];
+
+    await conn.beginTransaction();
+
+    // 1. Auto-expire previous active term for (facility_id, role, shift_type)
+    // Expiry date is set to 1 day prior to the new term's effective date
+    await conn.query(`
+      UPDATE facility_rate_cards
+      SET expiry_date = DATE_SUB(?, INTERVAL 1 DAY)
+      WHERE facility_id = ?
+        AND role = ?
+        AND shift_type = ?
+        AND (expiry_date IS NULL OR expiry_date >= ?)
+    `, [parsed.effective_date, facilityId, parsed.role, parsed.shift_type, parsed.effective_date]);
+
+    // 2. Insert the new contracted rate term
+    const termId = crypto.randomUUID();
+    await conn.query(`
+      INSERT INTO facility_rate_cards
+        (id, facility_id, role, shift_type, bill_rate, pay_rate, overtime_multiplier, effective_date, expiry_date, notes, created_by)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, NULL, ?, ?)
+    `, [
+      termId,
+      facilityId,
+      parsed.role,
+      parsed.shift_type,
+      parsed.bill_rate,
+      parsed.pay_rate || null,
+      parsed.overtime_multiplier || 1.50,
+      parsed.effective_date,
+      parsed.notes || null,
+      req.admin.full_name || req.admin.email
+    ]);
+
+    // 3. If facility was pending, activate it now that a contracted rate card exists
+    if (facility.status === 'pending') {
+      await conn.query(`UPDATE facilities SET status = 'active' WHERE id = ?`, [facilityId]);
+    }
+
+    // 4. Record audit log
+    await conn.query(`
+      INSERT INTO audit_logs (id, admin_id, actor_name, action, target_entity, target_id, details, severity, ip_address)
+      VALUES (?, ?, ?, 'RATE_CARD_TERM_CREATED', 'facility_rate_cards', ?, ?, 'info', ?)
+    `, [
+      crypto.randomUUID(),
+      req.admin.id,
+      req.admin.full_name,
+      termId,
+      `Contracted rate term added for ${facility.name}: ${parsed.role} (${parsed.shift_type}) bill rate \$${parsed.bill_rate}/hr effective ${parsed.effective_date}. Auto-expired prior active term.`,
+      req.ip
+    ]);
+
+    await conn.commit();
+
+    // Emit live event for connected admin dashboards
+    adminEvents.emit('rate_card:created', {
+      facility_id: facilityId,
+      facility_name: facility.name,
+      term_id: termId,
+      role: parsed.role,
+      shift_type: parsed.shift_type,
+      bill_rate: parsed.bill_rate,
+      effective_date: parsed.effective_date
+    });
+
+    res.status(201).json({
+      success: true,
+      message: `Rate card term established for ${facility.name} (${parsed.role} - \$${parsed.bill_rate}/hr).`,
+      data: {
+        id: termId,
+        facility_id: facilityId,
+        ...parsed,
+        expiry_date: null,
+        is_active: 1
+      }
+    });
+  } catch (err) {
+    await conn.rollback();
+    if (err.name === 'ZodError') {
+      return res.status(400).json({ success: false, error: 'Validation failed', details: err.errors });
+    }
+    next(err);
+  } finally {
+    conn.release();
+  }
+});
+
+// DELETE /api/admin/facilities/:facilityId/rate-cards/:rateCardId — Remove an erroneous term
+router.delete('/facilities/:facilityId/rate-cards/:rateCardId', async (req, res, next) => {
+  try {
+    const { facilityId, rateCardId } = req.params;
+    const [cardRows] = await pool.query('SELECT * FROM facility_rate_cards WHERE id = ? AND facility_id = ?', [rateCardId, facilityId]);
+    if (!cardRows || cardRows.length === 0) {
+      return res.status(404).json({ success: false, error: 'Rate card term not found' });
+    }
+
+    const card = cardRows[0];
+    await pool.query('DELETE FROM facility_rate_cards WHERE id = ?', [rateCardId]);
+
+    await pool.query(`
+      INSERT INTO audit_logs (id, admin_id, actor_name, action, target_entity, target_id, details, severity, ip_address)
+      VALUES (?, ?, ?, 'RATE_CARD_TERM_DELETED', 'facility_rate_cards', ?, ?, 'warning', ?)
+    `, [
+      crypto.randomUUID(),
+      req.admin.id,
+      req.admin.full_name,
+      rateCardId,
+      `Removed rate term for ${card.role} (${card.shift_type} - \$${card.bill_rate}/hr) from facility ${facilityId}`,
+      req.ip
+    ]);
+
+    res.json({
+      success: true,
+      message: 'Rate card term deleted successfully.'
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// PATCH /api/admin/requests/:id/rate-exception — Admin-only one-off exception on a specific shift
+router.patch('/requests/:id/rate-exception', async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { billing_hourly_rate, reason } = req.body;
+
+    const [reqRows] = await pool.query('SELECT * FROM staffing_requests WHERE id = ?', [id]);
+    if (!reqRows || reqRows.length === 0) {
+      return res.status(404).json({ success: false, error: 'Staffing request not found' });
+    }
+    const shift = reqRows[0];
+
+    const newRate = billing_hourly_rate != null && billing_hourly_rate !== '' ? parseFloat(billing_hourly_rate) : null;
+    if (newRate !== null && (isNaN(newRate) || newRate <= 0)) {
+      return res.status(400).json({ success: false, error: 'Invalid hourly rate amount' });
+    }
+
+    await pool.query('UPDATE staffing_requests SET billing_hourly_rate = ? WHERE id = ?', [newRate, id]);
+
+    await pool.query(`
+      INSERT INTO audit_logs (id, admin_id, actor_name, action, target_entity, target_id, details, severity, ip_address)
+      VALUES (?, ?, ?, 'SHIFT_RATE_EXCEPTION_SET', 'staffing_requests', ?, ?, 'info', ?)
+    `, [
+      crypto.randomUUID(),
+      req.admin.id,
+      req.admin.full_name,
+      id,
+      `Admin ${req.admin.full_name} set one-off rate exception on ${shift.request_code}: \$${newRate || 'Default'}/hr. Reason: ${reason || 'N/A'}`,
+      req.ip
+    ]);
+
+    adminEvents.emit('request:rate_updated', {
+      id,
+      request_code: shift.request_code,
+      billing_hourly_rate: newRate,
+      updated_by: req.admin.full_name
+    });
+
+    res.json({
+      success: true,
+      message: `Shift ${shift.request_code} rate exception updated to \$${newRate || 'Default'}/hr.`,
+      data: { id, billing_hourly_rate: newRate }
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
 module.exports = router;
+
 

@@ -68,6 +68,7 @@ CREATE TABLE IF NOT EXISTS `staff_roster` (
 CREATE TABLE IF NOT EXISTS `staffing_requests` (
   `id` VARCHAR(36) NOT NULL,
   `request_code` VARCHAR(20) NOT NULL,
+  `facility_id` VARCHAR(36) NULL,
   `facility_name` VARCHAR(150) NOT NULL,
   `unit_department` VARCHAR(100) NULL,
   `contact_name` VARCHAR(100) NOT NULL,
@@ -102,6 +103,7 @@ CREATE TABLE IF NOT EXISTS `staffing_requests` (
   INDEX `idx_requests_status` (`status`),
   INDEX `idx_requests_created` (`created_at` DESC),
   INDEX `idx_requests_facility` (`facility_name`),
+  INDEX `idx_requests_facility_id` (`facility_id`),
   CONSTRAINT `fk_requests_assigned_staff`
     FOREIGN KEY (`assigned_staff_id`) REFERENCES `staff_roster` (`id`)
     ON DELETE SET NULL ON UPDATE CASCADE
@@ -196,5 +198,51 @@ CREATE TABLE IF NOT EXISTS `users` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_users_email` (`email`),
   INDEX `idx_users_role` (`role`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 8. FACILITIES TABLE
+-- Purpose: Registered healthcare client facilities with contracted MSA terms
+CREATE TABLE IF NOT EXISTS `facilities` (
+  `id` VARCHAR(36) NOT NULL,
+  `name` VARCHAR(255) NOT NULL,
+  `facility_code` VARCHAR(20) NOT NULL,
+  `address` VARCHAR(255) NULL,
+  `region` VARCHAR(80) NULL DEFAULT 'Greater Toronto Area',
+  `contact_name` VARCHAR(100) NULL,
+  `contact_email` VARCHAR(191) NULL,
+  `contact_phone` VARCHAR(30) NULL,
+  `msa_signed_date` DATE NULL,
+  `msa_expiry_date` DATE NULL,
+  `msa_document_url` TEXT NULL,
+  `status` ENUM('active', 'pending', 'expired') NOT NULL DEFAULT 'pending',
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_facility_code` (`facility_code`),
+  INDEX `idx_facility_name` (`name`),
+  INDEX `idx_facility_status` (`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 9. FACILITY RATE CARDS TABLE
+-- Purpose: Per-facility contracted MSA billing and pay rates managed exclusively by internal admins
+CREATE TABLE IF NOT EXISTS `facility_rate_cards` (
+  `id` VARCHAR(36) NOT NULL,
+  `facility_id` VARCHAR(36) NOT NULL,
+  `role` ENUM('RN', 'RPN', 'PSW', 'Companion', 'Travel Nurse', 'Multiple') NOT NULL,
+  `shift_type` VARCHAR(60) NOT NULL DEFAULT 'standard',
+  `bill_rate` DECIMAL(6,2) NOT NULL,
+  `pay_rate` DECIMAL(6,2) NULL,
+  `overtime_multiplier` DECIMAL(3,2) NOT NULL DEFAULT 1.50,
+  `effective_date` DATE NOT NULL,
+  `expiry_date` DATE NULL,
+  `notes` TEXT NULL,
+  `created_by` VARCHAR(64) NULL,
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  INDEX `idx_rate_cards_lookup` (`facility_id`, `role`, `shift_type`, `effective_date`),
+  INDEX `idx_rate_cards_facility` (`facility_id`),
+  CONSTRAINT `fk_rate_cards_facility`
+    FOREIGN KEY (`facility_id`) REFERENCES `facilities` (`id`)
+    ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

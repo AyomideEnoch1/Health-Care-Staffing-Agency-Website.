@@ -105,6 +105,50 @@ try {
         try { await conn.query('ALTER TABLE staffing_requests ADD COLUMN clock_in_time DATETIME NULL DEFAULT NULL'); } catch (_) {}
         try { await conn.query('ALTER TABLE staffing_requests ADD COLUMN clock_out_time DATETIME NULL DEFAULT NULL'); } catch (_) {}
         try { await conn.query(`ALTER TABLE staffing_requests MODIFY COLUMN status ENUM('pending','confirmed','dispatched','in_session','completed','cancelled') NOT NULL DEFAULT 'pending'`); } catch (_) {}
+        try { await conn.query('ALTER TABLE staffing_requests ADD COLUMN facility_id VARCHAR(36) NULL'); } catch (_) {}
+
+        await conn.query(`
+          CREATE TABLE IF NOT EXISTS facilities (
+            id VARCHAR(36) NOT NULL,
+            name VARCHAR(255) NOT NULL,
+            facility_code VARCHAR(20) NOT NULL,
+            address VARCHAR(255) NULL,
+            region VARCHAR(80) NULL DEFAULT 'Greater Toronto Area',
+            contact_name VARCHAR(100) NULL,
+            contact_email VARCHAR(191) NULL,
+            contact_phone VARCHAR(30) NULL,
+            msa_signed_date DATE NULL,
+            msa_expiry_date DATE NULL,
+            msa_document_url TEXT NULL,
+            status ENUM('active', 'pending', 'expired') NOT NULL DEFAULT 'pending',
+            created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY (id),
+            UNIQUE KEY idx_facility_code (facility_code),
+            INDEX idx_facility_name (name),
+            INDEX idx_facility_status (status)
+          ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+        `);
+
+        await conn.query(`
+          CREATE TABLE IF NOT EXISTS facility_rate_cards (
+            id VARCHAR(36) NOT NULL,
+            facility_id VARCHAR(36) NOT NULL,
+            role ENUM('RN', 'RPN', 'PSW', 'Companion', 'Travel Nurse', 'Multiple') NOT NULL,
+            shift_type VARCHAR(60) NOT NULL DEFAULT 'standard',
+            bill_rate DECIMAL(6,2) NOT NULL,
+            pay_rate DECIMAL(6,2) NULL,
+            overtime_multiplier DECIMAL(3,2) NOT NULL DEFAULT 1.50,
+            effective_date DATE NOT NULL,
+            expiry_date DATE NULL,
+            notes TEXT NULL,
+            created_by VARCHAR(64) NULL,
+            created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (id),
+            INDEX idx_rate_cards_lookup (facility_id, role, shift_type, effective_date),
+            INDEX idx_rate_cards_facility (facility_id)
+          ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+        `);
       } catch (schemaNotice) {
         console.warn('⚠️ [Database Schema Verification Notice]:', schemaNotice.message);
       } finally {
@@ -171,6 +215,8 @@ const inMemoryStore = {
   staff_documents: [],
   shift_punches: [],
   newsletter_subscribers: [],
+  facilities: [],
+  facility_rate_cards: [],
   // IMPORTANT: users[] must NEVER contain administrator emails.
   // Admins live exclusively in admins[]. Mixing them here bypasses the
   // /api/users/login 403 rejection check and lets admins access the public portal.
@@ -807,6 +853,52 @@ function handleInMemoryQuery(sql, params = []) {
     if (normalized.startsWith('delete')) {
       inMemoryStore.shift_punches = [];
       return [{ affectedRows: 1 }];
+    }
+  }
+
+  // 10. FACILITIES
+  if (normalized.includes('from facilities') || normalized.includes('from `facilities`') || normalized.includes('into facilities')) {
+    if (normalized.startsWith('select')) {
+      return [inMemoryStore.facilities || []];
+    }
+    if (normalized.startsWith('insert')) {
+      const fac = {
+        id: params[0] || crypto.randomUUID(),
+        name: params[1] || 'Sample Facility',
+        facility_code: params[2] || 'FAC-' + Date.now().toString().slice(-4),
+        address: params[3] || null,
+        region: params[4] || 'Greater Toronto Area',
+        status: params[5] || 'pending',
+        msa_signed_date: params[6] || null,
+        msa_expiry_date: params[7] || null,
+        created_at: new Date().toISOString()
+      };
+      inMemoryStore.facilities.push(fac);
+      return [{ affectedRows: 1, insertId: fac.id }];
+    }
+  }
+
+  // 11. FACILITY RATE CARDS
+  if (normalized.includes('from facility_rate_cards') || normalized.includes('from `facility_rate_cards`') || normalized.includes('into facility_rate_cards')) {
+    if (normalized.startsWith('select')) {
+      return [inMemoryStore.facility_rate_cards || []];
+    }
+    if (normalized.startsWith('insert')) {
+      const card = {
+        id: params[0] || crypto.randomUUID(),
+        facility_id: params[1],
+        role: params[2],
+        shift_type: params[3] || 'standard',
+        bill_rate: params[4],
+        pay_rate: params[5] || null,
+        overtime_multiplier: params[6] || 1.5,
+        effective_date: params[7] || new Date().toISOString().slice(0, 10),
+        expiry_date: params[8] || null,
+        created_by: params[9] || null,
+        created_at: new Date().toISOString()
+      };
+      inMemoryStore.facility_rate_cards.push(card);
+      return [{ affectedRows: 1, insertId: card.id }];
     }
   }
 
