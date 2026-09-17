@@ -58,15 +58,19 @@ router.get('/stream', (req, res) => {
   res.write(`data: ${JSON.stringify({ type: 'connected', timestamp: new Date().toISOString() })}\n\n`);
 
   // Event listeners
-  const onRequest     = (data) => res.write(`data: ${JSON.stringify({ type: 'request:created',     payload: data })}\n\n`);
-  const onApplication = (data) => res.write(`data: ${JSON.stringify({ type: 'application:created', payload: data })}\n\n`);
-  const onInquiry     = (data) => res.write(`data: ${JSON.stringify({ type: 'inquiry:created',     payload: data })}\n\n`);
-  const onStatusChange= (data) => res.write(`data: ${JSON.stringify({ type: 'status:changed',      payload: data })}\n\n`);
+  const onRequest          = (data) => res.write(`data: ${JSON.stringify({ type: 'request:created',     payload: data })}\n\n`);
+  const onApplication      = (data) => res.write(`data: ${JSON.stringify({ type: 'application:created', payload: data })}\n\n`);
+  const onInquiry          = (data) => res.write(`data: ${JSON.stringify({ type: 'inquiry:created',     payload: data })}\n\n`);
+  const onStatusChange     = (data) => res.write(`data: ${JSON.stringify({ type: 'status:changed',      payload: data })}\n\n`);
+  const onClientRegistered = (data) => res.write(`data: ${JSON.stringify({ type: 'client:registered',  payload: data })}\n\n`);
+  const onFacilityCreated  = (data) => res.write(`data: ${JSON.stringify({ type: 'facility:created',   payload: data })}\n\n`);
 
   adminEvents.on('request:created',     onRequest);
   adminEvents.on('application:created', onApplication);
   adminEvents.on('inquiry:created',     onInquiry);
   adminEvents.on('status:changed',      onStatusChange);
+  adminEvents.on('client:registered',   onClientRegistered);
+  adminEvents.on('facility:created',    onFacilityCreated);
 
   // Keep-alive heartbeat every 25 seconds (SSE comment lines — not parsed by client)
   const heartbeat = setInterval(() => {
@@ -80,6 +84,8 @@ router.get('/stream', (req, res) => {
     adminEvents.off('application:created', onApplication);
     adminEvents.off('inquiry:created',     onInquiry);
     adminEvents.off('status:changed',      onStatusChange);
+    adminEvents.off('client:registered',   onClientRegistered);
+    adminEvents.off('facility:created',    onFacilityCreated);
   });
 });
 
@@ -1653,14 +1659,20 @@ router.get('/facilities', async (req, res, next) => {
         f.*,
         COUNT(DISTINCT CASE WHEN (frc.expiry_date IS NULL OR frc.expiry_date >= CURDATE()) THEN frc.id END) AS active_rate_cards_count,
         COUNT(DISTINCT frc.id) AS total_rate_cards_count,
-        MAX(frc.created_at) AS last_rate_updated_at
+        MAX(frc.created_at) AS last_rate_updated_at,
+        COUNT(DISTINCT u.id) AS registered_users_count,
+        GROUP_CONCAT(DISTINCT u.email SEPARATOR ', ') AS registered_user_emails,
+        MAX(u.created_at) AS latest_user_registered_at,
+        COUNT(DISTINCT sr.id) AS total_shifts_requested
       FROM facilities f
       LEFT JOIN facility_rate_cards frc ON frc.facility_id = f.id
+      LEFT JOIN users u ON (u.facility_id = f.id OR LOWER(TRIM(u.organization_name)) = LOWER(TRIM(f.name))) AND u.role = 'client'
+      LEFT JOIN staffing_requests sr ON (sr.facility_id = f.id OR LOWER(TRIM(sr.facility_name)) = LOWER(TRIM(f.name)))
       GROUP BY f.id
-      ORDER BY f.name ASC
+      ORDER BY f.created_at DESC, f.name ASC
     `);
 
-    // Enhance facilities with MSA expiry alert flags
+    // Enhance facilities with MSA expiry alert flags & portal account meta
     const today = new Date();
     const formatted = (facilities || []).map(fac => {
       let isExpired = fac.status === 'expired';
@@ -1684,7 +1696,12 @@ router.get('/facilities', async (req, res, next) => {
         is_expiring_soon: isExpiringSoon,
         days_until_expiry: daysUntilExpiry,
         active_rate_cards_count: Number(fac.active_rate_cards_count || 0),
-        total_rate_cards_count: Number(fac.total_rate_cards_count || 0)
+        total_rate_cards_count: Number(fac.total_rate_cards_count || 0),
+        has_portal_account: Number(fac.registered_users_count || 0) > 0,
+        registered_user_emails: fac.registered_user_emails || '',
+        registered_users_count: Number(fac.registered_users_count || 0),
+        latest_user_registered_at: fac.latest_user_registered_at || null,
+        total_shifts_requested: Number(fac.total_shifts_requested || 0)
       };
     });
 
@@ -1692,6 +1709,136 @@ router.get('/facilities', async (req, res, next) => {
       success: true,
       data: formatted,
       count: formatted.length
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// GET /api/admin/registered-clients — List all self-registered healthcare facility client user accounts
+router.get('/registered-clients', async (req, res, next) => {
+  try {
+    const [clients] = await pool.query(`
+      SELECT 
+        u.id,
+        u.email,
+        u.full_name,
+        u.organization_name,
+        u.facility_id,
+        u.client_role,
+        u.phone,
+        u.is_active,
+        u.email_verified,
+        u.last_login,
+        u.created_at,
+        f.facility_code,
+        f.name AS linked_facility_name,
+        f.status AS facility_status,
+        COUNT(DISTINCT sr.id) AS total_requests_count
+      FROM users u
+      LEFT JOIN facilities f ON (f.id = u.facility_id OR LOWER(TRIM(f.name)) = LOWER(TRIM(u.organization_name)))
+      LEFT JOIN staffing_requests sr ON (sr.facility_id = f.id OR LOWER(TRIM(sr.facility_name)) = LOWER(TRIM(u.organization_name)) OR sr.contact_email = u.email)
+      WHERE u.role = 'client'
+      GROUP BY u.id
+      ORDER BY u.created_at DESC
+    `);
+
+    res.json({
+      success: true,
+      data: clients || [],
+      count: (clients || []).length
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// PATCH /api/admin/registered-clients/:id/toggle-status — Activate or suspend a registered client portal account
+router.patch('/registered-clients/:id/toggle-status', async (req, res, next) => {
+  try {
+    const userId = req.params.id;
+    const [users] = await pool.query(
+      'SELECT id, email, full_name, is_active FROM users WHERE id = ? AND role = ? LIMIT 1',
+      [userId, 'client']
+    );
+
+    if (!users || users.length === 0) {
+      return res.status(404).json({ success: false, error: 'Registered client account not found.' });
+    }
+
+    const user = users[0];
+    const newStatus = user.is_active ? 0 : 1;
+
+    await pool.query('UPDATE users SET is_active = ?, updated_at = NOW() WHERE id = ?', [newStatus, userId]);
+
+    // Record audit log
+    try {
+      await pool.query(
+        `INSERT INTO audit_logs (id, admin_id, actor_name, action, target_entity, target_id, details, severity)
+         VALUES (?, ?, ?, 'CLIENT_STATUS_TOGGLED', 'users', ?, ?, 'warning')`,
+        [
+          crypto.randomUUID(),
+          req.admin?.id || null,
+          req.admin?.name || 'Administrator',
+          userId,
+          `Client account ${user.email} (${user.full_name}) status set to ${newStatus === 1 ? 'ACTIVE' : 'SUSPENDED'}`
+        ]
+      );
+    } catch (_) {}
+
+    res.json({
+      success: true,
+      message: `Client account ${user.email} is now ${newStatus === 1 ? 'Active' : 'Suspended'}.`,
+      is_active: newStatus
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// POST /api/admin/registered-clients/:id/reset-password — Reset password for a registered client account
+router.post('/registered-clients/:id/reset-password', async (req, res, next) => {
+  try {
+    const userId = req.params.id;
+    const { new_password } = req.body;
+
+    if (!new_password || new_password.length < 6) {
+      return res.status(400).json({ success: false, error: 'Password must be at least 6 characters long.' });
+    }
+
+    const [users] = await pool.query(
+      'SELECT id, email, full_name FROM users WHERE id = ? AND role = ? LIMIT 1',
+      [userId, 'client']
+    );
+
+    if (!users || users.length === 0) {
+      return res.status(404).json({ success: false, error: 'Registered client account not found.' });
+    }
+
+    const user = users[0];
+    const salt = await bcrypt.genSalt(10);
+    const hash = await bcrypt.hash(new_password, salt);
+
+    await pool.query('UPDATE users SET password_hash = ?, updated_at = NOW() WHERE id = ?', [hash, userId]);
+
+    // Record audit log
+    try {
+      await pool.query(
+        `INSERT INTO audit_logs (id, admin_id, actor_name, action, target_entity, target_id, details, severity)
+         VALUES (?, ?, ?, 'CLIENT_PASSWORD_RESET', 'users', ?, ?, 'critical')`,
+        [
+          crypto.randomUUID(),
+          req.admin?.id || null,
+          req.admin?.name || 'Administrator',
+          userId,
+          `Password reset performed by administrator for client account ${user.email} (${user.full_name})`
+        ]
+      );
+    } catch (_) {}
+
+    res.json({
+      success: true,
+      message: `Password reset successfully for client account ${user.email}.`
     });
   } catch (err) {
     next(err);

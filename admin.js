@@ -30,6 +30,8 @@
     subscribers: [],
     activeReportType: 'shifts',
     facilities: [],
+    registeredClients: [],
+    facilitiesSubView: 'facilities',
     facilityRateCards: {},
     expandedFacilityId: null,
     kpis:       null,
@@ -791,7 +793,14 @@
             loadAllDashboardData();
           } else if (msg.type === 'inquiry:created' || msg.type === 'inquiry:replied') {
             showToast(`💬 Dispatch Communication Updated`, 'info');
-            fetchAndRenderInquiries().then(renderChatInbox);
+          } else if (msg.type === 'client:registered') {
+            const org = msg.payload?.organization_name || 'Healthcare Facility';
+            const name = msg.payload?.full_name || 'Client';
+            showToast(`🏥 New Client Registered: ${org} (${name})`, 'info');
+            if (typeof fetchAndRenderFacilities === 'function') fetchAndRenderFacilities();
+          } else if (msg.type === 'facility:created') {
+            showToast(`🏢 New Facility Added: ${msg.payload?.name || 'Facility'}`, 'info');
+            if (typeof fetchAndRenderFacilities === 'function') fetchAndRenderFacilities();
           } else if (msg.type === 'status:changed') {
             if (msg.payload && msg.payload.action === 'running_late') {
               showToast(`⏱️ Delay Notice: ${msg.payload.staff_name || 'Caregiver'} running ${msg.payload.minutes_late || 15}m late. Reason: "${msg.payload.reason || 'Delayed'}"`, 'warning');
@@ -4495,24 +4504,34 @@
     if (!facilitiesTableBody) return;
 
     try {
-      const res = await apiRequest('/admin/facilities');
-      LiveStore.facilities = (res && res.data) ? res.data : [];
+      const [facRes, clientRes] = await Promise.all([
+        apiRequest('/admin/facilities'),
+        apiRequest('/admin/registered-clients').catch(() => ({ data: [] }))
+      ]);
+
+      LiveStore.facilities = (facRes && facRes.data) ? facRes.data : [];
+      LiveStore.registeredClients = (clientRes && clientRes.data) ? clientRes.data : [];
 
       // Update KPI counters
       const activeCount   = LiveStore.facilities.filter(f => f.effective_status === 'active').length;
       const expiringCount = LiveStore.facilities.filter(f => f.is_expiring_soon).length;
       const pendingCount  = LiveStore.facilities.filter(f => f.effective_status === 'pending').length;
       const totalTerms    = LiveStore.facilities.reduce((acc, f) => acc + (f.active_rate_cards_count || 0), 0);
+      const registeredClientsCount = LiveStore.registeredClients.length;
 
       const elActive   = document.getElementById('stat-active-facilities');
       const elTerms    = document.getElementById('stat-active-rate-cards');
       const elExpiring = document.getElementById('stat-expiring-facilities');
       const elPending  = document.getElementById('stat-pending-facilities');
+      const elClients  = document.getElementById('stat-registered-clients');
+      const elClientBadge = document.getElementById('badge-client-users-count');
 
       if (elActive)   elActive.textContent   = activeCount;
       if (elTerms)    elTerms.textContent    = totalTerms;
       if (elExpiring) elExpiring.textContent = expiringCount;
       if (elPending)  elPending.textContent  = pendingCount;
+      if (elClients)  elClients.textContent  = registeredClientsCount;
+      if (elClientBadge) elClientBadge.textContent = registeredClientsCount;
 
       if (badgeFacilitiesCount) {
         badgeFacilitiesCount.textContent = LiveStore.facilities.length;
@@ -4520,6 +4539,7 @@
       }
 
       renderFacilitiesList();
+      renderClientAccountsList();
     } catch (err) {
       console.error('[Facilities Fetch Error]:', err);
       facilitiesTableBody.innerHTML = `
@@ -4534,6 +4554,41 @@
     }
   }
 
+  // Sub-view toggle between Facilities & Registered Clients
+  window.switchFacilitiesSubView = function(view) {
+    LiveStore.facilitiesSubView = view;
+    const facContainer = document.getElementById('facilities-table-container');
+    const clientContainer = document.getElementById('client-accounts-container');
+    const btnFac = document.getElementById('btn-show-facilities-table');
+    const btnClients = document.getElementById('btn-show-clients-table');
+
+    if (view === 'clients') {
+      if (facContainer) facContainer.style.display = 'none';
+      if (clientContainer) clientContainer.style.display = 'block';
+      if (btnFac) {
+        btnFac.style.background = 'transparent';
+        btnFac.style.color = 'var(--text-muted)';
+      }
+      if (btnClients) {
+        btnClients.style.background = 'var(--brand-turquoise)';
+        btnClients.style.color = '#fff';
+      }
+      renderClientAccountsList();
+    } else {
+      if (facContainer) facContainer.style.display = 'block';
+      if (clientContainer) clientContainer.style.display = 'none';
+      if (btnFac) {
+        btnFac.style.background = 'var(--brand-turquoise)';
+        btnFac.style.color = '#fff';
+      }
+      if (btnClients) {
+        btnClients.style.background = 'transparent';
+        btnClients.style.color = 'var(--text-muted)';
+      }
+      renderFacilitiesList();
+    }
+  };
+
   function renderFacilitiesList() {
     if (!facilitiesTableBody) return;
 
@@ -4546,9 +4601,18 @@
         (f.facility_code && f.facility_code.toLowerCase().includes(query)) ||
         (f.region && f.region.toLowerCase().includes(query)) ||
         (f.contact_name && f.contact_name.toLowerCase().includes(query)) ||
-        (f.contact_email && f.contact_email.toLowerCase().includes(query));
+        (f.contact_email && f.contact_email.toLowerCase().includes(query)) ||
+        (f.registered_user_emails && f.registered_user_emails.toLowerCase().includes(query));
 
-      const matchesStatus = !status || f.effective_status === status;
+      let matchesStatus = true;
+      if (status === 'portal_active') {
+        matchesStatus = Boolean(f.has_portal_account);
+      } else if (status === 'no_portal') {
+        matchesStatus = !f.has_portal_account;
+      } else if (status) {
+        matchesStatus = f.effective_status === status;
+      }
+
       return matchesSearch && matchesStatus;
     });
 
@@ -4620,13 +4684,26 @@
             </div>
           </td>
 
-          <!-- Primary Contact -->
-          <td class="cell-grid-item" data-label="Primary Contact">
-            <div class="meta-label">Primary Contact</div>
+          <!-- Primary Contact & Portal Account -->
+          <td class="cell-grid-item" data-label="Primary Contact & Portal">
+            <div class="meta-label">Primary Contact &amp; Portal Account</div>
             <div class="meta-value">
               <div style="font-weight: 600; color: var(--text-primary);">${escapeHTML(f.contact_name || '—')}</div>
               ${f.contact_email ? `<div style="font-size: 0.74rem; color: var(--text-muted); word-break: break-all;">${escapeHTML(f.contact_email)}</div>` : ''}
               ${f.contact_phone ? `<div style="font-size: 0.72rem; color: var(--text-muted);">${escapeHTML(f.contact_phone)}</div>` : ''}
+              ${f.has_portal_account ? `
+                <div style="margin-top: 4px;">
+                  <span style="background: rgba(6, 182, 212, 0.12); color: #0891b2; border: 1px solid rgba(6, 182, 212, 0.35); font-size: 0.68rem; font-weight: 700; padding: 1px 6px; border-radius: 4px; display: inline-flex; align-items: center; gap: 3px;" title="Registered Login: ${escapeHTML(f.registered_user_emails)}">
+                    <i data-lucide="user-check" style="width: 10px; height: 10px;"></i> Client Portal User (${f.registered_users_count})
+                  </span>
+                </div>
+              ` : `
+                <div style="margin-top: 4px;">
+                  <span style="background: rgba(255,255,255,0.04); color: var(--text-muted); font-size: 0.68rem; padding: 1px 6px; border-radius: 4px; display: inline-flex; align-items: center; gap: 3px;">
+                    <i data-lucide="user-minus" style="width: 10px; height: 10px;"></i> No Portal Login
+                  </span>
+                </div>
+              `}
             </div>
           </td>
 
@@ -4676,6 +4753,191 @@
 
     if (window.lucide) lucide.createIcons();
   }
+
+  // Render Registered Client Accounts Ledger
+  function renderClientAccountsList() {
+    const tableBody = document.getElementById('client-accounts-table-body');
+    if (!tableBody) return;
+
+    const query = (facilitiesSearchInput?.value || '').trim().toLowerCase();
+    const clients = LiveStore.registeredClients || [];
+
+    const filtered = clients.filter(c => {
+      if (!query) return true;
+      return (
+        (c.full_name && c.full_name.toLowerCase().includes(query)) ||
+        (c.email && c.email.toLowerCase().includes(query)) ||
+        (c.organization_name && c.organization_name.toLowerCase().includes(query)) ||
+        (c.phone && c.phone.toLowerCase().includes(query)) ||
+        (c.facility_code && c.facility_code.toLowerCase().includes(query))
+      );
+    });
+
+    if (filtered.length === 0) {
+      tableBody.innerHTML = `
+        <tr>
+          <td colspan="7" style="text-align: center; padding: 3rem 1.5rem; color: var(--text-muted);">
+            <i data-lucide="users" style="width: 38px; height: 38px; opacity: 0.4; margin-bottom: 0.75rem;"></i>
+            <div style="font-weight: 600; font-size: 0.95rem; color: var(--text-primary); margin-bottom: 4px;">No Registered Client Accounts Found</div>
+            <div style="font-size: 0.82rem;">Healthcare facilities that sign up via the Client Portal login page will automatically appear here.</div>
+          </td>
+        </tr>
+      `;
+      if (window.lucide) lucide.createIcons();
+      return;
+    }
+
+    tableBody.innerHTML = filtered.map(c => {
+      const isActive = Number(c.is_active) === 1;
+      const statusBadge = isActive
+        ? '<span class="status-pill verified" style="font-size: 0.72rem; padding: 2px 8px;"><i data-lucide="shield-check" style="width: 12px; height: 12px;"></i> Active</span>'
+        : '<span class="status-pill danger" style="font-size: 0.72rem; padding: 2px 8px;"><i data-lucide="slash" style="width: 12px; height: 12px;"></i> Suspended</span>';
+
+      const regDateStr = c.created_at ? formatUserDateTime(c.created_at) : '—';
+      const lastLoginStr = c.last_login ? formatUserDateTime(c.last_login) : 'Never logged in';
+
+      return `
+        <tr class="table-card-row">
+          <td class="cell-primary" data-label="Organization">
+            <div class="row-header-wrapper">
+              <div class="user-meta-name">
+                <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                  <strong class="user-display-name">${escapeHTML(c.organization_name || c.linked_facility_name || 'Individual Facility')}</strong>
+                  ${c.facility_code ? `<span style="font-family: monospace; font-size: 0.72rem; background: rgba(255,255,255,0.06); padding: 1px 5px; border-radius: 4px; color: var(--text-muted); font-weight: 700;">${escapeHTML(c.facility_code)}</span>` : ''}
+                </div>
+                <span class="user-role-sub" style="font-size: 0.74rem; color: var(--brand-turquoise);">Client Portal Account</span>
+              </div>
+              <div class="row-status-top">${statusBadge}</div>
+            </div>
+          </td>
+
+          <td class="cell-grid-item" data-label="Contact Person">
+            <div class="meta-label">Primary Contact</div>
+            <div class="meta-value">
+              <div style="font-weight: 600; color: var(--text-primary);">${escapeHTML(c.full_name)}</div>
+              <div style="font-size: 0.72rem; color: var(--text-muted);">${escapeHTML(c.client_role || 'Staffing Requester')}</div>
+            </div>
+          </td>
+
+          <td class="cell-grid-item" data-label="Login & Contact">
+            <div class="meta-label">Login Email &amp; Phone</div>
+            <div class="meta-value">
+              <div style="font-weight: 600; color: var(--text-primary); font-size: 0.8rem; word-break: break-all;">${escapeHTML(c.email)}</div>
+              ${c.phone ? `<div style="font-size: 0.74rem; color: var(--text-muted);">${escapeHTML(c.phone)}</div>` : ''}
+              <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 2px;">Last login: ${lastLoginStr}</div>
+            </div>
+          </td>
+
+          <td class="cell-status-desktop" data-label="Account Status">
+            <div class="meta-label">Status</div>
+            <div class="meta-value">${statusBadge}</div>
+          </td>
+
+          <td class="cell-grid-item" data-label="Registered Date">
+            <div class="meta-label">Registered Date</div>
+            <div class="meta-value" style="font-size: 0.78rem;">
+              <strong>${regDateStr.split(',')[0]}</strong>
+              <div style="font-size: 0.72rem; color: var(--text-muted);">${regDateStr.split(',')[1] || ''}</div>
+            </div>
+          </td>
+
+          <td class="cell-grid-item" data-label="Total Requests">
+            <div class="meta-label">Shifts Placed</div>
+            <div class="meta-value">
+              <span class="status-pill ${Number(c.total_requests_count) > 0 ? 'verified' : ''}" style="font-size: 0.72rem; padding: 2px 7px;">
+                <strong>${c.total_requests_count || 0}</strong> requests
+              </span>
+            </div>
+          </td>
+
+          <td class="cell-actions" data-label="Actions">
+            <div style="display: flex; gap: 0.4rem; justify-content: flex-end; width: 100%; flex-wrap: wrap;">
+              <button type="button" class="btn-secondary-action" style="font-size: 0.74rem; padding: 0.35rem 0.6rem; display: inline-flex; align-items: center; gap: 4px;" onclick="window.toggleClientStatus('${c.id}')" title="${isActive ? 'Suspend Account' : 'Activate Account'}">
+                <i data-lucide="${isActive ? 'slash' : 'check'}" style="width: 12px; height: 12px; color: ${isActive ? 'var(--status-danger)' : 'var(--status-success)'};"></i> ${isActive ? 'Suspend' : 'Activate'}
+              </button>
+              <button type="button" class="btn-secondary-action" style="font-size: 0.74rem; padding: 0.35rem 0.6rem; display: inline-flex; align-items: center; gap: 4px;" onclick="window.openClientResetModal('${c.id}', '${escapeHTML(c.email)}')" title="Reset Password">
+                <i data-lucide="key" style="width: 12px; height: 12px;"></i> Reset Pwd
+              </button>
+              ${c.facility_id ? `
+                <button type="button" class="btn-primary-action" style="font-size: 0.74rem; padding: 0.35rem 0.65rem; display: inline-flex; align-items: center; gap: 4px;" onclick="window.openFacilityRateCardsModal('${c.facility_id}')" title="Set MSA Rates">
+                  <i data-lucide="badge-dollar-sign" style="width: 12px; height: 12px;"></i> Rates
+                </button>
+              ` : ''}
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('');
+
+    if (window.lucide) lucide.createIcons();
+  }
+
+  // Client Account Management Actions
+  window.toggleClientStatus = async function(userId) {
+    if (!confirm('Are you sure you want to toggle access status for this client account?')) return;
+    try {
+      const res = await apiRequest(`/admin/registered-clients/${userId}/toggle-status`, { method: 'PATCH' });
+      showToast(res.message || 'Client account status updated.', 'success');
+      await fetchAndRenderFacilities();
+    } catch (err) {
+      showToast(`Failed to update client status: ${err.message}`, 'danger');
+    }
+  };
+
+  window.openClientResetModal = function(userId, email) {
+    const modal = document.getElementById('modal-client-reset-password');
+    const inputId = document.getElementById('client-reset-user-id');
+    const emailEl = document.getElementById('client-reset-user-email');
+    const pwdInput = document.getElementById('client-new-password');
+
+    if (inputId) inputId.value = userId;
+    if (emailEl) emailEl.textContent = email;
+    if (pwdInput) {
+      const randomStr = Math.random().toString(36).slice(-8) + '!';
+      pwdInput.value = 'DF-' + randomStr;
+    }
+    if (modal) modal.style.display = 'flex';
+    if (window.lucide) lucide.createIcons();
+  };
+
+  window.closeClientResetModal = function() {
+    const modal = document.getElementById('modal-client-reset-password');
+    if (modal) modal.style.display = 'none';
+  };
+
+  window.saveClientResetPassword = async function(e) {
+    if (e) e.preventDefault();
+    const userId = document.getElementById('client-reset-user-id')?.value;
+    const newPassword = document.getElementById('client-new-password')?.value;
+    const btn = document.getElementById('btn-submit-client-reset');
+
+    if (!userId || !newPassword || newPassword.length < 6) {
+      showToast('Password must be at least 6 characters long.', 'warning');
+      return;
+    }
+
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = 'Saving...';
+    }
+
+    try {
+      const res = await apiRequest(`/admin/registered-clients/${userId}/reset-password`, {
+        method: 'POST',
+        body: JSON.stringify({ new_password: newPassword })
+      });
+      showToast(res.message || 'Password reset successfully.', 'success');
+      window.closeClientResetModal();
+    } catch (err) {
+      showToast(`Password reset failed: ${err.message}`, 'danger');
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = '<i data-lucide="check" style="width: 15px; height: 15px;"></i> Save New Password';
+        if (window.lucide) lucide.createIcons();
+      }
+    }
+  };
 
   // Facility Rate Cards Management Modal Handlers
   window.openFacilityRateCardsModal = async function(facilityId) {

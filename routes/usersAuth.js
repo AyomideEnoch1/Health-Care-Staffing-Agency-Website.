@@ -15,6 +15,7 @@ const crypto = require('crypto');
 const { z } = require('zod');
 const pool = require('../db');
 const { authLoginLimiter } = require('../middleware/rateLimiter');
+const adminEvents = require('../utils/events');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'divine_fingers_default_secure_jwt_secret_key_2026_production_fallback';
 const USER_COOKIE_NAME = 'df_user_session';
@@ -77,22 +78,99 @@ router.post('/register', async (req, res, next) => {
     // Hash password
     const salt = await bcrypt.genSalt(10);
     const password_hash = await bcrypt.hash(data.password, salt);
-    const userId = 'u-' + crypto.randomUUID();
+    const userId = crypto.randomUUID();
 
-    // Insert user
+    // If registering as a healthcare facility client, resolve or auto-provision linked facility
+    let facilityId = null;
+    const orgName = data.organization_name ? data.organization_name.trim() : null;
+
+    if (data.role === 'client' && orgName) {
+      try {
+        const [facMatch] = await pool.query(
+          'SELECT id, facility_code FROM facilities WHERE LOWER(TRIM(name)) = LOWER(TRIM(?)) LIMIT 1',
+          [orgName]
+        );
+
+        if (facMatch && facMatch.length > 0) {
+          facilityId = facMatch[0].id;
+        } else {
+          const [countRows] = await pool.query('SELECT COUNT(*) AS total FROM facilities');
+          const nextNum = ((countRows && countRows[0] && countRows[0].total) || 0) + 1;
+          const facilityCode = `FAC-${String(nextNum).padStart(3, '0')}`;
+          facilityId = crypto.randomUUID();
+
+          await pool.query(
+            `INSERT INTO facilities 
+              (id, name, facility_code, address, region, contact_name, contact_email, contact_phone, status, created_at, updated_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending', NOW(), NOW())`,
+            [
+              facilityId,
+              orgName,
+              facilityCode,
+              'GTA / Client Self-Registered',
+              'Greater Toronto Area',
+              data.full_name.trim(),
+              emailClean,
+              data.phone ? data.phone.trim() : null
+            ]
+          );
+
+          // Broadcast facility created to admin dashboard
+          adminEvents.emit('facility:created', {
+            id: facilityId,
+            name: orgName,
+            facility_code: facilityCode,
+            status: 'pending',
+            contact_name: data.full_name.trim(),
+            contact_email: emailClean,
+            created_at: new Date().toISOString()
+          });
+        }
+      } catch (facErr) {
+        console.warn('[Facility Auto-Link Warning]:', facErr.message);
+      }
+    }
+
+    // Insert user with facility_id
     await pool.query(
-      `INSERT INTO users (id, email, password_hash, full_name, role, organization_name, phone, is_active, email_verified, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, 1, 1, NOW(), NOW())`,
+      `INSERT INTO users (id, email, password_hash, full_name, role, organization_name, facility_id, phone, is_active, email_verified, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, 1, NOW(), NOW())`,
       [
         userId,
         emailClean,
         password_hash,
         data.full_name.trim(),
         data.role,
-        data.organization_name ? data.organization_name.trim() : null,
+        orgName,
+        facilityId,
         data.phone ? data.phone.trim() : null
       ]
     );
+
+    // Broadcast client registration event to admin dashboard
+    adminEvents.emit('client:registered', {
+      id: userId,
+      email: emailClean,
+      full_name: data.full_name.trim(),
+      organization_name: orgName,
+      facility_id: facilityId,
+      phone: data.phone ? data.phone.trim() : null,
+      created_at: new Date().toISOString()
+    });
+
+    // Record audit trail
+    try {
+      await pool.query(
+        `INSERT INTO audit_logs (id, actor_name, action, target_entity, target_id, details, severity)
+         VALUES (?, ?, 'CLIENT_REGISTERED', 'users', ?, ?, 'info')`,
+        [
+          crypto.randomUUID(),
+          data.full_name.trim(),
+          userId,
+          `Client account self-registered: ${data.full_name.trim()} (${emailClean}) for facility "${orgName || 'N/A'}"`
+        ]
+      );
+    } catch (_) {}
 
     // If registering as a healthcare professional, also populate staff_roster so the admin dispatch team sees them
     if (data.role === 'healthcare_worker') {
@@ -128,7 +206,8 @@ router.post('/register', async (req, res, next) => {
       email: emailClean,
       full_name: data.full_name.trim(),
       role: data.role,
-      organization_name: data.organization_name || null,
+      organization_name: orgName,
+      facility_id: facilityId,
       phone: data.phone || null,
       credential_status: data.role === 'healthcare_worker' ? 'pending' : 'verified',
       staff_status: data.role === 'healthcare_worker' ? 'pending_verification' : 'available',
@@ -149,7 +228,8 @@ router.post('/register', async (req, res, next) => {
         email: emailClean,
         full_name: data.full_name.trim(),
         role: data.role,
-        organization_name: data.organization_name || null,
+        organization_name: orgName,
+        facility_id: facilityId,
         phone: data.phone || null,
         credential_status: data.role === 'healthcare_worker' ? 'pending' : 'verified',
         staff_status: data.role === 'healthcare_worker' ? 'pending_verification' : 'available',

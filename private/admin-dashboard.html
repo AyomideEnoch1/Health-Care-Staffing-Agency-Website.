@@ -662,42 +662,62 @@
                 <span class="kpi-trend neutral">Agency Default</span>
               </div>
             </div>
+            <div class="kpi-card">
+              <div class="kpi-top">
+                <span class="kpi-title">Registered Clients</span>
+                <div class="kpi-icon-box" style="background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%) !important;"><i data-lucide="users" style="width: 18px; height: 18px;"></i></div>
+              </div>
+              <div class="kpi-value-row">
+                <span class="kpi-number tabular-nums" id="stat-registered-clients">0</span>
+                <span class="kpi-trend positive" style="color: #06b6d4; background: rgba(6, 182, 212, 0.12);"><i data-lucide="user-check" style="width: 12px; height: 12px;"></i> Portal Active</span>
+              </div>
+            </div>
           </div>
 
           <!-- Governance Info Banner -->
           <div style="background: rgba(0, 168, 150, 0.08); border: 1px solid rgba(0, 168, 150, 0.25); border-radius: 8px; padding: 0.9rem 1.1rem; margin-bottom: 1.25rem; display: flex; align-items: flex-start; gap: 0.85rem;">
             <i data-lucide="shield-check" style="width: 22px; height: 22px; color: var(--brand-turquoise, #00a896); flex-shrink: 0; margin-top: 2px;"></i>
             <div style="font-size: 0.82rem; line-height: 1.45; color: var(--text-secondary, #94a3b8);">
-              <strong style="color: var(--text-primary, #f8fafc);">Internal Rate Card Governance:</strong> Contracted MSA rates reflect the actual signed Master Service Agreement terms, managed exclusively by agency administrators. The resolution order is: <code style="background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 4px; color: var(--brand-turquoise);">1. Shift One-Off Exception</code> &rarr; <code style="background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 4px; color: var(--brand-turquoise);">2. Contracted Facility MSA Rate</code> &rarr; <code style="background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 4px; color: var(--brand-turquoise);">3. Global Agency Default</code>. Historical terms are immutably archived upon new rate insertion.
+              <strong style="color: var(--text-primary, #f8fafc);">Internal Rate Card Governance &amp; Portal Accounts:</strong> Healthcare facilities registering online via the client portal are automatically synced here in <span style="color: #f59e0b; font-weight: 700;">Pending Onboarding</span> status until their MSA contracts and rate cards are finalized. Agency admins can review accounts, set customized shift rates, or toggle portal access.
             </div>
           </div>
 
           <div class="table-card">
             <div class="table-toolbar" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.85rem; padding: 1rem 1.25rem; border-bottom: 1px solid var(--border-color, rgba(255,255,255,0.08));">
-              <div class="table-filter-group" style="display: flex; gap: 0.75rem; flex-wrap: wrap; flex: 1; min-width: 280px;">
-                <input type="text" class="search-input filter-search-box" id="facilities-search-input" placeholder="Search facility name, code, contact or region..." style="min-width: 240px; flex: 1;">
-                <select class="filter-select" id="facilities-status-filter" style="min-width: 190px;">
-                  <option value="">All MSA Statuses</option>
+              <!-- Sub-View Toggle -->
+              <div class="segmented-control" style="display: inline-flex; background: rgba(255,255,255,0.06); padding: 3px; border-radius: 8px; gap: 4px;">
+                <button type="button" class="segmented-btn active" id="btn-show-facilities-table" onclick="window.switchFacilitiesSubView('facilities')" style="font-size: 0.78rem; padding: 0.4rem 0.85rem; border-radius: 6px; border: none; background: var(--brand-turquoise); color: #fff; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 5px;">
+                  <i data-lucide="building-2" style="width: 14px; height: 14px;"></i> Facilities &amp; Rates
+                </button>
+                <button type="button" class="segmented-btn" id="btn-show-clients-table" onclick="window.switchFacilitiesSubView('clients')" style="font-size: 0.78rem; padding: 0.4rem 0.85rem; border-radius: 6px; border: none; background: transparent; color: var(--text-muted); font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 5px;">
+                  <i data-lucide="users" style="width: 14px; height: 14px;"></i> Registered Clients <span class="badge" id="badge-client-users-count" style="background: rgba(27,174,207,0.2); color: #1BAECF; padding: 1px 6px; border-radius: 10px; font-size: 0.7rem; font-weight: 800;">0</span>
+                </button>
+              </div>
+
+              <div class="table-filter-group" style="display: flex; gap: 0.75rem; flex-wrap: wrap; flex: 1; min-width: 280px; justify-content: flex-end;">
+                <input type="text" class="search-input filter-search-box" id="facilities-search-input" placeholder="Search facility name, code, contact or email..." style="min-width: 220px; flex: 1; max-width: 340px;">
+                <select class="filter-select" id="facilities-status-filter" style="min-width: 180px;">
+                  <option value="">All Statuses</option>
                   <option value="active">Active MSA Contract</option>
                   <option value="pending">Pending Onboarding</option>
                   <option value="expired">Expired MSA</option>
+                  <option value="portal_active">Has Portal Account</option>
+                  <option value="no_portal">No Portal Account</option>
                 </select>
-              </div>
-              <div class="table-action-group">
-                <button type="button" class="btn-primary-action" onclick="window.openFacilityModal()" style="display: flex; align-items: center; gap: 0.4rem;">
+                <button type="button" class="btn-primary-action" onclick="window.openFacilityModal()" style="display: flex; align-items: center; gap: 0.4rem; white-space: nowrap;">
                   <i data-lucide="plus-circle" style="width: 16px; height: 16px;"></i> Register Facility
                 </button>
               </div>
             </div>
 
-            <!-- Facilities Table Container -->
-            <div class="table-responsive-container">
+            <!-- VIEW 1: Facilities & Rate Cards Table -->
+            <div class="table-responsive-container" id="facilities-table-container">
               <table class="data-table mobile-stacked-table" id="facilities-table">
                 <thead>
                   <tr>
                     <th>Facility Name &amp; Code</th>
                     <th>Location / Region</th>
-                    <th>Primary Contact</th>
+                    <th>Primary Contact &amp; Portal Account</th>
                     <th>Contract Status</th>
                     <th>MSA Expiry Date</th>
                     <th>Contracted Terms</th>
@@ -709,6 +729,31 @@
                     <td colspan="7" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">
                       <i data-lucide="loader-2" class="spin" style="width: 24px; height: 24px; margin-bottom: 0.5rem;"></i>
                       <div>Loading healthcare facilities &amp; contracted rate cards...</div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- VIEW 2: Registered Client Portal Users Ledger -->
+            <div class="table-responsive-container" id="client-accounts-container" style="display: none;">
+              <table class="data-table mobile-stacked-table" id="client-accounts-table">
+                <thead>
+                  <tr>
+                    <th>Client Facility / Organization</th>
+                    <th>Primary Contact Person</th>
+                    <th>Login Email &amp; Phone</th>
+                    <th>Account Status</th>
+                    <th>Registered Date</th>
+                    <th>Total Requests</th>
+                    <th style="text-align: right;">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="client-accounts-table-body">
+                  <tr>
+                    <td colspan="7" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">
+                      <i data-lucide="loader-2" class="spin" style="width: 24px; height: 24px; margin-bottom: 0.5rem;"></i>
+                      <div>Loading registered client portal accounts...</div>
                     </td>
                   </tr>
                 </tbody>
@@ -1932,6 +1977,38 @@
       <div class="modal-actions" style="display: flex; justify-content: flex-end; gap: 0.75rem; padding-top: 1rem; border-top: 1px solid var(--border-color); margin-top: 1rem;">
         <button type="button" class="btn-secondary-action" onclick="window.closeFacilityRateCardsModal()">Close</button>
       </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       CLIENT PORTAL PASSWORD RESET MODAL
+       ========================================================================== -->
+  <div class="admin-modal-overlay" id="modal-client-reset-password">
+    <div class="admin-modal-card" style="max-width: 460px;">
+      <div class="modal-header">
+        <h3 class="modal-title" id="client-reset-modal-title">
+          <i data-lucide="key" style="width: 20px; height: 20px; color: var(--brand-cyan);"></i> Reset Client Password
+        </h3>
+        <button type="button" class="modal-close-btn" onclick="window.closeClientResetModal()" aria-label="Close modal"><i data-lucide="x" style="width: 20px; height: 20px;"></i></button>
+      </div>
+      <form id="form-client-reset-password" onsubmit="window.saveClientResetPassword(event)">
+        <input type="hidden" id="client-reset-user-id" value="">
+        <div style="margin-bottom: 1.25rem;">
+          <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.75rem;">
+            Resetting portal password for: <strong id="client-reset-user-email" style="color: var(--text-primary);"></strong>
+          </div>
+          <div class="modal-form-group">
+            <label for="client-new-password">New Password (Min. 6 characters) *</label>
+            <input type="text" class="modal-input" id="client-new-password" placeholder="Enter temporary or new password" required minlength="6">
+          </div>
+        </div>
+        <div class="modal-actions" style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+          <button type="button" class="btn-secondary-action" onclick="window.closeClientResetModal()">Cancel</button>
+          <button type="submit" class="btn-primary-action" id="btn-submit-client-reset">
+            <i data-lucide="check" style="width: 15px; height: 15px;"></i> Save New Password
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 
