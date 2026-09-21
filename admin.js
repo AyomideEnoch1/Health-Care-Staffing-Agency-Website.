@@ -4565,6 +4565,7 @@
     if (view === 'clients') {
       if (facContainer) facContainer.style.display = 'none';
       if (clientContainer) clientContainer.style.display = 'block';
+      if (facilitiesStatusFilter) facilitiesStatusFilter.style.display = 'none';
       if (btnFac) {
         btnFac.style.background = 'transparent';
         btnFac.style.color = 'var(--text-muted)';
@@ -4577,6 +4578,7 @@
     } else {
       if (facContainer) facContainer.style.display = 'block';
       if (clientContainer) clientContainer.style.display = 'none';
+      if (facilitiesStatusFilter) facilitiesStatusFilter.style.display = '';
       if (btnFac) {
         btnFac.style.background = 'var(--brand-turquoise)';
         btnFac.style.color = '#fff';
@@ -5369,7 +5371,13 @@
 
   // Bind filter events for facilities tab
   if (facilitiesSearchInput) {
-    facilitiesSearchInput.addEventListener('input', () => renderFacilitiesList());
+    facilitiesSearchInput.addEventListener('input', () => {
+      if (LiveStore.facilitiesSubView === 'clients') {
+        renderClientAccountsList();
+      } else {
+        renderFacilitiesList();
+      }
+    });
   }
   if (facilitiesStatusFilter) {
     facilitiesStatusFilter.addEventListener('change', () => renderFacilitiesList());

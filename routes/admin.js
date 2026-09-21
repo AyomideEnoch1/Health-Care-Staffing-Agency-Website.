@@ -168,7 +168,10 @@ router.post('/clean-dummy-data', async (req, res, next) => {
       'job_applications',
       'contact_inquiries',
       'audit_logs',
-      'newsletter_subscribers'
+      'newsletter_subscribers',
+      'facility_rate_cards',
+      'users',
+      'facilities'
     ];
 
     const results = {};
@@ -189,13 +192,6 @@ router.post('/clean-dummy-data', async (req, res, next) => {
     }
 
     try {
-      const [rUsers] = await pool.query("DELETE FROM users");
-      results.users = rUsers.affectedRows || 0;
-    } catch (e) {
-      results.users = `skipped (${e.message})`;
-    }
-
-    try {
       const [rAdmins] = await pool.query(
         "DELETE FROM admins WHERE email NOT IN ('admin@divinefingershealthcare.ca', 'ayomidenoch15@gmail.com')"
       );
@@ -212,6 +208,8 @@ router.post('/clean-dummy-data', async (req, res, next) => {
       pool.inMemoryStore.newsletter_subscribers = [];
       pool.inMemoryStore.staff_roster = [];
       pool.inMemoryStore.users = [];
+      pool.inMemoryStore.facilities = [];
+      pool.inMemoryStore.facility_rate_cards = [];
     }
 
     res.json({
@@ -1915,7 +1913,7 @@ router.patch('/facilities/:id', async (req, res, next) => {
     const updates = [];
     const params = [];
 
-    const allowed = ['name', 'address', 'region', 'contact_name', 'contact_email', 'contact_phone', 'msa_signed_date', 'msa_expiry_date', 'msa_document_url', 'status'];
+    const allowed = ['name', 'facility_code', 'address', 'region', 'contact_name', 'contact_email', 'contact_phone', 'msa_signed_date', 'msa_expiry_date', 'msa_document_url', 'status'];
     for (const key of allowed) {
       if (req.body[key] !== undefined) {
         updates.push(`${key} = ?`);

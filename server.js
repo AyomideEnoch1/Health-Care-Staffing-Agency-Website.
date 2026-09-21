@@ -196,8 +196,8 @@ app.use('/api/contact',      contactRoute);
 app.use('/api/auth',         authRoute);
 // CSRF verification only on admin state-changing routes
 app.use('/api/admin', (req, res, next) => {
-  // Apply CSRF check only to PATCH and POST (not GET/OPTIONS/SSE stream/clean-dummy-data)
-  if (req.method === 'PATCH' || (req.method === 'POST' && req.path !== '/stream' && req.path !== '/clean-dummy-data')) {
+  // Apply CSRF check to PATCH, DELETE, and POST (not GET/OPTIONS/SSE stream/clean-dummy-data)
+  if (req.method === 'PATCH' || req.method === 'DELETE' || (req.method === 'POST' && req.path !== '/stream' && req.path !== '/clean-dummy-data')) {
     return verifyCsrfToken(req, res, next);
   }
   next();

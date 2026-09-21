@@ -7664,6 +7664,17 @@ html, body {
   <script>
     let currentUser = null;
 
+    function escapeHTML(str) {
+      if (!str && str !== 0) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+    window.escapeHTML = escapeHTML;
+
     // Dynamic API Base Resolution
     const API_BASE = window.API_BASE_URL || (() => {
       if (typeof window === 'undefined') return '/api';
@@ -10134,22 +10145,70 @@ function toggleClientMobileSidebar(open) {
 // Explicit Window Exports (Ensures Global Accessibility)
 // ------------------------------------------------------------------------
 window.switchStaffPage = switchStaffPage;
-window.goToCredentialsVault = function() {
-  if (typeof goToCredentialsVault === 'function') {
-    goToCredentialsVault();
-  } else {
-    switchStaffPage('staff-page-credentials', 'Clinical Credentials Vault');
-    if (typeof loadStaffDocuments === 'function') loadStaffDocuments();
-  }
-};
-window.openCredentialRequiredModal = function(data) {
-  if (typeof openCredentialRequiredModal === 'function') openCredentialRequiredModal(data);
-};
+
+// ------------------------------------------------------------------------
+// Clinical Compliance & Credential Modal Handlers
+// ------------------------------------------------------------------------
 window.closeCredentialRequiredModal = function() {
-  if (typeof closeCredentialRequiredModal === 'function') closeCredentialRequiredModal();
+  const modal = document.getElementById('staff-credential-required-modal');
+  if (modal) modal.style.display = 'none';
 };
+
+window.openCredentialRequiredModal = function(data) {
+  const modal = document.getElementById('staff-credential-required-modal');
+  const container = document.getElementById('claim-missing-reqs-container');
+  if (!modal) return;
+
+  const comp = data || currentStaffCompliance || window.currentStaffCompliance || {};
+  const missing = (comp && Array.isArray(comp.missing_requirements)) ? comp.missing_requirements : [];
+  if (container) {
+    if (missing.length === 0) {
+      container.innerHTML = `
+        <div style="background: #FEF2F2; border: 1.5px solid #FECACA; border-radius: 8px; padding: 0.9rem 1rem; font-size: 0.84rem; color: #991B1B; display: flex; align-items: flex-start; gap: 0.6rem;">
+          <i data-lucide="alert-triangle" style="width: 18px; height: 18px; flex-shrink: 0; margin-top: 2px; color: #DC2626;"></i>
+          <div>
+            <div style="font-weight: 800; color: #7F1D1D; margin-bottom: 3px;">Clinical Verification Pending</div>
+            <div style="color: #991B1B; font-size: 0.8rem; line-height: 1.45;">
+              ${escapeHTML(comp?.error || comp?.message || 'Your clinical documents are awaiting verification by Clinical Operations Dispatch. You will be able to claim shifts immediately upon approval.')}
+            </div>
+          </div>
+        </div>
+      `;
+    } else {
+      container.innerHTML = missing.map(m => `
+        <div style="background: #FEF2F2; border: 1.5px solid #FECACA; border-radius: 8px; padding: 0.85rem 1rem; display: flex; align-items: flex-start; gap: 0.75rem;">
+          <span style="background: #DC2626; color: #FFFFFF; font-size: 0.68rem; font-weight: 800; padding: 0.2rem 0.5rem; border-radius: 4px; flex-shrink: 0; margin-top: 2px;">
+            ACTION NEEDED
+          </span>
+          <div style="flex: 1;">
+            <div style="font-weight: 800; color: #7F1D1D; font-size: 0.88rem;">${escapeHTML(m.name || 'Required Credential')}</div>
+            <div style="color: #991B1B; font-size: 0.8rem; margin-top: 3px; line-height: 1.4;">${escapeHTML(m.reason || 'Must be uploaded to your Clinical Credentials Vault')}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+  }
+
+  modal.style.display = 'flex';
+  if (window.lucide) lucide.createIcons();
+};
+
+window.goToCredentialsVault = function() {
+  window.closeCredentialRequiredModal();
+  switchStaffPage('staff-page-credentials', 'Clinical Credentials Vault');
+  if (typeof loadStaffDocuments === 'function') {
+    loadStaffDocuments();
+  }
+  setTimeout(() => {
+    const form = document.getElementById('staff-credential-upload-form') || document.getElementById('worker-credentials-panel') || document.getElementById('staff-page-credentials');
+    if (form) form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 150);
+};
+
 window.handleBlockedClaimClick = function(id) {
-  if (typeof handleBlockedClaimClick === 'function') handleBlockedClaimClick(id);
+  window.openCredentialRequiredModal(currentStaffCompliance || window.currentStaffCompliance || {
+    message: 'Your profile has unmet clinical credential requirements. Please upload all required documents to enable shift claiming.'
+  });
 };
 window.toggleStaffSidebarCollapse = toggleStaffSidebarCollapse;
 window.toggleStaffMobileSidebar = toggleStaffMobileSidebar;
@@ -10990,66 +11049,10 @@ async function loadPunchHistory() {
 // ------------------------------------------------------------------------
 let currentStaffCompliance = null;
 
-function openCredentialRequiredModal(data) {
-  const modal = document.getElementById('staff-credential-required-modal');
-  const container = document.getElementById('claim-missing-reqs-container');
-  if (!modal) return;
-
-  const missing = (data && Array.isArray(data.missing_requirements)) ? data.missing_requirements : [];
-  if (container) {
-    if (missing.length === 0) {
-      container.innerHTML = `
-        <div style="background: #FEF2F2; border: 1.5px solid #FECACA; border-radius: 8px; padding: 0.9rem 1rem; font-size: 0.84rem; color: #991B1B; display: flex; align-items: flex-start; gap: 0.6rem;">
-          <i data-lucide="alert-triangle" style="width: 18px; height: 18px; flex-shrink: 0; margin-top: 2px; color: #DC2626;"></i>
-          <div>
-            <div style="font-weight: 800; color: #7F1D1D; margin-bottom: 3px;">Clinical Verification Pending</div>
-            <div style="color: #991B1B; font-size: 0.8rem; line-height: 1.45;">
-              ${escapeHTML(data?.error || data?.message || 'Your clinical documents are awaiting verification by Clinical Operations Dispatch. You will be able to claim shifts immediately upon approval.')}
-            </div>
-          </div>
-        </div>
-      `;
-    } else {
-      container.innerHTML = missing.map(m => `
-        <div style="background: #FEF2F2; border: 1.5px solid #FECACA; border-radius: 8px; padding: 0.85rem 1rem; display: flex; align-items: flex-start; gap: 0.75rem;">
-          <span style="background: #DC2626; color: #FFFFFF; font-size: 0.68rem; font-weight: 800; padding: 0.2rem 0.5rem; border-radius: 4px; flex-shrink: 0; margin-top: 2px;">
-            ACTION NEEDED
-          </span>
-          <div style="flex: 1;">
-            <div style="font-weight: 800; color: #7F1D1D; font-size: 0.88rem;">${escapeHTML(m.name || 'Required Credential')}</div>
-            <div style="color: #991B1B; font-size: 0.8rem; margin-top: 3px; line-height: 1.4;">${escapeHTML(m.reason || 'Must be uploaded to your Clinical Credentials Vault')}</div>
-          </div>
-        </div>
-      `).join('');
-    }
-  }
-
-  modal.style.display = 'flex';
-  if (window.lucide) lucide.createIcons();
-}
-
-function closeCredentialRequiredModal() {
-  const modal = document.getElementById('staff-credential-required-modal');
-  if (modal) modal.style.display = 'none';
-}
-
-function goToCredentialsVault() {
-  closeCredentialRequiredModal();
-  switchStaffPage('staff-page-credentials', 'Clinical Credentials Vault');
-  if (typeof loadStaffDocuments === 'function') {
-    loadStaffDocuments();
-  }
-  setTimeout(() => {
-    const form = document.getElementById('staff-credential-upload-form') || document.getElementById('worker-credentials-panel') || document.getElementById('staff-page-credentials');
-    if (form) form.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }, 150);
-}
-
-function handleBlockedClaimClick(shiftId) {
-  openCredentialRequiredModal(currentStaffCompliance || {
-    message: 'Your profile has unmet clinical credential requirements. Please upload all required documents to enable shift claiming.'
-  });
-}
+const openCredentialRequiredModal = window.openCredentialRequiredModal;
+const closeCredentialRequiredModal = window.closeCredentialRequiredModal;
+const goToCredentialsVault = window.goToCredentialsVault;
+const handleBlockedClaimClick = window.handleBlockedClaimClick;
 
 async function loadStaffOpenShifts() {
   const container = document.getElementById('worker-shifts-container');
@@ -11064,12 +11067,14 @@ async function loadStaffOpenShifts() {
       const data = await res.json();
       if (data && data.compliance) {
         currentStaffCompliance = data.compliance;
+        window.currentStaffCompliance = data.compliance;
       }
       if (data && data.locked) {
         currentStaffCompliance = {
           isCompliant: false,
           missing_requirements: data.missing_requirements || []
         };
+        window.currentStaffCompliance = currentStaffCompliance;
         const missingListHtml = (data.missing_requirements && data.missing_requirements.length > 0)
           ? `<div style="text-align: left; max-width: 480px; margin: 1.25rem auto; display: flex; flex-direction: column; gap: 0.5rem;">` +
             data.missing_requirements.map(m => `
