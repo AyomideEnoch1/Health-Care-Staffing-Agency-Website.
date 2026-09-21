@@ -469,9 +469,92 @@ router.get('/applications/:id/resume', requirePermission('applications:view'), a
   } catch (err) { next(err); }
 });
 
+/// ============================================================================
+// STAFF ROSTER (CRUD) & ROBUST STAFF RESOLUTION
 // ============================================================================
-// STAFF ROSTER (CRUD)
-// ============================================================================
+
+/**
+ * Resolves a clinical staff member across staff_roster, users, and job_applications.
+ * If found in users or job_applications but missing in staff_roster, automatically
+ * provisions them in staff_roster so that admin and portal actions succeed seamlessly.
+ */
+async function ensureRosterStaff(identifier) {
+  if (!identifier) return null;
+  const clean = String(identifier).trim();
+  const lower = clean.toLowerCase();
+
+  try {
+    // 1. Check staff_roster directly by id, email, or staff_code
+    const [existing] = await pool.query(
+      `SELECT * FROM staff_roster 
+       WHERE id = ? OR LOWER(email) = ? OR LOWER(staff_code) = ? 
+          OR email IN (SELECT email FROM users WHERE id = ? OR LOWER(email) = ?)
+       LIMIT 1`,
+      [clean, lower, lower, clean, lower]
+    );
+    if (existing && existing.length > 0) return existing[0];
+
+    // 2. Fallback: check users table
+    const [userRows] = await pool.query(
+      `SELECT id, full_name, email, phone, role, organization_name FROM users 
+       WHERE id = ? OR LOWER(email) = ? LIMIT 1`,
+      [clean, lower]
+    );
+    if (userRows && userRows.length > 0) {
+      const u = userRows[0];
+      const [countRows] = await pool.query('SELECT COUNT(*) AS total FROM staff_roster');
+      const nextCode = `STF-${String(((countRows && countRows[0] && countRows[0].total) || 0) + 1).padStart(3, '0')}`;
+      const newId = u.id || crypto.randomUUID();
+
+      await pool.query(
+        `INSERT INTO staff_roster 
+          (id, staff_code, name, role, specialty, region, phone, email, status, credential_status, hourly_rate, cpr_expiry_date)
+         VALUES (?, ?, ?, 'RN', 'General Care', 'Greater Toronto Area', ?, ?, 'available', 'pending', 35.00, DATE_ADD(CURDATE(), INTERVAL 1 YEAR))
+         ON DUPLICATE KEY UPDATE name = VALUES(name), email = VALUES(email)`,
+        [newId, nextCode, u.full_name || 'Staff Member', u.phone || null, u.email]
+      );
+
+      // Keep users role aligned to healthcare_worker if appropriate
+      if (u.role !== 'healthcare_worker' && !u.organization_name) {
+        await pool.query('UPDATE users SET role = ? WHERE id = ?', ['healthcare_worker', u.id]).catch(() => {});
+      }
+
+      const [synced] = await pool.query('SELECT * FROM staff_roster WHERE id = ? OR LOWER(email) = ? LIMIT 1', [newId, lower]);
+      if (synced && synced.length > 0) return synced[0];
+    }
+
+    // 3. Fallback: check job_applications
+    const [appRows] = await pool.query(
+      `SELECT id, full_name, email, phone, role_applied FROM job_applications 
+       WHERE id = ? OR LOWER(email) = ? LIMIT 1`,
+      [clean, lower]
+    );
+    if (appRows && appRows.length > 0) {
+      const a = appRows[0];
+      const validRoles = ['RN', 'RPN', 'PSW', 'Companion', 'Travel Nurse'];
+      const standardRole = validRoles.find(r => (a.role_applied || '').toUpperCase().includes(r)) || 'RN';
+      const [countRows] = await pool.query('SELECT COUNT(*) AS total FROM staff_roster');
+      const nextCode = `STF-${String(((countRows && countRows[0] && countRows[0].total) || 0) + 1).padStart(3, '0')}`;
+      const newId = a.id || crypto.randomUUID();
+
+      await pool.query(
+        `INSERT INTO staff_roster 
+          (id, staff_code, name, role, specialty, region, phone, email, status, credential_status, hourly_rate, cpr_expiry_date)
+         VALUES (?, ?, ?, ?, 'General Care', 'Greater Toronto Area', ?, ?, 'available', 'pending', 35.00, DATE_ADD(CURDATE(), INTERVAL 1 YEAR))
+         ON DUPLICATE KEY UPDATE name = VALUES(name), email = VALUES(email)`,
+        [newId, nextCode, a.full_name || 'Staff Member', standardRole, a.phone || null, a.email]
+      );
+
+      const [syncedApp] = await pool.query('SELECT * FROM staff_roster WHERE id = ? OR LOWER(email) = ? LIMIT 1', [newId, lower]);
+      if (syncedApp && syncedApp.length > 0) return syncedApp[0];
+    }
+  } catch (err) {
+    console.warn('[ensureRosterStaff Error]:', err.message);
+  }
+
+  return null;
+}
+
 // GET /api/admin/roster
 router.get('/roster', requirePermission('roster:view'), async (req, res, next) => {
   try {
@@ -480,7 +563,7 @@ router.get('/roster', requirePermission('roster:view'), async (req, res, next) =
       const [missingUsers] = await pool.query(`
         SELECT u.id, u.full_name, u.email, u.phone 
         FROM users u 
-        WHERE u.role = 'healthcare_worker' 
+        WHERE (u.role = 'healthcare_worker' OR (u.organization_name IS NULL AND u.role != 'client'))
           AND LOWER(TRIM(u.email)) NOT IN (SELECT LOWER(TRIM(email)) FROM staff_roster WHERE email IS NOT NULL AND email != '')
       `);
       if (missingUsers && missingUsers.length > 0) {
@@ -569,14 +652,6 @@ router.post('/roster', requirePermission('roster:manage'), async (req, res, next
             VALUES (?, ?, ?, ?, 'healthcare_worker', ?, 1, 1)`,
           [id, emailClean, passwordHash, name.trim(), phone ? phone.trim() : null]
         );
-
-        // Send email with portal link and temporary password
-        sendStaffWelcomeEmail({
-          name: name.trim(),
-          email: emailClean,
-          staff_code: staffCode,
-          temporary_password: plainPassword
-        }).catch(err => console.warn('[Mailer Error]:', err.message));
       } else {
         await pool.query(
           `UPDATE users SET is_active = 1, role = 'healthcare_worker' WHERE id = ?`,
@@ -584,7 +659,20 @@ router.post('/roster', requirePermission('roster:manage'), async (req, res, next
         );
       }
     } catch (userErr) {
-      console.warn('[Staff User Provisioning Warning]:', userErr.message);
+      console.warn('[Staff User Account Provisioning Warning]:', userErr.message);
+    }
+
+    // Auto-dispatch welcome email with temporary credentials to the new healthcare worker
+    try {
+      const temporaryPassword = initial_password || 'DivineFingers2026!';
+      await sendStaffWelcomeEmail({
+        name: name.trim(),
+        email: emailClean,
+        staff_code: staffCode,
+        temporary_password: temporaryPassword
+      });
+    } catch (mailErr) {
+      console.warn('[Staff Welcome Mailer Warning]:', mailErr.message);
     }
 
     await pool.query(
@@ -592,15 +680,15 @@ router.post('/roster', requirePermission('roster:manage'), async (req, res, next
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [crypto.randomUUID(), req.admin.id, req.admin.full_name,
        'STAFF_ADDED', 'staff_roster', id,
-       `Added new staff ${name} (${role}) as ${staffCode} (Portal Login Provisioned)`, 'info', req.ip]
+       `Added staff member ${name} (${staffCode}, ${role}) with login email ${emailClean}`, 'info', req.ip]
     );
 
     adminEvents.emit('status:changed', { entity: 'staff_roster', id, action: 'created' });
 
     res.status(201).json({
       success: true,
-      message: `Staff member ${name} onboarded successfully. Initial password: ${initial_password || 'DivineFingers2026!'}`,
-      data: { id, staff_code: staffCode, email: emailClean, initial_password: initial_password || 'DivineFingers2026!', login_provisioned: true }
+      message: `Staff member ${name} added to roster and provisioned with portal access.`,
+      data: { id, staff_code: staffCode, name, role, email: emailClean, status: effectiveStatus }
     });
   } catch (err) { next(err); }
 });
@@ -612,34 +700,11 @@ router.post('/staff/:id/reset-password', requirePermission('roster:manage'), asy
     const { new_password } = req.body || {};
     const temporaryPassword = new_password && new_password.trim() ? new_password.trim() : 'DivineFingers2026!';
 
-    // Find staff (by id, email, staff_code, or matching user id)
-    let [staffRows] = await pool.query(
-      `SELECT id, name, email, staff_code FROM staff_roster 
-       WHERE id = ? OR email = ? OR staff_code = ? OR email IN (SELECT email FROM users WHERE id = ?) 
-       LIMIT 1`,
-      [id, id, id, id]
-    );
-
-    // If missing from staff_roster, check users table and auto-sync
-    if (!staffRows || staffRows.length === 0) {
-      const [userRows] = await pool.query('SELECT id, full_name, email, phone FROM users WHERE (id = ? OR email = ?) AND role = ? LIMIT 1', [id, id, 'healthcare_worker']);
-      if (userRows && userRows.length > 0) {
-        const u = userRows[0];
-        const [countRows] = await pool.query('SELECT COUNT(*) AS total FROM staff_roster');
-        const nextCode = `STF-${String((countRows?.[0]?.total || 0) + 1).padStart(3, '0')}`;
-        await pool.query(
-          `INSERT INTO staff_roster (id, staff_code, name, role, specialty, region, phone, email, status, credential_status, hourly_rate, cpr_expiry_date)
-           VALUES (?, ?, ?, 'RN', 'General Care', 'Greater Toronto Area', ?, ?, 'available', 'pending', 35.00, DATE_ADD(CURDATE(), INTERVAL 1 YEAR))`,
-          [u.id, nextCode, u.full_name, u.phone || null, u.email]
-        );
-        staffRows = [{ id: u.id, name: u.full_name, email: u.email, staff_code: nextCode }];
-      }
-    }
-
-    if (!staffRows || staffRows.length === 0) {
+    // Find staff via robust multi-entity resolver
+    const staff = await ensureRosterStaff(id);
+    if (!staff) {
       return res.status(404).json({ success: false, error: 'Staff member not found on roster.' });
     }
-    const staff = staffRows[0];
 
     // Hash new password
     const salt = await bcrypt.genSalt(10);
@@ -648,7 +713,7 @@ router.post('/staff/:id/reset-password', requirePermission('roster:manage'), asy
     // Update in users table by email or id
     const [updateRes] = await pool.query(
       'UPDATE users SET password_hash = ?, is_active = 1 WHERE email = ? OR id = ?',
-      [passwordHash, staff.email, id]
+      [passwordHash, staff.email, staff.id]
     );
 
     if (!updateRes || updateRes.affectedRows === 0) {
@@ -656,16 +721,29 @@ router.post('/staff/:id/reset-password', requirePermission('roster:manage'), asy
       await pool.query(
         `INSERT INTO users (id, email, password_hash, full_name, role, is_active, email_verified)
          VALUES (?, ?, ?, ?, 'healthcare_worker', 1, 1)`,
-        [id, staff.email, passwordHash, staff.name]
+        [staff.id, staff.email, passwordHash, staff.name]
       );
     }
 
     if (pool.inMemoryStore && pool.inMemoryStore.users) {
+      let foundInMem = false;
       for (const u of pool.inMemoryStore.users) {
-        if (u.email === staff.email || u.id === id) {
+        if (u.email === staff.email || u.id === staff.id) {
           u.password_hash = passwordHash;
           u.is_active = 1;
+          foundInMem = true;
         }
+      }
+      if (!foundInMem) {
+        pool.inMemoryStore.users.push({
+          id: staff.id,
+          email: staff.email,
+          password_hash: passwordHash,
+          full_name: staff.name,
+          role: 'healthcare_worker',
+          is_active: 1,
+          email_verified: 1
+        });
       }
     }
 
@@ -681,7 +759,7 @@ router.post('/staff/:id/reset-password', requirePermission('roster:manage'), asy
     await pool.query(
       `INSERT INTO audit_logs (id, admin_id, actor_name, action, target_entity, target_id, details, severity, ip_address)
        VALUES (?, ?, ?, 'STAFF_PASSWORD_RESET', 'staff_roster', ?, ?, 'warn', ?)`,
-      [crypto.randomUUID(), req.admin.id, req.admin.full_name, id, `Reset portal password for ${staff.name} (${staff.email})`, req.ip]
+      [crypto.randomUUID(), req.admin.id, req.admin.full_name, staff.id, `Reset portal password for ${staff.name} (${staff.email})`, req.ip]
     ).catch(() => {});
 
     res.json({
@@ -702,17 +780,11 @@ router.patch('/roster/:id', requirePermission('roster:manage'), async (req, res,
       cno_registration_num, vss_status, n95_fit_test
     } = req.body;
 
-    const [existing] = await pool.query(
-      `SELECT * FROM staff_roster 
-       WHERE id = ? OR email = ? OR staff_code = ? OR email IN (SELECT email FROM users WHERE id = ?) 
-       LIMIT 1`,
-      [id, id, id, id]
-    );
-    if (!existing.length) {
+    const cur = await ensureRosterStaff(id);
+    if (!cur) {
       return res.status(404).json({ success: false, error: 'Staff member not found.' });
     }
 
-    const cur = existing[0];
     await pool.query(
       `UPDATE staff_roster SET
         name = ?, role = ?, specialty = ?, status = ?, credential_status = ?,
@@ -756,17 +828,11 @@ router.patch('/roster/:id', requirePermission('roster:manage'), async (req, res,
 router.post('/roster/:id/approve', requirePermission('roster:manage'), async (req, res, next) => {
   try {
     const { id } = req.params;
-    const [existing] = await pool.query(
-      `SELECT * FROM staff_roster 
-       WHERE id = ? OR email = ? OR staff_code = ? OR email IN (SELECT email FROM users WHERE id = ?) 
-       LIMIT 1`,
-      [id, id, id, id]
-    );
-    if (!existing || existing.length === 0) {
+    const cur = await ensureRosterStaff(id);
+    if (!cur) {
       return res.status(404).json({ success: false, error: 'Staff member not found.' });
     }
 
-    const cur = existing[0];
     await pool.query(
       `UPDATE staff_roster SET credential_status = 'verified', status = 'available' WHERE id = ?`,
       [cur.id]
@@ -806,13 +872,13 @@ router.post('/roster/:id/approve', requirePermission('roster:manage'), async (re
 router.get('/staff/:id/availability', async (req, res, next) => {
   try {
     const { id } = req.params;
-    const [staffRows] = await pool.query('SELECT id, email, name, availability_schedule FROM staff_roster WHERE id = ?', [id]);
+    const staff = await ensureRosterStaff(id);
     let email = '';
     let dbAvail = null;
-    if (staffRows.length > 0) {
-      if (staffRows[0].email) email = staffRows[0].email.toLowerCase().trim();
-      if (staffRows[0].availability_schedule) {
-        try { dbAvail = JSON.parse(staffRows[0].availability_schedule); } catch (e) {}
+    if (staff) {
+      if (staff.email) email = staff.email.toLowerCase().trim();
+      if (staff.availability_schedule) {
+        try { dbAvail = JSON.parse(staff.availability_schedule); } catch (e) {}
       }
     }
     const store = global.staffAvailabilityStore || {};
@@ -825,14 +891,18 @@ router.get('/staff/:id/availability', async (req, res, next) => {
 router.get('/staff/:id/documents', async (req, res, next) => {
   try {
     const { id } = req.params;
+    const staff = await ensureRosterStaff(id);
+    const targetId = staff ? staff.id : id;
+    const targetEmail = staff ? staff.email : '';
     const [docs] = await pool.query(
       `SELECT id, staff_id, doc_type, title, file_name, file_size, mime_type, expiry_date, uploaded_by, created_at,
               status, verified_at, verified_by, credential_value
        FROM staff_documents 
        WHERE staff_id = ? 
+          OR staff_id = ?
           OR staff_id IN (SELECT id FROM staff_roster WHERE email = ? OR email IN (SELECT email FROM users WHERE id = ?))
        ORDER BY created_at DESC`,
-      [id, id, id]
+      [id, targetId, targetEmail, id]
     );
     res.json({ success: true, data: docs });
   } catch (err) { next(err); }
@@ -848,18 +918,13 @@ router.post('/staff/:id/documents', uploadCredential.single('document'), async (
       return res.status(400).json({ success: false, error: 'No file was uploaded.' });
     }
 
-    const [staffRows] = await pool.query(
-      `SELECT id, name, staff_code FROM staff_roster 
-       WHERE id = ? OR email = ? OR staff_code = ? OR email IN (SELECT email FROM users WHERE id = ?) 
-       LIMIT 1`,
-      [id, id, id, id]
-    );
-    if (!staffRows.length) {
+    const staff = await ensureRosterStaff(id);
+    if (!staff) {
       if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
       return res.status(404).json({ success: false, error: 'Staff member not found.' });
     }
 
-    const targetStaffId = staffRows[0].id;
+    const targetStaffId = staff.id;
     const docId = crypto.randomUUID();
     const docTitle = title || req.file.originalname;
     const docType = doc_type || 'other';
@@ -896,7 +961,7 @@ router.post('/staff/:id/documents', uploadCredential.single('document'), async (
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [crypto.randomUUID(), req.admin.id, req.admin.full_name,
        'CREDENTIAL_UPLOADED', 'staff_documents', docId,
-       `Uploaded and verified ${docType} (${docTitle}) for ${staffRows[0].name} (${staffRows[0].staff_code})`, 'info', req.ip]
+       `Uploaded and verified "${docTitle}" (${docType}) for caregiver ${staff.name}`, 'info', req.ip]
     );
 
     res.status(201).json({
@@ -904,7 +969,7 @@ router.post('/staff/:id/documents', uploadCredential.single('document'), async (
       message: `Document "${docTitle}" uploaded and verified successfully.`,
       data: {
         id: docId,
-        staff_id: id,
+        staff_id: targetStaffId,
         doc_type: docType,
         title: docTitle,
         file_name: req.file.originalname,
@@ -1055,16 +1120,11 @@ router.patch('/staff/:id/quick-credentials', async (req, res, next) => {
     const { id } = req.params;
     const { cno_registration_num, cpr_expiry_date, vss_status, n95_fit_test, credential_status } = req.body || {};
 
-    const [staffRows] = await pool.query(
-      `SELECT * FROM staff_roster 
-       WHERE id = ? OR email = ? OR staff_code = ? OR email IN (SELECT email FROM users WHERE id = ?) 
-       LIMIT 1`,
-      [id, id, id, id]
-    );
-    if (!staffRows.length) {
+    const staff = await ensureRosterStaff(id);
+    if (!staff) {
       return res.status(404).json({ success: false, error: 'Staff member not found.' });
     }
-    const targetStaffId = staffRows[0].id;
+    const targetStaffId = staff.id;
 
     const updates = [];
     const params = [];
@@ -1103,8 +1163,8 @@ router.patch('/staff/:id/quick-credentials', async (req, res, next) => {
         crypto.randomUUID(),
         req.admin ? req.admin.id : null,
         adminName,
-        id,
-        `Directly updated clinical credentials for ${staffRows[0].name}`,
+        targetStaffId,
+        `Directly updated clinical credentials for ${staff.name}`,
         req.ip
       ]
     ).catch(() => {});

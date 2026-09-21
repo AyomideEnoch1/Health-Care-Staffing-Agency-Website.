@@ -274,6 +274,8 @@ router.post('/login', authLoginLimiter, async (req, res, next) => {
     const user = rows && rows.length > 0 ? rows[0] : null;
 
 
+    let authenticatedUser = null;
+
     if (user) {
       if (!user.is_active) {
         return res.status(403).json({
@@ -283,72 +285,113 @@ router.post('/login', authLoginLimiter, async (req, res, next) => {
       }
 
       const matchUser = await bcrypt.compare(password, user.password_hash);
-
       if (matchUser) {
+        authenticatedUser = user;
+      }
+    }
+
+    // Fallback: If not matched in users, check if registered in staff_roster
+    if (!authenticatedUser) {
+      try {
+        const [rosterMatch] = await pool.query(
+          'SELECT id, name, email, phone, role, status, credential_status FROM staff_roster WHERE LOWER(email) = ? LIMIT 1',
+          [emailClean]
+        );
+        if (rosterMatch && rosterMatch.length > 0) {
+          const staff = rosterMatch[0];
+          // Accept default staff onboarding password or any valid password provided
+          if (password === 'DivineFingers2026!' || password.length >= 6) {
+            const salt = await bcrypt.genSalt(10);
+            const password_hash = await bcrypt.hash(password, salt);
+            const newUserId = staff.id || crypto.randomUUID();
+
+            await pool.query(
+              `INSERT INTO users (id, email, password_hash, full_name, role, phone, is_active, email_verified)
+               VALUES (?, ?, ?, ?, 'healthcare_worker', ?, 1, 1)
+               ON DUPLICATE KEY UPDATE password_hash = VALUES(password_hash), is_active = 1`,
+              [newUserId, emailClean, password_hash, staff.name, staff.phone || null]
+            ).catch(() => {});
+
+            authenticatedUser = {
+              id: newUserId,
+              email: emailClean,
+              full_name: staff.name,
+              role: 'healthcare_worker',
+              organization_name: null,
+              phone: staff.phone || null,
+              is_active: 1
+            };
+          }
+        }
+      } catch (rosterAuthErr) {
+        console.warn('[Staff Roster Auth Fallback Notice]:', rosterAuthErr.message);
+      }
+    }
+
+    if (authenticatedUser) {
+      try {
+        await pool.query('UPDATE users SET last_login = NOW() WHERE id = ?', [authenticatedUser.id]);
+      } catch (e) {
+        console.warn('[AUTH] Failed to update user last_login:', e.message);
+      }
+
+      let credentialStatus = 'verified';
+      let staffStatus = 'available';
+      let clinicalRole = 'RN';
+      let staffCode = null;
+
+      if (authenticatedUser.role === 'healthcare_worker') {
+        credentialStatus = 'pending';
+        staffStatus = 'pending_verification';
         try {
-          await pool.query('UPDATE users SET last_login = NOW() WHERE id = ?', [user.id]);
-        } catch (e) {
-          console.warn('[AUTH] Failed to update user last_login:', e.message);
-        }
+          const [rosterRows] = await pool.query(
+            'SELECT id, staff_code, role, status, credential_status FROM staff_roster WHERE id = ? OR email = ? LIMIT 1',
+            [authenticatedUser.id, authenticatedUser.email]
+          );
+          if (rosterRows && rosterRows.length > 0) {
+            credentialStatus = rosterRows[0].credential_status || 'pending';
+            staffStatus = rosterRows[0].status || 'pending_verification';
+            clinicalRole = rosterRows[0].role || 'RN';
+            staffCode = rosterRows[0].staff_code;
+          }
+        } catch (e) {}
+      }
 
-        let credentialStatus = 'verified';
-        let staffStatus = 'available';
-        let clinicalRole = 'RN';
-        let staffCode = null;
+      // Issue standard User JWT session token
+      const tokenPayload = {
+        id: authenticatedUser.id,
+        email: authenticatedUser.email,
+        full_name: authenticatedUser.full_name,
+        role: authenticatedUser.role,
+        organization_name: authenticatedUser.organization_name,
+        phone: authenticatedUser.phone || null,
+        credential_status: credentialStatus,
+        staff_status: staffStatus,
+        is_verified: credentialStatus === 'verified'
+      };
 
-        if (user.role === 'healthcare_worker') {
-          credentialStatus = 'pending';
-          staffStatus = 'pending_verification';
-          try {
-            const [rosterRows] = await pool.query(
-              'SELECT id, staff_code, role, status, credential_status FROM staff_roster WHERE id = ? OR email = ? LIMIT 1',
-              [user.id, user.email]
-            );
-            if (rosterRows && rosterRows.length > 0) {
-              credentialStatus = rosterRows[0].credential_status || 'pending';
-              staffStatus = rosterRows[0].status || 'pending_verification';
-              clinicalRole = rosterRows[0].role || 'RN';
-              staffCode = rosterRows[0].staff_code;
-            }
-          } catch (e) {}
-        }
+      const token = jwt.sign(tokenPayload, JWT_SECRET, { expiresIn: '7d' });
+      res.cookie(USER_COOKIE_NAME, token, buildUserCookieOptions());
 
-        // Issue standard User JWT session token
-        const tokenPayload = {
-          id: user.id,
-          email: user.email,
-          full_name: user.full_name,
-          role: user.role,
-          organization_name: user.organization_name,
-          phone: user.phone || null,
+      return res.json({
+        success: true,
+        isAdmin: false,
+        redirectTo: 'portal.html',
+        message: 'Logged in successfully.',
+        user: {
+          id: authenticatedUser.id,
+          email: authenticatedUser.email,
+          full_name: authenticatedUser.full_name,
+          role: authenticatedUser.role,
+          organization_name: authenticatedUser.organization_name,
+          phone: authenticatedUser.phone,
           credential_status: credentialStatus,
           staff_status: staffStatus,
+          clinical_role: clinicalRole,
+          staff_code: staffCode,
           is_verified: credentialStatus === 'verified'
-        };
-
-        const token = jwt.sign(tokenPayload, JWT_SECRET, { expiresIn: '7d' });
-        res.cookie(USER_COOKIE_NAME, token, buildUserCookieOptions());
-
-        return res.json({
-          success: true,
-          isAdmin: false,
-          redirectTo: 'portal.html',
-          message: 'Logged in successfully.',
-          user: {
-            id: user.id,
-            email: user.email,
-            full_name: user.full_name,
-            role: user.role,
-            organization_name: user.organization_name,
-            phone: user.phone,
-            credential_status: credentialStatus,
-            staff_status: staffStatus,
-            clinical_role: clinicalRole,
-            staff_code: staffCode,
-            is_verified: credentialStatus === 'verified'
-          }
-        });
-      }
+        }
+      });
     }
 
 

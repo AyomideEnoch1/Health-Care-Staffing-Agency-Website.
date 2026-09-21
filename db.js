@@ -341,25 +341,45 @@ function handleInMemoryQuery(sql, params = []) {
       if (normalized.includes('count(*)')) {
         return [[{ total: inMemoryStore.staff_roster.length, count: inMemoryStore.staff_roster.length }]];
       }
-      if (normalized.includes('where id = ? or email = ?') || normalized.includes('where email = ? or id = ?') || normalized.includes('staff_code = ?')) {
+      if (normalized.includes('where id = ?') || normalized.includes('where lower(email) = ?') || normalized.includes('where email = ?') || normalized.includes('staff_code = ?')) {
         const pList = params.map(p => String(p || '').toLowerCase().trim());
-        return [inMemoryStore.staff_roster.filter(s => 
+        let found = inMemoryStore.staff_roster.filter(s => 
           params.includes(s.id) ||
+          pList.includes(s.id) ||
           pList.includes((s.email || '').toLowerCase()) ||
           pList.includes((s.staff_code || '').toLowerCase())
-        )];
-      }
-      if (normalized.includes('where id = ?')) {
-        const p0 = String(params[0] || '').toLowerCase().trim();
-        return [inMemoryStore.staff_roster.filter(s => 
-          s.id === params[0] || 
-          (s.email && s.email.toLowerCase() === p0) ||
-          (s.staff_code && s.staff_code.toLowerCase() === p0)
-        )];
-      }
-      if (normalized.includes('where email = ?')) {
-        const p0 = (params[0] || '').toLowerCase().trim();
-        return [inMemoryStore.staff_roster.filter(s => s.email && s.email.toLowerCase().trim() === p0)];
+        );
+        // If not found, auto-sync from inMemoryStore.users
+        if (found.length === 0 && inMemoryStore.users) {
+          const matchedUser = inMemoryStore.users.find(u => 
+            params.includes(u.id) || pList.includes(u.id) || pList.includes((u.email || '').toLowerCase())
+          );
+          if (matchedUser) {
+            const newStaff = {
+              id: matchedUser.id,
+              staff_code: 'STF-' + String(inMemoryStore.staff_roster.length + 1).padStart(3, '0'),
+              name: matchedUser.full_name || 'Staff Member',
+              role: 'RN',
+              specialty: 'General Care',
+              region: 'Greater Toronto Area',
+              phone: matchedUser.phone || null,
+              email: matchedUser.email,
+              status: 'available',
+              credential_status: 'pending',
+              rating: 5.00,
+              shifts_completed: 0,
+              hourly_rate: 35.00,
+              cpr_expiry_date: '2027-12-31',
+              vss_status: 'Clear',
+              n95_fit_test: '3M Valid',
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            };
+            inMemoryStore.staff_roster.push(newStaff);
+            found = [newStaff];
+          }
+        }
+        return [found];
       }
       return [inMemoryStore.staff_roster];
     }
@@ -801,6 +821,15 @@ function handleInMemoryQuery(sql, params = []) {
         });
         return [enriched];
       }
+      if (normalized.includes('where (id = ? or email = ?)') || normalized.includes('where id = ? or email = ?') || normalized.includes('where lower(email) = ? or id = ?') || normalized.includes('where email = ? or id = ?')) {
+        const p0 = String(params[0] || '').toLowerCase().trim();
+        const p1 = String(params[1] || p0).toLowerCase().trim();
+        const found = inMemoryStore.users.filter(u => 
+          (u.id === params[0] || u.id === params[1] || u.email.toLowerCase() === p0 || u.email.toLowerCase() === p1) &&
+          !_adminEmailSet.has(u.email.toLowerCase())
+        );
+        return [found];
+      }
       if (normalized.includes('where email = ?') || normalized.includes('where lower(email) = ?')) {
         const emailParam = (params[0] || '').toLowerCase().trim();
         // Guard: never return a user row for an admin email address
@@ -816,14 +845,15 @@ function handleInMemoryQuery(sql, params = []) {
       return [inMemoryStore.users.filter(u => !_adminEmailSet.has(u.email.toLowerCase()))];
     }
     if (normalized.startsWith('insert')) {
+      const colMatch = sql.match(/insert\s+into\s+[`"]?users[`"]?\s*\(([^)]+)\)\s*values\s*\(([^)]+)\)/i);
       const newUser = {
-        id: params[0] || crypto.randomUUID(),
-        email: (params[1] || '').toLowerCase().trim(),
-        password_hash: params[2],
-        full_name: params[3],
-        role: params[4] || 'client',
-        organization_name: params[5] || null,
-        phone: params[6] || null,
+        id: crypto.randomUUID(),
+        email: '',
+        password_hash: '',
+        full_name: 'Portal User',
+        role: 'client',
+        organization_name: null,
+        phone: null,
         facility_id: null,
         client_role: 'requester',
         is_active: 1,
@@ -832,10 +862,85 @@ function handleInMemoryQuery(sql, params = []) {
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       };
-      inMemoryStore.users.push(newUser);
+
+      if (colMatch) {
+        const cols = colMatch[1].split(',').map(c => c.trim().replace(/[`"']/g, '').toLowerCase());
+        const rawVals = colMatch[2].split(',').map(v => v.trim());
+        let pIdx = 0;
+        for (let i = 0; i < cols.length; i++) {
+          const col = cols[i];
+          const rawVal = rawVals[i];
+          if (rawVal === '?') {
+            newUser[col] = params[pIdx++];
+          } else if (/^['"].*['"]$/.test(rawVal)) {
+            newUser[col] = rawVal.slice(1, -1);
+          } else if (/^\d+$/.test(rawVal)) {
+            newUser[col] = parseInt(rawVal, 10);
+          } else {
+            newUser[col] = rawVal;
+          }
+        }
+      } else {
+        newUser.id = params[0] || newUser.id;
+        newUser.email = (params[1] || '').toLowerCase().trim();
+        newUser.password_hash = params[2];
+        newUser.full_name = params[3];
+        newUser.role = params[4] || 'client';
+      }
+
+      if (newUser.email) newUser.email = newUser.email.toLowerCase().trim();
+
+      const existingIdx = inMemoryStore.users.findIndex(u => 
+        (newUser.id && u.id === newUser.id) || 
+        (newUser.email && u.email && u.email.toLowerCase() === newUser.email)
+      );
+
+      if (existingIdx >= 0) {
+        Object.assign(inMemoryStore.users[existingIdx], newUser, { updated_at: new Date().toISOString() });
+      } else {
+        inMemoryStore.users.push(newUser);
+      }
+
+      // Auto-mirror healthcare_worker into staff_roster
+      if (newUser.role === 'healthcare_worker' && inMemoryStore.staff_roster) {
+        if (!inMemoryStore.staff_roster.some(s => s.id === newUser.id || (s.email && s.email.toLowerCase() === newUser.email))) {
+          inMemoryStore.staff_roster.push({
+            id: newUser.id,
+            staff_code: 'STF-' + String(inMemoryStore.staff_roster.length + 1).padStart(3, '0'),
+            name: newUser.full_name || 'Staff Member',
+            role: 'RN',
+            specialty: 'General Care',
+            region: 'Greater Toronto Area',
+            phone: newUser.phone || null,
+            email: newUser.email,
+            status: 'available',
+            credential_status: 'pending',
+            rating: 5.00,
+            shifts_completed: 0,
+            hourly_rate: 35.00,
+            cpr_expiry_date: '2027-12-31',
+            vss_status: 'Clear',
+            n95_fit_test: '3M Valid',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          });
+        }
+      }
+
       return [{ affectedRows: 1, insertId: newUser.id }];
     }
     if (normalized.startsWith('update')) {
+      if (normalized.includes('password_hash = ?')) {
+        const newHash = params[0];
+        const whereParams = params.slice(1).map(p => String(p || '').toLowerCase().trim());
+        inMemoryStore.users.forEach(u => {
+          if (whereParams.includes(u.id) || whereParams.includes(u.email.toLowerCase())) {
+            u.password_hash = newHash;
+            u.is_active = 1;
+          }
+        });
+        return [{ affectedRows: 1 }];
+      }
       if (normalized.includes('last_login = now()') && normalized.includes('where id = ?')) {
         const idParam = params[params.length - 1];
         const user = inMemoryStore.users.find(u => u.id === idParam);
