@@ -379,7 +379,7 @@ async function runFacilitiesQATests() {
     testRequestId = tempReqId;
     await pool.query(`
       INSERT INTO staffing_requests (id, request_code, facility_name, facility_id, role_requested, shift_type, start_date, contact_name, contact_email, contact_phone, status, billing_hourly_rate)
-      VALUES (?, 'REQ-TEST-EXC', 'Sunnybrook QA Testing Health Centre', ?, 'RN', 'standard', CURDATE(), 'Dr. Wilson', 'staffing-qa@sunnybrook-test.ca', '+1 416-480-9999', 'open', 99.00)
+      VALUES (?, 'REQ-TEST-EXC', 'Sunnybrook QA Testing Health Centre', ?, 'RN', 'standard', CURDATE(), 'Dr. Wilson', 'staffing-qa@sunnybrook-test.ca', '+1 416-480-9999', 'pending', 99.00)
     `, [tempReqId, testFacilityId]);
 
     const exceptionRes = await fetch(`${BASE_URL}/api/admin/requests/${tempReqId}/rate-exception`, {
@@ -414,7 +414,7 @@ async function runFacilitiesQATests() {
 
     await pool.query(`
       INSERT INTO users (id, role, email, password_hash, full_name, organization_name, facility_id, client_role, phone, is_active, email_verified)
-      VALUES (?, 'client', 'dr.house.qa@sunnybrook-test.ca', ?, 'Dr. Gregory House', 'Sunnybrook QA Testing Health Centre', ?, 'Medical Director', '+1 416-480-6100', 1, 1)
+      VALUES (?, 'client', 'dr.house.qa@sunnybrook-test.ca', ?, 'Dr. Gregory House', 'Sunnybrook QA Testing Health Centre', ?, 'facility_director', '+1 416-480-6100', 1, 1)
     `, [tempClientId, initHash, testFacilityId]);
 
     // Check Registered Clients list to ensure new client appears and links to facility

@@ -1729,9 +1729,9 @@ router.get('/registered-clients', async (req, res, next) => {
         u.email_verified,
         u.last_login,
         u.created_at,
-        f.facility_code,
-        f.name AS linked_facility_name,
-        f.status AS facility_status,
+        MAX(f.facility_code) AS facility_code,
+        MAX(f.name) AS linked_facility_name,
+        MAX(f.status) AS facility_status,
         COUNT(DISTINCT sr.id) AS total_requests_count
       FROM users u
       LEFT JOIN facilities f ON (f.id = u.facility_id OR LOWER(TRIM(f.name)) = LOWER(TRIM(u.organization_name)))

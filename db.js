@@ -744,6 +744,30 @@ function handleInMemoryQuery(sql, params = []) {
   // 12. USERS
   if (normalized.includes('users') || normalized.includes('`users`')) {
     if (normalized.startsWith('select')) {
+      // Handle registered-clients join query
+      if (normalized.includes('facilities f') || normalized.includes('linked_facility_name')) {
+        const clientUsers = (inMemoryStore.users || []).filter(u => u.role === 'client');
+        const enriched = clientUsers.map(u => {
+          const fac = (inMemoryStore.facilities || []).find(f => 
+            (u.facility_id && f.id === u.facility_id) || 
+            (f.name && u.organization_name && f.name.toLowerCase().trim() === u.organization_name.toLowerCase().trim())
+          );
+          const reqCount = (inMemoryStore.staffing_requests || []).filter(sr => 
+            (fac && sr.facility_id === fac.id) || 
+            (fac && sr.facility_name && fac.name && sr.facility_name.toLowerCase().trim() === fac.name.toLowerCase().trim()) || 
+            (sr.contact_email && sr.contact_email.toLowerCase() === u.email.toLowerCase())
+          ).length;
+
+          return {
+            ...u,
+            facility_code: fac ? fac.facility_code : null,
+            linked_facility_name: fac ? fac.name : (u.organization_name || null),
+            facility_status: fac ? fac.status : 'pending',
+            total_requests_count: reqCount
+          };
+        });
+        return [enriched];
+      }
       if (normalized.includes('where email = ?') || normalized.includes('where lower(email) = ?')) {
         const emailParam = (params[0] || '').toLowerCase().trim();
         // Guard: never return a user row for an admin email address
