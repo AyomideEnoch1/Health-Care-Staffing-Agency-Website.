@@ -182,7 +182,7 @@ router.post('/register', async (req, res, next) => {
         const clinicalRole = (data.clinical_role && validRoles.includes(data.clinical_role)) ? data.clinical_role : 'RN';
         await pool.query(
           `INSERT INTO staff_roster (id, staff_code, name, role, specialty, region, phone, email, status, credential_status, hourly_rate, cpr_expiry_date)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending_verification', 'pending', 0.00, '2027-12-31')
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'available', 'pending', 0.00, '2027-12-31')
            ON DUPLICATE KEY UPDATE name = VALUES(name), role = VALUES(role), phone = VALUES(phone), email = VALUES(email)`,
           [
             userId,
@@ -472,7 +472,7 @@ router.get('/me', async (req, res) => {
 
     if (user.role === 'healthcare_worker') {
       credentialStatus = 'pending';
-      staffStatus = 'pending_verification';
+      staffStatus = 'available';
       try {
         const [rosterRows] = await pool.query(
           'SELECT id, staff_code, role, status, credential_status FROM staff_roster WHERE id = ? OR email = ? LIMIT 1',
@@ -480,9 +480,19 @@ router.get('/me', async (req, res) => {
         );
         if (rosterRows && rosterRows.length > 0) {
           credentialStatus = rosterRows[0].credential_status || 'pending';
-          staffStatus = rosterRows[0].status || 'pending_verification';
+          staffStatus = rosterRows[0].status || 'available';
           clinicalRole = rosterRows[0].role || 'RN';
           staffCode = rosterRows[0].staff_code;
+        } else {
+          // Auto-sync into staff_roster if missing
+          const [countRes] = await pool.query('SELECT COUNT(*) AS total FROM staff_roster');
+          const nextNum = ((countRes[0] && countRes[0][0] && countRes[0][0].total) || 0) + 1;
+          staffCode = `STF-${String(nextNum).padStart(3, '0')}`;
+          await pool.query(
+            `INSERT INTO staff_roster (id, staff_code, name, role, specialty, region, phone, email, status, credential_status, hourly_rate, cpr_expiry_date)
+             VALUES (?, ?, ?, 'RN', 'General Care', 'Greater Toronto Area', ?, ?, 'available', 'pending', 35.00, DATE_ADD(CURDATE(), INTERVAL 1 YEAR))`,
+            [user.id, staffCode, user.full_name || 'Staff Member', user.phone || null, user.email]
+          );
         }
       } catch (e) {}
     }
