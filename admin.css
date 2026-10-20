@@ -3152,8 +3152,79 @@ select optgroup,
     display: flex !important;
   }
 
+  /* Mobile 2-in-a-Row Responsive Neo-Cubes (Option 1 with original Lucide icons) */
   .kpi-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.65rem !important;
+    margin-bottom: 1.15rem !important;
+  }
+
+  .kpi-card {
+    padding: 0.75rem 0.85rem !important;
+    border-radius: 14px !important;
+    min-height: 105px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+  }
+
+  .kpi-top {
+    display: flex !important;
+    align-items: flex-start !important;
+    justify-content: space-between !important;
+    gap: 0.35rem !important;
+    margin-bottom: 0.35rem !important;
+  }
+
+  .kpi-title {
+    font-size: clamp(0.68rem, 2.5vw, 0.78rem) !important;
+    font-weight: 600 !important;
+    line-height: 1.25 !important;
+    word-break: normal !important;
+    overflow-wrap: break-word !important;
+  }
+
+  /* Retain original Lucide icons & gradients while scaling to cube proportion */
+  .kpi-icon-box {
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px !important;
+    min-height: 28px !important;
+    border-radius: 8px !important;
+    flex-shrink: 0 !important;
+  }
+
+  .kpi-icon-box svg,
+  .kpi-icon-box i {
+    width: 15px !important;
+    height: 15px !important;
+  }
+
+  .kpi-value-row {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.25rem !important;
+    margin-bottom: 0 !important;
+    margin-top: auto !important;
+  }
+
+  .kpi-number {
+    font-size: clamp(1.4rem, 4.5vw, 1.7rem) !important;
+    line-height: 1 !important;
+    letter-spacing: -0.02em !important;
+  }
+
+  .kpi-trend {
+    font-size: clamp(0.58rem, 2vw, 0.68rem) !important;
+    padding: 0.15rem 0.4rem !important;
+    border-radius: 4px !important;
+    max-width: 100% !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    display: inline-flex !important;
+    align-items: center !important;
   }
 
   .topbar {

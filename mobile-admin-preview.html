@@ -1,0 +1,1399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mobile KPI Cubes Redesign Preview | Divine Fingers Admin</title>
+  <style>
+    /* 100% STANDALONE CSS - ZERO EXTERNAL CDN DEPENDENCY */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #060b18;
+      color: #f1f5f9;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    header {
+      background-color: #0b1329;
+      border-bottom: 1px solid #1e293b;
+      padding: 1rem 1.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: rgba(0, 245, 212, 0.15);
+      border: 1px solid rgba(0, 245, 212, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+    }
+
+    .brand-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .badge-mobile {
+      font-size: 0.7rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 9999px;
+      background: rgba(0, 245, 212, 0.15);
+      color: #00f5d4;
+      border: 1px solid rgba(0, 245, 212, 0.3);
+      font-weight: 600;
+    }
+
+    .brand-sub {
+      font-size: 0.75rem;
+      color: #94a3b8;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .device-switcher {
+      display: flex;
+      background: #111e38;
+      padding: 3px;
+      border-radius: 10px;
+      border: 1px solid #1e293b;
+      gap: 3px;
+    }
+
+    .device-btn {
+      background: transparent;
+      border: none;
+      color: #94a3b8;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.4rem 0.75rem;
+      border-radius: 7px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .device-btn.active {
+      background: #00f5d4;
+      color: #060b18;
+      font-weight: 700;
+    }
+
+    .live-admin-link {
+      background: #111e38;
+      border: 1px solid #1e293b;
+      color: #f1f5f9;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.45rem 0.85rem;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .live-admin-link:hover {
+      border-color: #00f5d4;
+      color: #00f5d4;
+    }
+
+    /* Layout grid */
+    main {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+
+    @media (min-width: 1024px) {
+      main {
+        grid-template-columns: 460px 1fr;
+      }
+    }
+
+    /* Left controls column */
+    .controls-col {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .panel {
+      background: #0b1329;
+      border: 1px solid #1b2d5d;
+      border-radius: 16px;
+      padding: 1.25rem;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+    }
+
+    .panel-header {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #00f5d4;
+      margin-bottom: 0.85rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .panel-header-sub {
+      font-size: 0.7rem;
+      color: #64748b;
+      font-weight: normal;
+      text-transform: none;
+    }
+
+    /* Layout selector options */
+    .option-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .option-card {
+      border: 1px solid #1e293b;
+      background: #070d1e;
+      border-radius: 12px;
+      padding: 1rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .option-card:hover {
+      border-color: #334155;
+    }
+
+    .option-card.active {
+      border-color: #00f5d4;
+      background: rgba(0, 245, 212, 0.06);
+      box-shadow: 0 0 0 1px rgba(0, 245, 212, 0.35);
+    }
+
+    .option-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.35rem;
+    }
+
+    .option-name {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #f1f5f9;
+    }
+
+    .option-card.active .option-name {
+      color: #00f5d4;
+    }
+
+    .option-pill {
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 0.15rem 0.5rem;
+      border-radius: 9999px;
+      background: #1e293b;
+      color: #94a3b8;
+    }
+
+    .option-card.active .option-pill {
+      background: rgba(0, 245, 212, 0.2);
+      color: #00f5d4;
+      border: 1px solid rgba(0, 245, 212, 0.4);
+    }
+
+    .option-desc {
+      font-size: 0.75rem;
+      color: #94a3b8;
+      line-height: 1.4;
+    }
+
+    /* Comparison metrics */
+    .metrics-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      margin: 0.75rem 0;
+    }
+
+    .metric-box {
+      background: #070d1e;
+      border: 1px solid #1e293b;
+      border-radius: 10px;
+      padding: 0.75rem;
+    }
+
+    .metric-box.saved {
+      background: rgba(0, 245, 212, 0.05);
+      border-color: rgba(0, 245, 212, 0.3);
+    }
+
+    .metric-box-label {
+      font-size: 0.7rem;
+      color: #94a3b8;
+    }
+
+    .metric-box.saved .metric-box-label {
+      color: #00f5d4;
+    }
+
+    .metric-box-val {
+      font-size: 1.25rem;
+      font-weight: 800;
+      margin: 0.25rem 0 0.15rem 0;
+    }
+
+    .metric-box-val.bad {
+      color: #f43f5e;
+    }
+
+    .metric-box-val.good {
+      color: #00f5d4;
+    }
+
+    .metric-box-sub {
+      font-size: 0.65rem;
+      color: #64748b;
+    }
+
+    .metric-box.saved .metric-box-sub {
+      color: #10b981;
+      font-weight: 600;
+    }
+
+    .desktop-safety {
+      background: rgba(0, 245, 212, 0.08);
+      border: 1px solid rgba(0, 245, 212, 0.25);
+      border-radius: 12px;
+      padding: 1rem;
+      font-size: 0.75rem;
+      color: #cbd5e1;
+      line-height: 1.45;
+    }
+
+    .desktop-safety strong {
+      color: #00f5d4;
+      display: block;
+      margin-bottom: 0.25rem;
+      font-size: 0.8rem;
+    }
+
+    /* Right simulator column */
+    .simulator-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+    }
+
+    /* Phone Mockup Frame */
+    .phone-outer {
+      width: 393px;
+      max-width: 100%;
+      background: #0f172a;
+      border-radius: 50px;
+      padding: 14px;
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.8), 0 0 0 10px #1e293b, 0 0 0 12px #334155;
+      position: relative;
+      transition: width 0.3s ease;
+    }
+
+    /* Dynamic Island */
+    .dynamic-island {
+      position: absolute;
+      top: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 110px;
+      height: 24px;
+      background: #000000;
+      border-radius: 9999px;
+      z-index: 40;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding-right: 10px;
+    }
+
+    .camera-lens {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #111e38;
+      border: 1px solid #1e293b;
+    }
+
+    /* Phone Screen Viewport */
+    .phone-screen {
+      background: #0b1329;
+      height: 720px;
+      border-radius: 38px;
+      overflow-y: auto;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      scrollbar-width: none;
+    }
+
+    .phone-screen::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* Mobile Header inside phone */
+    .m-header {
+      background: rgba(15, 28, 61, 0.95);
+      border-bottom: 1px solid #1b2d5d;
+      padding: 2.25rem 1rem 0.75rem 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      backdrop-filter: blur(8px);
+    }
+
+    .m-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .m-logo {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: #00f5d4;
+      color: #0b1329;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 0.85rem;
+    }
+
+    .m-brand-name {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #ffffff;
+      line-height: 1.15;
+    }
+
+    .m-brand-sub {
+      font-size: 0.65rem;
+      color: #00f5d4;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .m-profile {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .m-status {
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 0.15rem 0.45rem;
+      border-radius: 9999px;
+      background: rgba(245, 158, 11, 0.15);
+      color: #f59e0b;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    .m-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #1b2d5d;
+      border: 1px solid rgba(0, 245, 212, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #00f5d4;
+    }
+
+    /* Screen content */
+    .m-content {
+      padding: 1rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .m-section-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .m-section-title h2 {
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #64748b;
+    }
+
+    .m-section-title h1 {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #f1f5f9;
+    }
+
+    .m-badge-sync {
+      font-size: 0.65rem;
+      font-weight: 600;
+      padding: 0.15rem 0.45rem;
+      border-radius: 9999px;
+      background: rgba(0, 245, 212, 0.1);
+      color: #00f5d4;
+      border: 1px solid rgba(0, 245, 212, 0.2);
+    }
+
+    /* KPI CONTAINERS */
+    #kpi-container {
+      width: 100%;
+    }
+
+    /* 1. CURRENT LAYOUT (1 Column Full Width) */
+    .layout-current-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .current-kpi-card {
+      background: #0f1c3d;
+      border: 1px solid #1b2d5d;
+      border-radius: 14px;
+      padding: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .current-kpi-title {
+      font-size: 0.75rem;
+      color: #8e9db5;
+      font-weight: 500;
+    }
+
+    .current-kpi-val-row {
+      display: flex;
+      align-items: baseline;
+      gap: 0.5rem;
+      margin-top: 0.35rem;
+    }
+
+    .current-kpi-val {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: #ffffff;
+      line-height: 1;
+    }
+
+    .current-kpi-sub {
+      font-size: 0.7rem;
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      background: #111e38;
+      color: #94a3b8;
+    }
+
+    .current-kpi-sub.warn {
+      background: rgba(245, 158, 11, 0.15);
+      color: #f59e0b;
+      font-weight: 700;
+    }
+
+    .current-kpi-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: rgba(0, 245, 212, 0.1);
+      border: 1px solid rgba(0, 245, 212, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #00f5d4;
+      font-size: 1.1rem;
+    }
+
+    /* 2. CUBE STYLE 1: Modern Neo-Cubes 2-in-a-row */
+    .layout-cube1-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.65rem;
+    }
+
+    .cube1-card {
+      background: #0f1c3d;
+      border: 1px solid #1b2d5d;
+      border-radius: 14px;
+      padding: 0.75rem 0.85rem;
+      min-height: 110px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.2s;
+    }
+
+    .cube1-card:hover {
+      border-color: rgba(0, 245, 212, 0.5);
+    }
+
+    .cube1-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 0.35rem;
+    }
+
+    .cube1-title {
+      font-size: clamp(0.68rem, 2.5vw, 0.75rem);
+      font-weight: 600;
+      color: #8e9db5;
+      line-height: 1.2;
+    }
+
+    .cube1-icon {
+      width: 26px;
+      height: 26px;
+      border-radius: 8px;
+      background: rgba(0, 245, 212, 0.12);
+      border: 1px solid rgba(0, 245, 212, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      color: #00f5d4;
+      flex-shrink: 0;
+    }
+
+    .cube1-icon.cyan {
+      background: rgba(0, 187, 249, 0.12);
+      border-color: rgba(0, 187, 249, 0.3);
+      color: #00bbf9;
+    }
+
+    .cube1-icon.amber {
+      background: rgba(245, 158, 11, 0.12);
+      border-color: rgba(245, 158, 11, 0.3);
+      color: #f59e0b;
+    }
+
+    .cube1-icon.emerald {
+      background: rgba(16, 185, 129, 0.12);
+      border-color: rgba(16, 185, 129, 0.3);
+      color: #10b981;
+    }
+
+    .cube1-bottom {
+      margin-top: 0.5rem;
+    }
+
+    .cube1-val {
+      font-size: clamp(1.4rem, 5vw, 1.65rem);
+      font-weight: 900;
+      color: #ffffff;
+      line-height: 1;
+    }
+
+    .cube1-val.emerald {
+      color: #10b981;
+    }
+
+    .cube1-trend {
+      font-size: clamp(0.6rem, 2vw, 0.68rem);
+      font-weight: 600;
+      color: #00f5d4;
+      margin-top: 0.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .cube1-trend.amber {
+      color: #f59e0b;
+    }
+
+    .cube1-trend.muted {
+      color: #64748b;
+    }
+
+    .cube1-trend.emerald {
+      color: #10b981;
+    }
+
+    /* 3. CUBE STYLE 2: High Density Pills */
+    .layout-cube2-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.5rem;
+    }
+
+    .cube2-card {
+      background: #0f1c3d;
+      border: 1px solid #1b2d5d;
+      border-radius: 12px;
+      padding: 0.65rem 0.75rem;
+      min-height: 85px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .cube2-header {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: #8e9db5;
+    }
+
+    .cube2-bottom {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-top: 0.35rem;
+    }
+
+    .cube2-val {
+      font-size: 1.35rem;
+      font-weight: 900;
+      color: #ffffff;
+      line-height: 1;
+    }
+
+    .cube2-pill {
+      font-size: 0.6rem;
+      font-weight: 700;
+      padding: 0.15rem 0.35rem;
+      border-radius: 4px;
+      background: #111e38;
+      color: #00f5d4;
+    }
+
+    .cube2-pill.amber {
+      background: rgba(245, 158, 11, 0.2);
+      color: #f59e0b;
+    }
+
+    .cube2-pill.emerald {
+      background: rgba(16, 185, 129, 0.2);
+      color: #10b981;
+    }
+
+    /* 4. CUBE STYLE 3: Clinical Glow Border */
+    .layout-cube3-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.65rem;
+    }
+
+    .cube3-card {
+      background: #0f1c3d;
+      border: 1px solid #1b2d5d;
+      border-top: 3px solid #00f5d4;
+      border-radius: 12px;
+      padding: 0.75rem;
+      min-height: 98px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .cube3-card.amber { border-top-color: #f59e0b; }
+    .cube3-card.cyan { border-top-color: #00bbf9; }
+    .cube3-card.emerald { border-top-color: #10b981; }
+
+    .cube3-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #cbd5e1;
+    }
+
+    .cube3-val {
+      font-size: 1.45rem;
+      font-weight: 900;
+      color: #ffffff;
+      margin-top: 0.35rem;
+      line-height: 1;
+    }
+
+    .cube3-sub {
+      font-size: 0.65rem;
+      color: #00f5d4;
+      font-weight: 600;
+      margin-top: 0.2rem;
+    }
+
+    .cube3-sub.amber { color: #f59e0b; }
+    .cube3-sub.cyan { color: #00bbf9; }
+    .cube3-sub.emerald { color: #10b981; }
+
+    /* Next sections inside phone */
+    .m-sub-section {
+      border-top: 1px solid #1b2d5d;
+      padding-top: 0.85rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+    }
+
+    .m-sub-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #94a3b8;
+    }
+
+    .m-sub-header a {
+      color: #00f5d4;
+      text-decoration: none;
+      font-size: 0.7rem;
+    }
+
+    .m-shift-card {
+      background: #0f1c3d;
+      border: 1px solid #1b2d5d;
+      border-radius: 12px;
+      padding: 0.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .m-shift-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .m-tag {
+      font-size: 0.62rem;
+      font-weight: 700;
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      background: rgba(0, 245, 212, 0.15);
+      color: #00f5d4;
+    }
+
+    .m-tag.danger {
+      background: rgba(244, 63, 94, 0.2);
+      color: #f43f5e;
+    }
+
+    .m-shift-time {
+      font-size: 0.7rem;
+      font-family: monospace;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .m-shift-facility {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .m-shift-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.68rem;
+      color: #94a3b8;
+    }
+
+    .m-fast-dispatch-btn {
+      background: #00f5d4;
+      color: #060b18;
+      font-size: 0.65rem;
+      font-weight: 800;
+      border: none;
+      padding: 0.2rem 0.5rem;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    /* Bottom mobile nav */
+    .m-bottom-nav {
+      background: rgba(15, 28, 61, 0.95);
+      border-top: 1px solid #1b2d5d;
+      padding: 0.65rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 30;
+      backdrop-filter: blur(8px);
+    }
+
+    .m-nav-item {
+      background: none;
+      border: none;
+      color: #64748b;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.2rem;
+      font-size: 0.65rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .m-nav-item.active {
+      color: #00f5d4;
+      font-weight: 700;
+    }
+
+    .m-nav-icon {
+      font-size: 1rem;
+    }
+
+    /* Home Indicator Bar */
+    .home-indicator {
+      position: absolute;
+      bottom: 22px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 120px;
+      height: 4px;
+      background: rgba(148, 163, 184, 0.4);
+      border-radius: 9999px;
+      pointer-events: none;
+      z-index: 40;
+    }
+
+    .sim-hint {
+      text-align: center;
+      font-size: 0.75rem;
+      color: #64748b;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Studio Header -->
+  <header>
+    <div class="brand">
+      <div class="brand-icon">🧊</div>
+      <div>
+        <div class="brand-title">
+          <span>Mobile KPI Cubes Redesign Preview</span>
+          <span class="badge-mobile">Mobile Only Breakpoint</span>
+        </div>
+        <div class="brand-sub">Redesigning KPI info cards into 2-in-a-row responsive cubes (Desktop remains untouched)</div>
+      </div>
+    </div>
+
+    <!-- Right Controls -->
+    <div class="header-actions">
+      <!-- Device switcher -->
+      <div class="device-switcher">
+        <button id="btn-iphone" onclick="switchDevice('393px', 'btn-iphone')" class="device-btn active">iPhone (393px)</button>
+        <button id="btn-android" onclick="switchDevice('412px', 'btn-android')" class="device-btn">Galaxy/Pixel (412px)</button>
+        <button id="btn-compact" onclick="switchDevice('360px', 'btn-compact')" class="device-btn">Compact (360px)</button>
+      </div>
+
+      <a href="/admin" target="_blank" class="live-admin-link">Open Live /admin ↗</a>
+    </div>
+  </header>
+
+  <!-- Main Studio Workspace -->
+  <main>
+    
+    <!-- LEFT: CONTROLS & COMPARISONS -->
+    <div class="controls-col">
+      
+      <!-- Option Selector -->
+      <div class="panel">
+        <div class="panel-header">
+          <span>Choose Layout Mode</span>
+          <span class="panel-header-sub">Swaps instantly on the phone</span>
+        </div>
+
+        <div class="option-list">
+          
+          <!-- Option 1: Recommended Neo-Cubes -->
+          <div id="opt-cube1" class="option-card active" onclick="setLayout('cube1')">
+            <div class="option-top">
+              <span class="option-name">✅ Style 1: Modern Neo-Cubes (Recommended)</span>
+              <span class="option-pill">2 in a Row</span>
+            </div>
+            <div class="option-desc">
+              Square-like tiles with label top-left, mini glow icon top-right, bold 2xl metric, and status chip. <strong>Saves 55% vertical height</strong> so shifts and charts appear without scrolling.
+            </div>
+          </div>
+
+          <!-- Option 2: High-Density Pill Cubes -->
+          <div id="opt-cube2" class="option-card" onclick="setLayout('cube2')">
+            <div class="option-top">
+              <span class="option-name">✨ Style 2: High-Density Horizontal Pills</span>
+              <span class="option-pill">Ultra Compact (85px)</span>
+            </div>
+            <div class="option-desc">
+              Ultra compact layout with inline icon and title header, followed by side-by-side metric and status tag. Maximum vertical space saver.
+            </div>
+          </div>
+
+          <!-- Option 3: Clinical Glow Borders -->
+          <div id="opt-cube3" class="option-card" onclick="setLayout('cube3')">
+            <div class="option-top">
+              <span class="option-name">🎨 Style 3: Glow Border Clinical Cubes</span>
+              <span class="option-pill">Accent Top-Border</span>
+            </div>
+            <div class="option-desc">
+              Top colored accent line matching category status (Teal for Dispatches, Amber for Requests, Cyan for Candidates, Emerald for Staff).
+            </div>
+          </div>
+
+          <!-- Current Layout (Screenshot) -->
+          <div id="opt-current" class="option-card" onclick="setLayout('current')">
+            <div class="option-top">
+              <span class="option-name">❌ Current Layout (From Your Screenshot)</span>
+              <span class="option-pill">1 Column Full-Width</span>
+            </div>
+            <div class="option-desc">
+              Full-width cards stacked vertically in 4 tall rows (~540px total). Requires continuous scrolling to see any dispatch information.
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Space Saving Metrics -->
+      <div class="panel">
+        <div class="panel-header">
+          <span>📊 Vertical Space Comparison</span>
+        </div>
+
+        <div class="metrics-row">
+          <div class="metric-box">
+            <div class="metric-box-label">Current 1-Col Height</div>
+            <div class="metric-box-val bad">~540px</div>
+            <div class="metric-box-sub">Full page scroll needed</div>
+          </div>
+          <div class="metric-box saved">
+            <div class="metric-box-label">2-in-a-Row Cube Height</div>
+            <div class="metric-box-val good">~240px</div>
+            <div class="metric-box-sub">↓ 55% vertical space saved!</div>
+          </div>
+        </div>
+
+        <p style="font-size: 0.75rem; color: #94a3b8; line-height: 1.45;">
+          With 2-in-a-row cubes, shift coordinators can immediately glance at active shifts, urgent dispatch surge alerts, and the action buttons without having to scroll down first.
+        </p>
+      </div>
+
+      <!-- Safe Scope Guarantee -->
+      <div class="desktop-safety">
+        <strong>🔒 Responsive & Safe Implementation:</strong>
+        All changes will be applied strictly inside <code style="background:#070d1e; color:#00f5d4; padding:0.15rem 0.35rem; border-radius:4px;">@media (max-width: 768px)</code>. Your desktop widescreen 4-card horizontal bar will remain 100% untouched.
+      </div>
+
+    </div>
+
+    <!-- RIGHT: INTERACTIVE PHONE SIMULATOR -->
+    <div class="simulator-col">
+      
+      <!-- Phone Bezel Container -->
+      <div id="phone-frame" class="phone-outer">
+        
+        <!-- Dynamic Island -->
+        <div class="dynamic-island">
+          <div class="camera-lens"></div>
+        </div>
+
+        <!-- Phone Screen -->
+        <div class="phone-screen">
+          
+          <!-- Top App Header -->
+          <div class="m-header">
+            <div class="m-brand">
+              <div class="m-logo">DF</div>
+              <div>
+                <div class="m-brand-name">Divine Fingers</div>
+                <div class="m-brand-sub">Dispatch Portal</div>
+              </div>
+            </div>
+            <div class="m-profile">
+              <span class="m-status">ONLINE</span>
+              <div class="m-avatar">SA</div>
+            </div>
+          </div>
+
+          <!-- Main Scrollable Screen Area -->
+          <div class="m-content">
+            
+            <!-- Breadcrumb / Section Header -->
+            <div class="m-section-title">
+              <div>
+                <h2>Dashboard Overview</h2>
+                <h1>Operations Center</h1>
+              </div>
+              <span class="m-badge-sync">Live Sync ●</span>
+            </div>
+
+            <!-- DYNAMIC KPI CONTAINER -->
+            <div id="kpi-container">
+              <!-- Rendered via JavaScript -->
+            </div>
+
+            <!-- Content below KPIs showing what now fits above the fold -->
+            <div class="m-sub-section">
+              <div class="m-sub-header">
+                <span>Active Shift Dispatches</span>
+                <a href="#">View All (14) →</a>
+              </div>
+
+              <!-- Shift Card 1 -->
+              <div class="m-shift-card">
+                <div class="m-shift-row">
+                  <span class="m-tag">Routine Coverage</span>
+                  <span class="m-shift-time">Day 07:00 - 15:00</span>
+                </div>
+                <div class="m-shift-facility">Sunnybrook Health Sciences</div>
+                <div class="m-shift-footer">
+                  <span>Unit 4B &bull; Florence N. (RN)</span>
+                  <span style="color:#10b981; font-weight:600;">Clocked in 07:02</span>
+                </div>
+              </div>
+
+              <!-- Shift Card 2 -->
+              <div class="m-shift-card" style="border-color: rgba(244, 63, 94, 0.4);">
+                <div class="m-shift-row">
+                  <span class="m-tag danger">🚨 Emergency Surge</span>
+                  <span class="m-shift-time" style="color:#f43f5e;">&lt; 2h target</span>
+                </div>
+                <div class="m-shift-facility">Scarborough Health Network</div>
+                <div class="m-shift-footer">
+                  <span>ICU Unit &bull; Unassigned</span>
+                  <button class="m-fast-dispatch-btn">Fast Dispatch</button>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- Bottom Mobile Nav -->
+          <div class="m-bottom-nav">
+            <button class="m-nav-item active">
+              <span class="m-nav-icon">📊</span>
+              <span>Overview</span>
+            </button>
+            <button class="m-nav-item">
+              <span class="m-nav-icon">📋</span>
+              <span>Shifts</span>
+            </button>
+            <button class="m-nav-item">
+              <span class="m-nav-icon">👩‍⚕️</span>
+              <span>Roster</span>
+            </button>
+            <button class="m-nav-item">
+              <span class="m-nav-icon">⚙️</span>
+              <span>Admin</span>
+            </button>
+          </div>
+
+          <!-- Home indicator bar -->
+          <div class="home-indicator"></div>
+
+        </div>
+
+      </div>
+
+      <div class="sim-hint">
+        Live Mobile Simulator &bull; Click any layout option on the left to swap in real-time
+      </div>
+
+    </div>
+
+  </main>
+
+  <script>
+    // Templates
+    const templates = {
+      // 1. Current full-width 1-column layout
+      current: `
+        <div class="layout-current-list">
+          <div class="current-kpi-card">
+            <div>
+              <div class="current-kpi-title">Dispatched Shifts</div>
+              <div class="current-kpi-val-row">
+                <span class="current-kpi-val">2</span>
+                <span class="current-kpi-sub">2 Dispatched</span>
+              </div>
+            </div>
+            <div class="current-kpi-icon">⚡</div>
+          </div>
+
+          <div class="current-kpi-card">
+            <div>
+              <div class="current-kpi-title">Pending Requests</div>
+              <div class="current-kpi-val-row">
+                <span class="current-kpi-val">8</span>
+                <span class="current-kpi-sub warn">0 Urgent</span>
+              </div>
+            </div>
+            <div class="current-kpi-icon" style="color:#00bbf9; border-color:rgba(0,187,249,0.3); background:rgba(0,187,249,0.1);">🏢</div>
+          </div>
+
+          <div class="current-kpi-card">
+            <div>
+              <div class="current-kpi-title">New Applications</div>
+              <div class="current-kpi-val-row">
+                <span class="current-kpi-val">2</span>
+                <span class="current-kpi-sub">3 Total</span>
+              </div>
+            </div>
+            <div class="current-kpi-icon">📄</div>
+          </div>
+
+          <div class="current-kpi-card">
+            <div>
+              <div class="current-kpi-title">Staff Available</div>
+              <div class="current-kpi-val-row">
+                <span class="current-kpi-val">3</span>
+                <span class="current-kpi-sub">3 on Roster</span>
+              </div>
+            </div>
+            <div class="current-kpi-icon" style="color:#10b981; border-color:rgba(16,185,129,0.3); background:rgba(16,185,129,0.1);">👩‍⚕️</div>
+          </div>
+        </div>
+      `,
+
+      // 2. Style 1: 2-in-a-row Responsive Neo-Cubes (Recommended)
+      cube1: `
+        <div class="layout-cube1-grid">
+          
+          <!-- Cube 1 -->
+          <div class="cube1-card">
+            <div class="cube1-top">
+              <span class="cube1-title">Dispatched Shifts</span>
+              <div class="cube1-icon">⚡</div>
+            </div>
+            <div class="cube1-bottom">
+              <div class="cube1-val">2</div>
+              <div class="cube1-trend">● 2 Dispatched</div>
+            </div>
+          </div>
+
+          <!-- Cube 2 -->
+          <div class="cube1-card">
+            <div class="cube1-top">
+              <span class="cube1-title">Pending Requests</span>
+              <div class="cube1-icon amber">⏳</div>
+            </div>
+            <div class="cube1-bottom">
+              <div class="cube1-val">8</div>
+              <div class="cube1-trend amber">0 Urgent</div>
+            </div>
+          </div>
+
+          <!-- Cube 3 -->
+          <div class="cube1-card">
+            <div class="cube1-top">
+              <span class="cube1-title">New Applications</span>
+              <div class="cube1-icon cyan">📄</div>
+            </div>
+            <div class="cube1-bottom">
+              <div class="cube1-val">2</div>
+              <div class="cube1-trend muted">3 Total ATS</div>
+            </div>
+          </div>
+
+          <!-- Cube 4 -->
+          <div class="cube1-card">
+            <div class="cube1-top">
+              <span class="cube1-title">Staff Available</span>
+              <div class="cube1-icon emerald">👩‍⚕️</div>
+            </div>
+            <div class="cube1-bottom">
+              <div class="cube1-val emerald">3</div>
+              <div class="cube1-trend emerald">3 On Active Roster</div>
+            </div>
+          </div>
+
+        </div>
+      `,
+
+      // 3. Style 2: High-Density Pills
+      cube2: `
+        <div class="layout-cube2-grid">
+          
+          <div class="cube2-card">
+            <div class="cube2-header">
+              <span>⚡</span>
+              <span>Dispatched</span>
+            </div>
+            <div class="cube2-bottom">
+              <span class="cube2-val">2</span>
+              <span class="cube2-pill">Active</span>
+            </div>
+          </div>
+
+          <div class="cube2-card">
+            <div class="cube2-header">
+              <span>⏳</span>
+              <span>Requests</span>
+            </div>
+            <div class="cube2-bottom">
+              <span class="cube2-val">8</span>
+              <span class="cube2-pill amber">0 Urgent</span>
+            </div>
+          </div>
+
+          <div class="cube2-card">
+            <div class="cube2-header">
+              <span>📄</span>
+              <span>Applicants</span>
+            </div>
+            <div class="cube2-bottom">
+              <span class="cube2-val">2</span>
+              <span class="cube2-pill">3 Total</span>
+            </div>
+          </div>
+
+          <div class="cube2-card">
+            <div class="cube2-header">
+              <span>👩‍⚕️</span>
+              <span>Staff Ready</span>
+            </div>
+            <div class="cube2-bottom">
+              <span class="cube2-val" style="color:#10b981;">3</span>
+              <span class="cube2-pill emerald">100%</span>
+            </div>
+          </div>
+
+        </div>
+      `,
+
+      // 4. Style 3: Glow Border Clinical Cubes
+      cube3: `
+        <div class="layout-cube3-grid">
+          
+          <div class="cube3-card">
+            <div class="cube3-top">
+              <span>Dispatched</span>
+              <span style="color:#00f5d4;">●</span>
+            </div>
+            <div class="cube3-val">2</div>
+            <div class="cube3-sub">Shifts Covered</div>
+          </div>
+
+          <div class="cube3-card amber">
+            <div class="cube3-top">
+              <span>Requests</span>
+              <span style="color:#f59e0b;">●</span>
+            </div>
+            <div class="cube3-val">8</div>
+            <div class="cube3-sub amber">0 Emergency</div>
+          </div>
+
+          <div class="cube3-card cyan">
+            <div class="cube3-top">
+              <span>New ATS</span>
+              <span style="color:#00bbf9;">●</span>
+            </div>
+            <div class="cube3-val">2</div>
+            <div class="cube3-sub cyan">Candidates</div>
+          </div>
+
+          <div class="cube3-card emerald">
+            <div class="cube3-top">
+              <span>Available</span>
+              <span style="color:#10b981;">●</span>
+            </div>
+            <div class="cube3-val" style="color:#10b981;">3</div>
+            <div class="cube3-sub emerald">Ready Now</div>
+          </div>
+
+        </div>
+      `
+    };
+
+    function setLayout(mode) {
+      document.getElementById('kpi-container').innerHTML = templates[mode];
+
+      // Update options styling
+      ['cube1', 'cube2', 'cube3', 'current'].forEach(id => {
+        const el = document.getElementById('opt-' + id);
+        if (el) {
+          if (id === mode) {
+            el.classList.add('active');
+          } else {
+            el.classList.remove('active');
+          }
+        }
+      });
+    }
+
+    function switchDevice(width, activeBtnId) {
+      const frame = document.getElementById('phone-frame');
+      frame.style.width = width;
+
+      ['btn-iphone', 'btn-android', 'btn-compact'].forEach(b => {
+        const btn = document.getElementById(b);
+        if (b === activeBtnId) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+    }
+
+    // Default init with Style 1 (Cube 1)
+    setLayout('cube1');
+  </script>
+</body>
+</html>
