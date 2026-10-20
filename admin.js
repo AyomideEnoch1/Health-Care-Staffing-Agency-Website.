@@ -1117,7 +1117,7 @@
               <div class="row-status-top"><span class="status-pill ${statusClass}">${statusLabel}</span></div>
             </div>
           </td>
-          <td class="cell-grid-item" data-label="Role">
+          <td class="cell-grid-item cell-pill-item" data-pill-cell data-label="Role">
             <div class="meta-label">Role / Discipline</div>
             <div class="meta-value"><span class="status-pill ${s.role === 'RN' ? 'verified' : 'off-duty'}">${s.role}</span></div>
           </td>
@@ -1125,7 +1125,7 @@
             <div class="meta-label">Status</div>
             <div class="meta-value"><span class="status-pill ${statusClass}">${statusLabel}</span></div>
           </td>
-          <td class="cell-grid-item" data-label="Compliance">
+          <td class="cell-grid-item cell-pill-item" data-pill-cell data-label="Compliance">
             <div class="meta-label">Compliance</div>
             <div class="meta-value"><span class="status-pill ${credClass}">${credLabel}</span></div>
           </td>
@@ -1259,7 +1259,7 @@
                 </div>
               ` : ''}
             </td>
-            <td class="cell-grid-item" data-label="Role Requested">
+            <td class="cell-grid-item cell-pill-item" data-pill-cell data-label="Role Requested">
               <div class="meta-label">Role Requested</div>
               <div class="meta-value"><span class="status-pill role-${r.role_requested?.toLowerCase().includes('rpn') ? 'rpn' : r.role_requested?.toLowerCase().includes('psw') ? 'psw' : 'rn'}">${r.role_requested}</span></div>
             </td>
@@ -1267,7 +1267,7 @@
               <div class="meta-label">Shift Type</div>
               <div class="meta-value">${r.shift_type || 'Day Shift'}</div>
             </td>
-            <td class="cell-grid-item" data-label="Urgency">
+            <td class="cell-grid-item cell-pill-item" data-pill-cell data-label="Urgency">
               <div class="meta-label">Urgency Level</div>
               <div class="meta-value"><span class="status-pill ${r.urgency_level === 'emergency_surge' || r.urgency_level === 'urgent' ? 'urgent' : 'verified'}">${(r.urgency_level || 'routine').toUpperCase()}</span></div>
             </td>
@@ -1332,7 +1332,7 @@
             <div class="row-status-top"><span class="status-pill ${a.stage}">${(a.stage || '').replace('_', ' ').toUpperCase()}</span></div>
           </div>
         </td>
-        <td class="cell-grid-item" data-label="Role Applied">
+        <td class="cell-grid-item cell-pill-item" data-pill-cell data-label="Role Applied">
           <div class="meta-label">Role Applied</div>
           <div class="meta-value"><span class="status-pill verified">${a.role_applied}</span></div>
         </td>
@@ -1713,17 +1713,17 @@
             </td>
             <td class="cell-email tabular-nums" data-label="Email Address">
               <div class="meta-label">Email Address</div>
-              <div class="meta-value">${escapeHTML(a.email)}</div>
+              <div class="meta-value"><i data-lucide="mail" style="width:13px;height:13px;vertical-align:middle;margin-right:5px;color:var(--brand-teal,#00f5d4);"></i>${escapeHTML(a.email)}</div>
             </td>
-            <td class="cell-grid-item" data-label="Role">
+            <td class="cell-grid-item cell-pill-item" data-pill-cell data-label="Role">
               <div class="meta-label">Role Clearance</div>
               <div class="meta-value"><span class="status-pill ${roleBadgeClass}"><i data-lucide="${roleIcon}" style="width:13.5px;height:13.5px;vertical-align:middle;margin-right:4px;"></i> ${escapeHTML(roleLabel)}</span></div>
             </td>
-            <td class="cell-grid-item" data-label="Email Verification">
+            <td class="cell-grid-item cell-pill-item" data-pill-cell data-label="Email Verification">
               <div class="meta-label">Verification</div>
               <div class="meta-value">${emailVerifiedBadge}</div>
             </td>
-            <td class="cell-grid-item" data-label="2FA Security">
+            <td class="cell-grid-item cell-pill-item" data-pill-cell data-label="2FA Security">
               <div class="meta-label">2FA Security</div>
               <div class="meta-value">${mfaBadge}</div>
             </td>
@@ -2429,7 +2429,7 @@
               <div class="meta-label">Applicant Name</div>
               <div class="meta-value"><strong>${escapeHTML(a.full_name)}</strong> &bull; <span style="font-size:0.75rem;color:var(--text-muted);">${escapeHTML(a.email)}</span></div>
             </td>
-            <td class="cell-grid-item" data-label="Role Applied">
+            <td class="cell-grid-item cell-pill-item" data-pill-cell data-label="Role Applied">
               <div class="meta-label">Role Applied</div>
               <div class="meta-value"><span class="status-pill verified">${escapeHTML(a.role_applied)}</span></div>
             </td>
