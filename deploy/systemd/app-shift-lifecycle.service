@@ -1,0 +1,37 @@
+[Unit]
+Description=Divine Fingers Automated Shift Lifecycle Engine
+After=network.target mysql.service
+Wants=mysql.service
+
+[Service]
+Type=simple
+User=app
+Group=app
+WorkingDirectory=/var/www/divine-fingers
+Environment=NODE_ENV=production
+EnvironmentFile=/var/www/divine-fingers/.env
+ExecStart=/usr/bin/node shiftLifecycleRunner.js
+Restart=always
+RestartSec=15s
+
+# Security Hardening Directives
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+
+# Resource Limits
+LimitNOFILE=32768
+MemoryMax=512M
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=df-shift-lifecycle
+
+[Install]
+WantedBy=multi-user.target

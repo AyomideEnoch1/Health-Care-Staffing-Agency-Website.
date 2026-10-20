@@ -1,0 +1,151 @@
+'use strict';
+/**
+ * Transactional Email Outbox & Suppression Management
+ * Divine Fingers Healthcare Services Inc.
+ *
+ * Architecture:
+ * - Application routes invoke enqueueMail() asynchronously (non-blocking).
+ * - Recipient email addresses are encrypted at rest with AES-256-GCM.
+ * - Hashed addresses (HMAC-SHA256) are used for indexed suppression checks without storing plaintext PII.
+ * - Enqueued jobs are dispatched by the dedicated standalone process workers/mailWorker.js.
+ */
+
+const crypto = require('crypto');
+const dbModule = require('../db');
+const pool = dbModule.pool || dbModule;
+
+function getKey() {
+  const hex = process.env.OUTBOX_ENC_KEY || '';
+  if (/^[0-9a-f]{64}$/i.test(hex)) {
+    return Buffer.from(hex, 'hex');
+  }
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('OUTBOX_ENC_KEY must be a 64 hex character (32-byte) string in production. Generate with: openssl rand -hex 32');
+  }
+  // Deterministic local dev key
+  return crypto.createHash('sha256').update('dev-local-outbox-key-divine-fingers-2026').digest();
+}
+
+if (process.env.NODE_ENV === 'production') {
+  getKey(); // Assert immediately on startup
+}
+
+function encrypt(plain) {
+  const iv = crypto.randomBytes(12);
+  const cipher = crypto.createCipheriv('aes-256-gcm', getKey(), iv);
+  const enc = Buffer.concat([cipher.update(String(plain), 'utf8'), cipher.final()]);
+  return Buffer.concat([iv, cipher.getAuthTag(), enc]).toString('base64');
+}
+
+function decrypt(b64) {
+  try {
+    const buf = Buffer.from(b64, 'base64');
+    if (buf.length < 28) return b64;
+    const decipher = crypto.createDecipheriv('aes-256-gcm', getKey(), buf.subarray(0, 12));
+    decipher.setAuthTag(buf.subarray(12, 28));
+    return Buffer.concat([decipher.update(buf.subarray(28)), decipher.final()]).toString('utf8');
+  } catch (err) {
+    // If decryption fails, return as-is for backwards compatibility in dev
+    return b64;
+  }
+}
+
+function hashEmail(email) {
+  return crypto.createHmac('sha256', getKey()).update(String(email || '').trim().toLowerCase()).digest('hex');
+}
+
+/**
+ * Enqueue an email job into the transactional outbox.
+ * @param {{ type: string, to: string, userId?: string|number, vars?: object, sendAfter?: Date }} job
+ */
+async function enqueueMail({ type, to, userId = null, vars = {}, sendAfter = null }) {
+  const addr = String(to || '').trim().toLowerCase();
+  const toHash = hashEmail(addr);
+  const toEncrypted = encrypt(addr);
+
+  // Check suppression list first before queuing
+  const suppressed = await isSuppressed(addr);
+  const initialStatus = suppressed ? 'suppressed' : 'pending';
+
+  const [res] = await pool.query(
+    `INSERT INTO email_outbox (type, recipient_user_id, to_hash, to_encrypted, payload, status, next_attempt_at)
+     VALUES (?, ?, ?, ?, ?, ?, COALESCE(?, NOW()))`,
+    [type, userId ? String(userId) : null, toHash, toEncrypted, JSON.stringify(vars), initialStatus, sendAfter]
+  );
+
+  // Write audit record
+  const outboxId = res && res.insertId ? res.insertId : null;
+  await logEmailAudit({
+    outboxId,
+    type,
+    recipientHash: toHash,
+    status: suppressed ? 'suppressed' : 'queued'
+  }).catch(() => {});
+
+  return { success: true, outboxId, status: initialStatus };
+}
+
+/**
+ * Check if an email address exists on the suppression list.
+ */
+async function isSuppressed(email) {
+  try {
+    const [rows] = await pool.query(
+      'SELECT 1 FROM email_suppressions WHERE email_hash = ? LIMIT 1',
+      [hashEmail(email)]
+    );
+    return Array.isArray(rows) && rows.length > 0;
+  } catch (err) {
+    return false;
+  }
+}
+
+/**
+ * Add an address to the suppression list (bounces, complaints, unsubscribes).
+ */
+async function suppress(email, reason = 'bounce', source = 'system', details = null) {
+  try {
+    const toHash = hashEmail(email);
+    await pool.query(
+      'INSERT IGNORE INTO email_suppressions (email_hash, reason, source, details) VALUES (?, ?, ?, ?)',
+      [toHash, String(reason).slice(0, 50), String(source).slice(0, 100), details ? String(details).slice(0, 255) : null]
+    );
+    await logEmailAudit({
+      outboxId: null,
+      type: 'suppression_event',
+      recipientHash: toHash,
+      status: 'suppressed',
+      errorCode: String(reason).slice(0, 50)
+    }).catch(() => {});
+  } catch (err) {
+    console.warn('[Suppression Warning]:', err.message);
+  }
+}
+
+/**
+ * Audit logger for email lifecycle operations.
+ * Strictly records metadata; NEVER message body or credentials.
+ */
+async function logEmailAudit({ outboxId = null, type, recipientHash, providerMessageId = null, status, errorCode = null, ipAddress = null }) {
+  try {
+    const auditId = crypto.randomUUID();
+    await pool.query(
+      `INSERT INTO email_audit_logs (id, outbox_id, type, recipient_hash, provider_message_id, status, error_code)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [auditId, outboxId, type, recipientHash, providerMessageId ? String(providerMessageId).slice(0, 255) : null, status, errorCode ? String(errorCode).slice(0, 50) : null]
+    );
+  } catch (_) {
+    // Non-blocking
+  }
+}
+
+module.exports = {
+  enqueueMail,
+  isSuppressed,
+  suppress,
+  decrypt,
+  encrypt,
+  hashEmail,
+  logEmailAudit,
+  pool
+};

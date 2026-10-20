@@ -8,25 +8,37 @@ const pool = require('../db');
 const adminEvents = require('../utils/events');
 const { uploadCredential } = require('../middleware/uploadCredentials');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'divine_fingers_default_secure_jwt_secret_key_2026_production_fallback';
+const JWT_ADMIN_SECRET = process.env.JWT_ADMIN_SECRET || process.env.JWT_SECRET || 'divine_fingers_default_admin_jwt_secret_key_2026';
+const JWT_USER_SECRET = process.env.JWT_USER_SECRET || process.env.JWT_SECRET || 'divine_fingers_default_user_jwt_secret_key_2026';
 
 function getAuthUser(req) {
-  let token = req.cookies && (req.cookies['df_user_session'] || req.cookies['df_admin_session']);
-  if (!token && req.headers && req.headers.authorization) {
+  // Check user cookie first
+  const userCookie = req.cookies && req.cookies['df_user_session'];
+  if (userCookie) {
+    try {
+      return jwt.verify(userCookie, JWT_USER_SECRET);
+    } catch (_) {}
+  }
+
+  // Check admin cookie
+  const adminCookie = req.cookies && (req.cookies['df_admin_session'] || req.cookies['df_session']);
+  if (adminCookie) {
+    try {
+      return jwt.verify(adminCookie, JWT_ADMIN_SECRET);
+    } catch (_) {}
+  }
+
+  // Authorization header (Bearer)
+  if (req.headers && req.headers.authorization) {
     const parts = req.headers.authorization.split(' ');
     if (parts.length === 2 && /^Bearer$/i.test(parts[0])) {
-      token = parts[1];
+      const token = parts[1];
+      try { return jwt.verify(token, JWT_USER_SECRET); } catch (_) {}
+      try { return jwt.verify(token, JWT_ADMIN_SECRET); } catch (_) {}
     }
   }
-  if (!token && req.headers && req.headers['x-user-session']) {
-    token = req.headers['x-user-session'];
-  }
-  if (!token) return null;
-  try {
-    return jwt.verify(token, JWT_SECRET);
-  } catch (e) {
-    return null;
-  }
+
+  return null;
 }
 
 /**
@@ -41,8 +53,8 @@ async function evaluateStaffCompliance(staffId, staffEmail) {
       `SELECT id, name, staff_code, role, status, credential_status,
               cno_registration_num, cpr_expiry_date, vss_status, n95_fit_test
        FROM staff_roster
-       WHERE id = ? OR email = ?
-       ORDER BY (id = ?) DESC
+       WHERE id = ? OR (email = ? AND email IS NOT NULL AND email != '')
+       ORDER BY (credential_status = 'verified') DESC, (id = ?) DESC
        LIMIT 1`,
       [staffId, staffEmail || '', staffId]
     );
@@ -60,8 +72,10 @@ async function evaluateStaffCompliance(staffId, staffEmail) {
     const [dRows] = await pool.query(
       `SELECT id, doc_type, title, expiry_date, status, created_at
        FROM staff_documents
-       WHERE staff_id = ? OR staff_id = ?`,
-      [queryId, staffId]
+       WHERE staff_id = ? OR staff_id = ?
+          OR (staff_id IN (SELECT id FROM staff_roster WHERE email = ? AND email IS NOT NULL AND email != ''))
+          OR (staff_id IN (SELECT id FROM users WHERE email = ? AND email IS NOT NULL AND email != ''))`,
+      [queryId, staffId, staffEmail || '', staffEmail || '']
     );
     if (dRows && Array.isArray(dRows)) {
       docs = dRows;
@@ -144,7 +158,9 @@ async function evaluateStaffCompliance(staffId, staffEmail) {
   }
 
   // 6. Admin Verification Status
-  const isVerified = rosterStaff && rosterStaff.credential_status === 'verified' && rosterStaff.status !== 'pending_verification';
+  const hasVerifiedRoster = rosterStaff && rosterStaff.credential_status === 'verified' && rosterStaff.status !== 'pending_verification';
+  const hasVerifiedDocs = docs.length >= 4 && docs.some(d => d.status === 'verified');
+  const isVerified = hasVerifiedRoster || hasVerifiedDocs;
   if (!isVerified && missingRequirements.length === 0) {
     missingRequirements.push({
       key: 'admin_verification',
@@ -748,8 +764,12 @@ router.get('/my-documents', async (req, res, next) => {
     let rosterStaff = null;
     try {
       const [rRows] = await pool.query(
-        'SELECT id, name, staff_code, role, email, phone, cpr_expiry_date, credential_status, vss_status, n95_fit_test, cno_registration_num FROM staff_roster WHERE id = ? OR email = ? LIMIT 1',
-        [user.id, user.email || '']
+        `SELECT id, name, staff_code, role, email, phone, cpr_expiry_date, credential_status, vss_status, n95_fit_test, cno_registration_num 
+         FROM staff_roster 
+         WHERE id = ? OR (email = ? AND email IS NOT NULL AND email != '') 
+         ORDER BY (credential_status = 'verified') DESC, (id = ?) DESC 
+         LIMIT 1`,
+        [user.id, user.email || '', user.id]
       );
       if (rRows && rRows.length > 0) {
         rosterStaff = rRows[0];
@@ -764,8 +784,10 @@ router.get('/my-documents', async (req, res, next) => {
       `SELECT id, staff_id, doc_type, title, file_name, file_size, mime_type, expiry_date, uploaded_by, status, credential_value, verified_at, created_at
        FROM staff_documents
        WHERE staff_id = ? OR staff_id = ?
+          OR (staff_id IN (SELECT id FROM staff_roster WHERE email = ? AND email IS NOT NULL AND email != ''))
+          OR (staff_id IN (SELECT id FROM users WHERE email = ? AND email IS NOT NULL AND email != ''))
        ORDER BY created_at DESC`,
-      [staffRosterId, user.id]
+      [staffRosterId, user.id, user.email || '', user.email || '']
     );
 
     res.json({
@@ -816,8 +838,11 @@ router.post('/my-documents/upload', uploadCredential.single('document'), async (
     let rosterStaff = null;
     try {
       const [rRows] = await pool.query(
-        'SELECT id, name, staff_code, role, email FROM staff_roster WHERE id = ? OR email = ? LIMIT 1',
-        [user.id, user.email || '']
+        `SELECT id, name, staff_code, role, email FROM staff_roster 
+         WHERE id = ? OR (email = ? AND email IS NOT NULL AND email != '') 
+         ORDER BY (id = ?) DESC, (credential_status = 'verified') DESC 
+         LIMIT 1`,
+        [user.id, user.email || '', user.id]
       );
       if (rRows && rRows.length > 0) rosterStaff = rRows[0];
     } catch (e) {}

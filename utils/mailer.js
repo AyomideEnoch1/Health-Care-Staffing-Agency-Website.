@@ -1,231 +1,376 @@
+/**
+ * Hardened SMTP Mailer & Transporter
+ * Divine Fingers Healthcare Services Inc.
+ * Configured for Hostinger Mailing Service & Enterprise SMTP Relays.
+ *
+ * Security Requirements Enforced:
+ * 1. TLS 1.2+ minimum, strict certificate authority validation (rejectUnauthorized: true).
+ * 2. Connection pooling with socket/greeting timeouts.
+ * 3. Enforced startup guards preventing localhost/unauthenticated relays in production.
+ * 4. Comprehensive CRLF / header injection sanitization.
+ * 5. Strict sender policy: From header is strictly system-controlled (no user spoofing).
+ * 6. Multipart delivery: Plaintext alternative always supplied alongside escaped HTML.
+ * 7. Zero PHI or plaintext credential transmission in email payloads.
+ */
+
 const nodemailer = require('nodemailer');
+const { sanitizeHeader, escapeHtml, hashEmail } = require('./cryptoUtils');
 require('dotenv').config();
 
+const isProduction = process.env.NODE_ENV === 'production';
+
+/**
+ * Startup Guard: Verifies SMTP settings.
+ * Refuses to allow application startup in production if configured with unsafe local/unauthenticated mailer.
+ */
+function assertProductionSmtpConfig() {
+  if (process.env.NODE_ENV !== 'production') return;
+
+  const host = (process.env.SMTP_HOST || '').trim().toLowerCase();
+  const user = (process.env.SMTP_USER || '').trim();
+  const pass = (process.env.SMTP_PASS || '').trim();
+  const forbiddenHosts = ['localhost', '127.0.0.1', '::1', 'mailhog', 'df_mailhog_dev'];
+
+  if (!host || forbiddenHosts.includes(host)) {
+    throw new Error(
+      `[FATAL STARTUP GUARD] Insecure SMTP_HOST ("${host}") detected in production environment. ` +
+      'A valid, TLS-enforced external SMTP relay (e.g. smtp.hostinger.com) is mandatory.'
+    );
+  }
+
+  if (!user || !pass) {
+    throw new Error(
+      '[FATAL STARTUP GUARD] SMTP authentication credentials (SMTP_USER, SMTP_PASS) are missing in production.'
+    );
+  }
+}
+
+// Execute assertion on module load
+assertProductionSmtpConfig();
+
+const smtpHost = process.env.SMTP_HOST || '127.0.0.1';
+const smtpPort = parseInt(process.env.SMTP_PORT || '587', 10);
+const smtpSecure = process.env.SMTP_SECURE === 'true' || smtpPort === 465;
+
+// Construct hardened transporter
 const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST || '127.0.0.1',
-  port: parseInt(process.env.SMTP_PORT || '1025', 10),
-  secure: process.env.SMTP_SECURE === 'true',
-  auth: process.env.SMTP_USER ? {
+  host: smtpHost,
+  port: smtpPort,
+  secure: smtpSecure,
+  pool: true,
+  maxConnections: 5,
+  maxMessages: 100,
+  connectionTimeout: 10000, // 10 seconds
+  greetingTimeout: 10000,   // 10 seconds
+  socketTimeout: 15000,     // 15 seconds
+  requireTLS: !smtpSecure && smtpPort !== 1025, // Enforce STARTTLS on port 587/25
+  tls: {
+    minVersion: 'TLSv1.2',
+    rejectUnauthorized: isProduction ? true : (process.env.SMTP_REJECT_UNAUTHORIZED !== 'false')
+  },
+  auth: (process.env.SMTP_USER && process.env.SMTP_PASS) ? {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS
   } : undefined
 });
 
-// Export connection verifier without blocking module load
+/**
+ * Get the standardized, immutable system sender address.
+ * Never allow user-controlled values in From header.
+ */
+function getSystemFromAddress() {
+  const notifyDomain = process.env.NOTIFY_DOMAIN || 'notify.divinefingershealthcare.ca';
+  const customFrom = process.env.SYSTEM_FROM_EMAIL;
+  if (customFrom) {
+    return sanitizeHeader(customFrom);
+  }
+  return `"Divine Fingers Healthcare" <no-reply@${sanitizeHeader(notifyDomain)}>`;
+}
+
+/**
+ * Connection verification helper
+ */
 async function verifyConnection() {
-  return new Promise((resolve) => {
-    transporter.verify((error) => {
-      if (error) {
-        console.warn('⚠️ [SMTP Warning] Could not connect to mail server:', error.message);
-      } else {
-        console.log('✅ [SMTP Mailer] Connected to mail server.');
-      }
-      resolve(!error);
+  try {
+    assertProductionSmtpConfig();
+    return await new Promise((resolve) => {
+      transporter.verify((error) => {
+        if (error) {
+          console.warn('⚠️ [SMTP Warning] Could not connect to mail server:', error.message);
+          resolve(false);
+        } else {
+          console.log(`✅ [SMTP Mailer] Connected to ${smtpHost}:${smtpPort} (TLS 1.2+ verified)`);
+          resolve(true);
+        }
+      });
     });
-  });
-}
-
-async function sendStaffingRequestAlert(requestData) {
-  const mailOptions = {
-    from: `"Divine Fingers Dispatch" <${process.env.SMTP_USER || 'no-reply@divinefingershealthcare.ca'}>`,
-    to: process.env.AGENCY_ALERT_EMAIL || 'info@divinefingershealthcare.ca',
-    subject: `🚨 [NEW STAFF REQUEST] ${requestData.facility_name} - ${requestData.role_requested}`,
-    html: `
-      <h2>New Staffing Request Received (${requestData.request_code})</h2>
-      <p><strong>Facility:</strong> ${requestData.facility_name}</p>
-      <p><strong>Contact Person:</strong> ${requestData.contact_name} (${requestData.contact_phone})</p>
-      <p><strong>Email:</strong> ${requestData.contact_email}</p>
-      <p><strong>Role Needed:</strong> ${requestData.role_requested}</p>
-      <p><strong>Shift / Location:</strong> ${requestData.shift_type}</p>
-      <p><strong>Urgency:</strong> ${requestData.urgency_level || 'routine'}</p>
-      <p><strong>Special Instructions:</strong> ${requestData.special_instructions || 'None'}</p>
-      <br>
-      <p>Log in to the Divine Fingers Dispatch Portal to assign staff to this facility.</p>
-    `
-  };
-  return transporter.sendMail(mailOptions);
-}
-
-async function sendApplicantConfirmation(applicantData) {
-  const mailOptions = {
-    from: `"Divine Fingers Recruitment" <${process.env.SMTP_USER || 'no-reply@divinefingershealthcare.ca'}>`,
-    to: applicantData.email,
-    subject: `Application Received - Divine Fingers Healthcare Services Inc.`,
-    html: `
-      <h3>Hello ${applicantData.full_name},</h3>
-      <p>Thank you for submitting your application for the <strong>${applicantData.role_applied}</strong> role at Divine Fingers Healthcare Services Inc. (Corp ID: 1592082-5).</p>
-      <p>Your application reference code is <strong>${applicantData.application_code}</strong>. Our clinical recruitment team will review your submitted credentials and contact you directly for the next onboarding stage.</p>
-      <br>
-      <p>Best regards,<br>
-      <strong>Divine Fingers Healthcare Recruitment Desk</strong><br>
-      17-2 Dailing Gate, Scarborough, ON M1B 1Z8<br>
-      Direct Lines: +1 (647) 210-6463 | +1 (647) 764-8522<br>
-      <a href="http://www.divinefingershealthcare.com">www.divinefingershealthcare.com</a></p>
-    `
-  };
-  return transporter.sendMail(mailOptions);
-}
-
-async function sendAdminEmailVerificationOtp(adminEmail, adminName, otpCode) {
-  console.log(`\n================================================================`);
-  console.log(` 📧 [PORTAL EMAIL VERIFICATION DISPATCH]`);
-  console.log(` To:      ${adminName} <${adminEmail}>`);
-  console.log(` 🔐 CODE: ${otpCode}`);
-  console.log(` Expiry: 15 minutes`);
-  console.log(`================================================================\n`);
-
-  const mailOptions = {
-    from: `"Divine Fingers Portal Security" <${process.env.SMTP_USER || 'no-reply@divinefingershealthcare.ca'}>`,
-    to: adminEmail,
-    subject: `🔐 Your Portal Verification Code: ${otpCode} - Divine Fingers Healthcare`,
-    html: `
-      <div style="font-family: Arial, sans-serif; max-width: 560px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px; background: #ffffff;">
-        <h2 style="color: #00a896; margin-top: 0;">Portal Identity Verification</h2>
-        <p>Hello <strong>${adminName}</strong>,</p>
-        <p>A sign-in or account setup request was initiated for your administrator account on the Divine Fingers Healthcare Care Coordination & Operations Portal.</p>
-        <p>Please enter the following 6-digit verification code to verify your corporate email address and finalize your login:</p>
-        <div style="text-align: center; margin: 24px 0;">
-          <span style="display: inline-block; font-size: 32px; font-weight: 800; letter-spacing: 8px; color: #0a192f; background: #f0fdfa; padding: 12px 24px; border-radius: 6px; border: 1px solid #00a896;">
-            ${otpCode}
-          </span>
-        </div>
-        <p style="font-size: 13px; color: #64748b;">This verification code is valid for <strong>15 minutes</strong>. If you did not attempt this sign-in, please notify your Super-Admin immediately.</p>
-        <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 20px 0;" />
-        <p style="font-size: 12px; color: #94a3b8; margin: 0;">Divine Fingers Healthcare Services Inc. (Corp ID: 1592082-5) &bull; Security &amp; Compliance</p>
-      </div>
-    `
-  };
-  try {
-    return await transporter.sendMail(mailOptions);
   } catch (err) {
-    console.warn(`⚠️ [SMTP Offline / Dev Intercept] Physical email delivery failed (${err.message}). In development, use console code above.`);
-    return { mock: true, accepted: [adminEmail] };
+    if (isProduction) throw err;
+    console.warn('⚠️ [SMTP Dev Warning]:', err.message);
+    return false;
   }
 }
 
-async function sendNewsletterWelcomeEmail(subscriberEmail) {
-  const mailOptions = {
-    from: `"Divine Fingers Healthcare" <${process.env.SMTP_USER || 'no-reply@divinefingershealthcare.ca'}>`,
-    to: subscriberEmail,
-    subject: `Welcome to Divine Fingers Staffing & Shift Alerts`,
-    html: `
-      <div style="font-family: Arial, sans-serif; max-width: 560px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 8px; background: #ffffff;">
-        <h2 style="color: #00a896; margin-top: 0;">Welcome to Divine Fingers Shift Alerts</h2>
-        <p>Hello,</p>
-        <p>Thank you for subscribing to the <strong>Divine Fingers Healthcare Services Inc.</strong> newsletter and clinical staffing alerts network.</p>
-        <p>You will now receive:</p>
-        <ul>
-          <li>🚨 Priority Ontario healthcare staffing & urgent surge availability</li>
-          <li>📋 Hospital, LTC, and community care shift openings</li>
-          <li>💡 Healthcare regulatory compliance updates & CNO bulletins</li>
-        </ul>
-        <br>
-        <p>If you have urgent staffing needs or questions, our 24/7 Clinical Dispatch team is always available at <strong>+1 (647) 210-6463</strong> or <strong>info@divinefingershealthcare.ca</strong>.</p>
-        <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 20px 0;" />
-        <p style="font-size: 12px; color: #94a3b8; margin: 0;">Divine Fingers Healthcare Services Inc. (Corp ID: 1592082-5) &bull; 17-2 Dailing Gate, Scarborough, ON M1B 1Z8</p>
-      </div>
-    `
-  };
-  try {
-    return await transporter.sendMail(mailOptions);
-  } catch (err) {
-    console.warn(`⚠️ [SMTP Offline / Dev Intercept] Newsletter email delivery failed (${err.message}).`);
-    return { mock: true, accepted: [subscriberEmail] };
+/**
+ * Core sanitized mail delivery method.
+ * Sanitizes headers, enforces system From, provides text + HTML.
+ */
+async function sendRawMail({ to, replyTo, subject, text, html }) {
+  const sanitizedTo = sanitizeHeader(to);
+  const sanitizedSubject = sanitizeHeader(subject);
+  const sanitizedReplyTo = replyTo ? sanitizeHeader(replyTo) : undefined;
+  const from = getSystemFromAddress();
+
+  if (!sanitizedTo || !sanitizedSubject) {
+    throw new Error('Email recipient and subject are required after sanitization.');
   }
+
+  const mailOptions = {
+    from,
+    to: sanitizedTo,
+    replyTo: sanitizedReplyTo,
+    subject: sanitizedSubject,
+    text: text || 'Please view this message in an HTML-compatible email client.',
+    html
+  };
+
+  return await transporter.sendMail(mailOptions);
 }
 
-async function sendAdminInviteEmail(adminEmail, adminName, inviteToken, role) {
-  const appUrl = process.env.APP_URL || 'http://localhost:3000';
-  const inviteUrl = `${appUrl}/admin-login.html?invite=${inviteToken}&email=${encodeURIComponent(adminEmail)}`;
+// ── Secure Email Templates (No PHI / Plaintext Credentials) ────────────────────
 
-  const mailOptions = {
-    from: `"Divine Fingers Admin Operations" <${process.env.SMTP_USER || 'no-reply@divinefingershealthcare.ca'}>`,
-    to: adminEmail,
-    subject: `Administrator Access Invitation — Divine Fingers Healthcare Services`,
-    html: `
-      <div style="font-family: Arial, sans-serif; max-width: 560px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 8px; background: #ffffff;">
-        <h2 style="color: #00a896; margin-top: 0;">Portal Operator Invitation</h2>
-        <p>Hello <strong>${adminName}</strong>,</p>
-        <p>You have been invited to join the <strong>Divine Fingers Healthcare Services Inc.</strong> Operations &amp; Dispatch Portal as <strong>${role}</strong>.</p>
-        <p>In compliance with Canadian healthcare privacy and security standards, your account requires you to establish your own private password and complete Two-Factor Authentication (TOTP) enrollment.</p>
-        <div style="margin: 24px 0; text-align: center;">
-          <a href="${inviteUrl}" style="background: #00a896; color: #ffffff; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">Activate Administrator Account</a>
-        </div>
-        <p style="font-size: 13px; color: #64748b;">Or copy and paste this activation link into your browser:<br><span style="font-family: monospace; word-break: break-all;">${inviteUrl}</span></p>
-        <p style="font-size: 13px; color: #64748b;">This invitation link is valid for 24 hours.</p>
-        <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 20px 0;" />
-        <p style="font-size: 12px; color: #94a3b8; margin: 0;">Divine Fingers Healthcare Services Inc. &bull; 17-2 Dailing Gate, Scarborough, ON M1B 1Z8</p>
+function buildStaffingRequestAlertEmail(requestData) {
+  const safeFacility = escapeHtml(sanitizeHeader(requestData.facility_name || 'Healthcare Facility'));
+  const safeRole = escapeHtml(sanitizeHeader(requestData.role_requested || 'Staffing'));
+  const safeCode = escapeHtml(sanitizeHeader(requestData.request_code || 'REF'));
+  const safeUrgency = escapeHtml(sanitizeHeader(requestData.urgency_level || 'routine'));
+  const safeAppUrl = sanitizeHeader(process.env.APP_URL || 'https://www.divinefingershealthcare.ca');
+
+  const subject = `[STAFF REQUEST ALERT] ${requestData.urgency_level === 'emergency_surge' ? '🚨 EMERGENCY: ' : ''}${requestData.facility_name || 'Facility'} - ${requestData.role_requested || 'Clinician'}`;
+  
+  const text = 
+    `Divine Fingers Healthcare Services Inc.\n` +
+    `New Staffing Shift Request Received\n\n` +
+    `Reference: ${requestData.request_code}\n` +
+    `Facility: ${requestData.facility_name}\n` +
+    `Role Requested: ${requestData.role_requested}\n` +
+    `Urgency Level: ${requestData.urgency_level || 'routine'}\n\n` +
+    `For full clinical details and patient care requirements, sign into the Operations Dispatch Console:\n` +
+    `${safeAppUrl}/admin-login.html\n\n` +
+    `Confidentiality Notice: This message may contain privileged healthcare operational details.`;
+
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 8px; background: #ffffff;">
+      <h3 style="color: #00a896; margin-top: 0;">New Shift Request Notification (${safeCode})</h3>
+      <p>A new shift fulfillment order has been registered in the care dispatch queue.</p>
+      <div style="background: #f8fafc; border-left: 4px solid #00a896; padding: 12px 16px; margin: 16px 0; border-radius: 4px;">
+        <p style="margin: 4px 0;"><strong>Facility:</strong> ${safeFacility}</p>
+        <p style="margin: 4px 0;"><strong>Role Needed:</strong> ${safeRole}</p>
+        <p style="margin: 4px 0;"><strong>Urgency:</strong> <span style="text-transform: uppercase; font-weight: bold;">${safeUrgency}</span></p>
       </div>
-    `
-  };
-  try {
-    return await transporter.sendMail(mailOptions);
-  } catch (err) {
-    console.warn(`⚠️ [SMTP Offline / Dev Intercept] Admin invitation email (${adminEmail}) logged: ${inviteUrl}`);
-    return { mock: true, accepted: [adminEmail], inviteUrl };
-  }
+      <p style="font-size: 14px; color: #475569;">To protect client and clinical confidentiality, full shift parameters and dispatch controls are accessible only within the authenticated portal.</p>
+      <div style="text-align: center; margin: 24px 0;">
+        <a href="${safeAppUrl}/admin-login.html" style="background: #00a896; color: #ffffff; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">Open Dispatch Console</a>
+      </div>
+      <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 20px 0;" />
+      <p style="font-size: 11px; color: #94a3b8; margin: 0;">Divine Fingers Healthcare Services Inc. (Corp ID: 1592082-5) &bull; Operations &amp; Dispatch</p>
+    </div>
+  `;
+
+  return { subject, text, html };
 }
 
-async function sendStaffWelcomeEmail(staffData) {
-  const appUrl = process.env.APP_URL || 'http://localhost:3000';
-  const portalUrl = `${appUrl}/portal.html`;
+function buildApplicantConfirmationEmail(applicantData) {
+  const safeName = escapeHtml(sanitizeHeader(applicantData.full_name || 'Applicant'));
+  const safeRole = escapeHtml(sanitizeHeader(applicantData.role_applied || 'Healthcare Professional'));
+  const safeCode = escapeHtml(sanitizeHeader(applicantData.application_code || 'REF'));
 
-  console.log(`\n================================================================`);
-  console.log(` 📧 [NEW CLINICAL STAFF CREDENTIAL DISPATCH]`);
-  console.log(` To:                 ${staffData.name} <${staffData.email}>`);
-  console.log(` Staff Code:         ${staffData.staff_code}`);
-  console.log(` Temporary Password: ${staffData.temporary_password}`);
-  console.log(` Portal Link:        ${portalUrl}`);
-  console.log(`================================================================\n`);
+  const subject = `Application Received: Divine Fingers Healthcare Services Inc. (${safeCode})`;
 
-  const mailOptions = {
-    from: `"Divine Fingers Clinical Operations" <${process.env.SMTP_USER || 'no-reply@divinefingershealthcare.ca'}>`,
-    to: staffData.email,
-    subject: `🎉 Welcome to Divine Fingers Healthcare — Staff Portal Account Credentials`,
-    html: `
-      <div style="font-family: Arial, sans-serif; max-width: 580px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 8px; background: #ffffff;">
-        <h2 style="color: #00a896; margin-top: 0;">Welcome to Divine Fingers Healthcare Services Inc.!</h2>
-        <p>Dear <strong>${staffData.name}</strong>,</p>
-        <p>Your clinician profile has been approved and enrolled onto our Ontario clinical staffing roster as <strong>${staffData.staff_code}</strong>.</p>
-        
-        <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-left: 4px solid #00a896; border-radius: 6px; padding: 16px; margin: 20px 0;">
-          <h4 style="margin: 0 0 10px 0; color: #0f172a; font-size: 1rem;">🔐 Your Staff Portal Sign-In Details:</h4>
-          <p style="margin: 6px 0; font-size: 0.9rem;"><strong>Portal URL:</strong> <a href="${portalUrl}" style="color: #00a896; font-weight: bold;">${portalUrl}</a></p>
-          <p style="margin: 6px 0; font-size: 0.9rem;"><strong>Email / Username:</strong> <span style="font-family: monospace; font-weight: bold;">${staffData.email}</span></p>
-          <p style="margin: 6px 0; font-size: 0.9rem;"><strong>Temporary Password:</strong> <code style="background: #e2e8f0; padding: 3px 8px; border-radius: 4px; font-weight: 800; font-size: 1rem; color: #0f172a;">${staffData.temporary_password}</code></p>
-        </div>
+  const text =
+    `Hello ${applicantData.full_name},\n\n` +
+    `Thank you for submitting your application for the ${applicantData.role_applied} role with Divine Fingers Healthcare Services Inc.\n` +
+    `Your application reference code is: ${applicantData.application_code}.\n\n` +
+    `Our clinical recruitment and compliance desk is currently reviewing your documentation. If your qualifications meet our Ontario roster standards, an onboarding coordinator will contact you directly.\n\n` +
+    `Best regards,\n` +
+    `Clinical Recruitment Desk\n` +
+    `Divine Fingers Healthcare Services Inc.`;
 
-        <h4 style="color: #0f172a; margin-bottom: 8px;">Next Steps to Begin Claiming Shifts:</h4>
-        <ol style="padding-left: 20px; font-size: 0.88rem; line-height: 1.6; color: #334155;">
-          <li>Sign into your Staff Portal using the credentials above.</li>
-          <li>Open your <strong>Credentials Vault</strong> to upload your N95 Mask Fit, BLS / CPR, and Vulnerable Sector Police Check (VSS).</li>
-          <li>Once our clinical coordinator approves your uploaded certificates, you will immediately be dispatch-ready to view and claim high-paying shifts!</li>
-        </ol>
-
-        <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 24px 0;" />
-        <p style="font-size: 12px; color: #64748b; margin: 0;">
-          Divine Fingers Healthcare Services Inc. (Corp ID: 1592082-5) &bull; 17-2 Dailing Gate, Scarborough, ON M1B 1Z8<br>
-          Direct Recruitment Lines: +1 (647) 210-6463 | +1 (647) 764-8522 &bull; <a href="https://www.divinefingershealthcare.com">www.divinefingershealthcare.com</a>
-        </p>
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 580px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 8px; background: #ffffff;">
+      <h3 style="color: #00a896; margin-top: 0;">Application Received</h3>
+      <p>Hello <strong>${safeName}</strong>,</p>
+      <p>Thank you for submitting your clinical credentials for the <strong>${safeRole}</strong> position at Divine Fingers Healthcare Services Inc.</p>
+      <div style="background: #f0fdfa; border: 1px solid #99f6e4; padding: 12px 16px; border-radius: 6px; margin: 16px 0;">
+        <p style="margin: 0; font-size: 14px; color: #115e59;"><strong>Application Reference Code:</strong> ${safeCode}</p>
       </div>
-    `
-  };
+      <p style="font-size: 14px; color: #334155;">Our clinical onboarding desk reviews credentials in accordance with CNO and Ontario healthcare standards. You will receive an update once initial verification is complete.</p>
+      <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 20px 0;" />
+      <p style="font-size: 11px; color: #94a3b8; margin: 0;">Divine Fingers Healthcare Services Inc. &bull; 17-2 Dailing Gate, Scarborough, ON M1B 1Z8</p>
+    </div>
+  `;
 
-  try {
-    return await transporter.sendMail(mailOptions);
-  } catch (err) {
-    console.warn(`⚠️ [SMTP Notice] Email delivery deferred: ${err.message}. Temporary password logged above.`);
-    return { mock: true, accepted: [staffData.email], temporary_password: staffData.temporary_password };
-  }
+  return { subject, text, html };
+}
+
+function buildAdminVerificationOtpEmail(adminName, otpCode) {
+  const safeName = escapeHtml(sanitizeHeader(adminName || 'Administrator'));
+  const safeOtp = escapeHtml(sanitizeHeader(otpCode));
+
+  const subject = `Portal Security Verification Code: ${safeOtp}`;
+
+  const text =
+    `Hello ${adminName},\n\n` +
+    `Your 6-digit Divine Fingers Operations Portal verification code is: ${otpCode}\n\n` +
+    `This code will expire in 15 minutes. If you did not initiate this authentication request, contact the Super-Admin immediately.\n\n` +
+    `Divine Fingers Healthcare Security & Compliance`;
+
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 540px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 8px; background: #ffffff;">
+      <h3 style="color: #00a896; margin-top: 0;">Portal Identity Verification</h3>
+      <p>Hello <strong>${safeName}</strong>,</p>
+      <p>Please enter the following single-use verification code to authenticate your portal session:</p>
+      <div style="text-align: center; margin: 24px 0;">
+        <span style="display: inline-block; font-size: 32px; font-weight: 800; letter-spacing: 6px; color: #0a192f; background: #f0fdfa; padding: 12px 24px; border-radius: 6px; border: 1px solid #00a896;">
+          ${safeOtp}
+        </span>
+      </div>
+      <p style="font-size: 13px; color: #64748b;">This code expires in <strong>15 minutes</strong> and can only be used once.</p>
+      <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 20px 0;" />
+      <p style="font-size: 11px; color: #94a3b8; margin: 0;">Divine Fingers Healthcare Services Inc. (Corp ID: 1592082-5) &bull; Security Desk</p>
+    </div>
+  `;
+
+  return { subject, text, html };
+}
+
+function buildPasswordResetEmail(recipientName, resetUrl) {
+  const safeName = escapeHtml(sanitizeHeader(recipientName || 'Member'));
+  const safeUrl = sanitizeHeader(resetUrl);
+
+  const subject = `Password Reset Request — Divine Fingers Healthcare`;
+
+  const text =
+    `Hello ${recipientName},\n\n` +
+    `We received a request to reset your Divine Fingers Portal password.\n` +
+    `To choose a new password, visit the secure link below:\n\n` +
+    `${safeUrl}\n\n` +
+    `This link is single-use and valid for 20 minutes. If you did not make this request, please disregard this email.\n\n` +
+    `Divine Fingers Healthcare Services Inc.`;
+
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 560px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 8px; background: #ffffff;">
+      <h3 style="color: #00a896; margin-top: 0;">Password Reset Request</h3>
+      <p>Hello <strong>${safeName}</strong>,</p>
+      <p>A request was received to reset your account password. Click the button below to establish a new password:</p>
+      <div style="text-align: center; margin: 24px 0;">
+        <a href="${safeUrl}" style="background: #00a896; color: #ffffff; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">Reset Password</a>
+      </div>
+      <p style="font-size: 13px; color: #64748b;">Or copy and paste this link into your browser:<br><span style="font-family: monospace; word-break: break-all;">${safeUrl}</span></p>
+      <p style="font-size: 13px; color: #64748b;">This single-use link expires in <strong>20 minutes</strong>.</p>
+      <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 20px 0;" />
+      <p style="font-size: 11px; color: #94a3b8; margin: 0;">Divine Fingers Healthcare Services Inc. &bull; Operations &amp; Privacy</p>
+    </div>
+  `;
+
+  return { subject, text, html };
+}
+
+function buildAdminInviteEmail(adminName, inviteUrl, role) {
+  const safeName = escapeHtml(sanitizeHeader(adminName || 'Colleague'));
+  const safeRole = escapeHtml(sanitizeHeader(role || 'Administrator'));
+  const safeUrl = sanitizeHeader(inviteUrl);
+
+  const subject = `Administrator Access Invitation — Divine Fingers Healthcare`;
+
+  const text =
+    `Hello ${adminName},\n\n` +
+    `You have been invited to join Divine Fingers Healthcare Services as a ${role}.\n` +
+    `To activate your account and configure your credentials and Two-Factor Authentication, open:\n\n` +
+    `${safeUrl}\n\n` +
+    `This link is single-use and valid for 24 hours.\n\n` +
+    `Divine Fingers Healthcare Security & Operations`;
+
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 560px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 8px; background: #ffffff;">
+      <h3 style="color: #00a896; margin-top: 0;">Portal Administrator Invitation</h3>
+      <p>Hello <strong>${safeName}</strong>,</p>
+      <p>You have been provisioned access to the <strong>Divine Fingers Operations Portal</strong> as <strong>${safeRole}</strong>.</p>
+      <div style="text-align: center; margin: 24px 0;">
+        <a href="${safeUrl}" style="background: #00a896; color: #ffffff; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">Activate Account</a>
+      </div>
+      <p style="font-size: 13px; color: #64748b;">Link is valid for 24 hours. Two-factor authentication (TOTP) setup will be required upon initial access.</p>
+      <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 20px 0;" />
+      <p style="font-size: 11px; color: #94a3b8; margin: 0;">Divine Fingers Healthcare Services Inc. &bull; Security &amp; Compliance</p>
+    </div>
+  `;
+
+  return { subject, text, html };
+}
+
+function buildStaffWelcomeNotificationEmail(staffName, staffCode, activationUrl) {
+  const safeName = escapeHtml(sanitizeHeader(staffName || 'Clinician'));
+  const safeCode = escapeHtml(sanitizeHeader(staffCode || 'STAFF'));
+  const safeUrl = sanitizeHeader(activationUrl);
+
+  const subject = `Account Approved: Welcome to Divine Fingers Healthcare (${safeCode})`;
+
+  const text =
+    `Dear ${staffName},\n\n` +
+    `Your clinical profile has been approved for the Divine Fingers Healthcare roster as ${staffCode}.\n\n` +
+    `To activate your staff portal account and configure your secure password, visit:\n` +
+    `${safeUrl}\n\n` +
+    `For security, credentials are never sent via plain email. Please complete your password setup promptly.\n\n` +
+    `Divine Fingers Clinical Operations`;
+
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 580px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 8px; background: #ffffff;">
+      <h3 style="color: #00a896; margin-top: 0;">Welcome to Divine Fingers Healthcare</h3>
+      <p>Dear <strong>${safeName}</strong>,</p>
+      <p>Your clinician profile has been approved and enrolled on our active roster with Staff Code <strong>${safeCode}</strong>.</p>
+      <p>In accordance with healthcare data protection standards, temporary passwords are not sent over plain email. Please click below to set up your password and access your Staff Portal:</p>
+      <div style="text-align: center; margin: 24px 0;">
+        <a href="${safeUrl}" style="background: #00a896; color: #ffffff; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">Set Your Password &amp; Sign In</a>
+      </div>
+      <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 20px 0;" />
+      <p style="font-size: 11px; color: #94a3b8; margin: 0;">Divine Fingers Healthcare Services Inc. &bull; 17-2 Dailing Gate, Scarborough, ON M1B 1Z8</p>
+    </div>
+  `;
+
+  return { subject, text, html };
+}
+
+function buildNewsletterWelcomeEmail(subscriberEmail) {
+  const subject = `Welcome to Divine Fingers Healthcare Shift & Staffing Alerts`;
+
+  const text =
+    `Hello,\n\n` +
+    `Thank you for subscribing to updates from Divine Fingers Healthcare Services Inc.\n` +
+    `You will receive notifications on Ontario healthcare staffing, surge availability, and compliance bulletins.\n\n` +
+    `Divine Fingers Healthcare Services Inc.`;
+
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 560px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 8px; background: #ffffff;">
+      <h3 style="color: #00a896; margin-top: 0;">Subscription Confirmed</h3>
+      <p>Thank you for subscribing to the <strong>Divine Fingers Healthcare Services Inc.</strong> alert network.</p>
+      <p>You will receive updates regarding healthcare surge coverage, regulatory compliance, and shift schedules.</p>
+      <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 20px 0;" />
+      <p style="font-size: 11px; color: #94a3b8; margin: 0;">Divine Fingers Healthcare Services Inc. &bull; 17-2 Dailing Gate, Scarborough, ON M1B 1Z8</p>
+    </div>
+  `;
+
+  return { subject, text, html };
 }
 
 module.exports = {
-  sendStaffingRequestAlert,
-  sendApplicantConfirmation,
-  sendAdminEmailVerificationOtp,
-  sendAdminInviteEmail,
-  sendNewsletterWelcomeEmail,
-  sendStaffWelcomeEmail,
-  verifyConnection
+  assertProductionSmtpConfig,
+  verifyConnection,
+  sendRawMail,
+  buildStaffingRequestAlertEmail,
+  buildApplicantConfirmationEmail,
+  buildAdminVerificationOtpEmail,
+  buildPasswordResetEmail,
+  buildAdminInviteEmail,
+  buildStaffWelcomeNotificationEmail,
+  buildNewsletterWelcomeEmail
 };
-

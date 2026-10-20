@@ -157,56 +157,25 @@ try {
     })
     .catch(err => {
       isMySqlAvailable = false;
-      console.warn(`⚠️ [Database] MySQL not reachable (${err.message}). Activating In-Memory Resilient Mode.`);
+      if (process.env.NODE_ENV === 'production' && !process.env.VERCEL) {
+        console.error(`❌ [FATAL DATABASE ERROR] Production MySQL unreachable: ${err.message}. Failing closed.`);
+        process.exit(1);
+      }
+      if (!err.message.includes('Pool is closed')) {
+        console.warn(`⚠️ [Database] MySQL not reachable (${err.message}). Activating In-Memory Resilient Mode (DEVELOPMENT ONLY).`);
+      }
     });
 } catch (e) {
   isMySqlAvailable = false;
+  if (process.env.NODE_ENV === 'production' && !process.env.VERCEL) {
+    console.error(`❌ [FATAL DATABASE ERROR] Failed to initialize database pool: ${e.message}`);
+    process.exit(1);
+  }
 }
 
-// ── In-Memory Datastore ───────────────────────────────────────────────────────
+// ── In-Memory Datastore (Strictly for local unit testing / non-production) ─────
 const inMemoryStore = {
-  admins: [
-    {
-      id: 'c4970cd8-eb90-4e33-9aba-446711e88d8b',
-      email: 'admin@divinefingershealthcare.ca',
-      password_hash: '$2b$10$ICqO6AZ.OprBLcm5OT5Nm.aWhldo4q3dLx6tHzcaFg6PwaX23uUPG',
-      full_name: 'Divine Fingers Administrator',
-      role: 'super-admin',
-      permissions: ['requests:view', 'requests:dispatch', 'roster:view', 'roster:manage', 'applications:view', 'applications:manage', 'inquiries:manage', 'reports:view', 'reports:export', 'newsletter:manage', 'audit:view', 'admins:manage'],
-      failed_login_attempts: 0,
-      lock_until: null,
-      totp_secret: null,
-      totp_enabled: 0,
-      email_verified: 1,
-      email_verification_token: null,
-      email_verification_expires: null,
-      last_login: new Date().toISOString(),
-      last_login_ip: '127.0.0.1',
-      is_active: 1,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    },
-    {
-      id: '1f2465dc-9c9b-4d09-a5fa-24c019be87d6',
-      email: 'ayomidenoch15@gmail.com',
-      password_hash: '$2b$10$ICqO6AZ.OprBLcm5OT5Nm.aWhldo4q3dLx6tHzcaFg6PwaX23uUPG',
-      full_name: 'Olugbodi Ayomide',
-      role: 'super-admin',
-      permissions: ['requests:view', 'requests:dispatch', 'roster:view', 'roster:manage', 'applications:view', 'applications:manage', 'inquiries:manage', 'reports:view', 'reports:export', 'newsletter:manage', 'audit:view', 'admins:manage'],
-      failed_login_attempts: 0,
-      lock_until: null,
-      totp_secret: null,
-      totp_enabled: 0,
-      email_verified: 1,
-      email_verification_token: null,
-      email_verification_expires: null,
-      last_login: new Date().toISOString(),
-      last_login_ip: '127.0.0.1',
-      is_active: 1,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    }
-  ],
+  admins: [],
   staff_roster: [],
   staffing_requests: [],
   job_applications: [],
@@ -217,6 +186,10 @@ const inMemoryStore = {
   newsletter_subscribers: [],
   facilities: [],
   facility_rate_cards: [],
+  email_outbox: [],
+  email_suppressions: [],
+  email_audit_logs: [],
+  sms_consent: [],
   // IMPORTANT: users[] must NEVER contain administrator emails.
   // Admins live exclusively in admins[]. Mixing them here bypasses the
   // /api/users/login 403 rejection check and lets admins access the public portal.
@@ -1069,36 +1042,72 @@ function handleInMemoryQuery(sql, params = []) {
 }
 
 // ── Unified Database Pool Export ──────────────────────────────────────────────
+const isProd = process.env.NODE_ENV === 'production' && !process.env.VERCEL;
+
 const pool = {
   async query(sql, params = []) {
+    if (isProd) {
+      if (!realPool) {
+        throw new Error('Database pool uninitialized in production.');
+      }
+      // Never fall back to in-memory store in production (fail closed)
+      return await realPool.query(sql, params);
+    }
+
     if (realPool) {
       try {
         return await realPool.query(sql, params);
       } catch (err) {
-        console.warn(`⚠️ [Database] MySQL query failed (${err.message}). Using In-Memory fallback.`);
+        if (!err.message.includes('Pool is closed')) {
+          console.warn(`⚠️ [Database] MySQL query failed (${err.message}). Using In-Memory fallback (DEV ONLY).`);
+        }
         return handleInMemoryQuery(sql, params);
       }
     }
     return handleInMemoryQuery(sql, params);
   },
+  async execute(sql, params = []) {
+    return this.query(sql, params);
+  },
   async getConnection() {
+    if (isProd) {
+      if (!realPool) {
+        throw new Error('Database pool uninitialized in production.');
+      }
+      return await realPool.getConnection();
+    }
+
     if (realPool) {
       try {
         return await realPool.getConnection();
       } catch (err) {
         return {
           async query(sql, params) { return pool.query(sql, params); },
+          async execute(sql, params) { return pool.query(sql, params); },
+          async beginTransaction() {},
+          async commit() {},
+          async rollback() {},
           release() {}
         };
       }
     }
     return {
       async query(sql, params) { return handleInMemoryQuery(sql, params); },
+      async execute(sql, params) { return handleInMemoryQuery(sql, params); },
+      async beginTransaction() {},
+      async commit() {},
+      async rollback() {},
       release() {}
     };
   },
   isMySqlAvailable() {
     return isMySqlAvailable || Boolean(realPool);
+  },
+  async end() {
+    if (realPool) {
+      await realPool.end();
+      realPool = null;
+    }
   },
   inMemoryStore
 };

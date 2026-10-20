@@ -14,10 +14,13 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const { z } = require('zod');
 const pool = require('../db');
-const { authLoginLimiter } = require('../middleware/rateLimiter');
+const { authLoginLimiter, passwordResetLimiter } = require('../middleware/rateLimiter');
 const adminEvents = require('../utils/events');
+const { enqueueMail } = require('../utils/mailOutbox');
+const { generateSecureToken } = require('../utils/cryptoUtils');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'divine_fingers_default_secure_jwt_secret_key_2026_production_fallback';
+const USER_JWT_SECRET = process.env.USER_JWT_SECRET || process.env.JWT_SECRET || 'divine_fingers_default_secure_jwt_secret_key_2026_production_fallback';
+const JWT_SECRET = USER_JWT_SECRET;
 const USER_COOKIE_NAME = 'df_user_session';
 
 function buildUserCookieOptions() {
@@ -25,7 +28,7 @@ function buildUserCookieOptions() {
   return {
     httpOnly: true,
     secure: isProd,
-    sameSite: 'Lax',
+    sameSite: isProd ? 'Strict' : 'Lax',
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     path: '/'
   };
@@ -290,7 +293,7 @@ router.post('/login', authLoginLimiter, async (req, res, next) => {
       }
     }
 
-    // Fallback: If not matched in users, check if registered in staff_roster
+    // Notice: If on staff_roster but no active password in users table, prompt for activation/reset
     if (!authenticatedUser) {
       try {
         const [rosterMatch] = await pool.query(
@@ -298,33 +301,13 @@ router.post('/login', authLoginLimiter, async (req, res, next) => {
           [emailClean]
         );
         if (rosterMatch && rosterMatch.length > 0) {
-          const staff = rosterMatch[0];
-          // Accept default staff onboarding password or any valid password provided
-          if (password === 'DivineFingers2026!' || password.length >= 6) {
-            const salt = await bcrypt.genSalt(10);
-            const password_hash = await bcrypt.hash(password, salt);
-            const newUserId = staff.id || crypto.randomUUID();
-
-            await pool.query(
-              `INSERT INTO users (id, email, password_hash, full_name, role, phone, is_active, email_verified)
-               VALUES (?, ?, ?, ?, 'healthcare_worker', ?, 1, 1)
-               ON DUPLICATE KEY UPDATE password_hash = VALUES(password_hash), is_active = 1`,
-              [newUserId, emailClean, password_hash, staff.name, staff.phone || null]
-            ).catch(() => {});
-
-            authenticatedUser = {
-              id: newUserId,
-              email: emailClean,
-              full_name: staff.name,
-              role: 'healthcare_worker',
-              organization_name: null,
-              phone: staff.phone || null,
-              is_active: 1
-            };
-          }
+          return res.status(401).json({
+            success: false,
+            error: 'Your staff account requires password activation. Please check your invitation email or click "Forgot Password" to establish your password.'
+          });
         }
       } catch (rosterAuthErr) {
-        console.warn('[Staff Roster Auth Fallback Notice]:', rosterAuthErr.message);
+        console.warn('[Staff Roster Auth Notice]:', rosterAuthErr.message);
       }
     }
 
@@ -664,6 +647,170 @@ router.post('/facility-team', async (req, res, next) => {
         client_role: validated.client_role,
         organization_name: decoded.organization_name
       }
+    });
+  } catch (err) {
+    if (err instanceof z.ZodError) {
+      return res.status(400).json({ success: false, error: err.errors[0].message });
+    }
+    next(err);
+  }
+});
+
+// In-memory per-email rate limit store (15 minute window, max 3 requests)
+const emailResetLimiterMap = new Map();
+function checkEmailRateLimit(email) {
+  const now = Date.now();
+  const entry = emailResetLimiterMap.get(email) || { count: 0, resetAt: now + 15 * 60 * 1000 };
+  if (now > entry.resetAt) {
+    entry.count = 1;
+    entry.resetAt = now + 15 * 60 * 1000;
+  } else {
+    entry.count += 1;
+  }
+  emailResetLimiterMap.set(email, entry);
+  return entry.count <= 3;
+}
+
+// Clean up stale entries every 30 minutes
+setInterval(() => {
+  const now = Date.now();
+  for (const [k, v] of emailResetLimiterMap.entries()) {
+    if (now > v.resetAt) emailResetLimiterMap.delete(k);
+  }
+}, 30 * 60 * 1000).unref();
+
+const forgotPasswordSchema = z.object({
+  email: z.string().trim().email({ message: 'A valid email address is required.' })
+});
+
+const resetPasswordSchema = z.object({
+  token: z.string().trim().min(32, { message: 'Invalid or malformed reset token.' }),
+  password: z.string().min(8, { message: 'Password must be at least 8 characters long.' })
+});
+
+// ── POST /api/users/forgot-password ─────────────────────────────────────────
+router.post('/forgot-password', passwordResetLimiter, async (req, res, next) => {
+  try {
+    const { email } = forgotPasswordSchema.parse(req.body);
+    const emailClean = email.toLowerCase().trim();
+
+    // Constant response text to avoid account enumeration
+    const genericResponse = {
+      success: true,
+      message: 'If an account is associated with that email address, a password reset link has been dispatched.'
+    };
+
+    // Per-email throttling
+    if (!checkEmailRateLimit(emailClean)) {
+      return res.status(429).json({
+        success: false,
+        error: 'Too many password reset requests for this email address. Please try again later.'
+      });
+    }
+
+    const [rows] = await pool.query(
+      'SELECT id, email, full_name, role, is_active FROM users WHERE email = ? LIMIT 1',
+      [emailClean]
+    );
+
+    let targetUser = rows && rows[0] ? rows[0] : null;
+
+    // Check staff_roster if not yet initialized in users table
+    if (!targetUser) {
+      const [rosterRows] = await pool.query(
+        'SELECT id, name, email FROM staff_roster WHERE LOWER(email) = ? LIMIT 1',
+        [emailClean]
+      );
+      if (rosterRows && rosterRows[0]) {
+        const staff = rosterRows[0];
+        const newUserId = staff.id || crypto.randomUUID();
+        await pool.query(
+          `INSERT INTO users (id, email, password_hash, full_name, role, is_active, email_verified)
+           VALUES (?, ?, 'pending_initial_activation', ?, 'healthcare_worker', 1, 1)
+           ON DUPLICATE KEY UPDATE is_active = 1`,
+          [newUserId, emailClean, staff.name]
+        );
+        targetUser = { id: newUserId, email: emailClean, full_name: staff.name };
+      }
+    }
+
+    if (targetUser && targetUser.is_active !== 0) {
+      const { token, hash } = generateSecureToken(32);
+
+      await pool.query(
+        'UPDATE users SET password_reset_token_hash = ?, password_reset_expires = DATE_ADD(NOW(), INTERVAL 20 MINUTE) WHERE id = ?',
+        [hash, targetUser.id]
+      );
+
+      const appBaseUrl = (process.env.APP_BASE_URL || process.env.APP_URL || 'https://www.divinefingershealthcare.ca').replace(/\/$/, '');
+      const resetUrl = `${appBaseUrl}/login.html?action=reset&token=${token}&email=${encodeURIComponent(emailClean)}`;
+
+      await enqueueMail({
+        type: 'password_reset',
+        to: emailClean,
+        userId: targetUser.id,
+        vars: {
+          full_name: targetUser.full_name,
+          reset_url: resetUrl
+        }
+      });
+    } else {
+      // Artificial delay to prevent timing-based user enumeration
+      await new Promise(r => setTimeout(r, 150));
+    }
+
+    return res.json(genericResponse);
+  } catch (err) {
+    if (err instanceof z.ZodError) {
+      return res.status(400).json({ success: false, error: err.errors[0].message });
+    }
+    next(err);
+  }
+});
+
+// ── POST /api/users/reset-password ──────────────────────────────────────────
+router.post('/reset-password', passwordResetLimiter, async (req, res, next) => {
+  try {
+    const { token, password } = resetPasswordSchema.parse(req.body);
+    const tokenHash = crypto.createHash('sha256').update(token.trim()).digest('hex');
+
+    const [users] = await pool.query(
+      `SELECT id, email, full_name, token_version FROM users 
+       WHERE password_reset_token_hash = ? AND password_reset_expires > NOW() LIMIT 1`,
+      [tokenHash]
+    );
+
+    if (!users || users.length === 0) {
+      return res.status(400).json({
+        success: false,
+        error: 'Password reset link is invalid, single-use token already consumed, or link has expired.'
+      });
+    }
+
+    const user = users[0];
+    const salt = await bcrypt.genSalt(12);
+    const passwordHash = await bcrypt.hash(password, salt);
+
+    // Consume token, update password, and increment token_version to invalidate previous sessions
+    await pool.query(
+      `UPDATE users SET
+         password_hash = ?,
+         password_reset_token_hash = NULL,
+         password_reset_expires = NULL,
+         token_version = token_version + 1,
+         email_verified = 1,
+         is_active = 1,
+         updated_at = NOW()
+       WHERE id = ?`,
+      [passwordHash, user.id]
+    );
+
+    // Invalidate any active cookie on the client
+    res.clearCookie(USER_COOKIE_NAME, { path: '/' });
+
+    return res.json({
+      success: true,
+      message: 'Your password has been successfully reset. Please log in with your new credentials.'
     });
   } catch (err) {
     if (err instanceof z.ZodError) {

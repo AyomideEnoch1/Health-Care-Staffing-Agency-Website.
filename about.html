@@ -8,10 +8,10 @@
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Open+Sans:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&family=Pacifico&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Montserrat:wght@400;500;600;700;800;900&family=Open+Sans:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&family=Pacifico&display=swap" rel="stylesheet">
   
-  <link rel="stylesheet" href="style.css?v=5.3.0">
-  <link rel="stylesheet" href="prototype.css?v=5.3.0">
+  <link rel="stylesheet" href="style.css?v=6.0.2">
+  <link rel="stylesheet" href="prototype.css?v=5.5.5">
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
@@ -57,7 +57,7 @@
   </header>
 
   <!-- PAGE HERO BANNER -->
-  <section class="hero-section subpage-hero">
+  <section class="hero-section subpage-hero" id="hero-slider">
     <div class="hero-bg-container">
       <div class="hero-diagonal-shape"></div>
       <div class="hero-image-wrapper">
@@ -67,8 +67,8 @@
 
     <div class="hero-content container">
       <div class="hero-text-block">
-        <h1 class="hero-title">About Divine Fingers <br>Health Care Services Inc.</h1>
-        <p class="hero-subtitle">
+        <h1 class="hero-title hero-slide-title">About Divine Fingers <br>Health Care Services Inc.</h1>
+        <p class="hero-subtitle hero-slide-sub">
           Where Innovation Meets Compassionate Care.
         </p>
       </div>
@@ -78,24 +78,26 @@
   <!-- =========================================================================
        1. EXECUTIVE OVERVIEW (SHARP TOP SLANT LEFT)
        ========================================================================= -->
-  <section class="section-padding sharp-top-slant-left" id="executive-overview" style="background-color: var(--white); overflow: hidden;">
+  <section class="section-padding sharp-top-slant-left anim-section proto-workforce-section about-overview-section" id="executive-overview" style="background-color: var(--white); overflow-x: clip;">
     <div class="container sectors-section" style="max-width: 1440px;">
       <div class="proto-split-grid" style="align-items: center; gap: 3.5rem;">
         
         <!-- Left: Narrative Column -->
-        <div class="welcome-narrative-col slide-from-left">
-          <span class="proto-section-eyebrow">ABOUT DIVINE FINGERS</span>
-          <h2 class="proto-heading-lg" style="margin-bottom: 1.25rem;">
-            Rooted in Trusted Health Care Expertise &amp; Critical Thinking
-          </h2>
+        <div class="welcome-narrative-col workforce-content-col">
+          <div class="workforce-slide-header about-slide-header">
+            <span class="proto-section-eyebrow">ABOUT DIVINE FINGERS</span>
+            <h2 class="proto-heading-lg" style="margin-bottom: 1.25rem;">
+              Rooted in Trusted Health Care Expertise &amp; Critical Thinking
+            </h2>
+          </div>
           
-          <p class="welcome-text" style="font-size: 1.15rem; color: #1E293B; line-height: 1.85; margin-bottom: 1.5rem; font-weight: 500;">
+          <p class="welcome-text workforce-slide-body about-slide-body" style="font-size: 1.15rem; color: #1E293B; line-height: 1.85; margin-bottom: 1.5rem; font-weight: 500; opacity: 0.72;">
             At Divine Fingers Health Care Services, we value people first. We partner with health care organizations to craft high-quality patient centered care rooted in trusted health care expertise with critical thinking to achieve great result within the targeted period. Our focus is to provide well-vetted Registered Nurses (RN), Registered Practical Nurses (RPN) and Personal Support Workers (PSWs) with high level skills and competency.
           </p>
 
           <!-- Modern Highlight Cards -->
-          <div class="proto-exec-highlights-row">
-            <div class="proto-exec-card">
+          <div class="proto-exec-highlights-row workforce-slide-link about-slide-highlights">
+            <div class="proto-exec-card slide-up stagger-1">
               <div class="proto-exec-icon-box">
                 <i data-lucide="clock-3"></i>
               </div>
@@ -105,7 +107,7 @@
               </div>
             </div>
 
-            <div class="proto-exec-card card-cyan">
+            <div class="proto-exec-card card-cyan slide-up stagger-2">
               <div class="proto-exec-icon-box">
                 <i data-lucide="user-check"></i>
               </div>
@@ -118,7 +120,7 @@
         </div>
 
         <!-- Right: Photo Block with Floating Badge -->
-        <div style="position: relative;" class="slide-from-right">
+        <div style="position: relative;" class="workforce-media-col workforce-slide-right slide-right about-slide-right">
           <div style="border-radius: var(--proto-radius-lg); overflow: hidden; box-shadow: var(--proto-shadow); border: 4px solid var(--white);">
             <img src="assets/images/team_divine.jpg" alt="Divine Fingers Care Team" style="width: 100%; height: 420px; object-fit: cover; display: block;">
           </div>
@@ -135,30 +137,35 @@
   <!-- =========================================================================
        2. OUR PURPOSE & VISION (SPLIT-SCREEN STORYTELLING - SHARP TOP SLANT RIGHT)
        ========================================================================= -->
-  <section class="section-padding sharp-top-slant-right" style="background-color: var(--proto-bg-tint); overflow: hidden;">
+  <!-- =========================================================================
+       2. OUR PURPOSE & VISION (SPLIT-SCREEN STORYTELLING - SHARP TOP SLANT RIGHT)
+       ========================================================================= -->
+  <section class="section-padding sharp-top-slant-right anim-section proto-workforce-section about-purpose-section" id="purpose-section" style="background-color: var(--proto-bg-tint); overflow-x: clip;">
     <div class="container sectors-section" style="max-width: 1440px;">
       
       <div class="proto-split-grid" style="align-items: center; gap: 3.5rem;">
         
         <!-- Left Column: Purpose Narrative Anchor -->
-        <div class="slide-from-left">
-          <span class="proto-section-eyebrow">PURPOSE-DRIVEN HEALTH CARE</span>
-          <h2 class="proto-heading-lg" style="margin-bottom: 1.25rem;">
-            Empowering health care organizations with trusted talent.
-          </h2>
-          <p class="proto-body-text" style="font-size: 1.05rem; line-height: 1.8; margin-bottom: 1.8rem;">
+        <div class="workforce-content-col purpose-narrative-col">
+          <div class="workforce-slide-header purpose-slide-header">
+            <span class="proto-section-eyebrow">PURPOSE-DRIVEN HEALTH CARE</span>
+            <h2 class="proto-heading-lg" style="margin-bottom: 1.25rem;">
+              Empowering health care organizations with trusted talent.
+            </h2>
+          </div>
+          <p class="proto-body-text workforce-slide-body purpose-slide-body" style="font-size: 1.05rem; line-height: 1.8; margin-bottom: 1.8rem;">
             Divine Fingers Health Care Services Inc. was founded on a commitment to elevate clinical standards and bridge workforce gaps. We align professional health care expertise, compassion, and rapid responsiveness to support health care providers across Canada.
           </p>
-          <a href="services.html" class="proto-arrow-link" style="font-size: 1.02rem;">
+          <a href="services.html" class="proto-arrow-link workforce-slide-link purpose-slide-link" style="font-size: 1.02rem;">
             Explore our staffing services <i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i>
           </a>
         </div>
 
         <!-- Right Column: Stacked Interactive Mission & Vision Cards -->
-        <div class="proto-stacked-mv-cards slide-from-right">
+        <div class="proto-stacked-mv-cards workforce-media-col workforce-slide-right slide-right purpose-slide-right">
           
           <!-- Mission Card -->
-          <article class="proto-stacked-mv-card mission-card">
+          <article class="proto-stacked-mv-card mission-card slide-up stagger-1">
             <div class="proto-mv-badge-row">
               <div class="proto-mv-icon-badge">
                 <i data-lucide="target" style="width: 24px; height: 24px;"></i>
@@ -174,7 +181,7 @@
           </article>
 
           <!-- Vision Card -->
-          <article class="proto-stacked-mv-card vision-card">
+          <article class="proto-stacked-mv-card vision-card slide-up stagger-2">
             <div class="proto-mv-badge-row">
               <div class="proto-mv-icon-badge icon-cyan">
                 <i data-lucide="eye" style="width: 24px; height: 24px;"></i>
@@ -198,9 +205,9 @@
   <!-- =========================================================================
        3. OUR CORE VALUES (2x2 ARCHITECTURAL NUMBERED GRID - SHARP TOP SLANT LEFT)
        ========================================================================= -->
-  <section class="proto-tricard-section section-padding geometric-ribbon-section sharp-top-slant-left">
+  <section class="proto-tricard-section section-padding geometric-ribbon-section sharp-top-slant-left anim-section" id="about-values">
     <div class="container">
-      <div class="accent-heading-wrapper" style="margin-bottom: 2.5rem;">
+      <div class="accent-heading-wrapper slide-top" style="margin-bottom: 2.5rem;">
         <h2 class="welcome-title" style="margin-bottom: 0;">OUR CORE <span class="brand-highlight">VALUES</span></h2>
         <div class="welcome-accent-line"></div>
       </div>
@@ -208,7 +215,7 @@
       <div class="proto-values-2x2-grid">
         
         <!-- Value 01: Respect for People & Practice -->
-        <article class="proto-value-card-2x2">
+        <article class="proto-value-card-2x2 slide-up stagger-1">
           <span class="proto-card-num-watermark">01</span>
           <div class="proto-value-header-row">
             <div class="proto-value-icon-box-2x2">
@@ -225,7 +232,7 @@
         </article>
 
         <!-- Value 02: Accountability at Every Level -->
-        <article class="proto-value-card-2x2">
+        <article class="proto-value-card-2x2 slide-up stagger-2">
           <span class="proto-card-num-watermark">02</span>
           <div class="proto-value-header-row">
             <div class="proto-value-icon-box-2x2 icon-cyan">
@@ -242,7 +249,7 @@
         </article>
 
         <!-- Value 03: Collaborative Partnership -->
-        <article class="proto-value-card-2x2">
+        <article class="proto-value-card-2x2 slide-up stagger-3">
           <span class="proto-card-num-watermark">03</span>
           <div class="proto-value-header-row">
             <div class="proto-value-icon-box-2x2">
@@ -259,7 +266,7 @@
         </article>
 
         <!-- Value 04: Quality Over Quantity -->
-        <article class="proto-value-card-2x2">
+        <article class="proto-value-card-2x2 slide-up stagger-4">
           <span class="proto-card-num-watermark">04</span>
           <div class="proto-value-header-row">
             <div class="proto-value-icon-box-2x2 icon-cyan">
@@ -282,13 +289,16 @@
   <!-- =========================================================================
        4. OUR TEAM (STAGGERED GALLERY + EDITORIAL STORY - SHARP TOP SLANT RIGHT)
        ========================================================================= -->
-  <section class="section-padding sharp-top-slant-right" style="background-color: var(--white); overflow: hidden;">
+  <!-- =========================================================================
+       4. OUR TEAM (STAGGERED GALLERY + EDITORIAL STORY - SHARP TOP SLANT RIGHT)
+       ========================================================================= -->
+  <section class="section-padding sharp-top-slant-right anim-section proto-mission-section about-team-section" id="about-team" style="background-color: var(--white); overflow-x: clip;">
     <div class="container sectors-section" style="max-width: 1440px;">
       
       <div class="proto-split-grid" style="align-items: center; gap: 3.5rem;">
         
         <!-- Left: Photo Collage Grid Layout -->
-        <div class="gallery-photo-col slide-from-left">
+        <div class="gallery-photo-col team-slide-media slide-left">
           <div class="photo-collage-3">
             <div class="collage-item collage-item-main">
               <img src="assets/images/team_divine.jpg" alt="Divine Fingers Health Care Team" class="collage-img">
@@ -306,71 +316,72 @@
         </div>
 
         <!-- Right: Team Story & Benefit Points -->
-        <div class="why-choose-info slide-from-right">
-        <div class="accent-heading-wrapper" style="margin-bottom: 1.5rem;">
-          <h2 class="gallery-title" style="margin-bottom: 0;">
-            OUR <span class="brand-highlight">TEAM</span>
-          </h2>
-          <div class="welcome-accent-line"></div>
-        </div>
-        
-        <div class="team-text-wrapper">
-          <p class="news-description" style="font-size: 0.98rem; line-height: 1.8; color: #334155; margin-bottom: 1rem;">
-            At Divine Fingers, our greatest asset is the dedicated team behind our mission. We bring together experienced health care professionals, support staff and certified Registered Nurses, Registered Practical Nurses, and Personal Support Workers/Health Care Aids from various cultural backgrounds, who share a common purpose: enhancing health care experiences for providers, patients, and communities.
-          </p>
+        <div class="why-choose-info team-content-col">
+          <div class="accent-heading-wrapper team-slide-header" style="margin-bottom: 1.5rem;">
+            <h2 class="gallery-title" style="margin-bottom: 0;">
+              OUR <span class="brand-highlight">TEAM</span>
+            </h2>
+            <div class="welcome-accent-line"></div>
+          </div>
           
-          <div class="team-text-collapse" id="team-text-collapse-about" style="display: none;">
-            <p class="news-description" style="font-size: 0.98rem; line-height: 1.8; color: #334155; margin-bottom: 1.2rem;">
-              Guided by expertise and driven by compassion, we collaborate closely with health care organizations to address complex challenges and deliver meaningful solutions. Our approach combines deep industry insight with a thorough understanding of the evolving needs of both patients and care providers. Every member of our team is committed to supporting health care organizations in achieving greater efficiency, improving care delivery, and creating lasting positive impacts. Together, we are helping shape a more connected, responsive, and patient-focused future for health care.
+          <div class="team-text-wrapper team-slide-body">
+            <p class="news-description" style="font-size: 0.98rem; line-height: 1.8; color: #334155; margin-bottom: 1rem;">
+              At Divine Fingers, our greatest asset is the dedicated team behind our mission. We bring together experienced health care professionals, support staff and certified Registered Nurses, Registered Practical Nurses, and Personal Support Workers/Health Care Aids from various cultural backgrounds, who share a common purpose: enhancing health care experiences for providers, patients, and communities.
             </p>
+            
+            <div class="team-text-collapse" id="team-text-collapse-about" style="display: none;">
+              <p class="news-description" style="font-size: 0.98rem; line-height: 1.8; color: #334155; margin-bottom: 1.2rem;">
+                Guided by expertise and driven by compassion, we collaborate closely with health care organizations to address complex challenges and deliver meaningful solutions. Our approach combines deep industry insight with a thorough understanding of the evolving needs of both patients and care providers. Every member of our team is committed to supporting health care organizations in achieving greater efficiency, improving care delivery, and creating lasting positive impacts. Together, we are helping shape a more connected, responsive, and patient-focused future for health care.
+              </p>
+            </div>
+
+            <button type="button" class="btn-see-more-toggle" id="btn-about-team-see-more" onclick="toggleTeamContent(this)" aria-expanded="false" aria-controls="team-text-collapse-about" style="margin-bottom: 1.5rem;">
+              <span class="btn-toggle-label">See More</span>
+              <i data-lucide="chevron-down" class="btn-toggle-icon"></i>
+            </button>
           </div>
 
-          <button type="button" class="btn-see-more-toggle" id="btn-about-team-see-more" onclick="toggleTeamContent(this)" aria-expanded="false" aria-controls="team-text-collapse-about" style="margin-bottom: 1.5rem;">
-            <span class="btn-toggle-label">See More</span>
-            <i data-lucide="chevron-down" class="btn-toggle-icon"></i>
-          </button>
-        </div>
+          <!-- Modern Benefit Points -->
+          <div class="proto-team-benefits team-slide-benefits">
+            <div class="proto-benefit-card slide-up stagger-1">
+              <div class="proto-benefit-icon">✓</div>
+              <div class="proto-benefit-content">
+                <h4>Expertise &amp; Compassion</h4>
+                <p>Deep industry insight combined with empathetic patient-centered care delivery.</p>
+              </div>
+            </div>
 
-        <!-- Modern Benefit Points -->
-        <div class="proto-team-benefits">
-          <div class="proto-benefit-card">
-            <div class="proto-benefit-icon">✓</div>
-            <div class="proto-benefit-content">
-              <h4>Expertise &amp; Compassion</h4>
-              <p>Deep industry insight combined with empathetic patient-centered care delivery.</p>
+            <div class="proto-benefit-card slide-up stagger-2">
+              <div class="proto-benefit-icon">✓</div>
+              <div class="proto-benefit-content">
+                <h4>Lasting Positive Impact</h4>
+                <p>Shaping a responsive, connected, and patient-focused health care ecosystem across Canada.</p>
+              </div>
             </div>
           </div>
 
-          <div class="proto-benefit-card">
-            <div class="proto-benefit-icon">✓</div>
-            <div class="proto-benefit-content">
-              <h4>Lasting Positive Impact</h4>
-              <p>Shaping a responsive, connected, and patient-focused health care ecosystem across Canada.</p>
-            </div>
+          <div class="team-slide-link" style="margin-top: 2rem;">
+            <a href="clients.html" class="proto-arrow-link" style="font-size: 1.05rem;">
+              Request a staffing consultation <i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i>
+            </a>
           </div>
         </div>
 
-        <div style="margin-top: 2rem;">
-          <a href="clients.html" class="proto-arrow-link" style="font-size: 1.05rem;">
-            Request a staffing consultation <i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i>
-          </a>
-        </div>
       </div>
-
     </div>
   </section>
 
   <!-- =========================================================================
        QUICK CONTACT CALLOUT BANNER
        ========================================================================= -->
-  <section class="callout-banner-section">
+  <section class="callout-banner-section anim-section" id="about-callout">
     <div class="container callout-banner-grid">
-      <div class="callout-text-block slide-from-left">
+      <div class="callout-text-block slide-left">
         <h3>Need Immediate Health Care Staffing Support?</h3>
         <p>Our Scarborough office is open 24 hours a day, 7 days a week. Speak directly with our care coordination team.</p>
       </div>
 
-      <div class="callout-btn-group slide-from-right">
+      <div class="callout-btn-group slide-right">
         <a href="tel:+16472106463" class="btn btn-pill-hero">CALL +1 (647) 210-6463</a>
         <a href="contact.html" class="btn btn-pill-outline">CONTACT US PAGE</a>
       </div>
@@ -434,7 +445,7 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-  <script src="script.js?v=5.1.0"></script>
+  <script src="script.js?v=5.3.6"></script>
   <script>
     if (window.lucide) {
       lucide.createIcons();

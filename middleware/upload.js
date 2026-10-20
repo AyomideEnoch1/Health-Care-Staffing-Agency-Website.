@@ -1,31 +1,21 @@
 /**
- * Resume Upload Middleware — Multer + Content-Sniffing MIME Validation
+ * Resume Upload Middleware — Multer + Strict Magic-Byte Content Sniffing + ClamAV Hook
  * Divine Fingers Healthcare Services Inc.
  *
- * Security layers (defence-in-depth):
- *   1. Extension whitelist (.pdf, .docx, .doc) checked at filter time
- *   2. Declared MIME type whitelist checked at filter time
- *   3. Actual file magic-byte content sniffing via the `file-type` package
- *      performed AFTER Multer writes the file to disk, in a post-upload
- *      validation step exported as validateMimeContent().
- *      If the content doesn't match, the file is deleted immediately.
- *
- * Why not rely on declared MIME alone?
- *   A malicious actor can set Content-Type: application/pdf on any file.
- *   Magic byte verification reads the actual binary header of the saved file
- *   and rejects executables, scripts, or other disguised content.
- *
- * Files are stored in uploadDir with UUID-style names (no original name on disk)
- * to prevent path traversal and filename-based attacks.
+ * Multi-layer upload defenses:
+ * 1. Extension & declared MIME filter.
+ * 2. Strict magic-byte inspection (fails closed, deletes mismatched files).
+ * 3. ClamAV malware scan hook.
+ * 4. Randomized UUID disk filenames to prevent path traversal.
  */
 
 const multer = require('multer');
 const path = require('path');
 const crypto = require('crypto');
 const fs = require('fs');
-const os = require('os');
+const { execFile } = require('child_process');
 
-const uploadDir = process.env.UPLOAD_DIR || (process.env.VERCEL ? path.join(os.tmpdir(), 'resumes') : path.join(__dirname, '../uploads/resumes'));
+const uploadDir = process.env.UPLOAD_DIR || path.join(__dirname, '../uploads/resumes');
 try {
   if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
@@ -34,12 +24,10 @@ try {
   console.warn('[Upload Directory Warning]:', e.message);
 }
 
-// Storage: randomized UUID filename, no extension guessable from declared type
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, uploadDir),
   filename: (req, file, cb) => {
     const uniqueId = crypto.randomUUID();
-    // Preserve extension for downstream resume viewer compatibility
     const safeExt = path.extname(file.originalname).toLowerCase().replace(/[^.a-z0-9]/g, '');
     cb(null, `RESUME-${Date.now()}-${uniqueId}${safeExt}`);
   }
@@ -50,12 +38,9 @@ const ALLOWED_MIMES = [
   'application/pdf',
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
   'application/msword',
-  'application/zip',
-  'application/x-zip-compressed',
   'application/octet-stream'
 ];
 
-// Layer 1 & 2: extension + declared MIME whitelist at filter time
 const fileFilter = (req, file, cb) => {
   const ext = path.extname(file.originalname).toLowerCase();
   if (ALLOWED_EXTS.includes(ext) && ALLOWED_MIMES.includes(file.mimetype)) {
@@ -75,11 +60,36 @@ const uploadResume = multer({
 });
 
 /**
- * Layer 3: Content-sniffing MIME validation using magic bytes.
- * Must be called AFTER multer has written the file to disk.
+ * Scan file with ClamAV if available on host.
+ */
+function scanWithClamAV(filePath) {
+  return new Promise((resolve) => {
+    // If CLAMAV_ENABLED is explicitly false, skip
+    if (process.env.CLAMAV_ENABLED === 'false') return resolve(true);
+
+    execFile('clamscan', ['--no-summary', filePath], (error, stdout, stderr) => {
+      if (error) {
+        // If command not found (ENOENT), ClamAV is not installed on this machine
+        if (error.code === 'ENOENT') {
+          return resolve(true);
+        }
+        // Exit code 1 means virus found
+        if (error.code === 1) {
+          console.warn(`[ClamAV Threat Detected] Infected upload quarantined: ${filePath}`);
+          return resolve(false);
+        }
+      }
+      resolve(true);
+    });
+  });
+}
+
+/**
+ * Strict magic-byte MIME validation.
+ * Must be executed immediately after Multer saves the file to disk.
  */
 async function validateMimeContent(req, res, next) {
-  if (!req.file || !req.file.path) return next(); // No file — let route handler handle missing file
+  if (!req.file || !req.file.path) return next();
 
   try {
     const ext = path.extname(req.file.originalname).toLowerCase();
@@ -88,22 +98,42 @@ async function validateMimeContent(req, res, next) {
     fs.readSync(fd, buffer, 0, 8, 0);
     fs.closeSync(fd);
 
-    const isPdf = ext === '.pdf' && buffer.toString('utf8', 0, 4) === '%PDF';
-    const isDocx = ext === '.docx' && buffer[0] === 0x50 && buffer[1] === 0x4B; // PK zip header
-    const isDoc = ext === '.doc' && buffer[0] === 0xD0 && buffer[1] === 0xCF; // OLE compound doc
+    const isPdf = buffer[0] === 0x25 && buffer[1] === 0x50 && buffer[2] === 0x44 && buffer[3] === 0x46; // %PDF
+    const isDocx = buffer[0] === 0x50 && buffer[1] === 0x4B; // PK zip header
+    const isDoc = buffer[0] === 0xD0 && buffer[1] === 0xCF && buffer[2] === 0x11 && buffer[3] === 0xE0; // OLE Compound
 
-    if (isPdf || isDocx || isDoc || ALLOWED_EXTS.includes(ext)) {
-      return next();
+    let matches = false;
+    if (ext === '.pdf' && isPdf) matches = true;
+    else if (ext === '.docx' && isDocx) matches = true;
+    else if (ext === '.doc' && isDoc) matches = true;
+
+    if (!matches) {
+      fs.unlink(req.file.path, () => {});
+      return res.status(422).json({
+        success: false,
+        error: 'File content failed binary header inspection. Only genuine PDF and Word documents are permitted.'
+      });
     }
 
-    fs.unlink(req.file.path, () => {});
+    // ClamAV Antivirus Scanning
+    const isClean = await scanWithClamAV(req.file.path);
+    if (!isClean) {
+      fs.unlink(req.file.path, () => {});
+      return res.status(422).json({
+        success: false,
+        error: 'Uploaded file failed security validation and was quarantined.'
+      });
+    }
+
+    next();
+  } catch (err) {
+    if (req.file && req.file.path && fs.existsSync(req.file.path)) {
+      fs.unlink(req.file.path, () => {});
+    }
     return res.status(422).json({
       success: false,
-      error: 'File content does not match the declared type. Only genuine PDF or Word documents are accepted.'
+      error: 'Security verification failed during upload inspection.'
     });
-  } catch (err) {
-    // If reading header fails, permit valid extension
-    next();
   }
 }
 

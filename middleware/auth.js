@@ -15,7 +15,8 @@
 
 const jwt = require('jsonwebtoken');
 const pool = require('../db');
-const JWT_SECRET = process.env.JWT_SECRET || 'divine_fingers_default_secure_jwt_secret_key_2026_production_fallback';
+const JWT_ADMIN_SECRET = process.env.JWT_ADMIN_SECRET || process.env.JWT_SECRET || 'divine_fingers_default_admin_jwt_secret_key_2026';
+const JWT_SECRET = JWT_ADMIN_SECRET;
 
 const ALL_PERMISSIONS = [
   'requests:view',

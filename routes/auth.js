@@ -23,8 +23,9 @@ const { z } = require('zod');
 const pool = require('../db');
 const { authLoginLimiter } = require('../middleware/rateLimiter');
 const { requireAdminAuth, normalizePermissions } = require('../middleware/auth');
-const { sendAdminEmailVerificationOtp } = require('../utils/mailer');
-const JWT_SECRET = process.env.JWT_SECRET || 'divine_fingers_default_secure_jwt_secret_key_2026_production_fallback';
+const { enqueueMail } = require('../utils/mailOutbox');
+const JWT_ADMIN_SECRET = process.env.JWT_ADMIN_SECRET || process.env.JWT_SECRET || 'divine_fingers_default_admin_jwt_secret_key_2026';
+const JWT_SECRET = JWT_ADMIN_SECRET;
 
 const loginSchema = z.object({
   email: z.string().email({ message: 'A valid email address is required.' }),
@@ -168,8 +169,13 @@ router.post('/login', authLoginLimiter, async (req, res, next) => {
         [hashedOtp, admin.id]
       );
 
-      // Send email via mailer
-      await sendAdminEmailVerificationOtp(admin.email, admin.full_name, emailOtp);
+      // Enqueue OTP email via outbox
+      await enqueueMail({
+        type: 'admin_verification_otp',
+        to: admin.email,
+        userId: admin.id,
+        vars: { full_name: admin.full_name, otp_code: emailOtp }
+      });
 
       const verifyToken = jwt.sign(
         {
@@ -440,7 +446,12 @@ router.post('/email/resend', authLoginLimiter, async (req, res, next) => {
       [hashedOtp, admin.id]
     );
 
-    await sendAdminEmailVerificationOtp(admin.email, admin.full_name, emailOtp);
+    await enqueueMail({
+      type: 'admin_verification_otp',
+      to: admin.email,
+      userId: admin.id,
+      vars: { full_name: admin.full_name, otp_code: emailOtp }
+    });
 
     res.json({
       success: true,

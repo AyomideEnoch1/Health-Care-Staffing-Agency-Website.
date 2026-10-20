@@ -5,7 +5,7 @@ const { z } = require('zod');
 const pool = require('../db');
 const { publicFormLimiter } = require('../middleware/rateLimiter');
 const { requireAdminAuth, requirePermission } = require('../middleware/auth');
-const { sendNewsletterWelcomeEmail } = require('../utils/mailer');
+const { enqueueMail } = require('../utils/mailOutbox');
 const adminEvents = require('../utils/events');
 
 const newsletterSchema = z.object({
@@ -46,8 +46,11 @@ router.post('/subscribe', publicFormLimiter, async (req, res, next) => {
       [id, normalizedEmail, validated.source || 'homepage_strip', req.ip]
     );
 
-    // Automated welcome email dispatch
-    sendNewsletterWelcomeEmail(normalizedEmail).catch(err => {
+    // Enqueue transactional welcome email
+    enqueueMail({
+      type: 'newsletter_welcome',
+      to: normalizedEmail
+    }).catch(err => {
       console.warn('⚠️ [Newsletter Mailer Error]', err.message);
     });
 

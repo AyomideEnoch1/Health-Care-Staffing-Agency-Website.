@@ -8,10 +8,10 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Open+Sans:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Montserrat:wght@400;500;600;700;800;900&family=Open+Sans:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="style.css?v=5.2.0">
-  <link rel="stylesheet" href="prototype.css?v=5.2.0">
+  <link rel="stylesheet" href="style.css?v=5.7.0">
+  <link rel="stylesheet" href="prototype.css?v=5.4.3">
   <script src="https://unpkg.com/lucide@latest"></script>
 
   <style>
@@ -229,21 +229,25 @@
       position: relative;
       display: flex;
       align-items: center;
+      gap: 0.75rem;
     }
 
-    .input-wrapper i.field-icon {
-      position: absolute;
-      left: 14px;
-      width: 17px;
-      height: 17px;
-      color: #94A3B8;
+    .input-wrapper .field-icon,
+    .input-wrapper i.field-icon,
+    .input-wrapper svg.field-icon {
+      flex-shrink: 0;
+      width: 19px;
+      height: 19px;
+      color: #1A3A63;
       pointer-events: none;
-      transition: color 0.2s ease;
+      transition: color 0.2s ease, transform 0.2s ease;
+      z-index: 2;
     }
 
     .auth-input {
       width: 100%;
-      padding: 0.75rem 1rem 0.75rem 2.55rem;
+      flex: 1;
+      padding: 0.75rem 1rem;
       font-family: var(--font-body);
       font-size: 0.92rem;
       color: var(--navy);
@@ -260,8 +264,10 @@
       box-shadow: 0 0 0 3px rgba(27, 174, 207, 0.15);
     }
 
-    .auth-input:focus ~ i.field-icon,
-    .input-wrapper:focus-within i.field-icon {
+    .auth-input:focus ~ .field-icon,
+    .input-wrapper:focus-within .field-icon,
+    .input-wrapper:focus-within i.field-icon,
+    .input-wrapper:focus-within svg.field-icon {
       color: #1BAECF;
     }
 
@@ -532,7 +538,7 @@
           <i data-lucide="log-in" style="width: 17px; height: 17px;"></i> Sign In
         </button>
         <button type="button" class="auth-tab-btn" id="tab-btn-register" onclick="switchAuthTab('register')">
-          <i data-lucide="user-plus" style="width: 17px; height: 17px;"></i> Create Account
+          <i data-lucide="building-2" style="width: 17px; height: 17px;"></i> Register Facility
         </button>
       </div>
 
@@ -549,7 +555,7 @@
           <span id="auth-success-text"></span>
         </div>
 
-        <!-- TAB 1: SIGN IN -->
+        <!-- TAB 1: SIGN IN (For Clients & Provisioned Clinical Staff) -->
         <div class="auth-tab-content active" id="tab-content-login">
           <form id="form-login" onsubmit="handleLogin(event)">
             <div class="form-group">
@@ -593,41 +599,10 @@
           </form>
         </div>
 
-        <!-- TAB 2: CREATE ACCOUNT -->
+        <!-- TAB 2: FACILITY REGISTRATION (Clients Only - Staff are provisioned by HR) -->
         <div class="auth-tab-content" id="tab-content-register">
           <form id="form-register" onsubmit="handleRegister(event)">
-            
-            <!-- Account Type Role Selector -->
-            <div class="role-picker-container">
-              <label class="role-picker-label">I am registering as:</label>
-              <div class="role-selector-grid">
-                <div class="role-option-card selected" id="role-client-card" onclick="selectRole('client')">
-                  <i data-lucide="building-2"></i>
-                  <div class="role-option-title">Health Care Facility</div>
-                  <div class="role-option-desc">Hospital, LTC, or Clinic</div>
-                </div>
-                <div class="role-option-card" id="role-worker-card" onclick="selectRole('healthcare_worker')">
-                  <i data-lucide="stethoscope"></i>
-                  <div class="role-option-title">Health Care Professional</div>
-                  <div class="role-option-desc">RN, RPN, PSW, Caregiver</div>
-                </div>
-              </div>
-              <input type="hidden" id="reg-role" value="client">
-            </div>
-
-            <!-- Notice for Healthcare Workers: Self-registration closed, HR provisioned only -->
-            <div id="worker-application-gate" style="display: none; background: rgba(0, 168, 150, 0.06); border: 1px solid rgba(0, 168, 150, 0.3); border-radius: 12px; padding: 1.75rem 1.25rem; text-align: center; margin-top: 1rem;">
-              <div style="width: 52px; height: 52px; border-radius: 50%; background: rgba(0, 168, 150, 0.15); color: var(--brand-turquoise); display: flex; align-items: center; justify-content: center; margin: 0 auto 0.85rem;">
-                <i data-lucide="shield-alert" style="width: 26px; height: 26px;"></i>
-              </div>
-              <h3 style="font-size: 1.05rem; font-weight: 800; color: var(--text-primary); margin: 0 0 0.5rem 0;">Clinical Accounts are Provisioned by HR</h3>
-              <p style="font-size: 0.83rem; color: var(--text-muted); line-height: 1.5; margin: 0 0 1.25rem 0;">
-                In accordance with Ontario health regulations (CNO &amp; MOH), healthcare workers cannot self-register accounts. All staff profiles and portal credentials are provisioned exclusively by Divine Fingers Human Resources following credential verification.
-              </p>
-              <a href="jobseekers.html#apply-now" class="btn-submit-auth" id="btn-goto-clinical-application" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; width: 100%; box-sizing: border-box;">
-                <i data-lucide="file-plus-2" style="width: 17px; height: 17px;"></i> Submit Clinical Application
-              </a>
-            </div>
+            <input type="hidden" id="reg-role" value="client">
 
             <!-- Client Facility Registration Fields -->
             <div id="client-registration-fields">
@@ -793,32 +768,17 @@
         regTabBtn.classList.add('active');
         loginContent.classList.remove('active');
         regContent.classList.add('active');
-        title.textContent = 'Create an Account';
-        subtitle.textContent = 'Register your facility for rapid staffing or join our network of premier health care professionals.';
+        title.textContent = 'Register Your Facility';
+        subtitle.textContent = 'Register your healthcare facility or hospital for rapid clinical staffing and shift management.';
       }
       if (window.lucide) lucide.createIcons();
     }
 
-    // Role Selection in Registration
+    // Role Selection (Client Facility Registration Only)
     function selectRole(role) {
-      document.getElementById('reg-role').value = role;
-      const clientCard = document.getElementById('role-client-card');
-      const workerCard = document.getElementById('role-worker-card');
-      const clientFields = document.getElementById('client-registration-fields');
-      const workerGate = document.getElementById('worker-application-gate');
-
-      if (role === 'client') {
-        clientCard.classList.add('selected');
-        workerCard.classList.remove('selected');
-        if (clientFields) clientFields.style.display = 'block';
-        if (workerGate) workerGate.style.display = 'none';
-      } else {
-        clientCard.classList.remove('selected');
-        workerCard.classList.add('selected');
-        if (clientFields) clientFields.style.display = 'none';
-        if (workerGate) workerGate.style.display = 'block';
+      if (document.getElementById('reg-role')) {
+        document.getElementById('reg-role').value = 'client';
       }
-      if (window.lucide) lucide.createIcons();
     }
 
     // Toggle Password Visibility
@@ -918,17 +878,13 @@
       if (e) e.preventDefault();
       clearAlerts();
 
-      const role = document.getElementById('reg-role').value;
-      if (role === 'healthcare_worker') {
-        window.location.href = 'jobseekers.html#apply-now';
-        return;
-      }
+      const role = 'client';
       const full_name = document.getElementById('reg-fullname').value.trim();
       const email = document.getElementById('reg-email').value.trim();
       const phone = document.getElementById('reg-phone').value.trim();
       const password = document.getElementById('reg-password').value;
-      const organization_name = role === 'client' ? document.getElementById('reg-orgname').value.trim() : null;
-      const clinical_role = role === 'healthcare_worker' ? (document.getElementById('reg-clinical-role') ? document.getElementById('reg-clinical-role').value : 'RN') : null;
+      const organization_name = document.getElementById('reg-orgname') ? document.getElementById('reg-orgname').value.trim() : null;
+      const clinical_role = null;
       const submitBtn = document.getElementById('btn-register-submit');
 
       if (!full_name || !email || !password) {

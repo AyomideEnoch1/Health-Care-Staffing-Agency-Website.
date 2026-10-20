@@ -2,9 +2,8 @@ const multer = require('multer');
 const path = require('path');
 const crypto = require('crypto');
 const fs = require('fs');
-const os = require('os');
 
-const uploadDir = process.env.CREDENTIALS_UPLOAD_DIR || (process.env.VERCEL ? path.join(os.tmpdir(), 'credentials') : path.join(__dirname, '../uploads/credentials'));
+const uploadDir = process.env.CREDENTIALS_UPLOAD_DIR || path.join(__dirname, '../uploads/credentials');
 
 try {
   if (!fs.existsSync(uploadDir)) {
@@ -52,7 +51,51 @@ const uploadCredential = multer({
   }
 });
 
+/**
+ * Strict magic byte inspection for uploaded credentials.
+ */
+function validateCredentialMime(req, res, next) {
+  if (!req.file || !req.file.path) return next();
+
+  try {
+    const ext = path.extname(req.file.originalname).toLowerCase();
+    const buffer = Buffer.alloc(8);
+    const fd = fs.openSync(req.file.path, 'r');
+    fs.readSync(fd, buffer, 0, 8, 0);
+    fs.closeSync(fd);
+
+    const isPdf = buffer[0] === 0x25 && buffer[1] === 0x50 && buffer[2] === 0x44 && buffer[3] === 0x46; // %PDF
+    const isPng = buffer[0] === 0x89 && buffer[1] === 0x50 && buffer[2] === 0x4E && buffer[3] === 0x47; // \x89PNG
+    const isJpg = buffer[0] === 0xFF && buffer[1] === 0xD8 && buffer[2] === 0xFF; // JPEG SOI
+    const isDocx = buffer[0] === 0x50 && buffer[1] === 0x4B; // PK
+    const isDoc = buffer[0] === 0xD0 && buffer[1] === 0xCF; // OLE
+
+    let valid = false;
+    if (ext === '.pdf' && isPdf) valid = true;
+    else if (ext === '.png' && isPng) valid = true;
+    else if ((ext === '.jpg' || ext === '.jpeg') && isJpg) valid = true;
+    else if (ext === '.docx' && isDocx) valid = true;
+    else if (ext === '.doc' && isDoc) valid = true;
+
+    if (!valid) {
+      fs.unlink(req.file.path, () => {});
+      return res.status(422).json({
+        success: false,
+        error: 'Uploaded credential file content does not match its declared format.'
+      });
+    }
+
+    next();
+  } catch (err) {
+    if (req.file && req.file.path && fs.existsSync(req.file.path)) {
+      fs.unlink(req.file.path, () => {});
+    }
+    return res.status(422).json({ success: false, error: 'File validation failed.' });
+  }
+}
+
 module.exports = {
   uploadCredential,
+  validateCredentialMime,
   uploadDir
 };

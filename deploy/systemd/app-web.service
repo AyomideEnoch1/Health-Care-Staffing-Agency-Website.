@@ -1,0 +1,39 @@
+[Unit]
+Description=Divine Fingers Healthcare Web Service (Express API)
+After=network.target mysql.service
+Wants=mysql.service
+
+[Service]
+Type=simple
+User=app
+Group=app
+WorkingDirectory=/var/www/divine-fingers
+Environment=NODE_ENV=production
+EnvironmentFile=/var/www/divine-fingers/.env
+ExecStart=/usr/bin/node server.js
+Restart=always
+RestartSec=5s
+
+# Security Hardening Directives
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+ReadWritePaths=/var/www/divine-fingers/uploads
+
+# Resource Limits
+LimitNOFILE=65535
+MemoryMax=1G
+CPUQuota=150%
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=df-web
+
+[Install]
+WantedBy=multi-user.target

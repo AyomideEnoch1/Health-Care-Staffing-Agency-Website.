@@ -33,7 +33,8 @@ const { z } = require('zod');
 const { uploadCredential } = require('../middleware/uploadCredentials');
 const { requireAdminAuth, requirePermission, normalizePermissions, ALL_PERMISSIONS } = require('../middleware/auth');
 const adminEvents = require('../utils/events');
-const { sendAdminEmailVerificationOtp, sendAdminInviteEmail, sendStaffWelcomeEmail } = require('../utils/mailer');
+const { enqueueMail } = require('../utils/mailOutbox');
+const { generateSecureToken } = require('../utils/cryptoUtils');
 
 // All admin routes require authentication
 router.use(requireAdminAuth());
@@ -263,17 +264,21 @@ router.patch('/requests/:id/status', requirePermission('requests:dispatch'), asy
       return res.status(400).json({ success: false, error: `Invalid status. Must be one of: ${VALID_STATUSES.join(', ')}` });
     }
 
-    const [existing] = await pool.query('SELECT request_code, facility_name, start_date, shift_type, unit_department FROM staffing_requests WHERE id = ?', [id]);
+    const [existing] = await pool.query('SELECT request_code, facility_name, start_date, shift_type, unit_department, role_requested FROM staffing_requests WHERE id = ?', [id]);
     const reqCode = existing.length ? existing[0].request_code : id.slice(0, 8);
     const facilityName = existing.length ? existing[0].facility_name : '';
 
     let staffName = '';
+    let staffOnlyName = '';
+    let staffEmail = '';
     let isConflict = false;
     let activeShift = null;
 
     if (assigned_staff_id) {
-      const [staff] = await pool.query('SELECT name, staff_code FROM staff_roster WHERE id = ?', [assigned_staff_id]);
+      const [staff] = await pool.query('SELECT name, staff_code, email FROM staff_roster WHERE id = ?', [assigned_staff_id]);
       if (staff.length) {
+        staffOnlyName = staff[0].name;
+        staffEmail = staff[0].email;
         staffName = `${staff[0].name} (${staff[0].staff_code})`;
       }
 
@@ -337,6 +342,22 @@ router.patch('/requests/:id/status', requirePermission('requests:dispatch'), asy
       assigned_staff_id,
       conflict_confirmed: isConflict
     });
+
+    // Notify clinician via transactional outbox when a shift is dispatched
+    if (status === 'dispatched' && staffEmail) {
+      enqueueMail({
+        type: 'shift_assigned_staff',
+        to: staffEmail,
+        vars: {
+          staff_name: staffOnlyName,
+          facility_name: facilityName,
+          unit_department: unit_department || (existing[0] && existing[0].unit_department),
+          role_requested: (existing[0] && existing[0].role_requested) || 'Clinical Staff',
+          shift_type: shift_type || (existing[0] && existing[0].shift_type),
+          request_code: reqCode
+        }
+      }).catch(err => console.warn('[Shift Assignment Mailer Warning]:', err.message));
+    }
 
     res.json({
       success: true,
@@ -662,14 +683,24 @@ router.post('/roster', requirePermission('roster:manage'), async (req, res, next
       console.warn('[Staff User Account Provisioning Warning]:', userErr.message);
     }
 
-    // Auto-dispatch welcome email with temporary credentials to the new healthcare worker
+    // Secure account activation dispatch via transactional outbox
     try {
-      const temporaryPassword = initial_password || 'DivineFingers2026!';
-      await sendStaffWelcomeEmail({
-        name: name.trim(),
-        email: emailClean,
-        staff_code: staffCode,
-        temporary_password: temporaryPassword
+      const { token: activationToken, hash: activationHash } = generateSecureToken(32);
+      await pool.query(
+        'UPDATE users SET password_reset_token_hash = ?, password_reset_expires = DATE_ADD(NOW(), INTERVAL 48 HOUR) WHERE email = ?',
+        [activationHash, emailClean]
+      );
+      const appBaseUrl = (process.env.APP_BASE_URL || process.env.APP_URL || 'https://www.divinefingershealthcare.ca').replace(/\/$/, '');
+      const activationUrl = `${appBaseUrl}/portal.html?action=activate&token=${activationToken}&email=${encodeURIComponent(emailClean)}`;
+
+      await enqueueMail({
+        type: 'staff_welcome',
+        to: emailClean,
+        vars: {
+          full_name: name.trim(),
+          staff_code: staffCode,
+          activation_url: activationUrl
+        }
       });
     } catch (mailErr) {
       console.warn('[Staff Welcome Mailer Warning]:', mailErr.message);
@@ -747,25 +778,37 @@ router.post('/staff/:id/reset-password', requirePermission('roster:manage'), asy
       }
     }
 
-    // Send email with new password
-    sendStaffWelcomeEmail({
-      name: staff.name,
-      email: staff.email,
-      staff_code: staff.staff_code,
-      temporary_password: temporaryPassword
+    // Generate secure single-use password reset token
+    const { token: resetToken, hash: resetHash } = generateSecureToken(32);
+    await pool.query(
+      'UPDATE users SET password_reset_token_hash = ?, password_reset_expires = DATE_ADD(NOW(), INTERVAL 30 MINUTE), token_version = token_version + 1 WHERE email = ? OR id = ?',
+      [resetHash, staff.email, staff.id]
+    );
+
+    const appBaseUrl = (process.env.APP_BASE_URL || process.env.APP_URL || 'https://www.divinefingershealthcare.ca').replace(/\/$/, '');
+    const resetUrl = `${appBaseUrl}/portal.html?action=reset&token=${resetToken}&email=${encodeURIComponent(staff.email)}`;
+
+    // Enqueue password reset email (NO plaintext password in email or logs)
+    enqueueMail({
+      type: 'password_reset',
+      to: staff.email,
+      userId: staff.id,
+      vars: {
+        full_name: staff.name,
+        reset_url: resetUrl
+      }
     }).catch(err => console.warn('[Mailer Error]:', err.message));
 
     // Audit log
     await pool.query(
       `INSERT INTO audit_logs (id, admin_id, actor_name, action, target_entity, target_id, details, severity, ip_address)
        VALUES (?, ?, ?, 'STAFF_PASSWORD_RESET', 'staff_roster', ?, ?, 'warn', ?)`,
-      [crypto.randomUUID(), req.admin.id, req.admin.full_name, staff.id, `Reset portal password for ${staff.name} (${staff.email})`, req.ip]
+      [crypto.randomUUID(), req.admin.id, req.admin.full_name, staff.id, `Dispatched secure password reset link for ${staff.name} (${staff.email})`, req.ip]
     ).catch(() => {});
 
     res.json({
       success: true,
-      message: `Temporary password for ${staff.name} reset to "${temporaryPassword}" and emailed.`,
-      temporary_password: temporaryPassword
+      message: `A secure password reset link has been dispatched to ${staff.name} (${staff.email}).`
     });
   } catch (err) { next(err); }
 });
@@ -1535,7 +1578,12 @@ router.post('/admins/:id/resend-verification', requirePermission('admins:manage'
       [hashedOtp, id]
     );
 
-    await sendAdminEmailVerificationOtp(targetAdmin.email, targetAdmin.full_name, emailOtp);
+    await enqueueMail({
+      type: 'admin_verification_otp',
+      to: targetAdmin.email,
+      userId: targetAdmin.id,
+      vars: { full_name: targetAdmin.full_name, otp_code: emailOtp }
+    });
 
     await pool.query(
       `INSERT INTO audit_logs (id, admin_id, actor_name, action, target_entity, target_id, details, severity, ip_address)
@@ -1582,12 +1630,37 @@ router.post('/admins', requirePermission('admins:manage'), async (req, res, next
       [newId, emailLower, passwordHash, validated.full_name.trim(), validated.role, JSON.stringify(initialPermissions), isEmailVerified, hasTypedPassword ? null : hashedOtp]
     );
 
-    // Send invitation email and verification OTP to new administrator's corporate email if mailer configured
+    // Send invitation email and verification OTP via secure transactional outbox
     try {
-      const inviteToken = crypto.randomBytes(24).toString('hex');
-      await sendAdminInviteEmail(emailLower, validated.full_name.trim(), inviteToken, validated.role);
+      const { token: inviteToken, hash: inviteHash } = generateSecureToken(32);
+      await pool.query(
+        'UPDATE admins SET invite_token_hash = ?, invite_token_expires = DATE_ADD(NOW(), INTERVAL 24 HOUR) WHERE id = ?',
+        [inviteHash, newId]
+      );
+      const appBaseUrl = (process.env.APP_BASE_URL || process.env.APP_URL || 'https://www.divinefingershealthcare.ca').replace(/\/$/, '');
+      const inviteUrl = `${appBaseUrl}/admin-login.html?invite=${inviteToken}&email=${encodeURIComponent(emailLower)}`;
+
+      await enqueueMail({
+        type: 'admin_invite',
+        to: emailLower,
+        userId: newId,
+        vars: {
+          full_name: validated.full_name.trim(),
+          role: validated.role,
+          invite_url: inviteUrl
+        }
+      });
+
       if (!isEmailVerified) {
-        await sendAdminEmailVerificationOtp(emailLower, validated.full_name.trim(), emailOtp);
+        await enqueueMail({
+          type: 'admin_verification_otp',
+          to: emailLower,
+          userId: newId,
+          vars: {
+            full_name: validated.full_name.trim(),
+            otp_code: emailOtp
+          }
+        });
       }
     } catch (mailErr) {
       console.warn('[Admin Creation Mailer Intercept]:', mailErr.message);

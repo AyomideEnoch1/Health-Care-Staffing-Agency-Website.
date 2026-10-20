@@ -17,5 +17,8 @@ uploads/
 *.log
 .DS_Store
 Thumbs.db
+# Temporary and scratch
+scratch/
+deploy-bundle/
 *.zip
 *.docx

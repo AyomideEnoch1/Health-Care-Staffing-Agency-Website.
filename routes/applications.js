@@ -18,7 +18,7 @@ const { z } = require('zod');
 const pool = require('../db');
 const { uploadResume, validateMimeContent } = require('../middleware/upload');
 const { publicFormLimiter } = require('../middleware/rateLimiter');
-const { sendApplicantConfirmation } = require('../utils/mailer');
+const { enqueueMail } = require('../utils/mailOutbox');
 const adminEvents = require('../utils/events');
 
 const applicationSchema = z.object({
@@ -72,9 +72,25 @@ router.post(
         created_at: new Date().toISOString()
       });
 
-      // Send confirmation email (non-blocking — failure doesn't affect response)
-      sendApplicantConfirmation({ ...validated, application_code: appCode })
-        .catch(err => console.error('[MAIL CONFIRM ERROR]:', err.message));
+      // Enqueue candidate confirmation email into transactional outbox
+      enqueueMail({
+        type: 'applicant_confirmation',
+        to: validated.email,
+        vars: { ...validated, application_code: appCode }
+      }).catch(err => console.error('[MAIL CONFIRM ERROR]:', err.message));
+
+      // Enqueue agency recruitment alert
+      enqueueMail({
+        type: 'application_alert',
+        to: process.env.AGENCY_ALERT_EMAIL || 'info@divinefingershealthcare.ca',
+        vars: {
+          full_name: validated.full_name,
+          role_applied: validated.role_applied,
+          application_code: appCode,
+          email: validated.email,
+          phone: validated.phone || 'Not provided'
+        }
+      }).catch(err => console.error('[MAIL APPLICANT ALERT ERROR]:', err.message));
 
       res.status(201).json({
         success: true,

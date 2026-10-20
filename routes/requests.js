@@ -5,10 +5,12 @@ const jwt = require('jsonwebtoken');
 const { z } = require('zod');
 const pool = require('../db');
 const { publicFormLimiter } = require('../middleware/rateLimiter');
-const { sendStaffingRequestAlert } = require('../utils/mailer');
+const { enqueueMail } = require('../utils/mailOutbox');
 const adminEvents = require('../utils/events');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'divine_fingers_default_secure_jwt_secret_key_2026_production_fallback';
+const JWT_ADMIN_SECRET = process.env.JWT_ADMIN_SECRET || process.env.JWT_SECRET || 'divine_fingers_default_admin_jwt_secret_key_2026';
+const JWT_USER_SECRET = process.env.JWT_USER_SECRET || process.env.JWT_SECRET || 'divine_fingers_default_user_jwt_secret_key_2026';
+const JWT_SECRET = JWT_USER_SECRET;
 
 const requestSchema = z.object({
   facility_name: z.string().min(2).max(150),
@@ -75,10 +77,27 @@ router.post('/', publicFormLimiter, async (req, res, next) => {
       created_at: new Date().toISOString()
     });
 
-    // Send async email notification
-    sendStaffingRequestAlert({ ...validated, request_code: requestCode }).catch(err =>
-      console.error('[MAIL ALERT ERROR]:', err.message)
-    );
+    // Enqueue transactional outbox alert to agency dispatch desk
+    enqueueMail({
+      type: 'staffing_request_alert',
+      to: process.env.AGENCY_ALERT_EMAIL || 'info@divinefingershealthcare.ca',
+      vars: { ...validated, request_code: requestCode }
+    }).catch(err => console.error('[MAIL ALERT ERROR]:', err.message));
+
+    // Enqueue order confirmation to facility contact
+    if (validated.contact_email) {
+      enqueueMail({
+        type: 'client_request_ack',
+        to: validated.contact_email,
+        vars: {
+          facility_name: validated.facility_name,
+          contact_name: validated.contact_name,
+          role_requested: validated.role_requested,
+          shift_type: validated.shift_type,
+          request_code: requestCode
+        }
+      }).catch(err => console.error('[CLIENT ACK MAIL ERROR]:', err.message));
+    }
 
     res.status(201).json({
       success: true,
@@ -176,11 +195,15 @@ router.post('/bulk', publicFormLimiter, async (req, res, next) => {
       }
     }
 
-    sendStaffingRequestAlert({
-      ...validated,
-      role_requested: 'Multiple (Bulk Order)',
-      shift_type: `${createdShifts.length} Shifts (${batchCode})`,
-      request_code: batchCode
+    enqueueMail({
+      type: 'staffing_request_alert',
+      to: process.env.AGENCY_ALERT_EMAIL || 'info@divinefingershealthcare.ca',
+      vars: {
+        ...validated,
+        role_requested: 'Multiple (Bulk Order)',
+        shift_type: `${createdShifts.length} Shifts (${batchCode})`,
+        request_code: batchCode
+      }
     }).catch(err => console.error('[MAIL ALERT ERROR]:', err.message));
 
     res.status(201).json({
@@ -215,7 +238,7 @@ function getSessionContext(req) {
   const adminToken = req.cookies['df_admin_session'] || req.cookies['df_session'];
   if (adminToken) {
     try {
-      const decodedAdmin = jwt.verify(adminToken, JWT_SECRET);
+      const decodedAdmin = jwt.verify(adminToken, JWT_ADMIN_SECRET);
       if (decodedAdmin && (decodedAdmin.role === 'super-admin' || decodedAdmin.role === 'dispatch' || decodedAdmin.role === 'care-coordinator')) {
         isAdmin = true;
       }
@@ -226,7 +249,7 @@ function getSessionContext(req) {
   const userToken = req.cookies['df_user_session'];
   if (userToken) {
     try {
-      const decodedUser = jwt.verify(userToken, JWT_SECRET);
+      const decodedUser = jwt.verify(userToken, JWT_USER_SECRET);
       if (decodedUser && decodedUser.email) {
         clientEmail = decodedUser.email.toLowerCase().trim();
         clientOrg = decodedUser.organization_name ? decodedUser.organization_name.trim() : null;
@@ -389,10 +412,14 @@ router.post('/recurring', publicFormLimiter, async (req, res, next) => {
       created_at: new Date().toISOString()
     });
 
-    sendStaffingRequestAlert({
-      ...validated,
-      shift_type: `[Standing Order - ${validated.recurrence_pattern}] ${validated.recurrence_days} (${validated.shift_type})`,
-      request_code: requestCode
+    enqueueMail({
+      type: 'staffing_request_alert',
+      to: process.env.AGENCY_ALERT_EMAIL || 'info@divinefingershealthcare.ca',
+      vars: {
+        ...validated,
+        shift_type: `[Standing Order - ${validated.recurrence_pattern}] ${validated.recurrence_days} (${validated.shift_type})`,
+        request_code: requestCode
+      }
     }).catch(err => console.error('[MAIL RECURRING ERROR]:', err.message));
 
     res.status(201).json({
@@ -490,11 +517,15 @@ router.post('/surge', publicFormLimiter, async (req, res, next) => {
       created_at: new Date().toISOString()
     });
 
-    sendStaffingRequestAlert({
-      ...validated,
-      urgency_level: 'emergency_surge',
-      special_instructions: `🚨 EMERGENCY 2-HOUR SURGE: ${validated.special_instructions || 'Urgent coverage needed'}`,
-      request_code: requestCode
+    enqueueMail({
+      type: 'staffing_request_alert',
+      to: process.env.AGENCY_ALERT_EMAIL || 'info@divinefingershealthcare.ca',
+      vars: {
+        ...validated,
+        urgency_level: 'emergency_surge',
+        special_instructions: `🚨 EMERGENCY 2-HOUR SURGE: ${validated.special_instructions || 'Urgent coverage needed'}`,
+        request_code: requestCode
+      }
     }).catch(err => console.error('[SURGE MAIL ERROR]:', err.message));
 
     res.status(201).json({

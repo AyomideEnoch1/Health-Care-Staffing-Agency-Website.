@@ -36,18 +36,42 @@ const adminRoute        = require('./routes/admin');
 const shiftsRoute       = require('./routes/shifts');
 const newsletterRoute   = require('./routes/newsletter');
 const usersAuthRoute    = require('./routes/usersAuth');
+const emailWebhooksRoute = require('./routes/emailWebhooks');
+const documentsRoute    = require('./routes/documents');
 const { startShiftLifecycleDaemon } = require('./utils/shiftLifecycle');
 const errorHandler      = require('./middleware/errorHandler');
 
+const isProd = process.env.NODE_ENV === 'production';
+const JWT_ADMIN_SECRET = process.env.JWT_ADMIN_SECRET || process.env.JWT_SECRET || 'divine_fingers_default_admin_jwt_secret_key_2026';
+const JWT_USER_SECRET  = process.env.JWT_USER_SECRET  || process.env.JWT_SECRET || 'divine_fingers_default_user_jwt_secret_key_2026';
+
+// ── Startup Cryptographic Guard ───────────────────────────────────────────────
+if (isProd) {
+  if (!process.env.JWT_ADMIN_SECRET || process.env.JWT_ADMIN_SECRET.length < 32) {
+    throw new Error('[FATAL STARTUP GUARD] JWT_ADMIN_SECRET must be set and at least 32 characters in production.');
+  }
+  if (!process.env.JWT_USER_SECRET || process.env.JWT_USER_SECRET.length < 32) {
+    throw new Error('[FATAL STARTUP GUARD] JWT_USER_SECRET must be set and at least 32 characters in production.');
+  }
+  if (process.env.JWT_ADMIN_SECRET === process.env.JWT_USER_SECRET) {
+    throw new Error('[FATAL STARTUP GUARD] JWT_ADMIN_SECRET and JWT_USER_SECRET must be different distinct keys.');
+  }
+}
+
 const app  = express();
 const PORT = process.env.PORT || 3000;
+
+// ── Reverse Proxy & IP Fingerprinting ─────────────────────────────────────────
+// Behind Nginx and Cloudflare, trust 1 hop so req.ip reflects the real visitor IP
+app.set('trust proxy', Number(process.env.TRUST_PROXY_HOPS || 1));
+app.disable('x-powered-by');
 
 // ── Security Headers (Helmet + Strict Telemetry & Privacy Safeguards) ──────────
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net", "https://unpkg.com"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net", "https://unpkg.com", "https://cdnjs.cloudflare.com"],
       scriptSrcAttr: ["'unsafe-inline'"],
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
       fontSrc: ["'self'", "https://fonts.gstatic.com"],
@@ -79,23 +103,32 @@ app.use((req, res, next) => {
   next();
 });
 
-// ── CORS ──────────────────────────────────────────────────────────────────────
-// Allowed origins are configured via ALLOWED_ORIGINS env var (comma-separated).
-// In development (NODE_ENV !== 'production'), localhost is always permitted.
+// ── CORS (Strict Whitelist — No null origin, no wildcard hosting domains) ────
 const allowedOrigins = (process.env.ALLOWED_ORIGINS || '')
   .split(',').map(o => o.trim()).filter(Boolean);
 
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin || origin === 'null') return callback(null, true); // Same-origin, file:// or non-browser requests
+    // Non-browser / same-origin requests (curl, server-to-server)
+    if (!origin) return callback(null, true);
+
+    // Explicitly reject null origin (sandboxed iframe / data URI attack vector)
+    if (origin === 'null') {
+      return callback(new Error('CORS: origin "null" is explicitly prohibited.'));
+    }
+
     const isLocal = origin.includes('localhost') || origin.includes('127.0.0.1');
-    const isDev   = process.env.NODE_ENV !== 'production';
-    if ((isDev && isLocal) || allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
+    if (!isProd && isLocal) {
       return callback(null, true);
     }
-    return callback(new Error(`CORS: origin ${origin} not allowed.`));
+
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    return callback(new Error(`CORS: origin ${origin} is not authorized.`));
   },
-  credentials: true, // Required for cookies to be sent cross-origin
+  credentials: true,
   methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: [
     'Content-Type',
@@ -153,7 +186,6 @@ app.use((req, res, next) => {
 
 // ── Server-Side Gate for Admin Dashboard (Zero Unauthenticated Markup) ────────
 const jwt = require('jsonwebtoken');
-const JWT_SECRET = process.env.JWT_SECRET || 'divine_fingers_default_secure_jwt_secret_key_2026_production_fallback';
 
 app.get(['/admin', '/admin.html'], (req, res) => {
   const sessionCookie = req.cookies['df_admin_session'];
@@ -163,7 +195,7 @@ app.get(['/admin', '/admin.html'], (req, res) => {
   }
 
   try {
-    const decoded = jwt.verify(sessionCookie, JWT_SECRET);
+    const decoded = jwt.verify(sessionCookie, JWT_ADMIN_SECRET);
     if (!decoded || !decoded.id) {
       res.clearCookie('df_admin_session');
       return res.sendFile(path.join(__dirname, 'admin-login.html'));
@@ -176,9 +208,39 @@ app.get(['/admin', '/admin.html'], (req, res) => {
   }
 });
 
-// Block any direct public access to private directory
-app.use('/private', (req, res) => {
-  res.status(403).json({ error: 'Access Denied: Private Server Directory' });
+// Block any direct public access to private and internal directories
+app.use(['/private', '/uploads'], (req, res) => {
+  res.status(404).json({ error: 'Not Found' });
+});
+
+// Strict path guard: Block public access to backend code, configs, databases, and sensitive assets
+app.use((req, res, next) => {
+  const p = req.path.toLowerCase();
+  if (
+    p.startsWith('/deploy') ||
+    p.startsWith('/sql') ||
+    p.startsWith('/tests') ||
+    p.startsWith('/scripts') ||
+    p.startsWith('/workers') ||
+    p.startsWith('/utils') ||
+    p.startsWith('/middleware') ||
+    p.startsWith('/routes') ||
+    p.startsWith('/.env') ||
+    p.startsWith('/.git') ||
+    p.startsWith('/node_modules') ||
+    p.startsWith('/scratch') ||
+    p.endsWith('.sql') ||
+    p.endsWith('.py') ||
+    p.endsWith('.json') ||
+    p.endsWith('.md') ||
+    p.endsWith('.yml') ||
+    p.endsWith('.yaml') ||
+    p.endsWith('.sh') ||
+    (p.endsWith('.js') && p !== '/script.js' && p !== '/admin.js')
+  ) {
+    return res.status(404).json({ error: 'Not Found' });
+  }
+  next();
 });
 
 // Redirect legacy/alternate careers URLs to candidate quick application section
@@ -186,14 +248,24 @@ app.get(['/careers', '/careers.html'], (req, res) => {
   res.redirect(302, '/jobseekers.html#apply-now');
 });
 
-// ── Static Assets (serves HTML, CSS, JS, images) ─────────────────────────────
-app.use(express.static(path.join(__dirname, './')));
+// ── Static Assets (serves HTML, CSS, client JS, images only) ──────────────────
+app.use(express.static(path.join(__dirname, './'), {
+  dotfiles: 'ignore',
+  setHeaders: (res, filePath) => {
+    if (filePath.endsWith('.css') || filePath.endsWith('.js') || filePath.endsWith('.html')) {
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+    }
+  }
+}));
 
 // ── API Routes ────────────────────────────────────────────────────────────────
 app.use('/api/requests',     requestsRoute);
 app.use('/api/applications', applicationsRoute);
 app.use('/api/contact',      contactRoute);
 app.use('/api/auth',         authRoute);
+app.use('/api/documents',    documentsRoute);
 // CSRF verification only on admin state-changing routes
 app.use('/api/admin', (req, res, next) => {
   // Apply CSRF check to PATCH, DELETE, and POST (not GET/OPTIONS/SSE stream/clean-dummy-data)
@@ -206,6 +278,7 @@ app.use('/api/admin', adminRoute);
 app.use('/api/shifts', shiftsRoute);
 app.use('/api/newsletter', newsletterRoute);
 app.use('/api/users', usersAuthRoute);
+app.use('/api/webhooks/email', emailWebhooksRoute);
 
 // ── Health Check ──────────────────────────────────────────────────────────────
 // Checks both API liveness AND active DB connection.
@@ -257,8 +330,14 @@ if (require.main === module) {
       console.warn(`⚠️  [SMTP Warning] Could not connect to mail server: ${err.message}`);
     }
 
-    // Start automated shift progression lifecycle engine
-    startShiftLifecycleDaemon(60000);
+    // Shift daemon execution:
+    // In production, shiftLifecycle is run as a dedicated systemd service (app-shift-lifecycle.service).
+    // In local development or when RUN_EMBEDDED_DAEMON=true, run embedded daemon.
+    if (process.env.RUN_EMBEDDED_DAEMON === 'true' || !isProd) {
+      startShiftLifecycleDaemon(60000);
+    } else {
+      console.log('⏱️ [Shift Lifecycle] Running in standalone service mode (managed by systemd).');
+    }
   });
 }
 

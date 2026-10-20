@@ -26,6 +26,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
     });
+
+    // Close mobile nav when clicking any nav link
+    navList.querySelectorAll('.nav-link').forEach(link => {
+      link.addEventListener('click', () => {
+        navList.classList.remove('open');
+        mobileToggle.classList.remove('active');
+      });
+    });
   }
 
   // 2. Interactive Staffing & Community Care Roles Pagination & Automatic Carousel (< 01 / 05 >)
@@ -137,19 +145,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const heroSlidesData = [
     {
-      text: "Where Innovation Meets<br>Compassionate Care.",
+      text: "Where Innovation Meets <br>Compassionate Care.",
       img: "assets/images/hero_divine.jpg"
     },
     {
-      text: "Travelling Nursing Program<br>On-Demand Clinical Care Across Canada.",
+      text: "Travelling Nursing &amp; On-Demand <br>Clinical Care Across Canada.",
       img: "assets/images/service_nurse.jpg"
     },
     {
-      text: "Personal Care Support<br>&amp; Assistive Daily Living.",
+      text: "Personal Care Support <br>&amp; Assistive Daily Living.",
       img: "assets/images/service_homecare.jpg"
     },
     {
-      text: "Partnership &amp; Quality<br>in Every Care Interaction.",
+      text: "Dedicated Clinical Staffing <br>&amp; Facility Partnerships.",
       img: "assets/images/team_divine.jpg"
     }
   ];
@@ -689,13 +697,20 @@ document.addEventListener('DOMContentLoaded', () => {
       { y: 0, opacity: 1, duration: 1.1, ease: 'power2.out', delay: 0.1 }
     );
 
-    gsap.fromTo('.hero-diagonal-shape', 
-      { scaleX: 0 }, 
-      { scaleX: 1, duration: 1.2, transformOrigin: 'left center', ease: 'power3.inOut' }
-    );
+    if (window.innerWidth > 768) {
+      gsap.fromTo('.hero-diagonal-shape', 
+        { scaleX: 0 }, 
+        { scaleX: 1, duration: 1.2, transformOrigin: 'left center', ease: 'power3.inOut' }
+      );
+    } else {
+      gsap.fromTo('.hero-diagonal-shape', 
+        { opacity: 0 }, 
+        { opacity: 1, duration: 1.2, ease: 'power2.out' }
+      );
+    }
 
     // C. Slide In Section Headers (excludes nested children to avoid double-animation)
-    const sectionHeaders = document.querySelectorAll('.welcome-header, .products-title-wrapper, .gallery-title, .form-title, .section-title, .page-title, .contact-card-title');
+    const sectionHeaders = document.querySelectorAll('.welcome-header, .products-title-wrapper, .gallery-title, .form-title, .section-title, .page-title');
     sectionHeaders.forEach(header => {
       gsap.fromTo(header, 
         { x: -35, opacity: 0 }, 
@@ -708,8 +723,7 @@ document.addEventListener('DOMContentLoaded', () => {
           scrollTrigger: {
             trigger: header,
             start: 'top 90%',
-            toggleActions: 'play none none none',
-            once: true
+            toggleActions: 'play none none reverse'
           }
         }
       );
@@ -732,8 +746,7 @@ document.addEventListener('DOMContentLoaded', () => {
               scrollTrigger: {
                 trigger: card,
                 start: 'top 88%',
-                toggleActions: 'play none none none',
-                once: true
+                toggleActions: 'play none none reverse'
               }
             }
           );
@@ -758,8 +771,7 @@ document.addEventListener('DOMContentLoaded', () => {
               scrollTrigger: {
                 trigger: card,
                 start: 'top 88%',
-                toggleActions: 'play none none none',
-                once: true
+                toggleActions: 'play none none reverse'
               }
             }
           );
@@ -767,8 +779,8 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     };
 
-    animateAlternatingCards('.step-card, .sector-card, .product-card, .why-item, .team-card, .pillar-card, .service-card, .advantage-card, .perk-card, .proto-content-card, .proto-team-narrative-card', 45);
-    animateBottomCards('.proto-pillar-card, .proto-value-card-2x2', 45);
+    animateAlternatingCards('.step-card, .sector-card, .product-card, .why-item, .team-card, .pillar-card, .service-card, .advantage-card, .perk-card, .proto-team-narrative-card', 40);
+    animateBottomCards('.proto-value-card-2x2', 45);
   }
 
   // 5. Scroll-Triggered Slide-In Animations (Left, Right, Top & Bottom)
@@ -792,8 +804,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const w = window.innerWidth;
     if (w <= 480) return 20;
     if (w <= 767) return 30;
-    if (w <= 991) return 45;
-    return 60;
+    if (w <= 991) return 40;
+    return 55;
   };
 
   const setupSlideAnimation = (elements, direction) => {
@@ -814,6 +826,20 @@ document.addEventListener('DOMContentLoaded', () => {
           fromState.y = offset;
         }
 
+        // Calculate natural staggered time delay between sibling cards in the same row/grid
+        const parentRow = el.closest('.contact-grid-row, .proto-grid-2col, .proto-grid-3col, .proto-split-grid, .service-card-grid');
+        let cardDelay = 0;
+        if (parentRow) {
+          const siblings = Array.from(parentRow.querySelectorAll('.slide-from-left, .slide-from-right, .slide-from-top, .slide-from-bottom, .proto-content-card'));
+          const siblingIndex = siblings.indexOf(el);
+          if (siblingIndex > 0) {
+            cardDelay = siblingIndex * 0.18;
+          }
+        } else if (direction === 'right') {
+          cardDelay = 0.18;
+        }
+
+        // Luxurious, smooth, relaxed entrance animation with reverse-scroll capability
         gsap.fromTo(
           el,
           fromState,
@@ -821,26 +847,59 @@ document.addEventListener('DOMContentLoaded', () => {
             x: 0,
             y: 0,
             opacity: 1,
-            duration: 0.95,
+            duration: 1.25,
+            delay: cardDelay,
             ease: 'power3.out',
-            clearProps: 'transform,opacity',
+            force3D: true,
             scrollTrigger: {
               trigger: el,
-              start: 'top 88%',
-              toggleActions: 'play none none none',
-              once: true
+              start: 'top 90%',
+              toggleActions: 'play none none reverse'
             }
           }
         );
+
+        // Alternating Left-and-Right Ripple Scroll Animation for Card Tablets (Silky Smooth)
+        const innerTablets = el.querySelectorAll('.detail-item, .contact-detail-list > div, .proto-gradient-callout, div[style*="border-left"]');
+        if (innerTablets.length > 0) {
+          innerTablets.forEach((tablet, tIdx) => {
+            // Gentle alternating entrance: even from Left (-22px), odd from Right (+22px)
+            const tabletStartX = tIdx % 2 === 0 ? -22 : 22;
+            const tabletDelay = cardDelay + 0.18 + (tIdx * 0.11);
+
+            gsap.fromTo(
+              tablet,
+              {
+                x: tabletStartX,
+                opacity: 0
+              },
+              {
+                x: 0,
+                opacity: 1,
+                duration: 1.15,
+                delay: tabletDelay,
+                ease: 'power3.out',
+                force3D: true,
+                scrollTrigger: {
+                  trigger: el,
+                  start: 'top 88%',
+                  toggleActions: 'play none none reverse'
+                }
+              }
+            );
+          });
+        }
       } else {
-        // IntersectionObserver CSS-transition fallback
+        // IntersectionObserver CSS-transition fallback with reverse-scroll support
         const observer = new IntersectionObserver(
           (entries) => {
             entries.forEach((entry) => {
               if (entry.isIntersecting) {
                 el.classList.remove('slide-hidden');
                 el.classList.add('active-slide');
-                observer.unobserve(el);
+              } else if (entry.boundingClientRect.top > (window.innerHeight || document.documentElement.clientHeight) || (window.scrollY || window.pageYOffset) < 80) {
+                el.classList.remove('active-slide');
+                el.classList.add('slide-hidden');
               }
             });
           },
@@ -855,6 +914,497 @@ document.addEventListener('DOMContentLoaded', () => {
   setupSlideAnimation(slideRightEls, 'right');
   setupSlideAnimation(slideTopEls, 'top');
   setupSlideAnimation(slideBottomEls, 'bottom');
+
+  // 5-0. Navbar & Hero Section Entrance Animations (On Load / Refresh, Large Screens >= 992px)
+  const siteHeaderEl = document.getElementById('site-header');
+  const heroSliderEl = document.getElementById('hero-slider');
+
+  const triggerHeaderAndHero = () => {
+    if (window.innerWidth < 992) {
+      if (siteHeaderEl) siteHeaderEl.classList.add('is-revealed');
+      if (heroSliderEl) heroSliderEl.classList.add('is-revealed');
+      return;
+    }
+
+    setTimeout(() => {
+      if (siteHeaderEl) siteHeaderEl.classList.add('is-revealed');
+      if (heroSliderEl) heroSliderEl.classList.add('is-revealed');
+    }, 100);
+  };
+
+  if (document.readyState === 'complete') {
+    triggerHeaderAndHero();
+  } else {
+    window.addEventListener('load', triggerHeaderAndHero);
+  }
+  document.addEventListener('DOMContentLoaded', triggerHeaderAndHero);
+
+  // 5-0b. Hero Reverse Scroll Handler: Re-animates smoothly upon scrolling back to top
+  if (heroSliderEl) {
+    const checkHeroScroll = () => {
+      if (window.innerWidth < 992) {
+        heroSliderEl.classList.add('is-revealed');
+        return;
+      }
+      const scrollY = window.scrollY || window.pageYOffset;
+      const rect = heroSliderEl.getBoundingClientRect();
+      const vh = window.innerHeight || document.documentElement.clientHeight;
+
+      // When back near the top or hero fold re-enters: re-trigger smooth entrance
+      if (scrollY <= 140 || rect.bottom >= vh * 0.40) {
+        heroSliderEl.classList.add('is-revealed');
+      } else if (rect.bottom < -40 || scrollY > 450) {
+        // Reset when user has scrolled down into subsequent sections so it replays upon reverse scroll back up
+        heroSliderEl.classList.remove('is-revealed');
+      }
+    };
+
+    window.addEventListener('scroll', checkHeroScroll, { passive: true });
+    window.addEventListener('resize', checkHeroScroll, { passive: true });
+  }
+
+  // 5a. Newsletter & Social Strip On-Refresh / In-View Directional Animations (Large Screens >= 992px)
+  const stripSection = document.getElementById('newsletter-strip') || document.querySelector('.strip-section');
+  if (stripSection) {
+    const triggerStripReveal = () => {
+      if (window.innerWidth < 992) {
+        stripSection.classList.add('is-revealed');
+        return;
+      }
+      const rect = stripSection.getBoundingClientRect();
+      const vh = window.innerHeight || document.documentElement.clientHeight;
+
+      // Reveal if in initial viewport, near top fold, or on refresh
+      if (rect.top <= vh * 0.96 && rect.bottom >= 0) {
+        stripSection.classList.add('is-revealed');
+      }
+    };
+
+    // On refresh / load: trigger after a short tick to guarantee transition paint
+    const onRefreshTrigger = () => {
+      setTimeout(() => {
+        if (window.innerWidth >= 992) {
+          const rect = stripSection.getBoundingClientRect();
+          const vh = window.innerHeight || document.documentElement.clientHeight;
+          // If at top or strip is visible/peeking on load
+          if (rect.top <= vh * 1.15 && rect.bottom >= 0) {
+            stripSection.classList.add('is-revealed');
+          }
+        } else {
+          stripSection.classList.add('is-revealed');
+        }
+      }, 200);
+    };
+
+    if (document.readyState === 'complete') {
+      onRefreshTrigger();
+    } else {
+      window.addEventListener('load', onRefreshTrigger);
+    }
+
+    window.addEventListener('scroll', triggerStripReveal, { passive: true });
+    window.addEventListener('resize', triggerStripReveal, { passive: true });
+    setTimeout(triggerStripReveal, 250);
+  }
+
+  // 5b. Welcome Section Staggered Directional Scroll Animations (Large Screens >= 992px)
+  const welcomeSection = document.getElementById('welcome-summary') || document.querySelector('.welcome-section');
+  if (welcomeSection) {
+    const checkWelcomeScroll = () => {
+      if (window.innerWidth < 992) {
+        welcomeSection.classList.add('is-revealed');
+        return;
+      }
+      const rect = welcomeSection.getBoundingClientRect();
+      const vh = window.innerHeight || document.documentElement.clientHeight;
+      const scrollY = window.scrollY || window.pageYOffset;
+
+      // When the top of the welcome section scrolls into view (at 75% viewport height)
+      if (rect.top <= vh * 0.78 && rect.bottom >= 0) {
+        welcomeSection.classList.add('is-revealed');
+      } else if (rect.top > vh * 1.05 || rect.bottom < -120 || scrollY < 80) {
+        // Reset when user scrolls back to the hero section or far off screen so it replays upon reverse scroll
+        welcomeSection.classList.remove('is-revealed');
+      }
+    };
+
+    window.addEventListener('scroll', checkWelcomeScroll, { passive: true });
+    window.addEventListener('resize', checkWelcomeScroll, { passive: true });
+    // Initial evaluation
+    setTimeout(checkWelcomeScroll, 150);
+  }
+
+  // 5c. Workforce Section Staggered Directional Scroll Animations (Large Screens >= 992px)
+  const workforceSection = document.getElementById('workforce-section') || document.querySelector('.proto-workforce-section');
+  const wmWorkforce = document.querySelector('.watermark-workforce');
+  const wmSolutions = document.querySelector('.watermark-solutions');
+  const wmExcellence = document.querySelector('.watermark-excellence');
+  const wmDispatch = document.querySelector('.watermark-dispatch');
+
+  if (workforceSection) {
+    const checkWorkforceScroll = () => {
+      if (window.innerWidth < 992) {
+        workforceSection.classList.add('is-revealed');
+        if (wmWorkforce) wmWorkforce.classList.add('is-revealed');
+        return;
+      }
+      const rect = workforceSection.getBoundingClientRect();
+      const vh = window.innerHeight || document.documentElement.clientHeight;
+      const scrollY = window.scrollY || window.pageYOffset;
+
+      // Reveal when the top of the workforce section scrolls up to 78% of viewport
+      if (rect.top <= vh * 0.78 && rect.bottom >= 0) {
+        workforceSection.classList.add('is-revealed');
+        if (wmWorkforce) wmWorkforce.classList.add('is-revealed');
+      } else if (rect.top > vh * 1.05 || rect.bottom < -120 || scrollY < 80) {
+        // Reset when user scrolls far above or below, or returns to the hero section
+        workforceSection.classList.remove('is-revealed');
+        if (wmWorkforce) wmWorkforce.classList.remove('is-revealed');
+      }
+    };
+
+    window.addEventListener('scroll', checkWorkforceScroll, { passive: true });
+    window.addEventListener('resize', checkWorkforceScroll, { passive: true });
+    setTimeout(checkWorkforceScroll, 200);
+  }
+
+  // 5c-2. Executive Overview Section Staggered Directional Scroll Animations (About Us Page)
+  const executiveSection = document.getElementById('executive-overview');
+  if (executiveSection && executiveSection !== workforceSection) {
+    const checkExecutiveScroll = () => {
+      if (window.innerWidth < 992) {
+        executiveSection.classList.add('is-revealed');
+        return;
+      }
+      const rect = executiveSection.getBoundingClientRect();
+      const vh = window.innerHeight || document.documentElement.clientHeight;
+      const scrollY = window.scrollY || window.pageYOffset;
+
+      if (rect.top <= vh * 0.78 && rect.bottom >= 0) {
+        executiveSection.classList.add('is-revealed');
+      } else if (rect.top > vh * 1.05 || rect.bottom < -120 || scrollY < 80) {
+        executiveSection.classList.remove('is-revealed');
+      }
+    };
+
+    window.addEventListener('scroll', checkExecutiveScroll, { passive: true });
+    window.addEventListener('resize', checkExecutiveScroll, { passive: true });
+    setTimeout(checkExecutiveScroll, 200);
+  }
+
+  // 5c-3. Purpose-Driven Health Care Section Staggered Directional Scroll Animations (About Us Page)
+  const purposeSection = document.getElementById('purpose-section');
+  if (purposeSection && purposeSection !== workforceSection) {
+    const checkPurposeScroll = () => {
+      if (window.innerWidth < 992) {
+        purposeSection.classList.add('is-revealed');
+        return;
+      }
+      const rect = purposeSection.getBoundingClientRect();
+      const vh = window.innerHeight || document.documentElement.clientHeight;
+      const scrollY = window.scrollY || window.pageYOffset;
+
+      if (rect.top <= vh * 0.78 && rect.bottom >= 0) {
+        purposeSection.classList.add('is-revealed');
+      } else if (rect.top > vh * 1.05 || rect.bottom < -120 || scrollY < 80) {
+        purposeSection.classList.remove('is-revealed');
+      }
+    };
+
+    window.addEventListener('scroll', checkPurposeScroll, { passive: true });
+    window.addEventListener('resize', checkPurposeScroll, { passive: true });
+    setTimeout(checkPurposeScroll, 200);
+  }
+
+  // 5d. Core Values Section Staggered Directional Scroll Animations (Large Screens >= 992px)
+  const coreValuesSection = document.getElementById('core-values-section') || document.querySelector('.proto-tricard-section');
+  if (coreValuesSection) {
+    const checkCoreValuesScroll = () => {
+      if (window.innerWidth < 992) {
+        coreValuesSection.classList.add('is-revealed');
+        return;
+      }
+      const rect = coreValuesSection.getBoundingClientRect();
+      const vh = window.innerHeight || document.documentElement.clientHeight;
+      const scrollY = window.scrollY || window.pageYOffset;
+
+      // Reveal when the top of the section enters 78% of the viewport height
+      if (rect.top <= vh * 0.78 && rect.bottom >= 0) {
+        coreValuesSection.classList.add('is-revealed');
+      } else if (rect.top > vh * 1.05 || rect.bottom < -120 || scrollY < 80) {
+        // Reset when user scrolls back above this section so it can replay smoothly
+        coreValuesSection.classList.remove('is-revealed');
+      }
+    };
+
+    window.addEventListener('scroll', checkCoreValuesScroll, { passive: true });
+    window.addEventListener('resize', checkCoreValuesScroll, { passive: true });
+    setTimeout(checkCoreValuesScroll, 200);
+  }
+
+  // 5e. Compassionate Health Care Solutions Directional Scroll Animations (Large Screens >= 992px)
+  const solutionsStoryRow = document.getElementById('compassionate-solutions-row') || document.querySelector('.solutions-story-row');
+  if (solutionsStoryRow) {
+    const checkSolutionsScroll = () => {
+      if (window.innerWidth < 992) {
+        solutionsStoryRow.classList.add('is-revealed');
+        if (wmSolutions) wmSolutions.classList.add('is-revealed');
+        return;
+      }
+      const rect = solutionsStoryRow.getBoundingClientRect();
+      const vh = window.innerHeight || document.documentElement.clientHeight;
+      const scrollY = window.scrollY || window.pageYOffset;
+
+      // Reveal when the top of the solutions row enters 78% of the viewport height
+      if (rect.top <= vh * 0.78 && rect.bottom >= 0) {
+        solutionsStoryRow.classList.add('is-revealed');
+        if (wmSolutions) wmSolutions.classList.add('is-revealed');
+      } else if (rect.top > vh * 1.05 || rect.bottom < -120 || scrollY < 80) {
+        // Reset when user scrolls back above this section so it can replay smoothly
+        solutionsStoryRow.classList.remove('is-revealed');
+        if (wmSolutions) wmSolutions.classList.remove('is-revealed');
+      }
+    };
+
+    window.addEventListener('scroll', checkSolutionsScroll, { passive: true });
+    window.addEventListener('resize', checkSolutionsScroll, { passive: true });
+    setTimeout(checkSolutionsScroll, 200);
+  }
+
+  // 5f. Clinical Excellence Edge Directional Scroll Animations (Large Screens >= 992px)
+  const excellenceSection = document.getElementById('excellence-section') || document.querySelector('.excellence-block');
+  if (excellenceSection) {
+    const checkExcellenceScroll = () => {
+      if (window.innerWidth < 992) {
+        excellenceSection.classList.add('is-revealed');
+        if (wmExcellence) wmExcellence.classList.add('is-revealed');
+        return;
+      }
+      const rect = excellenceSection.getBoundingClientRect();
+      const vh = window.innerHeight || document.documentElement.clientHeight;
+      const scrollY = window.scrollY || window.pageYOffset;
+
+      if (rect.top <= vh * 0.78 && rect.bottom >= 0) {
+        excellenceSection.classList.add('is-revealed');
+        if (wmExcellence) wmExcellence.classList.add('is-revealed');
+      } else if (rect.top > vh * 1.05 || rect.bottom < -120 || scrollY < 80) {
+        excellenceSection.classList.remove('is-revealed');
+        if (wmExcellence) wmExcellence.classList.remove('is-revealed');
+      }
+    };
+
+    window.addEventListener('scroll', checkExcellenceScroll, { passive: true });
+    window.addEventListener('resize', checkExcellenceScroll, { passive: true });
+    setTimeout(checkExcellenceScroll, 200);
+  }
+
+  // 5g. Workforce Dispatch Showcase Box Scroll Animations (Large Screens >= 992px)
+  const showcaseSection = document.getElementById('showcase-box-section') || document.querySelector('.showcase-block');
+  if (showcaseSection) {
+    const checkShowcaseScroll = () => {
+      if (window.innerWidth < 992) {
+        showcaseSection.classList.add('is-revealed');
+        if (wmDispatch) wmDispatch.classList.add('is-revealed');
+        return;
+      }
+      const rect = showcaseSection.getBoundingClientRect();
+      const vh = window.innerHeight || document.documentElement.clientHeight;
+      const scrollY = window.scrollY || window.pageYOffset;
+
+      if (rect.top <= vh * 0.78 && rect.bottom >= 0) {
+        showcaseSection.classList.add('is-revealed');
+        if (wmDispatch) wmDispatch.classList.add('is-revealed');
+      } else if (rect.top > vh * 1.05 || rect.bottom < -120 || scrollY < 80) {
+        showcaseSection.classList.remove('is-revealed');
+        if (wmDispatch) wmDispatch.classList.remove('is-revealed');
+      }
+    };
+
+    window.addEventListener('scroll', checkShowcaseScroll, { passive: true });
+    window.addEventListener('resize', checkShowcaseScroll, { passive: true });
+    setTimeout(checkShowcaseScroll, 200);
+  }
+
+  // 5h. Our Dedicated Clinical Team Scroll Animations (Large Screens >= 992px)
+  const teamSection = document.getElementById('team-section') || document.querySelector('.proto-mission-section');
+  if (teamSection) {
+    const checkTeamScroll = () => {
+      if (window.innerWidth < 992) {
+        teamSection.classList.add('is-revealed');
+        return;
+      }
+      const rect = teamSection.getBoundingClientRect();
+      const vh = window.innerHeight || document.documentElement.clientHeight;
+      const scrollY = window.scrollY || window.pageYOffset;
+
+      if (rect.top <= vh * 0.78 && rect.bottom >= 0) {
+        teamSection.classList.add('is-revealed');
+      } else if (rect.top > vh * 1.05 || rect.bottom < -120 || scrollY < 80) {
+        teamSection.classList.remove('is-revealed');
+      }
+    };
+
+    window.addEventListener('scroll', checkTeamScroll, { passive: true });
+    window.addEventListener('resize', checkTeamScroll, { passive: true });
+    setTimeout(checkTeamScroll, 200);
+  }
+
+  // 5h-2. Our Team Section Scroll Animations (About Us Page)
+  const aboutTeamSection = document.getElementById('about-team');
+  if (aboutTeamSection && aboutTeamSection !== teamSection) {
+    const checkAboutTeamScroll = () => {
+      if (window.innerWidth < 992) {
+        aboutTeamSection.classList.add('is-revealed');
+        return;
+      }
+      const rect = aboutTeamSection.getBoundingClientRect();
+      const vh = window.innerHeight || document.documentElement.clientHeight;
+      const scrollY = window.scrollY || window.pageYOffset;
+
+      if (rect.top <= vh * 0.78 && rect.bottom >= 0) {
+        aboutTeamSection.classList.add('is-revealed');
+      } else if (rect.top > vh * 1.05 || rect.bottom < -120 || scrollY < 80) {
+        aboutTeamSection.classList.remove('is-revealed');
+      }
+    };
+
+    window.addEventListener('scroll', checkAboutTeamScroll, { passive: true });
+    window.addEventListener('resize', checkAboutTeamScroll, { passive: true });
+    setTimeout(checkAboutTeamScroll, 200);
+  }
+
+  // 5i. Contact Us Section Scroll Animations (Large Screens >= 992px)
+  const contactSection = document.getElementById('contact') || document.querySelector('.contact-section');
+  if (contactSection) {
+    const isSubpageContact = !document.getElementById('welcome-summary');
+
+    const checkContactScroll = () => {
+      if (window.innerWidth < 992) {
+        contactSection.classList.add('is-revealed');
+        return;
+      }
+      const rect = contactSection.getBoundingClientRect();
+      const vh = window.innerHeight || document.documentElement.clientHeight;
+      const scrollY = window.scrollY || window.pageYOffset;
+
+      if (isSubpageContact) {
+        // Standalone Contact Page: reset when returning to hero fold (scroll back up to top)
+        if (scrollY < 60) {
+          contactSection.classList.remove('is-revealed');
+        } else if (rect.top <= vh * 0.78 && rect.bottom >= -60) {
+          contactSection.classList.add('is-revealed');
+        } else if (rect.top > vh * 1.05 || rect.bottom < -120) {
+          contactSection.classList.remove('is-revealed');
+        }
+      } else {
+        // Homepage Contact Section
+        if (rect.top <= vh * 0.78 && rect.bottom >= -60) {
+          contactSection.classList.add('is-revealed');
+        } else if (rect.top > vh * 1.05 || rect.bottom < -120 || scrollY < 80) {
+          contactSection.classList.remove('is-revealed');
+        }
+      }
+    };
+
+    window.addEventListener('scroll', checkContactScroll, { passive: true });
+    window.addEventListener('resize', checkContactScroll, { passive: true });
+    setTimeout(checkContactScroll, 200);
+  }
+
+  // 5i-2. Ambient Watermarks Scroll Observer for Any Subpage or Custom Section
+  const genericWatermarks = document.querySelectorAll('.section-ambient-watermark:not(.watermark-workforce):not(.watermark-solutions):not(.watermark-excellence):not(.watermark-dispatch)');
+  if (genericWatermarks.length > 0 && typeof IntersectionObserver !== 'undefined') {
+    const genericWatermarkObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-revealed');
+        } else if (entry.boundingClientRect.top > (window.innerHeight || document.documentElement.clientHeight) || (window.scrollY || window.pageYOffset) < 80) {
+          entry.target.classList.remove('is-revealed');
+        }
+      });
+    }, { threshold: 0.1 });
+    genericWatermarks.forEach((wm) => genericWatermarkObserver.observe(wm));
+  }
+
+  // 5j. Quick Contact Callout Banner Scroll Animations (Large Screens >= 992px)
+  const calloutBanner = document.getElementById('callout-banner') || document.querySelector('.callout-banner-section');
+  if (calloutBanner) {
+    const checkCalloutScroll = () => {
+      if (window.innerWidth < 992) {
+        calloutBanner.classList.add('is-revealed');
+        return;
+      }
+      const rect = calloutBanner.getBoundingClientRect();
+      const vh = window.innerHeight || document.documentElement.clientHeight;
+      const scrollY = window.scrollY || window.pageYOffset;
+
+      if (rect.top <= vh * 0.85 && rect.bottom >= 0) {
+        calloutBanner.classList.add('is-revealed');
+      } else if (rect.top > vh * 1.05 || scrollY < 80) {
+        calloutBanner.classList.remove('is-revealed');
+      }
+    };
+
+    window.addEventListener('scroll', checkCalloutScroll, { passive: true });
+    window.addEventListener('resize', checkCalloutScroll, { passive: true });
+    setTimeout(checkCalloutScroll, 200);
+  }
+
+  // 5k. Site Footer Scroll Animations (Large Screens >= 992px)
+  const siteFooter = document.getElementById('site-footer') || document.querySelector('.site-footer');
+  if (siteFooter) {
+    const checkFooterScroll = () => {
+      if (window.innerWidth < 992) {
+        siteFooter.classList.add('is-revealed');
+        return;
+      }
+      const rect = siteFooter.getBoundingClientRect();
+      const vh = window.innerHeight || document.documentElement.clientHeight;
+
+      // Reveal when footer enters viewport (at 92% of viewport or scrolled near page bottom)
+      const scrolledToBottom = (window.innerHeight + window.scrollY) >= (document.documentElement.scrollHeight - 70);
+      if (rect.top <= vh * 0.92 || scrolledToBottom) {
+        siteFooter.classList.add('is-revealed');
+      } else if (rect.top > vh) {
+        siteFooter.classList.remove('is-revealed');
+      }
+    };
+
+    window.addEventListener('scroll', checkFooterScroll, { passive: true });
+    window.addEventListener('resize', checkFooterScroll, { passive: true });
+    setTimeout(checkFooterScroll, 200);
+  }
+
+  // 5l. Universal Bidirectional Scroll & Reverse-Scroll Controller (About, Services & Subpages)
+  const animSections = document.querySelectorAll('.anim-section, .ref-service-row');
+  if (animSections.length > 0) {
+    const checkAnimSectionsScroll = () => {
+      const isMobile = window.innerWidth < 992;
+      const vh = window.innerHeight || document.documentElement.clientHeight;
+      const scrollY = window.scrollY || window.pageYOffset;
+
+      animSections.forEach((section) => {
+        if (isMobile) {
+          section.classList.add('is-revealed');
+          return;
+        }
+
+        const rect = section.getBoundingClientRect();
+
+        // When in viewport (from top or bottom): reveal smoothly
+        if (rect.top <= vh * 0.82 && rect.bottom >= 0) {
+          section.classList.add('is-revealed');
+        } else if (rect.top > vh * 1.05 || rect.bottom < -120 || scrollY < 80) {
+          // Reset when scrolled far off-screen or returning to hero fold
+          section.classList.remove('is-revealed');
+        }
+      });
+    };
+
+    window.addEventListener('scroll', checkAnimSectionsScroll, { passive: true });
+    window.addEventListener('resize', checkAnimSectionsScroll, { passive: true });
+    setTimeout(checkAnimSectionsScroll, 180);
+  }
 
   // Recalculate trigger positions after images and fonts load
   window.addEventListener('load', () => {

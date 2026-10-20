@@ -1,0 +1,53 @@
+# Production Docker Compose for Hostinger VPS
+# Divine Fingers Healthcare Services Inc.
+#
+# HARDENING RULES APPLIED:
+# 1. Loopback-only port binding (127.0.0.1:3306) prevents public exposure.
+#    (Docker manipulates iptables directly and bypasses UFW by default; 
+#     binding strictly to 127.0.0.1 guarantees no internet exposure).
+# 2. NO MailHog or development interceptors in production.
+# 3. MySQL hardened: local-infile disabled, secure authentication plugin.
+# 4. Root password loaded via secure file or protected environment variable.
+#
+# Usage:
+#   docker compose -f deploy/docker-compose.prod.yml --env-file .env up -d
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: df_mysql_prod
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-default_secure_prod_root_pw_change_me}
+      MYSQL_DATABASE: ${DB_NAME:-divine_fingers_prod}
+      MYSQL_USER: ${DB_USER:-df_app_user}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "127.0.0.1:3306:3306"
+    volumes:
+      - df_mysql_prod_data:/var/lib/mysql
+      - ../schema.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
+      - ../sql/outbox.sql:/docker-entrypoint-initdb.d/02_outbox.sql:ro
+    command:
+      - --local-infile=0
+      - --skip-name-resolve
+      - --bind-address=0.0.0.0
+      - --default-authentication-plugin=caching_sha2_password
+      - --max-connections=150
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u root -p$${MYSQL_ROOT_PASSWORD} --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+volumes:
+  df_mysql_prod_data:

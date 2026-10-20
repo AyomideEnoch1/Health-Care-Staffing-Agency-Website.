@@ -28,4 +28,15 @@ const authLoginLimiter = rateLimit({
   }
 });
 
-module.exports = { publicFormLimiter, authLoginLimiter };
+const passwordResetLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: isProd ? 5 : 50,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    error: 'Too many password reset attempts. Please wait 15 minutes before trying again.'
+  }
+});
+
+module.exports = { publicFormLimiter, authLoginLimiter, passwordResetLimiter };

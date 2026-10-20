@@ -12,7 +12,7 @@ services:
       MYSQL_USER: df_app_user
       MYSQL_PASSWORD: local_app_dev_password_2026!
     ports:
-      - "3306:3306"
+      - "127.0.0.1:3306:3306"
     volumes:
       - df_mysql_data:/var/lib/mysql
       # Auto-initializes schema on first boot
@@ -31,8 +31,8 @@ services:
     container_name: df_mailhog_dev
     restart: unless-stopped
     ports:
-      - "1025:1025" # SMTP server
-      - "8025:8025" # Web UI (http://localhost:8025)
+      - "127.0.0.1:1025:1025" # SMTP server (localhost only)
+      - "127.0.0.1:8025:8025" # Web UI (localhost only)
     networks:
       - df_network
 

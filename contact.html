@@ -8,10 +8,10 @@
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Open+Sans:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&family=Pacifico&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Montserrat:wght@400;500;600;700;800;900&family=Open+Sans:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&family=Pacifico&display=swap" rel="stylesheet">
   
-  <link rel="stylesheet" href="style.css?v=5.0.0">
-  <link rel="stylesheet" href="prototype.css?v=5.0.0">
+  <link rel="stylesheet" href="style.css?v=6.0.5">
+  <link rel="stylesheet" href="prototype.css?v=5.5.8">
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
@@ -76,94 +76,130 @@
   </section>
 
   <!-- CONTACT SECTION WITH SHARP TOP SLANT LEFT -->
-  <section class="section-padding contact-section geometric-ribbon-section sharp-top-slant-left" id="contact">
+  <!-- CONTACT SECTION WITH SHARP TOP SLANT LEFT (Matches Homepage Animation Architecture) -->
+  <section class="section-padding contact-section geometric-ribbon-section sharp-top-slant-left" id="contact" style="overflow-x: clip;">
     <div class="container">
-      <div class="accent-heading-wrapper slide-from-top" style="margin-bottom: 1.5rem;">
+      <div class="accent-heading-wrapper center-title contact-slide-top" style="margin-bottom: 1.5rem;">
         <h2 class="welcome-title" style="margin-bottom: 0;">Get In Touch With <span class="brand-highlight">OUR TEAM</span></h2>
         <div class="welcome-accent-line"></div>
       </div>
-      <p class="welcome-text slide-from-bottom">
+      <p class="welcome-text center-subtitle contact-slide-sub">
         Have staffing questions, emergency shift requests, or clinical education inquiries? Divine Fingers Health Care Services Inc. (1592082-5) is here to assist you 24 hours a day, 7 days a week.
       </p>
 
       <div class="contact-grid-row">
-        <!-- Contact Info Card -->
-        <div class="contact-info-card slide-from-left">
+        <!-- Contact Info Card (Matching Home Page Style & Animation) -->
+        <div class="contact-info-card preview-style-info-card contact-slide-card">
           <div>
-            <span class="proto-card-badge" style="margin-bottom: 0.4rem;">DISPATCH &amp; HQ</span>
-            <h3 class="contact-card-title">Divine Fingers Health Care Services Inc.</h3>
-            <p class="contact-card-subtitle">Serving Greater Toronto &amp; Health Care Organizations Across Canada</p>
+            <span class="info-tag contact-card-anim-tag">DISPATCH &amp; HQ</span>
+            <h3 class="info-company-title contact-card-anim-title">Divine Fingers Health Care Services Inc.</h3>
+            <p class="info-company-sub contact-card-anim-sub">Serving Greater Toronto &amp; Health Care Organizations Across Canada</p>
 
-            <div class="contact-detail-list">
-              <div class="detail-item has-header-row">
-                <div class="detail-header-row">
-                  <div class="detail-icon">
-                    <i data-lucide="map-pin"></i>
-                  </div>
+            <div class="info-list">
+              <div class="info-item contact-card-anim-item1">
+                <div class="info-icon-circle"><i data-lucide="map-pin"></i></div>
+                <div class="info-item-text">
                   <strong>Scarborough Office HQ</strong>
-                </div>
-                <div class="detail-body">
                   <span>17-2 Dailing Gate, Scarborough, ON M1B 1Z8, Canada</span>
                 </div>
               </div>
 
-              <div class="detail-item has-header-row">
-                <div class="detail-header-row">
-                  <div class="detail-icon">
-                    <i data-lucide="phone-call"></i>
-                  </div>
+              <div class="info-item contact-card-anim-item2">
+                <div class="info-icon-circle"><i data-lucide="phone-call"></i></div>
+                <div class="info-item-text">
                   <strong>24/7 Dispatch Phone Lines</strong>
-                </div>
-                <div class="detail-body">
                   <a href="tel:+16472106463">+1 (647) 210-6463</a> | <a href="tel:+16477648522">+1 (647) 764-8522</a>
                 </div>
               </div>
 
-              <div class="detail-item has-header-row">
-                <div class="detail-header-row">
-                  <div class="detail-icon">
-                    <i data-lucide="mail"></i>
-                  </div>
+              <div class="info-item contact-card-anim-item3">
+                <div class="info-icon-circle"><i data-lucide="mail"></i></div>
+                <div class="info-item-text">
                   <strong>Official Email Inquiry</strong>
-                </div>
-                <div class="detail-body">
                   <a href="mailto:info@divinefingershealthcare.ca">info@divinefingershealthcare.ca</a>
                 </div>
               </div>
             </div>
           </div>
 
-          <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid rgba(11, 37, 69, 0.08);">
-            <p style="font-size: 0.85rem; color: #64748B; margin: 0;">
-              <strong>Emergency Surge Staffing:</strong> Our on-call supervisors dispatch certified staff within 2 hours across Ontario.
-            </p>
+          <div class="surge-dispatch-box contact-card-anim-surge">
+            <span class="surge-pill">2HR Surge</span>
+            <span class="surge-desc">Our on-call clinical supervisors dispatch registered staff within 2 hours across Ontario.</span>
           </div>
         </div>
 
-        <!-- HIGH VISIBILITY CONTACT FORM -->
-        <form class="custom-form slide-from-right" id="general-contact-form">
-          <!-- Brand Header -->
-          <div class="form-brand-header">
+        <!-- Modern Contact Form: HealthTech Floating Glass Card (Matching Home Page Style & Animation) -->
+        <form class="custom-form auth-style-form style1-glass-card contact-slide-form" id="general-contact-form">
+          <!-- Brand Header Matching Official Agency Standard -->
+          <div class="form-brand-header contact-form-anim-brand">
             <img src="assets/images/logo.png" alt="Divine Fingers Health Care Logo">
             <div class="form-brand-header-text">
               <span class="form-brand-header-name">Divine Fingers Health Care Services Inc.</span>
               <span class="form-brand-header-tagline">General &amp; Staffing Enquiry</span>
             </div>
           </div>
+
           <!-- Watermark Logo -->
           <img src="assets/images/logo.png" alt="" class="form-watermark-logo" aria-hidden="true">
-          <h3 class="form-title" style="font-family: var(--font-heading); font-weight: 800; color: var(--navy); margin-bottom: 1.25rem;">Send Us a Direct Message</h3>
-          <div class="form-row-grid">
-            <input type="text" class="form-field" id="contact-name" placeholder="YOUR FULL NAME" required>
-            <input type="email" class="form-field" id="contact-email" placeholder="YOUR EMAIL ADDRESS" required>
+
+          <!-- Card Header -->
+          <div class="auth-card-header-styled contact-form-anim-header">
+            <h3 class="auth-title-styled">Send Us a Direct Message</h3>
+            <p class="auth-subtitle-styled">Have questions about clinical staffing, nursing placements, or home care? Connect directly with our dispatch desk.</p>
           </div>
-          <div class="form-row-grid">
-            <input type="tel" class="form-field" id="contact-phone" placeholder="PHONE NUMBER" required>
-            <input type="text" class="form-field" id="contact-subject" placeholder="INQUIRY TYPE (Staffing / Travelling Nursing / Care)" required>
+
+          <div class="auth-card-body-styled">
+            <!-- Full Name (Vertical) -->
+            <div class="form-group contact-form-anim-group1">
+              <label class="form-label" for="contact-name">Full Name</label>
+              <div class="input-wrapper">
+                <input type="text" class="auth-input form-field" id="contact-name" placeholder="e.g. Sarah Jenkins" required>
+                <i data-lucide="user" class="field-icon"></i>
+              </div>
+            </div>
+
+            <!-- Email Address (Vertical) -->
+            <div class="form-group contact-form-anim-group2">
+              <label class="form-label" for="contact-email">Email Address</label>
+              <div class="input-wrapper">
+                <input type="email" class="auth-input form-field" id="contact-email" placeholder="e.g. sarah@hospital.ca" required>
+                <i data-lucide="mail" class="field-icon"></i>
+              </div>
+            </div>
+
+            <!-- Phone Number (Vertical) -->
+            <div class="form-group contact-form-anim-group3">
+              <label class="form-label" for="contact-phone">Phone Number</label>
+              <div class="input-wrapper">
+                <input type="tel" class="auth-input form-field" id="contact-phone" placeholder="e.g. +1 (647) 000-0000" required>
+                <i data-lucide="phone" class="field-icon"></i>
+              </div>
+            </div>
+
+            <!-- Inquiry Subject (Vertical) -->
+            <div class="form-group contact-form-anim-group4">
+              <label class="form-label" for="contact-subject">Inquiry Type</label>
+              <div class="input-wrapper">
+                <input type="text" class="auth-input form-field" id="contact-subject" placeholder="e.g. Facility Staffing / Nurse Roster / Care" required>
+                <i data-lucide="tag" class="field-icon"></i>
+              </div>
+            </div>
+
+            <!-- Message (Vertical) -->
+            <div class="form-group contact-form-anim-group5">
+              <label class="form-label" for="contact-message">How can our care team assist you?</label>
+              <div class="input-wrapper textarea-wrapper">
+                <textarea class="auth-input form-field textarea-field" id="contact-message" rows="4" placeholder="Describe your staffing needs or patient care inquiries..." required></textarea>
+              </div>
+            </div>
+
+            <!-- Gradient Glow Action Button -->
+            <button type="submit" class="btn-submit-auth contact-form-anim-btn">
+              <i data-lucide="send" style="width: 18px; height: 18px;"></i> Send Message &rarr;
+            </button>
+            
+            <div class="form-feedback-msg" id="contact-form-feedback"></div>
           </div>
-          <textarea class="form-field textarea-field" id="contact-message" rows="4" placeholder="HOW CAN OUR HEALTH CARE TEAM ASSIST YOU TODAY?" required></textarea>
-          <button type="submit" class="btn btn-pill-hero full-width-btn" style="padding: 1rem; font-size: 1rem; font-weight: 800; letter-spacing: 0.5px;">SEND MESSAGE</button>
-          <div class="form-feedback-msg" id="contact-form-feedback"></div>
         </form>
       </div>
     </div>
@@ -226,7 +262,7 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-  <script src="script.js?v=3.0.0"></script>
+  <script src="script.js?v=6.0.0"></script>
   <script>
     if (window.lucide) lucide.createIcons();
   </script>
