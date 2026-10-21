@@ -12,7 +12,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
 
   <!-- Core Dashboard Design System -->
-  <link rel="stylesheet" href="admin.css?v=5.9.4">
+  <link rel="stylesheet" href="admin.css?v=5.9.6">
 
   <!-- Chart.js CDN for Gradient Visualizations -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -179,6 +179,9 @@
         </button>
       </div>
     </aside>
+
+    <!-- Mobile Sidebar Backdrop Overlay -->
+    <div class="sidebar-backdrop" id="sidebar-backdrop" aria-hidden="true"></div>
 
     <!-- ==========================================================================
          3. MAIN VIEW CONTENT AREA
@@ -686,20 +689,20 @@
           </div>
 
           <div class="table-card">
-            <div class="table-toolbar" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.85rem; padding: 1rem 1.25rem; border-bottom: 1px solid var(--border-color, rgba(255,255,255,0.08));">
+            <div class="table-toolbar facilities-table-toolbar">
               <!-- Sub-View Toggle -->
-              <div class="segmented-control" style="display: inline-flex; background: rgba(255,255,255,0.06); padding: 3px; border-radius: 8px; gap: 4px;">
-                <button type="button" class="segmented-btn active" id="btn-show-facilities-table" onclick="window.switchFacilitiesSubView('facilities')" style="font-size: 0.78rem; padding: 0.4rem 0.85rem; border-radius: 6px; border: none; background: var(--brand-turquoise); color: #fff; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 5px;">
+              <div class="segmented-control facilities-segmented-control">
+                <button type="button" class="segmented-btn active" id="btn-show-facilities-table" onclick="window.switchFacilitiesSubView('facilities')">
                   <i data-lucide="building-2" style="width: 14px; height: 14px;"></i> Facilities &amp; Rates
                 </button>
-                <button type="button" class="segmented-btn" id="btn-show-clients-table" onclick="window.switchFacilitiesSubView('clients')" style="font-size: 0.78rem; padding: 0.4rem 0.85rem; border-radius: 6px; border: none; background: transparent; color: var(--text-muted); font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 5px;">
-                  <i data-lucide="users" style="width: 14px; height: 14px;"></i> Registered Clients <span class="badge" id="badge-client-users-count" style="background: rgba(27,174,207,0.2); color: #1BAECF; padding: 1px 6px; border-radius: 10px; font-size: 0.7rem; font-weight: 800;">0</span>
+                <button type="button" class="segmented-btn" id="btn-show-clients-table" onclick="window.switchFacilitiesSubView('clients')">
+                  <i data-lucide="users" style="width: 14px; height: 14px;"></i> Registered Clients <span class="badge" id="badge-client-users-count">0</span>
                 </button>
               </div>
 
-              <div class="table-filter-group" style="display: flex; gap: 0.75rem; flex-wrap: wrap; flex: 1; min-width: 280px; justify-content: flex-end;">
-                <input type="text" class="search-input filter-search-box" id="facilities-search-input" placeholder="Search facility name, code, contact or email..." style="min-width: 220px; flex: 1; max-width: 340px;">
-                <select class="filter-select" id="facilities-status-filter" style="min-width: 180px;">
+              <div class="table-filter-group facilities-filter-group">
+                <input type="text" class="search-input filter-search-box" id="facilities-search-input" placeholder="Search facility name, code, contact or email...">
+                <select class="filter-select" id="facilities-status-filter">
                   <option value="">All Statuses</option>
                   <option value="active">Active MSA Contract</option>
                   <option value="pending">Pending Onboarding</option>
@@ -707,7 +710,7 @@
                   <option value="portal_active">Has Portal Account</option>
                   <option value="no_portal">No Portal Account</option>
                 </select>
-                <button type="button" class="btn-primary-action" onclick="window.openFacilityModal()" style="display: flex; align-items: center; gap: 0.4rem; white-space: nowrap;">
+                <button type="button" class="btn-primary-action" onclick="window.openFacilityModal()">
                   <i data-lucide="plus-circle" style="width: 16px; height: 16px;"></i> Register Facility
                 </button>
               </div>
@@ -2016,7 +2019,7 @@
   </div>
 
   <!-- Core Dashboard Application Script -->
-  <script src="admin.js?v=5.7.5"></script>
+  <script src="admin.js?v=5.9.6"></script>
 
 </body>
 </html>

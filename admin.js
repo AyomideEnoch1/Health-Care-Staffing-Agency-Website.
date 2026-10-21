@@ -1509,6 +1509,31 @@
     });
   }
 
+  function getActionTagHTML(action) {
+    const act = (action || 'OPERATION').toUpperCase();
+    let categoryClass = 'action-info';
+    let iconName = 'activity';
+
+    if (act.includes('DELETE') || act.includes('PURGE') || act.includes('RESET') || act.includes('SUSPEND') || act.includes('REJECT')) {
+      categoryClass = 'action-danger';
+      iconName = 'alert-triangle';
+    } else if (act.includes('CREATE') || act.includes('ADD') || act.includes('VERIF') || act.includes('HIRE') || act.includes('ACTIVE')) {
+      categoryClass = 'action-success';
+      iconName = 'check-circle-2';
+    } else if (act.includes('MFA') || act.includes('WARN') || act.includes('EXPIR')) {
+      categoryClass = 'action-warning';
+      iconName = 'shield-alert';
+    } else if (act.includes('STAGE') || act.includes('SHIFT') || act.includes('UPDATE') || act.includes('MODIF')) {
+      categoryClass = 'action-info';
+      iconName = 'refresh-cw';
+    }
+
+    return `<span class="audit-action-tag ${categoryClass}">
+      <i data-lucide="${iconName}"></i>
+      <span>${escapeHTML(act)}</span>
+    </span>`;
+  }
+
   // F. Audit Logs
   async function fetchAndRenderAudit() {
     try {
@@ -1554,9 +1579,7 @@
               <td class="cell-grid-item" data-label="Action Executed">
                 <div class="meta-label">Action</div>
                 <div class="meta-value">
-                  <span class="status-pill" style="background: rgba(56, 189, 248, 0.14); color: #0284C7; border: 1px solid rgba(56, 189, 248, 0.35); font-weight: 800; font-size: 0.74rem;">
-                    <i data-lucide="activity" style="width: 12px; height: 12px; vertical-align: middle; margin-right: 3px;"></i>${escapeHTML(l.action || 'OPERATION')}
-                  </span>
+                  ${getActionTagHTML(l.action)}
                 </div>
               </td>
               <td class="cell-grid-item" data-label="Target Module">
@@ -1574,7 +1597,7 @@
                   ${escapeHTML(l.details || 'System operation executed and verified.')}
                 </div>
               </td>
-              <td class="cell-status-desktop" data-label="Severity" style="text-align: center;">
+              <td class="cell-grid-item" data-label="Severity" style="text-align: center;">
                 <div class="meta-label">Severity</div>
                 <div class="meta-value">
                   <span class="status-pill ${sevClass}" style="font-weight: 900; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px;">
@@ -4719,25 +4742,36 @@
           </td>
 
           <!-- Primary Contact & Portal Account -->
-          <td class="cell-grid-item" data-label="Primary Contact & Portal">
+          <td class="cell-block-item" data-label="Primary Contact & Portal">
             <div class="meta-label">Primary Contact &amp; Portal Account</div>
             <div class="meta-value">
-              <div style="font-weight: 600; color: var(--text-primary);">${escapeHTML(f.contact_name || '—')}</div>
-              ${f.contact_email ? `<div style="font-size: 0.74rem; color: var(--text-muted); word-break: break-all;">${escapeHTML(f.contact_email)}</div>` : ''}
-              ${f.contact_phone ? `<div style="font-size: 0.72rem; color: var(--text-muted);">${escapeHTML(f.contact_phone)}</div>` : ''}
-              ${f.has_portal_account ? `
-                <div style="margin-top: 4px;">
-                  <span style="background: rgba(6, 182, 212, 0.12); color: #0891b2; border: 1px solid rgba(6, 182, 212, 0.35); font-size: 0.68rem; font-weight: 700; padding: 1px 6px; border-radius: 4px; display: inline-flex; align-items: center; gap: 3px;" title="Registered Login: ${escapeHTML(f.registered_user_emails)}">
-                    <i data-lucide="user-check" style="width: 10px; height: 10px;"></i> Client Portal User (${f.registered_users_count})
-                  </span>
+              <div style="font-weight: 700; color: var(--text-primary); font-size: 0.9rem; display: flex; align-items: center; gap: 6px;">
+                <i data-lucide="user" style="width: 14px; height: 14px; color: var(--brand-turquoise);"></i>
+                <span>${escapeHTML(f.contact_name || 'No Primary Contact Set')}</span>
+              </div>
+              ${f.contact_email ? `
+                <div style="font-size: 0.78rem; color: var(--text-secondary); word-break: break-all; margin-top: 3px; display: flex; align-items: center; gap: 6px;">
+                  <i data-lucide="mail" style="width: 13px; height: 13px; color: var(--text-muted); flex-shrink: 0;"></i>
+                  <span>${escapeHTML(f.contact_email)}</span>
                 </div>
-              ` : `
-                <div style="margin-top: 4px;">
-                  <span style="background: rgba(255,255,255,0.04); color: var(--text-muted); font-size: 0.68rem; padding: 1px 6px; border-radius: 4px; display: inline-flex; align-items: center; gap: 3px;">
-                    <i data-lucide="user-minus" style="width: 10px; height: 10px;"></i> No Portal Login
-                  </span>
+              ` : ''}
+              ${f.contact_phone ? `
+                <div style="font-size: 0.76rem; color: var(--text-muted); margin-top: 2px; display: flex; align-items: center; gap: 6px;">
+                  <i data-lucide="phone" style="width: 13px; height: 13px; color: var(--text-muted); flex-shrink: 0;"></i>
+                  <span>${escapeHTML(f.contact_phone)}</span>
                 </div>
-              `}
+              ` : ''}
+              <div style="margin-top: 6px;">
+                ${f.has_portal_account ? `
+                  <span style="background: rgba(6, 182, 212, 0.12); color: #0891b2; border: 1px solid rgba(6, 182, 212, 0.35); font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 6px; display: inline-flex; align-items: center; gap: 4px;" title="Registered Login: ${escapeHTML(f.registered_user_emails)}">
+                    <i data-lucide="user-check" style="width: 12px; height: 12px;"></i> Client Portal User (${f.registered_users_count})
+                  </span>
+                ` : `
+                  <span style="background: rgba(255,255,255,0.04); color: var(--text-muted); font-size: 0.72rem; padding: 2px 8px; border-radius: 6px; display: inline-flex; align-items: center; gap: 4px; border: 1px solid var(--border-color);">
+                    <i data-lucide="user-minus" style="width: 12px; height: 12px;"></i> No Portal Login
+                  </span>
+                `}
+              </div>
             </div>
           </td>
 
@@ -4772,12 +4806,12 @@
 
           <!-- Actions -->
           <td class="cell-actions" data-label="Actions">
-            <div style="display: flex; gap: 0.5rem; justify-content: flex-end; width: 100%; flex-wrap: wrap;">
-              <button type="button" class="btn-primary-action" style="font-size: 0.76rem; padding: 0.35rem 0.75rem; display: inline-flex; align-items: center; gap: 4px; flex: 1; justify-content: center; min-width: 100px;" onclick="window.openFacilityRateCardsModal('${f.id}')" title="Manage Contracted Rates">
-                <i data-lucide="badge-dollar-sign" style="width: 13px; height: 13px;"></i> Rate Cards
+            <div class="admin-action-toolbar" style="width: 100%; display: flex; gap: 0.5rem;">
+              <button type="button" class="btn-primary-action" style="flex: 1 1 calc(50% - 0.25rem); height: 42px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-weight: 700; font-size: 0.82rem;" onclick="window.openFacilityRateCardsModal('${f.id}')" title="Manage Contracted Rates">
+                <i data-lucide="badge-dollar-sign" style="width: 14px; height: 14px;"></i> Rate Cards
               </button>
-              <button type="button" class="btn-secondary-action" style="font-size: 0.76rem; padding: 0.35rem 0.65rem; display: inline-flex; align-items: center; gap: 4px; flex: 1; justify-content: center; min-width: 80px;" onclick="window.openFacilityModal('${f.id}')" title="Edit Profile">
-                <i data-lucide="edit-3" style="width: 13px; height: 13px;"></i> Edit
+              <button type="button" class="btn-secondary-action" style="flex: 1 1 calc(50% - 0.25rem); height: 42px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-weight: 700; font-size: 0.82rem;" onclick="window.openFacilityModal('${f.id}')" title="Edit Profile">
+                <i data-lucide="edit-3" style="width: 14px; height: 14px;"></i> Edit Facility
               </button>
             </div>
           </td>
@@ -4845,20 +4879,31 @@
             </div>
           </td>
 
-          <td class="cell-grid-item" data-label="Contact Person">
-            <div class="meta-label">Primary Contact</div>
+          <td class="cell-block-item" data-label="Contact Person">
+            <div class="meta-label">Primary Contact Person</div>
             <div class="meta-value">
-              <div style="font-weight: 600; color: var(--text-primary);">${escapeHTML(c.full_name)}</div>
-              <div style="font-size: 0.72rem; color: var(--text-muted);">${escapeHTML(c.client_role || 'Staffing Requester')}</div>
+              <div style="font-weight: 700; color: var(--text-primary); font-size: 0.9rem; display: flex; align-items: center; gap: 6px;">
+                <i data-lucide="user" style="width: 14px; height: 14px; color: var(--brand-turquoise);"></i>
+                <span>${escapeHTML(c.full_name)}</span>
+              </div>
+              <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">${escapeHTML(c.client_role || 'Staffing Requester')}</div>
             </div>
           </td>
 
-          <td class="cell-grid-item" data-label="Login & Contact">
-            <div class="meta-label">Login Email &amp; Phone</div>
+          <td class="cell-block-item" data-label="Login & Contact">
+            <div class="meta-label">Login Credentials &amp; Phone</div>
             <div class="meta-value">
-              <div style="font-weight: 600; color: var(--text-primary); font-size: 0.8rem; word-break: break-all;">${escapeHTML(c.email)}</div>
-              ${c.phone ? `<div style="font-size: 0.74rem; color: var(--text-muted);">${escapeHTML(c.phone)}</div>` : ''}
-              <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 2px;">Last login: ${lastLoginStr}</div>
+              <div style="font-weight: 600; color: var(--brand-turquoise); font-size: 0.82rem; word-break: break-all; display: flex; align-items: center; gap: 6px;">
+                <i data-lucide="mail" style="width: 13px; height: 13px; color: var(--brand-turquoise); flex-shrink: 0;"></i>
+                <span>${escapeHTML(c.email)}</span>
+              </div>
+              ${c.phone ? `
+                <div style="font-size: 0.76rem; color: var(--text-muted); margin-top: 3px; display: flex; align-items: center; gap: 6px;">
+                  <i data-lucide="phone" style="width: 13px; height: 13px; color: var(--text-muted); flex-shrink: 0;"></i>
+                  <span>${escapeHTML(c.phone)}</span>
+                </div>
+              ` : ''}
+              <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 4px;">Last active: ${lastLoginStr}</div>
             </div>
           </td>
 
@@ -4885,15 +4930,15 @@
           </td>
 
           <td class="cell-actions" data-label="Actions">
-            <div style="display: flex; gap: 0.4rem; justify-content: flex-end; width: 100%; flex-wrap: wrap;">
-              <button type="button" class="btn-secondary-action" style="font-size: 0.74rem; padding: 0.35rem 0.6rem; display: inline-flex; align-items: center; gap: 4px;" onclick="window.toggleClientStatus('${c.id}')" title="${isActive ? 'Suspend Account' : 'Activate Account'}">
+            <div class="admin-action-toolbar" style="width: 100%; display: flex; gap: 0.4rem; flex-wrap: wrap;">
+              <button type="button" class="btn-secondary-action" style="flex: 1 1 calc(33% - 0.4rem); min-width: 80px; height: 38px; font-size: 0.75rem; padding: 0.35rem 0.5rem; display: inline-flex; align-items: center; justify-content: center; gap: 4px;" onclick="window.toggleClientStatus('${c.id}')" title="${isActive ? 'Suspend Account' : 'Activate Account'}">
                 <i data-lucide="${isActive ? 'slash' : 'check'}" style="width: 12px; height: 12px; color: ${isActive ? 'var(--status-danger)' : 'var(--status-success)'};"></i> ${isActive ? 'Suspend' : 'Activate'}
               </button>
-              <button type="button" class="btn-secondary-action" style="font-size: 0.74rem; padding: 0.35rem 0.6rem; display: inline-flex; align-items: center; gap: 4px;" onclick="window.openClientResetModal('${c.id}', '${escapeHTML(c.email)}')" title="Reset Password">
+              <button type="button" class="btn-secondary-action" style="flex: 1 1 calc(33% - 0.4rem); min-width: 80px; height: 38px; font-size: 0.75rem; padding: 0.35rem 0.5rem; display: inline-flex; align-items: center; justify-content: center; gap: 4px;" onclick="window.openClientResetModal('${c.id}', '${escapeHTML(c.email)}')" title="Reset Password">
                 <i data-lucide="key" style="width: 12px; height: 12px;"></i> Reset Pwd
               </button>
               ${c.facility_id ? `
-                <button type="button" class="btn-primary-action" style="font-size: 0.74rem; padding: 0.35rem 0.65rem; display: inline-flex; align-items: center; gap: 4px;" onclick="window.openFacilityRateCardsModal('${c.facility_id}')" title="Set MSA Rates">
+                <button type="button" class="btn-primary-action" style="flex: 1 1 calc(33% - 0.4rem); min-width: 80px; height: 38px; font-size: 0.75rem; padding: 0.35rem 0.5rem; display: inline-flex; align-items: center; justify-content: center; gap: 4px;" onclick="window.openFacilityRateCardsModal('${c.facility_id}')" title="Set MSA Rates">
                   <i data-lucide="badge-dollar-sign" style="width: 12px; height: 12px;"></i> Rates
                 </button>
               ` : ''}
@@ -5472,7 +5517,7 @@
 
     if (viewHeading)     viewHeading.textContent     = title || 'Dashboard';
     if (breadcrumbTitle) breadcrumbTitle.textContent  = title || 'Dashboard';
-    if (sidebar)         sidebar.classList.remove('mobile-open');
+    if (typeof closeMobileSidebar === 'function') closeMobileSidebar(); else if (sidebar) sidebar.classList.remove('mobile-open');
 
     // Tab-specific lifecycle activations inside safe try-catch
     try {
@@ -5525,12 +5570,72 @@
     }
   };
 
+  // Mobile drawer controls with full backdrop, outside-tap, and escape dismissal
+  function openMobileSidebar() {
+    if (!sidebar) return;
+    sidebar.classList.add('mobile-open');
+    const backdrop = document.getElementById('sidebar-backdrop');
+    if (backdrop) backdrop.classList.add('active');
+    document.body.classList.add('sidebar-open-locked');
+  }
+
+  function closeMobileSidebar() {
+    if (!sidebar) return;
+    sidebar.classList.remove('mobile-open');
+    const backdrop = document.getElementById('sidebar-backdrop');
+    if (backdrop) backdrop.classList.remove('active');
+    document.body.classList.remove('sidebar-open-locked');
+  }
+
+  window.closeMobileSidebar = closeMobileSidebar;
+  window.openMobileSidebar = openMobileSidebar;
+
   if (collapseBtn && sidebar) {
-    collapseBtn.addEventListener('click', () => sidebar.classList.toggle('collapsed'));
+    collapseBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (window.innerWidth <= 900) {
+        // On mobile, collapse button reliably collapses/closes the drawer away
+        closeMobileSidebar();
+      } else {
+        sidebar.classList.toggle('collapsed');
+      }
+    });
   }
+
   if (mobileMenuBtn && sidebar) {
-    mobileMenuBtn.addEventListener('click', () => sidebar.classList.toggle('mobile-open'));
+    mobileMenuBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (sidebar.classList.contains('mobile-open')) {
+        closeMobileSidebar();
+      } else {
+        openMobileSidebar();
+      }
+    });
   }
+
+  const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+  if (sidebarBackdrop) {
+    sidebarBackdrop.addEventListener('click', (e) => {
+      e.stopPropagation();
+      closeMobileSidebar();
+    });
+  }
+
+  // Dismiss mobile drawer on Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && sidebar && sidebar.classList.contains('mobile-open')) {
+      closeMobileSidebar();
+    }
+  });
+
+  // Tap anywhere outside mobile sidebar collapses it
+  document.addEventListener('click', (e) => {
+    if (window.innerWidth <= 900 && sidebar && sidebar.classList.contains('mobile-open')) {
+      if (!sidebar.contains(e.target) && (!mobileMenuBtn || !mobileMenuBtn.contains(e.target))) {
+        closeMobileSidebar();
+      }
+    }
+  });
 
   // Global robust event delegation for all navigation buttons and clickable KPI cards
   document.addEventListener('click', (e) => {
