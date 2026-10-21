@@ -1126,13 +1126,18 @@ button .pulse-dot::before,
   justify-content: space-between;
   position: relative;
   overflow: hidden;
-  transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .kpi-card:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-md), var(--shadow-glow);
-  border-color: var(--border-accent);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08), 0 0 14px rgba(2, 132, 199, 0.1);
+  border-color: rgba(2, 132, 199, 0.4);
+}
+
+[data-theme="dark"] .kpi-card:hover {
+  border-color: rgba(0, 245, 212, 0.4);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 0 16px rgba(0, 245, 212, 0.15);
 }
 
 .kpi-card::before {
@@ -1141,14 +1146,14 @@ button .pulse-dot::before,
   top: 0;
   left: 0;
   right: 0;
-  height: 3px;
+  height: 2.5px;
   background: linear-gradient(90deg, var(--brand-cyan), var(--brand-teal));
   opacity: 0;
-  transition: opacity var(--transition-fast);
+  transition: opacity 0.25s ease;
 }
 
 .kpi-card:hover::before {
-  opacity: 1;
+  opacity: 0.85;
 }
 
 .kpi-top {
@@ -1286,10 +1291,13 @@ button .pulse-dot::before,
   box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.06), 0 1px 3px rgba(15, 23, 42, 0.03);
 }
 
+.chart-card.glass-cyber-card {
+  transition: border-color 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
 .chart-card.glass-cyber-card:hover {
   border-color: rgba(2, 132, 199, 0.35);
-  box-shadow: 0 12px 30px -4px rgba(2, 132, 199, 0.1), 0 4px 10px -2px rgba(15, 23, 42, 0.04);
-  transform: translateY(-2px);
+  box-shadow: 0 8px 24px -4px rgba(2, 132, 199, 0.12), 0 2px 6px rgba(15, 23, 42, 0.04);
 }
 
 /* Dark Theme Card Overrides */
@@ -1299,12 +1307,12 @@ button .pulse-dot::before,
   -webkit-backdrop-filter: none;
   border: 1px solid var(--border-color);
   box-shadow: var(--shadow-sm);
+  transition: border-color 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 [data-theme="dark"] .chart-card.glass-cyber-card:hover {
-  border-color: rgba(255, 255, 255, 0.14);
-  box-shadow: var(--shadow-md);
-  transform: translateY(-2px);
+  border-color: rgba(0, 245, 212, 0.28);
+  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.4), 0 0 16px rgba(0, 245, 212, 0.08);
 }
 
 .live-chart-pulse {
@@ -2820,15 +2828,15 @@ select optgroup,
 }
 
 .report-meta-card:hover {
-  transform: translateY(-3px);
-  border-color: var(--brand-cyan);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  transform: translateY(-1.5px);
+  border-color: rgba(2, 132, 199, 0.4);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08), 0 0 12px rgba(2, 132, 199, 0.1);
 }
 
 [data-theme="dark"] .report-meta-card:hover {
   background: rgba(255, 255, 255, 0.04);
-  border-color: rgba(255, 255, 255, 0.18);
-  box-shadow: var(--shadow-md);
+  border-color: rgba(0, 245, 212, 0.35);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35), 0 0 14px rgba(0, 245, 212, 0.12);
 }
 
 .report-card-top {
@@ -3166,6 +3174,16 @@ select optgroup,
     display: flex !important;
     flex-direction: column !important;
     justify-content: space-between !important;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+  }
+
+  .kpi-card:hover {
+    transform: none !important;
+    border-color: rgba(0, 245, 212, 0.4) !important;
+  }
+
+  .kpi-card:active {
+    transform: scale(0.985) !important;
   }
 
   .kpi-top {
@@ -3449,11 +3467,25 @@ select optgroup,
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35) !important;
   }
 
-  .table-card-row:hover,
+  .table-card-row {
+    transition: border-color 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+
+  .table-card-row:hover {
+    border-color: rgba(2, 132, 199, 0.35) !important;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08) !important;
+    transform: none !important;
+  }
+
   [data-theme="dark"] .table-card-row:hover {
-    border-color: var(--border-accent) !important;
-    transform: translateY(-2px) !important;
-    box-shadow: var(--shadow-md) !important;
+    border-color: rgba(0, 245, 212, 0.35) !important;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35), 0 0 12px rgba(0, 245, 212, 0.08) !important;
+    transform: none !important;
+  }
+
+  .table-card-row:active {
+    background: rgba(0, 245, 212, 0.03) !important;
+    transform: scale(0.995) !important;
   }
 
   /* Reset all table cells on mobile */
