@@ -2085,6 +2085,10 @@ select optgroup,
 /* ==========================================================================
    8. KANBAN PIPELINE VIEW (UNIFIED CONNECTED DISPATCH BOARD)
    ========================================================================== */
+.mobile-kanban-stage-bar {
+  display: none;
+}
+
 .pipeline-board {
   display: grid;
   grid-template-columns: repeat(4, minmax(280px, 1fr));
@@ -3852,16 +3856,94 @@ select optgroup,
     background: rgba(239, 68, 68, 0.08) !important;
   }
 
-  /* 5. Kanban Pipeline Board Responsive Column Stack */
+  /* 5. Mobile Kanban Stage Switcher Pill Bar (Option 1) */
+  .mobile-kanban-stage-bar {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.45rem !important;
+    overflow-x: auto !important;
+    white-space: nowrap !important;
+    padding: 0.25rem 0.25rem 0.75rem 0.25rem !important;
+    margin-bottom: 0.65rem !important;
+    scrollbar-width: none !important;
+    -webkit-overflow-scrolling: touch !important;
+    position: sticky !important;
+    top: calc(var(--topbar-h) + 2px) !important;
+    background: var(--bg-body) !important;
+    z-index: 20 !important;
+  }
+
+  .mobile-kanban-stage-bar::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .stage-pill {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    padding: 0.45rem 0.85rem !important;
+    border-radius: 9999px !important;
+    font-size: 0.74rem !important;
+    font-weight: 700 !important;
+    border: 1.5px solid var(--border-color) !important;
+    background: var(--bg-card) !important;
+    color: var(--text-secondary) !important;
+    cursor: pointer !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    flex-shrink: 0 !important;
+  }
+
+  .stage-pill.active {
+    background: var(--brand-cyan, #0284c7) !important;
+    color: #ffffff !important;
+    border-color: var(--brand-cyan, #0284c7) !important;
+    font-weight: 800 !important;
+    box-shadow: 0 2px 10px rgba(2, 132, 199, 0.3) !important;
+  }
+
+  [data-theme="dark"] .stage-pill.active {
+    background: #00f5d4 !important;
+    color: #060b18 !important;
+    border-color: #00f5d4 !important;
+    box-shadow: 0 0 14px rgba(0, 245, 212, 0.35) !important;
+  }
+
+  .stage-pill-count {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-width: 18px !important;
+    height: 18px !important;
+    padding: 0 5px !important;
+    border-radius: 99px !important;
+    font-size: 0.65rem !important;
+    font-weight: 900 !important;
+    color: #ffffff !important;
+    line-height: 1 !important;
+  }
+
+  .stage-pill.active .stage-pill-count {
+    background: rgba(0, 0, 0, 0.25) !important;
+    color: inherit !important;
+  }
+
   .pipeline-board {
     display: flex !important;
     flex-direction: column !important;
-    gap: 1rem !important;
+    gap: 0 !important;
     width: 100% !important;
     overflow-x: visible !important;
     padding: 0 !important;
     background: transparent !important;
     border: none !important;
+  }
+
+  /* Option 1: Show ONLY the active stage on mobile (eliminates endless scrolling) */
+  .pipeline-board[data-active-stage="pending"] .kanban-col:not([data-col-key="pending"]),
+  .pipeline-board[data-active-stage="dispatched"] .kanban-col:not([data-col-key="dispatched"]),
+  .pipeline-board[data-active-stage="completed"] .kanban-col:not([data-col-key="completed"]),
+  .pipeline-board[data-active-stage="cancelled"] .kanban-col:not([data-col-key="cancelled"]) {
+    display: none !important;
   }
 
   .pipeline-col,
@@ -3872,7 +3954,7 @@ select optgroup,
     border: 1px solid var(--border-color) !important;
     border-radius: var(--radius-md) !important;
     padding: 1rem !important;
-    margin: 0 0 1rem 0 !important;
+    margin: 0 !important;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
   }
 

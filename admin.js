@@ -1190,14 +1190,31 @@
       filtered.forEach(r => { if (cols[r.status]) cols[r.status].push(r); });
 
       const colDef = [
-        { key: 'pending',    label: '⏳ Pending Assignment', color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.08)' },
-        { key: 'dispatched', label: '🚑 Dispatched &amp; Active', color: '#00a896', bg: 'rgba(0, 168, 150, 0.08)' },
-        { key: 'completed',  label: '✅ Completed Shifts',     color: '#10b981', bg: 'rgba(16, 185, 129, 0.08)' },
-        { key: 'cancelled',  label: '❌ Cancelled / Void',    color: '#64748b', bg: 'rgba(100, 116, 139, 0.08)' }
+        { key: 'pending',    label: '⏳ Pending Assignment', shortLabel: '⏳ Pending', color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.08)' },
+        { key: 'dispatched', label: '🚑 Dispatched &amp; Active', shortLabel: '🚑 Dispatched', color: '#00a896', bg: 'rgba(0, 168, 150, 0.08)' },
+        { key: 'completed',  label: '✅ Completed Shifts',     shortLabel: '✅ Completed', color: '#10b981', bg: 'rgba(16, 185, 129, 0.08)' },
+        { key: 'cancelled',  label: '❌ Cancelled / Void',    shortLabel: '❌ Void', color: '#64748b', bg: 'rgba(100, 116, 139, 0.08)' }
       ];
 
+      // Maintain active mobile stage filter (default to pending)
+      if (!window._activeMobileKanbanStage) {
+        window._activeMobileKanbanStage = 'pending';
+      }
+      kanban.setAttribute('data-active-stage', window._activeMobileKanbanStage);
+
+      // Render Mobile Stage Switcher Pills Bar
+      const stageBar = document.getElementById('requests-mobile-stage-bar');
+      if (stageBar) {
+        stageBar.innerHTML = colDef.map(col => `
+          <button type="button" class="stage-pill ${window._activeMobileKanbanStage === col.key ? 'active' : ''}" onclick="window.switchMobileKanbanStage('${col.key}')">
+            <span>${col.shortLabel}</span>
+            <span class="stage-pill-count" style="background:${col.color};">${cols[col.key].length}</span>
+          </button>
+        `).join('');
+      }
+
       kanban.innerHTML = colDef.map(col => `
-        <div class="kanban-col">
+        <div class="kanban-col" data-col-key="${col.key}">
           <div class="kanban-col-header" style="border-left: 4px solid ${col.color}; background: ${col.bg};">
             <div class="kanban-header-title" style="color: ${col.color};">
               <span>${col.label}</span>
@@ -1288,6 +1305,21 @@
       }
     }
   }
+
+  window.switchMobileKanbanStage = function(stageKey) {
+    window._activeMobileKanbanStage = stageKey;
+    const kanban = document.getElementById('requests-kanban-board');
+    if (kanban) {
+      kanban.setAttribute('data-active-stage', stageKey);
+    }
+    const stageBar = document.getElementById('requests-mobile-stage-bar');
+    if (stageBar) {
+      stageBar.querySelectorAll('.stage-pill').forEach(btn => {
+        const matches = btn.getAttribute('onclick')?.includes(`'${stageKey}'`);
+        btn.classList.toggle('active', !!matches);
+      });
+    }
+  };
 
   // D. Job Applications (ATS)
   async function fetchAndRenderApplicants() {
