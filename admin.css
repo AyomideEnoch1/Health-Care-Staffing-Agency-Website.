@@ -3552,16 +3552,17 @@ select optgroup,
 
   /* 2. Subtitle / Email Row & Key-Value Items - Streamlined Option 2 Mobile Layout */
   
-  /* Unclipped dedicated email row */
+  /* Unclipped dedicated email row - Left aligned */
   .table-card-row > td.cell-email,
   .cell-email {
     display: flex !important;
     flex-direction: row !important;
     align-items: center !important;
+    justify-content: flex-start !important;
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;
-    padding: 0.2rem 0 !important;
+    padding: 0.25rem 0 !important;
     margin-bottom: 0.35rem !important;
     min-height: auto !important;
     width: 100% !important;
@@ -3577,17 +3578,26 @@ select optgroup,
   .cell-email .meta-value {
     font-size: clamp(0.78rem, 2.8vw, 0.85rem) !important;
     font-weight: 600 !important;
-    color: var(--brand-teal, #00f5d4) !important;
+    color: var(--brand-teal, #00a896) !important;
     word-break: break-all !important;
     overflow-wrap: anywhere !important;
     white-space: normal !important;
     text-align: left !important;
+    justify-content: flex-start !important;
     margin-left: 0 !important;
-    width: 100% !important;
+    margin-right: auto !important;
+    width: auto !important;
+    max-width: 100% !important;
     overflow: visible !important;
     text-overflow: clip !important;
-    display: flex !important;
+    display: inline-flex !important;
     align-items: center !important;
+    gap: 6px !important;
+  }
+
+  [data-theme="dark"] .table-card-row > td.cell-email .meta-value,
+  [data-theme="dark"] .cell-email .meta-value {
+    color: var(--brand-teal, #00f5d4) !important;
   }
 
   /* Subtitle rows (Facility & Unit, etc.) */
@@ -3721,8 +3731,8 @@ select optgroup,
     color: #94A3B8 !important;
   }
 
-  .table-card-row .meta-value,
-  .cell-grid-item .meta-value {
+  .table-card-row > td.cell-grid-item:not([data-pill-cell]):not(.cell-pill-item) .meta-value,
+  .cell-grid-item:not([data-pill-cell]):not(.cell-pill-item) .meta-value {
     display: inline-flex !important;
     align-items: center !important;
     justify-content: flex-end !important;
