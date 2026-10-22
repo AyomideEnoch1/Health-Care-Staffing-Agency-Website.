@@ -632,10 +632,30 @@
               </div>
 
               <div class="form-group">
-                <label class="form-label" for="reg-phone">Direct Phone Number</label>
-                <div class="input-wrapper">
-                  <i data-lucide="phone" class="field-icon"></i>
-                  <input type="tel" id="reg-phone" class="auth-input" placeholder="e.g. (647) 555-0144" autocomplete="tel">
+                <label class="form-label" for="reg-phone">Direct Contact Phone *</label>
+                <div class="phone-input-group">
+                  <div class="country-code-wrapper">
+                    <select id="reg-country-code" class="country-code-select" aria-label="Country Dial Code">
+                      <option value="+1" selected>🇨🇦 +1 (CA)</option>
+                      <option value="+1">🇺🇸 +1 (US)</option>
+                      <option value="+44">🇬🇧 +44 (UK)</option>
+                      <option value="+234">🇳🇬 +234 (NG)</option>
+                      <option value="+233">🇬🇭 +233 (GH)</option>
+                      <option value="+61">🇦🇺 +61 (AU)</option>
+                      <option value="+91">🇮🇳 +91 (IN)</option>
+                      <option value="+63">🇵🇭 +63 (PH)</option>
+                      <option value="+353">🇮🇪 +353 (IE)</option>
+                      <option value="+27">🇿🇦 +27 (ZA)</option>
+                      <option value="+1-876">🇯🇲 +1-876 (JM)</option>
+                      <option value="+49">🇩🇪 +49 (DE)</option>
+                      <option value="+33">🇫🇷 +33 (FR)</option>
+                      <option value="+971">🇦🇪 +971 (AE)</option>
+                    </select>
+                  </div>
+                  <div class="input-wrapper" style="flex: 1;">
+                    <i data-lucide="phone" class="field-icon"></i>
+                    <input type="tel" id="reg-phone" class="auth-input" placeholder="e.g. (647) 555-0144" autocomplete="tel" required>
+                  </div>
                 </div>
               </div>
 
@@ -958,6 +978,119 @@
     }
     window.openResetView = openResetView;
 
+
+    // Handle OTP Verification Form
+    async function handleVerifyOtp(e) {
+      if (e) e.preventDefault();
+      clearAlerts();
+
+      const codeInput = document.getElementById('user-verify-code');
+      const tokenInput = document.getElementById('user-verify-token');
+      const submitBtn = document.getElementById('btn-verify-otp-submit');
+
+      const code = codeInput ? codeInput.value.trim() : '';
+      const token = tokenInput ? tokenInput.value.trim() : '';
+
+      if (!code || code.length !== 6) {
+        showAlert('error', 'Please enter the complete 6-digit security code dispatched to your email.');
+        if (codeInput) codeInput.focus();
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="spinner-border"></span> Verifying Passcode...';
+
+      try {
+        const response = await fetch(`${API_BASE}/users/verify-otp`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ verify_token: token, email_code: code })
+        });
+
+        const result = await response.json();
+
+        if (response.ok && result.success) {
+          showAlert('success', result.message || 'Identity confirmed! Redirecting to your facility portal...');
+          if (result.user) {
+            sessionStorage.setItem('df_portal_user', JSON.stringify(result.user));
+            try { localStorage.setItem('df_portal_user', JSON.stringify(result.user)); } catch (e) {}
+          }
+          const params = new URLSearchParams(window.location.search);
+          const redirectUrl = params.get('redirect') || (result.redirectTo || 'portal.html');
+          setTimeout(() => {
+            window.location.href = redirectUrl;
+          }, 600);
+        } else {
+          showAlert('error', result.error || 'Invalid or expired 6-digit code. Please check your inbox or click Resend.');
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<i data-lucide="check-circle" style="width: 18px; height: 18px;"></i> Verify &amp; Access Portal';
+          if (window.lucide) lucide.createIcons();
+        }
+      } catch (err) {
+        showAlert('error', 'Network error connecting to verification service. Please try again.');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i data-lucide="check-circle" style="width: 18px; height: 18px;"></i> Verify &amp; Access Portal';
+        if (window.lucide) lucide.createIcons();
+      }
+    }
+    window.handleVerifyOtp = handleVerifyOtp;
+
+    // Handle Resend OTP Request
+    async function handleResendUserOtp() {
+      clearAlerts();
+      const tokenInput = document.getElementById('user-verify-token');
+      const token = tokenInput ? tokenInput.value.trim() : '';
+      const resendBtn = document.getElementById('btn-user-resend-otp');
+
+      if (!token) {
+        showAlert('error', 'Verification session expired. Please return to Sign In.');
+        return;
+      }
+
+      if (resendBtn) {
+        resendBtn.disabled = true;
+        resendBtn.textContent = 'Sending fresh code...';
+      }
+
+      try {
+        const response = await fetch(`${API_BASE}/users/resend-otp`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ verify_token: token })
+        });
+
+        const result = await response.json();
+
+        if (response.ok && result.success) {
+          if (result.verify_token && tokenInput) {
+            tokenInput.value = result.verify_token;
+          }
+          showAlert('success', result.message || 'A fresh 6-digit verification code has been dispatched to your email.');
+          if (resendBtn) resendBtn.textContent = 'Code Sent!';
+          setTimeout(() => {
+            if (resendBtn) {
+              resendBtn.disabled = false;
+              resendBtn.textContent = 'Resend Code';
+            }
+          }, 30000);
+        } else {
+          showAlert('error', result.error || 'Failed to resend verification code. Please try again.');
+          if (resendBtn) {
+            resendBtn.disabled = false;
+            resendBtn.textContent = 'Resend Code';
+          }
+        }
+      } catch (err) {
+        showAlert('error', 'Network error requesting fresh code.');
+        if (resendBtn) {
+          resendBtn.disabled = false;
+          resendBtn.textContent = 'Resend Code';
+        }
+      }
+    }
+    window.handleResendUserOtp = handleResendUserOtp;
+
     // Role Selection (Client Facility Registration Only)
     function selectRole(role) {
       if (document.getElementById('reg-role')) {
@@ -1074,7 +1207,12 @@
       const role = 'client';
       const full_name = document.getElementById('reg-fullname').value.trim();
       const email = document.getElementById('reg-email').value.trim();
-      const phone = document.getElementById('reg-phone').value.trim();
+      const countryCode = document.getElementById('reg-country-code') ? document.getElementById('reg-country-code').value.trim() : '+1';
+      let rawPhone = document.getElementById('reg-phone') ? document.getElementById('reg-phone').value.trim() : '';
+      let phone = '';
+      if (rawPhone) {
+        phone = rawPhone.startsWith('+') ? rawPhone : (countryCode + ' ' + rawPhone);
+      }
       const password = document.getElementById('reg-password').value;
       const organization_name = document.getElementById('reg-orgname') ? document.getElementById('reg-orgname').value.trim() : null;
       const clinical_role = null;

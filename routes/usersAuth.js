@@ -100,6 +100,11 @@ router.post('/register', async (req, res, next) => {
 
         if (facMatch && facMatch.length > 0) {
           facilityId = facMatch[0].id;
+          if (data.phone) {
+            try {
+              await pool.query('UPDATE facilities SET contact_phone = COALESCE(NULLIF(contact_phone, ""), ?), updated_at = NOW() WHERE id = ?', [data.phone.trim(), facilityId]);
+            } catch (_) {}
+          }
         } else {
           const [countRows] = await pool.query('SELECT COUNT(*) AS total FROM facilities');
           const nextNum = ((countRows && countRows[0] && countRows[0].total) || 0) + 1;
@@ -974,7 +979,8 @@ router.post('/facility/logo', requirePortalUser, uploadAvatar.single('logo'), va
 // ── POST /api/users/verify-otp ─────────────────────────────────────────────
 router.post('/verify-otp', authLoginLimiter, async (req, res, next) => {
   try {
-    const { verify_token, email_code } = req.body;
+    const verify_token = req.body.verify_token || req.body.token;
+    const email_code = req.body.email_code || req.body.code;
     if (!verify_token || !email_code) {
       return res.status(400).json({ success: false, error: 'Verification session and 6-digit code are required.' });
     }
@@ -1077,7 +1083,7 @@ router.post('/verify-otp', authLoginLimiter, async (req, res, next) => {
 // ── POST /api/users/resend-otp ─────────────────────────────────────────────
 router.post('/resend-otp', authLoginLimiter, async (req, res, next) => {
   try {
-    const { verify_token } = req.body;
+    const verify_token = req.body.verify_token || req.body.token;
     if (!verify_token) {
       return res.status(400).json({ success: false, error: 'Verification token is required.' });
     }

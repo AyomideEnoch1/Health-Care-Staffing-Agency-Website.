@@ -117,6 +117,8 @@ try {
         try { await conn.query('ALTER TABLE users ADD COLUMN token_version INT UNSIGNED NOT NULL DEFAULT 1'); } catch (_) {}
         try { await conn.query('ALTER TABLE facilities ADD COLUMN logo_url VARCHAR(500) NULL AFTER facility_code'); } catch (_) {}
         try { await conn.query('ALTER TABLE staff_roster MODIFY COLUMN avatar_url VARCHAR(500) NULL'); } catch (_) {}
+        try { await conn.query('ALTER TABLE users MODIFY COLUMN phone VARCHAR(50) NULL'); } catch (_) {}
+        try { await conn.query('ALTER TABLE facilities MODIFY COLUMN contact_phone VARCHAR(50) NULL'); } catch (_) {}
 
         await conn.query(`
           CREATE TABLE IF NOT EXISTS facilities (

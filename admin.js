@@ -835,9 +835,11 @@
             const name = msg.payload?.full_name || 'Client';
             showToast(`🏥 New Client Registered: ${org} (${name})`, 'info');
             if (typeof fetchAndRenderFacilities === 'function') fetchAndRenderFacilities();
+            if (typeof loadAllDashboardData === 'function') loadAllDashboardData();
           } else if (msg.type === 'facility:created') {
             showToast(`🏢 New Facility Added: ${msg.payload?.name || 'Facility'}`, 'info');
             if (typeof fetchAndRenderFacilities === 'function') fetchAndRenderFacilities();
+            if (typeof loadAllDashboardData === 'function') loadAllDashboardData();
           } else if (msg.type === 'status:changed') {
             if (msg.payload && msg.payload.action === 'running_late') {
               showToast(`⏱️ Delay Notice: ${msg.payload.staff_name || 'Caregiver'} running ${msg.payload.minutes_late || 15}m late. Reason: "${msg.payload.reason || 'Delayed'}"`, 'warning');
@@ -4878,6 +4880,9 @@
     const clientContainer = document.getElementById('client-accounts-container');
     const btnFac = document.getElementById('btn-show-facilities-table');
     const btnClients = document.getElementById('btn-show-clients-table');
+
+    if (btnFac) btnFac.classList.toggle('active', view !== 'clients');
+    if (btnClients) btnClients.classList.toggle('active', view === 'clients');
 
     if (view === 'clients') {
       if (facContainer) facContainer.style.display = 'none';
