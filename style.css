@@ -5301,8 +5301,8 @@ button.btn.btn-subscribe svg {
     object-position: center 18% !important;
   }
 
-  /* ── Gradient Fade at the BOTTOM of the Hero Section (NOT the top) ── */
-  /* Top of hero is completely transparent daylight photo; rich brand gradient rises from bottom protecting text */
+  /* ── Exact Hero Gradient: Subtle at Top, Concentrated at Bottom (Mobile Home Hero) ── */
+  /* Uses exact brand sequence (Lime -> Teal -> Cyan -> Cerulean -> Navy), subtle at top (0.18) and concentrated at bottom (0.95) */
   .hero-section:not(.subpage-hero) .hero-diagonal-shape,
   #hero-slider .hero-diagonal-shape {
     width: 100% !important;
@@ -5312,18 +5312,18 @@ button.btn.btn-subscribe svg {
     top: 0 !important;
     bottom: 0 !important;
     clip-path: none !important;
-    background: linear-gradient(to top, 
-      rgba(10, 25, 47, 0.98) 0%, 
-      rgba(15, 35, 65, 0.94) 18%, 
-      rgba(27, 174, 207, 0.88) 38%, 
-      rgba(60, 175, 138, 0.65) 58%, 
-      rgba(124, 194, 66, 0.22) 75%, 
-      rgba(124, 194, 66, 0.04) 86%, 
-      transparent 100%) !important;
+    background: linear-gradient(165deg, 
+      rgba(124, 194, 66, 0.18) 0%, 
+      rgba(124, 194, 66, 0.35) 18%, 
+      rgba(60, 175, 138, 0.62) 36%, 
+      rgba(27, 174, 207, 0.82) 56%, 
+      rgba(46, 155, 214, 0.90) 76%, 
+      rgba(26, 58, 99, 0.95) 100%) !important;
+    opacity: 1 !important;
     z-index: 2 !important;
   }
 
-  /* Hero Content: Flush left-aligned, standard mobile 1.25rem padding */
+  /* Hero Content: Moved down a few pixels, vertically balanced and spaced out */
   .hero-section:not(.subpage-hero) .hero-content,
   #hero-slider .hero-content,
   #home .hero-content {
@@ -5332,14 +5332,14 @@ button.btn.btn-subscribe svg {
     min-height: 0 !important;
     width: 100% !important;
     max-width: 100% !important;
-    padding-top: 1rem !important;
-    padding-bottom: clamp(3.8rem, 7vh, 4.8rem) !important;
-    padding-left: 1.25rem !important;
-    padding-right: 1.25rem !important;
+    padding-top: clamp(3rem, 7.5vh, 4.5rem) !important;
+    padding-bottom: clamp(4.5rem, 9vh, 6rem) !important;
+    padding-left: clamp(1.25rem, 4vw, 1.75rem) !important;
+    padding-right: clamp(1.25rem, 4vw, 1.75rem) !important;
     margin: 0 !important;
     display: flex !important;
     flex-direction: column !important;
-    justify-content: flex-end !important;
+    justify-content: center !important;
     align-items: flex-start !important;
     text-align: left !important;
     overflow: hidden !important;
@@ -5353,7 +5353,7 @@ button.btn.btn-subscribe svg {
   #home .hero-text-block {
     width: 100% !important;
     max-width: 100% !important;
-    margin-top: auto !important;
+    margin-top: 14px !important;
     margin-bottom: 0 !important;
     margin-left: 0 !important;
     margin-right: 0 !important;
@@ -5361,7 +5361,7 @@ button.btn.btn-subscribe svg {
     display: flex !important;
     flex-direction: column !important;
     align-items: stretch !important;
-    justify-content: flex-end !important;
+    justify-content: center !important;
     box-sizing: border-box !important;
   }
 
@@ -5370,15 +5370,16 @@ button.btn.btn-subscribe svg {
   #home .hero-title {
     width: 100% !important;
     max-width: 100% !important;
-    font-size: clamp(1.68rem, 5.8vw, 2.15rem) !important;
-    line-height: 1.18 !important;
+    font-size: clamp(2.05rem, 7.2vw, 2.65rem) !important;
+    font-weight: 800 !important;
+    line-height: 1.22 !important;
     margin-top: 0 !important;
-    margin-bottom: 0.55rem !important;
+    margin-bottom: 1rem !important;
     margin-left: 0 !important;
     margin-right: 0 !important;
     text-align: left !important;
     color: #FFFFFF !important;
-    text-shadow: 0 2px 14px rgba(0, 0, 0, 0.6) !important;
+    text-shadow: 0 2px 14px rgba(10, 25, 47, 0.7), 0 1px 3px rgba(0, 0, 0, 0.5) !important;
     word-break: normal !important;
     overflow-wrap: break-word !important;
   }
@@ -5388,15 +5389,16 @@ button.btn.btn-subscribe svg {
   #home .hero-subtitle {
     width: 100% !important;
     max-width: 100% !important;
-    font-size: clamp(0.85rem, 2.8vw, 0.98rem) !important;
-    line-height: 1.48 !important;
+    font-size: clamp(1.05rem, 3.6vw, 1.22rem) !important;
+    font-weight: 500 !important;
+    line-height: 1.62 !important;
     margin-top: 0 !important;
-    margin-bottom: 0.95rem !important;
+    margin-bottom: 1.45rem !important;
     margin-left: 0 !important;
     margin-right: 0 !important;
     text-align: left !important;
-    color: rgba(255, 255, 255, 0.95) !important;
-    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.45) !important;
+    color: rgba(255, 255, 255, 0.98) !important;
+    text-shadow: 0 1px 8px rgba(10, 25, 47, 0.65), 0 1px 2px rgba(0, 0, 0, 0.45) !important;
     word-break: normal !important;
     overflow-wrap: break-word !important;
   }
@@ -5408,8 +5410,8 @@ button.btn.btn-subscribe svg {
     max-width: 100% !important;
     display: flex !important;
     flex-direction: column !important;
-    gap: 0.65rem !important;
-    margin: 0 0 0.85rem 0 !important;
+    gap: 0.85rem !important;
+    margin: 0 0 1.2rem 0 !important;
     align-items: stretch !important;
   }
 
@@ -5419,15 +5421,65 @@ button.btn.btn-subscribe svg {
   #hero-slider .btn-pill-outline {
     width: 100% !important;
     max-width: 100% !important;
+    min-height: 48px !important;
     border-radius: 999px !important;
     text-align: center !important;
     justify-content: center !important;
     display: flex !important;
     align-items: center !important;
-    padding: 0.72rem 1.25rem !important;
+    padding: 0.95rem 1.35rem !important;
     font-weight: 800 !important;
-    font-size: 0.78rem !important;
+    font-size: 0.80rem !important;
     box-sizing: border-box !important;
+  }
+
+  /* Mobile Home Hero Action Buttons: Exact Desktop Design & Hover Effects */
+  .hero-section:not(.subpage-hero) .hero-btn-row .btn-pill-hero,
+  #hero-slider .hero-btn-row .btn-pill-hero,
+  #home .hero-btn-row .btn-pill-hero {
+    background: var(--white) !important;
+    color: var(--navy) !important;
+    border: 2.5px solid var(--white) !important;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35) !important;
+    transition: var(--transition-fast) !important;
+  }
+
+  .hero-section:not(.subpage-hero) .hero-btn-row .btn-pill-hero:hover,
+  .hero-section:not(.subpage-hero) .hero-btn-row .btn-pill-hero:active,
+  #hero-slider .hero-btn-row .btn-pill-hero:hover,
+  #hero-slider .hero-btn-row .btn-pill-hero:active,
+  #home .hero-btn-row .btn-pill-hero:hover,
+  #home .hero-btn-row .btn-pill-hero:active {
+    background: var(--cyan-turquoise) !important;
+    color: var(--white) !important;
+    border-color: var(--cyan-turquoise) !important;
+    transform: translateY(-3px) !important;
+    box-shadow: 0 12px 30px rgba(27, 174, 207, 0.45) !important;
+  }
+
+  .hero-section:not(.subpage-hero) .hero-btn-row .btn-pill-outline,
+  #hero-slider .hero-btn-row .btn-pill-outline,
+  #home .hero-btn-row .btn-pill-outline {
+    background: transparent !important;
+    color: var(--white) !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.85) !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    transition: var(--transition-fast) !important;
+  }
+
+  .hero-section:not(.subpage-hero) .hero-btn-row .btn-pill-outline:hover,
+  .hero-section:not(.subpage-hero) .hero-btn-row .btn-pill-outline:active,
+  #hero-slider .hero-btn-row .btn-pill-outline:hover,
+  #hero-slider .hero-btn-row .btn-pill-outline:active,
+  #home .hero-btn-row .btn-pill-outline:hover,
+  #home .hero-btn-row .btn-pill-outline:active {
+    background: var(--white) !important;
+    color: var(--navy) !important;
+    border-color: var(--white) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35) !important;
   }
 
   /* Centralized Carousel Dots (Nav Link Icons) on Mobile - ALWAYS Centralized */
@@ -5591,16 +5643,18 @@ button.btn.btn-subscribe svg {
   .hero-section:not(.subpage-hero) .hero-title,
   #hero-slider .hero-title,
   #home .hero-title {
-    font-size: clamp(1.55rem, 5.8vw, 1.95rem) !important;
-    line-height: 1.18 !important;
+    font-size: clamp(1.95rem, 6.8vw, 2.35rem) !important;
+    font-weight: 800 !important;
+    line-height: 1.22 !important;
     text-align: left !important;
   }
 
   .hero-section:not(.subpage-hero) .hero-subtitle,
   #hero-slider .hero-subtitle,
   #home .hero-subtitle {
-    font-size: clamp(0.82rem, 2.7vw, 0.94rem) !important;
-    line-height: 1.45 !important;
+    font-size: clamp(1rem, 3.4vw, 1.15rem) !important;
+    font-weight: 500 !important;
+    line-height: 1.58 !important;
     text-align: left !important;
   }
 
@@ -5617,8 +5671,9 @@ button.btn.btn-subscribe svg {
   #hero-slider .btn-pill-outline {
     width: 100% !important;
     max-width: 100% !important;
-    padding: 0.68rem 1.15rem !important;
-    font-size: 0.75rem !important;
+    min-height: 46px !important;
+    padding: 0.88rem 1.25rem !important;
+    font-size: 0.77rem !important;
   }
 
   /* Other Webpages (subpages) Full Width Hero Text Content */
