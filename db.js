@@ -184,7 +184,42 @@ try {
 
 // ── In-Memory Datastore (Strictly for local unit testing / non-production) ─────
 const inMemoryStore = {
-  admins: [],
+  admins: [
+    {
+      id: '1f2465dc-9c9b-4d09-a5fa-24c019be87d6',
+      email: 'ayomidenoch15@gmail.com',
+      password_hash: '$2b$10$ICqO6AZ.OprBLcm5OT5Nm.aWhldo4q3dLx6tHzcaFg6PwaX23uUPG',
+      full_name: 'Olugbodi Ayomide',
+      role: 'super-admin',
+      failed_login_attempts: 0,
+      lock_until: null,
+      totp_secret: null,
+      totp_enabled: 0,
+      email_verified: 1,
+      email_verification_token: null,
+      email_verification_expires: null,
+      is_active: 1,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    },
+    {
+      id: 'c4970cd8-eb90-4e33-9aba-446711e88d8b',
+      email: 'admin@divinefingershealthcare.ca',
+      password_hash: '$2b$10$ICqO6AZ.OprBLcm5OT5Nm.aWhldo4q3dLx6tHzcaFg6PwaX23uUPG',
+      full_name: 'Divine Fingers Administrator',
+      role: 'super-admin',
+      failed_login_attempts: 0,
+      lock_until: null,
+      totp_secret: null,
+      totp_enabled: 0,
+      email_verified: 1,
+      email_verification_token: null,
+      email_verification_expires: null,
+      is_active: 1,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    }
+  ],
   staff_roster: [],
   staffing_requests: [],
   job_applications: [],
@@ -248,9 +283,19 @@ function handleInMemoryQuery(sql, params = []) {
       const targetId = params[params.length - 1];
       const admin = inMemoryStore.admins.find(a => a.id === targetId || a.email === targetId);
       if (admin) {
-        if (normalized.includes('email_verified = 1')) admin.email_verified = 1;
+        if (normalized.includes('email_verification_token = ?')) {
+          admin.email_verification_token = params[0];
+          admin.email_verification_expires = new Date(Date.now() + 10 * 60 * 1000).toISOString();
+        }
+        if (normalized.includes('email_verified = 1')) {
+          admin.email_verified = 1;
+          admin.email_verification_token = null;
+          admin.email_verification_expires = null;
+        }
         if (normalized.includes('failed_login_attempts = ?')) admin.failed_login_attempts = params[0];
         if (normalized.includes('totp_enabled = ?')) admin.totp_enabled = params[0];
+        if (normalized.includes('totp_secret = ?')) admin.totp_secret = params[0];
+        if (normalized.includes('last_login = now()') || normalized.includes('last_login')) admin.last_login = new Date().toISOString();
         admin.updated_at = new Date().toISOString();
       }
     }

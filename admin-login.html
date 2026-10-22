@@ -199,6 +199,11 @@
             <i data-lucide="mail-check" class="challenge-icon"></i>
             <div class="challenge-title">Email Verification Required</div>
             <div class="challenge-desc" id="email-recipient-note">A 6-digit verification code has been dispatched to your corporate email.</div>
+            <div id="preview-otp-badge" style="display:none; margin-top:0.75rem; padding:0.6rem 0.9rem; background:rgba(0,168,150,0.12); border:1px solid rgba(0,168,150,0.3); border-radius:8px;">
+              <div style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--brand-turquoise); font-weight:700; margin-bottom:2px;">Preview Environment Code</div>
+              <div id="preview-otp-value" style="font-size:1.4rem; font-weight:800; font-family:monospace; letter-spacing:4px; color:var(--brand-turquoise);"></div>
+              <div style="font-size:0.72rem; color:var(--text-muted); margin-top:2px;">Auto-filled below for instant testing</div>
+            </div>
           </div>
 
           <div class="form-group">
@@ -311,6 +316,15 @@
             stepCredentials.style.display = 'none';
             stepEmail.style.display = 'block';
             document.getElementById('email-recipient-note').textContent = `Verification code dispatched to ${data.email}.`;
+            const badge = document.getElementById('preview-otp-badge');
+            const valEl = document.getElementById('preview-otp-value');
+            if (data.dev_otp && badge && valEl) {
+              valEl.textContent = data.dev_otp;
+              badge.style.display = 'block';
+              document.getElementById('input-email-code').value = data.dev_otp;
+            } else if (badge) {
+              badge.style.display = 'none';
+            }
             document.getElementById('input-email-code').focus();
             if (window.lucide) lucide.createIcons();
             return;
@@ -383,6 +397,15 @@
           });
           const data = await res.json();
           if (data.success) {
+            if (data.dev_otp) {
+              const badge = document.getElementById('preview-otp-badge');
+              const valEl = document.getElementById('preview-otp-value');
+              if (badge && valEl) {
+                valEl.textContent = data.dev_otp;
+                badge.style.display = 'block';
+                document.getElementById('input-email-code').value = data.dev_otp;
+              }
+            }
             alert(data.message || 'Fresh verification code dispatched.');
           } else {
             showError(data.error || 'Failed to resend code.');
