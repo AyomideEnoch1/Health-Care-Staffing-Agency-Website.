@@ -112,6 +112,8 @@ try {
         try { await conn.query('ALTER TABLE users ADD COLUMN avatar_updated_at TIMESTAMP NULL AFTER avatar_url'); } catch (_) {}
         try { await conn.query('ALTER TABLE users ADD COLUMN password_reset_token_hash VARCHAR(128) NULL DEFAULT NULL'); } catch (_) {}
         try { await conn.query('ALTER TABLE users ADD COLUMN password_reset_expires DATETIME NULL DEFAULT NULL'); } catch (_) {}
+        try { await conn.query('ALTER TABLE users ADD COLUMN email_verification_token VARCHAR(128) NULL DEFAULT NULL AFTER email_verified'); } catch (_) {}
+        try { await conn.query('ALTER TABLE users ADD COLUMN email_verification_expires DATETIME NULL DEFAULT NULL AFTER email_verification_token'); } catch (_) {}
         try { await conn.query('ALTER TABLE users ADD COLUMN token_version INT UNSIGNED NOT NULL DEFAULT 1'); } catch (_) {}
         try { await conn.query('ALTER TABLE facilities ADD COLUMN logo_url VARCHAR(500) NULL AFTER facility_code'); } catch (_) {}
         try { await conn.query('ALTER TABLE staff_roster MODIFY COLUMN avatar_url VARCHAR(500) NULL'); } catch (_) {}
@@ -228,7 +230,56 @@ const inMemoryStore = {
   staff_documents: [],
   shift_punches: [],
   newsletter_subscribers: [],
-  facilities: [],
+  facilities: [
+    {
+      id: 'fac-sunnybrook-001',
+      name: 'Sunnybrook Health Sciences Centre',
+      facility_code: 'FAC-SHN-01',
+      address: '2075 Bayview Ave, Toronto, ON M4N 3M5',
+      region: 'Toronto Central',
+      contact_name: 'Director Laura Rossi',
+      contact_email: 'clinical.staffing@sunnybrook.ca',
+      contact_phone: '(416) 480-6100',
+      status: 'active',
+      msa_signed_date: '2026-01-10',
+      msa_expiry_date: '2027-01-10',
+      msa_document_url: 'https://storage.divinefingershealthcare.ca/contracts/msa-sunnybrook-2026.pdf',
+      created_at: new Date(Date.now() - 30 * 24 * 3600 * 1000).toISOString(),
+      updated_at: new Date().toISOString()
+    },
+    {
+      id: 'fac-humber-002',
+      name: 'Humber River Hospital',
+      facility_code: 'FAC-HRH-02',
+      address: '1235 Wilson Ave, North York, ON M3M 0B2',
+      region: 'North York / GTA West',
+      contact_name: 'Lead Coordinator James Patel',
+      contact_email: 'dispatch@hrh.ca',
+      contact_phone: '(416) 242-1000',
+      status: 'active',
+      msa_signed_date: '2026-02-15',
+      msa_expiry_date: '2027-02-15',
+      msa_document_url: 'https://storage.divinefingershealthcare.ca/contracts/msa-hrh-2026.pdf',
+      created_at: new Date(Date.now() - 20 * 24 * 3600 * 1000).toISOString(),
+      updated_at: new Date().toISOString()
+    },
+    {
+      id: 'fac-stmichael-003',
+      name: "St. Michael's Hospital (Unity Health)",
+      facility_code: 'FAC-SMH-03',
+      address: '36 Queen St E, Toronto, ON M5B 1W8',
+      region: 'Downtown Toronto',
+      contact_name: 'Supervisor Marcus Wong',
+      contact_email: 'dispatch@unityhealth.to',
+      contact_phone: '(416) 864-6060',
+      status: 'active',
+      msa_signed_date: '2026-03-01',
+      msa_expiry_date: '2027-03-01',
+      msa_document_url: null,
+      created_at: new Date(Date.now() - 10 * 24 * 3600 * 1000).toISOString(),
+      updated_at: new Date().toISOString()
+    }
+  ],
   facility_rate_cards: [],
   email_outbox: [],
   email_suppressions: [],
@@ -957,6 +1008,26 @@ function handleInMemoryQuery(sql, params = []) {
       return [{ affectedRows: 1, insertId: newUser.id }];
     }
     if (normalized.startsWith('update')) {
+      if (normalized.includes('email_verification_token = ?')) {
+        const targetId = params[params.length - 1];
+        const user = inMemoryStore.users.find(u => u.id === targetId || u.email === targetId);
+        if (user) {
+          user.email_verification_token = params[0];
+          user.email_verification_expires = new Date(Date.now() + 15 * 60 * 1000).toISOString();
+        }
+        return [{ affectedRows: 1, changedRows: 1 }];
+      }
+      if (normalized.includes('email_verified = 1')) {
+        const targetId = params[params.length - 1];
+        const user = inMemoryStore.users.find(u => u.id === targetId || u.email === targetId);
+        if (user) {
+          user.email_verified = 1;
+          user.email_verification_token = null;
+          user.email_verification_expires = null;
+          user.last_login = new Date().toISOString();
+        }
+        return [{ affectedRows: 1, changedRows: 1 }];
+      }
       if (normalized.includes('password_hash = ?')) {
         const newHash = params[0];
         const whereParams = params.slice(1).map(p => String(p || '').toLowerCase().trim());
@@ -1046,24 +1117,114 @@ function handleInMemoryQuery(sql, params = []) {
   }
 
   // 10. FACILITIES
-  if (normalized.includes('from facilities') || normalized.includes('from `facilities`') || normalized.includes('into facilities')) {
+  if (normalized.includes('from facilities') || normalized.includes('from `facilities`') || normalized.includes('into facilities') || normalized.includes('update facilities') || normalized.includes('update `facilities`')) {
     if (normalized.startsWith('select')) {
-      return [inMemoryStore.facilities || []];
+      if (normalized.includes('count(*) as total') || normalized.includes('count(*)')) {
+        const total = (inMemoryStore.facilities || []).length;
+        const pending = (inMemoryStore.facilities || []).filter(f => f.status === 'pending').length;
+        const active = (inMemoryStore.facilities || []).filter(f => f.status === 'active').length;
+        return [[{ total_facilities: total, pending_facilities: pending, active_facilities: active, total, count: total }]];
+      }
+      if (normalized.includes('where id = ?') || normalized.includes('where lower(trim(name)) = lower(trim(?))')) {
+        const p0 = String(params[0] || '').toLowerCase().trim();
+        const found = (inMemoryStore.facilities || []).filter(f => f.id === params[0] || (f.name && f.name.toLowerCase().trim() === p0));
+        return [found];
+      }
+
+      // Return enriched facilities
+      const today = new Date();
+      const enriched = (inMemoryStore.facilities || []).map(fac => {
+        const rateCards = (inMemoryStore.facility_rate_cards || []).filter(rc => rc.facility_id === fac.id);
+        const users = (inMemoryStore.users || []).filter(u => u.facility_id === fac.id || (u.organization_name && fac.name && u.organization_name.toLowerCase().trim() === fac.name.toLowerCase().trim()));
+        const requests = (inMemoryStore.staffing_requests || []).filter(r => r.facility_id === fac.id || (r.facility_name && fac.name && r.facility_name.toLowerCase().trim() === fac.name.toLowerCase().trim()));
+
+        let isExpired = fac.status === 'expired';
+        let isExpiringSoon = false;
+        let daysUntilExpiry = null;
+        if (fac.msa_expiry_date) {
+          const expDate = new Date(fac.msa_expiry_date);
+          const diffDays = Math.ceil((expDate - today) / (1000 * 60 * 60 * 24));
+          daysUntilExpiry = diffDays;
+          if (diffDays <= 0) isExpired = true;
+          else if (diffDays <= 30) isExpiringSoon = true;
+        }
+
+        return {
+          ...fac,
+          effective_status: isExpired ? 'expired' : (fac.status || 'pending'),
+          is_expiring_soon: isExpiringSoon,
+          days_until_expiry: daysUntilExpiry,
+          active_rate_cards_count: rateCards.length,
+          total_rate_cards_count: rateCards.length,
+          has_portal_account: users.length > 0,
+          registered_user_emails: users.map(u => u.email).join(', '),
+          registered_users_count: users.length,
+          latest_user_registered_at: users.length > 0 ? users[users.length - 1].created_at : null,
+          total_shifts_requested: requests.length
+        };
+      });
+
+      return [enriched];
     }
+
     if (normalized.startsWith('insert')) {
-      const fac = {
-        id: params[0] || crypto.randomUUID(),
-        name: params[1] || 'Sample Facility',
-        facility_code: params[2] || 'FAC-' + Date.now().toString().slice(-4),
-        address: params[3] || null,
-        region: params[4] || 'Greater Toronto Area',
-        status: params[5] || 'pending',
-        msa_signed_date: params[6] || null,
-        msa_expiry_date: params[7] || null,
-        created_at: new Date().toISOString()
+      const colMatch = sql.match(/insert\s+into\s+[`"]?facilities[`"]?\s*\(([^)]+)\)\s*values\s*\(([^)]+)\)/i);
+      const newFac = {
+        id: crypto.randomUUID(),
+        name: 'New Healthcare Facility',
+        facility_code: 'FAC-' + Date.now().toString().slice(-4),
+        address: null,
+        region: 'Greater Toronto Area',
+        contact_name: null,
+        contact_email: null,
+        contact_phone: null,
+        msa_signed_date: null,
+        msa_expiry_date: null,
+        msa_document_url: null,
+        status: 'pending',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
       };
-      inMemoryStore.facilities.push(fac);
-      return [{ affectedRows: 1, insertId: fac.id }];
+
+      if (colMatch) {
+        const cols = colMatch[1].split(',').map(c => c.trim().replace(/[`"']/g, '').toLowerCase());
+        const rawVals = colMatch[2].split(',').map(v => v.trim());
+        let pIdx = 0;
+        for (let i = 0; i < cols.length; i++) {
+          const col = cols[i];
+          const rawVal = rawVals[i];
+          if (rawVal === '?') {
+            newFac[col] = params[pIdx++];
+          } else if (/^['"].*['"]$/.test(rawVal)) {
+            newFac[col] = rawVal.slice(1, -1);
+          } else if (/^\d+$/.test(rawVal)) {
+            newFac[col] = parseInt(rawVal, 10);
+          } else if (rawVal.toLowerCase() === 'now()') {
+            newFac[col] = new Date().toISOString();
+          } else {
+            newFac[col] = rawVal;
+          }
+        }
+      } else {
+        newFac.id = params[0] || newFac.id;
+        newFac.name = params[1] || newFac.name;
+        newFac.facility_code = params[2] || newFac.facility_code;
+      }
+
+      inMemoryStore.facilities = inMemoryStore.facilities || [];
+      inMemoryStore.facilities.unshift(newFac);
+      return [{ affectedRows: 1, insertId: newFac.id }];
+    }
+
+    if (normalized.startsWith('update')) {
+      const idParam = params[params.length - 1];
+      const fac = (inMemoryStore.facilities || []).find(f => f.id === idParam);
+      if (fac) {
+        if (normalized.includes('status = ?')) fac.status = params[0];
+        if (normalized.includes('address = ?')) fac.address = params[1] || fac.address;
+        fac.updated_at = new Date().toISOString();
+      }
+      return [{ affectedRows: 1, changedRows: 1 }];
     }
   }
 

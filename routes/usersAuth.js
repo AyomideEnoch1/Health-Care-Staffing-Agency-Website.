@@ -20,7 +20,8 @@ const { uploadAvatar, validateAvatarContent } = require('../middleware/avatarUpl
 const { authLoginLimiter, passwordResetLimiter } = require('../middleware/rateLimiter');
 const adminEvents = require('../utils/events');
 const { enqueueMail } = require('../utils/mailOutbox');
-const { generateSecureToken } = require('../utils/cryptoUtils');
+const { generateSecureToken, maskEmail } = require('../utils/cryptoUtils');
+const { sendRawMail, buildUserVerificationOtpEmail } = require('../utils/mailer');
 
 const USER_JWT_SECRET = process.env.USER_JWT_SECRET || process.env.JWT_SECRET || 'divine_fingers_default_secure_jwt_secret_key_2026_production_fallback';
 const JWT_SECRET = USER_JWT_SECRET;
@@ -206,41 +207,40 @@ router.post('/register', async (req, res, next) => {
       }
     }
 
-    // Issue JWT session token
-    const tokenPayload = {
-      id: userId,
-      email: emailClean,
-      full_name: data.full_name.trim(),
-      role: data.role,
-      organization_name: orgName,
-      facility_id: facilityId,
-      phone: data.phone || null,
-      credential_status: data.role === 'healthcare_worker' ? 'pending' : 'verified',
-      staff_status: data.role === 'healthcare_worker' ? 'pending_verification' : 'available',
-      is_verified: data.role !== 'healthcare_worker'
-    };
+    // ── MANDATORY EMAIL OTP VERIFICATION FOR NEW CLIENT REGISTRATION ──
+    const emailOtp = crypto.randomInt(100000, 999999).toString();
+    const hashedOtp = crypto.createHash('sha256').update(emailOtp).digest('hex');
 
-    const token = jwt.sign(tokenPayload, JWT_SECRET, { expiresIn: '7d' });
-    res.cookie(USER_COOKIE_NAME, token, buildUserCookieOptions());
+    await pool.query(
+      'UPDATE users SET email_verified = 0, email_verification_token = ?, email_verification_expires = DATE_ADD(NOW(), INTERVAL 15 MINUTE) WHERE id = ?',
+      [hashedOtp, userId]
+    );
+
+    try {
+      const emailContent = buildUserVerificationOtpEmail(data.full_name.trim(), emailOtp, 'registration');
+      await sendRawMail({
+        to: emailClean,
+        subject: emailContent.subject,
+        text: emailContent.text,
+        html: emailContent.html
+      });
+      console.log(`[AUTH REGISTER] ✅ Registration verification OTP sent to ${emailClean}`);
+    } catch (mailErr) {
+      console.error('[AUTH REGISTER] OTP delivery warning:', mailErr.message);
+    }
+
+    const verifyToken = jwt.sign(
+      { id: userId, email: emailClean, purpose: 'user_verify_pending' },
+      JWT_SECRET,
+      { expiresIn: '15m' }
+    );
 
     return res.status(201).json({
       success: true,
-      message: data.role === 'healthcare_worker'
-        ? 'Account created! Your clinical profile is pending verification by the compliance team.'
-        : 'Account created successfully.',
-      redirectTo: 'portal.html',
-      user: {
-        id: userId,
-        email: emailClean,
-        full_name: data.full_name.trim(),
-        role: data.role,
-        organization_name: orgName,
-        facility_id: facilityId,
-        phone: data.phone || null,
-        credential_status: data.role === 'healthcare_worker' ? 'pending' : 'verified',
-        staff_status: data.role === 'healthcare_worker' ? 'pending_verification' : 'available',
-        is_verified: data.role !== 'healthcare_worker'
-      }
+      requires_email_verification: true,
+      verify_token: verifyToken,
+      email: maskEmail(emailClean),
+      message: `Account created for ${data.full_name.trim()}! A 6-digit verification code has been dispatched to ${maskEmail(emailClean)}. Please enter the code to complete verification.`
     });
   } catch (err) {
     if (err instanceof z.ZodError) {
@@ -343,40 +343,40 @@ router.post('/login', authLoginLimiter, async (req, res, next) => {
         } catch (e) {}
       }
 
-      // Issue standard User JWT session token
-      const tokenPayload = {
-        id: authenticatedUser.id,
-        email: authenticatedUser.email,
-        full_name: authenticatedUser.full_name,
-        role: authenticatedUser.role,
-        organization_name: authenticatedUser.organization_name,
-        phone: authenticatedUser.phone || null,
-        credential_status: credentialStatus,
-        staff_status: staffStatus,
-        is_verified: credentialStatus === 'verified'
-      };
+      // ── MANDATORY REAL-TIME EMAIL OTP VERIFICATION FOR SIGN IN ──
+      const emailOtp = crypto.randomInt(100000, 999999).toString();
+      const hashedOtp = crypto.createHash('sha256').update(emailOtp).digest('hex');
 
-      const token = jwt.sign(tokenPayload, JWT_SECRET, { expiresIn: '7d' });
-      res.cookie(USER_COOKIE_NAME, token, buildUserCookieOptions());
+      await pool.query(
+        'UPDATE users SET email_verification_token = ?, email_verification_expires = DATE_ADD(NOW(), INTERVAL 15 MINUTE) WHERE id = ?',
+        [hashedOtp, authenticatedUser.id]
+      );
+
+      try {
+        const emailContent = buildUserVerificationOtpEmail(authenticatedUser.full_name, emailOtp, 'sign-in');
+        await sendRawMail({
+          to: authenticatedUser.email,
+          subject: emailContent.subject,
+          text: emailContent.text,
+          html: emailContent.html
+        });
+        console.log(`[AUTH LOGIN] ✅ Sign-in OTP dispatched to ${authenticatedUser.email}`);
+      } catch (mailErr) {
+        console.error('[AUTH LOGIN] OTP dispatch warning:', mailErr.message);
+      }
+
+      const verifyToken = jwt.sign(
+        { id: authenticatedUser.id, email: authenticatedUser.email, purpose: 'user_verify_pending' },
+        JWT_SECRET,
+        { expiresIn: '15m' }
+      );
 
       return res.json({
         success: true,
-        isAdmin: false,
-        redirectTo: 'portal.html',
-        message: 'Logged in successfully.',
-        user: {
-          id: authenticatedUser.id,
-          email: authenticatedUser.email,
-          full_name: authenticatedUser.full_name,
-          role: authenticatedUser.role,
-          organization_name: authenticatedUser.organization_name,
-          phone: authenticatedUser.phone,
-          credential_status: credentialStatus,
-          staff_status: staffStatus,
-          clinical_role: clinicalRole,
-          staff_code: staffCode,
-          is_verified: credentialStatus === 'verified'
-        }
+        requires_email_verification: true,
+        verify_token: verifyToken,
+        email: maskEmail(authenticatedUser.email),
+        message: `A 6-digit verification code has been dispatched to ${maskEmail(authenticatedUser.email)}. Please check your inbox to complete sign in.`
       });
     }
 
@@ -968,6 +968,160 @@ router.post('/facility/logo', requirePortalUser, uploadAvatar.single('logo'), va
     }
     next(err);
   }
+});
+
+
+// ── POST /api/users/verify-otp ─────────────────────────────────────────────
+router.post('/verify-otp', authLoginLimiter, async (req, res, next) => {
+  try {
+    const { verify_token, email_code } = req.body;
+    if (!verify_token || !email_code) {
+      return res.status(400).json({ success: false, error: 'Verification session and 6-digit code are required.' });
+    }
+
+    let decoded;
+    try {
+      decoded = jwt.verify(verify_token, JWT_SECRET);
+      if (decoded.purpose !== 'user_verify_pending') throw new Error('Invalid token purpose');
+    } catch {
+      return res.status(401).json({ success: false, error: 'Verification session expired. Please sign in again.' });
+    }
+
+    const hashedInput = crypto.createHash('sha256').update(String(email_code).trim()).digest('hex');
+
+    const [rows] = await pool.query(
+      'SELECT id, email, full_name, role, organization_name, facility_id, phone, is_active, email_verified, email_verification_token, email_verification_expires FROM users WHERE id = ? LIMIT 1',
+      [decoded.id]
+    );
+
+    if (!rows || rows.length === 0 || !rows[0].is_active) {
+      return res.status(401).json({ success: false, error: 'Account not found or inactive.' });
+    }
+
+    const user = rows[0];
+
+    if (!user.email_verification_token || !user.email_verification_expires || new Date(user.email_verification_expires) < new Date()) {
+      return res.status(400).json({ success: false, error: 'Verification code has expired. Please click "Resend Code".' });
+    }
+
+    if (user.email_verification_token !== hashedInput) {
+      return res.status(400).json({ success: false, error: 'Invalid verification code. Please check your email and try again.' });
+    }
+
+    // Success: activate email verification, clear tokens, and update last_login
+    await pool.query(
+      'UPDATE users SET email_verified = 1, email_verification_token = NULL, email_verification_expires = NULL, last_login = NOW() WHERE id = ?',
+      [user.id]
+    );
+
+    let credentialStatus = 'verified';
+    let staffStatus = 'available';
+    let clinicalRole = 'RN';
+    let staffCode = null;
+
+    if (user.role === 'healthcare_worker') {
+      credentialStatus = 'pending';
+      staffStatus = 'pending_verification';
+      try {
+        const [rosterRows] = await pool.query(
+          'SELECT id, staff_code, role, status, credential_status FROM staff_roster WHERE id = ? OR email = ? LIMIT 1',
+          [user.id, user.email]
+        );
+        if (rosterRows && rosterRows.length > 0) {
+          credentialStatus = rosterRows[0].credential_status || 'pending';
+          staffStatus = rosterRows[0].status || 'pending_verification';
+          clinicalRole = rosterRows[0].role || 'RN';
+          staffCode = rosterRows[0].staff_code;
+        }
+      } catch (e) {}
+    }
+
+    const tokenPayload = {
+      id: user.id,
+      email: user.email,
+      full_name: user.full_name,
+      role: user.role,
+      organization_name: user.organization_name,
+      facility_id: user.facility_id,
+      phone: user.phone || null,
+      credential_status: credentialStatus,
+      staff_status: staffStatus,
+      is_verified: true
+    };
+
+    const token = jwt.sign(tokenPayload, JWT_SECRET, { expiresIn: '7d' });
+    res.cookie(USER_COOKIE_NAME, token, buildUserCookieOptions());
+
+    return res.json({
+      success: true,
+      message: 'Identity verified successfully! Redirecting to your portal...',
+      redirectTo: 'portal.html',
+      user: {
+        id: user.id,
+        email: user.email,
+        full_name: user.full_name,
+        role: user.role,
+        organization_name: user.organization_name,
+        facility_id: user.facility_id,
+        phone: user.phone,
+        credential_status: credentialStatus,
+        staff_status: staffStatus,
+        clinical_role: clinicalRole,
+        staff_code: staffCode,
+        is_verified: true
+      }
+    });
+  } catch (err) { next(err); }
+});
+
+// ── POST /api/users/resend-otp ─────────────────────────────────────────────
+router.post('/resend-otp', authLoginLimiter, async (req, res, next) => {
+  try {
+    const { verify_token } = req.body;
+    if (!verify_token) {
+      return res.status(400).json({ success: false, error: 'Verification token is required.' });
+    }
+
+    let decoded;
+    try {
+      decoded = jwt.verify(verify_token, JWT_SECRET);
+      if (decoded.purpose !== 'user_verify_pending') throw new Error('Invalid token purpose');
+    } catch {
+      return res.status(401).json({ success: false, error: 'Session expired. Please sign in again.' });
+    }
+
+    const [rows] = await pool.query('SELECT id, email, full_name, is_active FROM users WHERE id = ? LIMIT 1', [decoded.id]);
+    if (!rows || rows.length === 0 || !rows[0].is_active) {
+      return res.status(401).json({ success: false, error: 'Account not found.' });
+    }
+
+    const user = rows[0];
+    const emailOtp = crypto.randomInt(100000, 999999).toString();
+    const hashedOtp = crypto.createHash('sha256').update(emailOtp).digest('hex');
+
+    await pool.query(
+      'UPDATE users SET email_verification_token = ?, email_verification_expires = DATE_ADD(NOW(), INTERVAL 15 MINUTE) WHERE id = ?',
+      [hashedOtp, user.id]
+    );
+
+    try {
+      const emailContent = buildUserVerificationOtpEmail(user.full_name, emailOtp, 'sign-in');
+      await sendRawMail({
+        to: user.email,
+        subject: emailContent.subject,
+        text: emailContent.text,
+        html: emailContent.html
+      });
+      console.log(`[AUTH RESEND] ✅ Resent OTP to ${user.email}`);
+    } catch (mailErr) {
+      console.error('[AUTH RESEND] OTP dispatch error:', mailErr.message);
+    }
+
+    res.json({
+      success: true,
+      message: `A fresh 6-digit verification code has been dispatched to ${maskEmail(user.email)}. Please check your email inbox.`
+    });
+  } catch (err) { next(err); }
 });
 
 module.exports = router;

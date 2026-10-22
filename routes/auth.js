@@ -82,43 +82,10 @@ router.post('/login', authLoginLimiter, async (req, res, next) => {
       );
 
       if (userRows && userRows.length > 0) {
-        const staffUser = userRows[0];
-        if (!staffUser.is_active) {
-          return res.status(403).json({ success: false, error: 'Your account is currently inactive. Please contact clinical dispatch.' });
-        }
-        const match = await bcrypt.compare(password, staffUser.password_hash);
-        if (match) {
-          const tokenPayload = {
-            id: staffUser.id,
-            email: staffUser.email,
-            full_name: staffUser.full_name,
-            role: staffUser.role,
-            organization_name: staffUser.organization_name
-          };
-          const isProd = process.env.NODE_ENV === 'production';
-          const token = jwt.sign(tokenPayload, JWT_SECRET, { expiresIn: '7d' });
-          res.cookie('df_user_session', token, {
-            httpOnly: true,
-            secure: isProd,
-            sameSite: 'Lax',
-            maxAge: 7 * 24 * 60 * 60 * 1000,
-            path: '/'
-          });
-          return res.json({
-            success: true,
-            isUser: true,
-            redirectTo: 'portal.html',
-            message: 'Healthcare Staff credentials verified! Redirecting to Member Portal...',
-            user: {
-              id: staffUser.id,
-              email: staffUser.email,
-              full_name: staffUser.full_name,
-              role: staffUser.role,
-              organization_name: staffUser.organization_name,
-              phone: staffUser.phone
-            }
-          });
-        }
+        return res.status(403).json({
+          success: false,
+          error: 'This portal gate is strictly for administrative operations. Healthcare clients and staff must sign in via the Client & Staff Portal at /login.html.'
+        });
       }
 
       // Dummy bcrypt comparison to normalize execution time and defend against username enumeration

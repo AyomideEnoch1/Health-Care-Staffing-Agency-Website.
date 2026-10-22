@@ -132,6 +132,14 @@ router.get('/kpis', async (req, res, next) => {
       FROM staff_roster
     `);
 
+    const [[facCounts]] = await pool.query(`
+      SELECT
+        COUNT(*) AS total_facilities,
+        SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) AS pending_facilities,
+        SUM(CASE WHEN status = 'active' THEN 1 ELSE 0 END) AS active_facilities
+      FROM facilities
+    `).catch(() => [[{ total_facilities: 0, pending_facilities: 0, active_facilities: 0 }]]);
+
     const [regionalRows] = await pool.query(`
       SELECT
         COALESCE(NULLIF(TRIM(f.region), ''), 'Scarborough') AS region,
@@ -167,6 +175,11 @@ router.get('/kpis', async (req, res, next) => {
           total:     parseInt(rosterCounts?.total_staff)          || 0,
           available: parseInt(rosterCounts?.available_staff)      || 0,
           expiring:  parseInt(rosterCounts?.credentials_expiring) || 0
+        },
+        facilities: {
+          total:     parseInt(facCounts?.total_facilities)   || 0,
+          pending:   parseInt(facCounts?.pending_facilities) || 0,
+          active:    parseInt(facCounts?.active_facilities)  || 0
         },
         shift_fill_rate: fillRate, // null if no data yet — UI shows "N/A"
         regional_demand: regionalRows || []

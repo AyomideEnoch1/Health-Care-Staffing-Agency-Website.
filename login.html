@@ -691,6 +691,41 @@
           </form>
         </div>
 
+        <!-- TAB 5: EMAIL VERIFICATION CHALLENGE -->
+        <div class="auth-tab-content" id="tab-content-verify">
+          <form id="form-verify-otp" onsubmit="handleVerifyOtp(event)">
+            <input type="hidden" id="user-verify-token" value="">
+            
+            <div style="background: rgba(0, 168, 150, 0.08); border: 1px solid rgba(0, 168, 150, 0.25); border-radius: 12px; padding: 1.25rem; margin-bottom: 1.5rem; text-align: center;">
+              <i data-lucide="shield-check" style="width: 32px; height: 32px; color: var(--brand-turquoise); margin-bottom: 0.5rem;"></i>
+              <div style="font-family: var(--font-heading); font-size: 1.05rem; font-weight: 800; color: var(--navy); margin-bottom: 0.35rem;">Security Verification Required</div>
+              <div style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.45;" id="verify-recipient-desc">
+                A 6-digit verification code has been dispatched to your email address. Please enter it below to complete authentication.
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="user-verify-code" style="text-align: center; display: block;">6-Digit Security Passcode</label>
+              <div class="input-wrapper">
+                <input type="text" id="user-verify-code" class="auth-input" placeholder="000000" maxlength="6" pattern="[0-9]{6}" inputmode="numeric" required style="font-size: 1.5rem; letter-spacing: 8px; text-align: center; font-weight: 800; font-family: monospace;" autocomplete="one-time-code">
+              </div>
+            </div>
+
+            <button type="submit" class="btn-submit-auth" id="btn-verify-otp-submit">
+              <i data-lucide="check-circle" style="width: 18px; height: 18px;"></i> Verify &amp; Access Portal
+            </button>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1.25rem;">
+              <button type="button" id="btn-user-resend-otp" onclick="handleResendUserOtp()" style="background: none; border: none; color: var(--brand-turquoise); font-size: 0.82rem; font-weight: 700; cursor: pointer;">
+                Resend Code
+              </button>
+              <button type="button" onclick="switchAuthTab('login')" style="background: none; border: none; color: var(--text-muted); font-size: 0.82rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;">
+                <i data-lucide="arrow-left" style="width: 13px; height: 13px;"></i> Return to Sign In
+              </button>
+            </div>
+          </form>
+        </div>
+
         <!-- TAB 4: RESET PASSWORD (When opening ?action=reset&token=...) -->
         <div class="auth-tab-content" id="tab-content-reset">
           <form id="form-reset" onsubmit="handleResetPassword(event)">
@@ -832,6 +867,8 @@
 
       if (forgotContent) forgotContent.classList.remove('active');
       if (resetContent) resetContent.classList.remove('active');
+      const verifyContent = document.getElementById('tab-content-verify');
+      if (verifyContent) verifyContent.classList.remove('active');
 
       if (tab === 'login') {
         loginTabBtn.classList.add('active');
@@ -874,6 +911,29 @@
       if (window.lucide) lucide.createIcons();
     }
     window.openForgotView = openForgotView;
+
+    function openVerifyView() {
+      clearAlerts();
+      const tabsNav = document.querySelector('.auth-tabs-nav');
+      if (tabsNav) tabsNav.style.display = 'none';
+
+      document.querySelectorAll('.auth-tab-content').forEach(el => el.classList.remove('active'));
+      const verifyContent = document.getElementById('tab-content-verify');
+      if (verifyContent) verifyContent.classList.add('active');
+
+      const title = document.getElementById('auth-main-title');
+      const subtitle = document.getElementById('auth-main-subtitle');
+      if (title) title.textContent = 'Identity Verification';
+      if (subtitle) subtitle.textContent = 'Enter the 6-digit verification code dispatched to your corporate email to complete authentication.';
+
+      const codeInput = document.getElementById('user-verify-code');
+      if (codeInput) {
+        codeInput.value = '';
+        codeInput.focus();
+      }
+      if (window.lucide) lucide.createIcons();
+    }
+    window.openVerifyView = openVerifyView;
 
     function openResetView(token, email) {
       clearAlerts();
@@ -973,6 +1033,15 @@
         const result = await response.json();
 
         if (response.ok && result.success) {
+          if (result.requires_email_verification) {
+            document.getElementById('user-verify-token').value = result.verify_token;
+            const desc = document.getElementById('verify-recipient-desc');
+            if (desc) desc.textContent = `A 6-digit security verification code has been dispatched to ${result.email}. Please enter it below to complete sign in.`;
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i> Sign In';
+            openVerifyView();
+            return;
+          }
           showAlert('success', 'Sign in successful! Redirecting to your portal...');
           if (result.user) {
             sessionStorage.setItem('df_portal_user', JSON.stringify(result.user));
@@ -1043,6 +1112,15 @@
         const result = await response.json();
 
         if (response.ok && result.success) {
+          if (result.requires_email_verification) {
+            document.getElementById('user-verify-token').value = result.verify_token;
+            const desc = document.getElementById('verify-recipient-desc');
+            if (desc) desc.textContent = `Facility account created! A 6-digit verification code has been dispatched to ${result.email}. Please enter it below to activate your account.`;
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i data-lucide="building-2" style="width: 18px; height: 18px;"></i> Register Facility Account';
+            openVerifyView();
+            return;
+          }
           if (result.user) {
             sessionStorage.setItem('df_portal_user', JSON.stringify(result.user));
             try { localStorage.setItem('df_portal_user', JSON.stringify(result.user)); } catch (e) {}

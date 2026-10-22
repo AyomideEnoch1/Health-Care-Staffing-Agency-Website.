@@ -213,6 +213,42 @@ function buildApplicantConfirmationEmail(applicantData) {
   return { subject, text, html };
 }
 
+function buildUserVerificationOtpEmail(userName, otpCode, purpose = 'sign-in') {
+  const safeName = escapeHtml(sanitizeHeader(userName || 'Client'));
+  const safeOtp = escapeHtml(sanitizeHeader(otpCode));
+
+  const isReg = purpose === 'registration';
+  const subject = isReg 
+    ? `Verify Your Facility Account: ${safeOtp} — Divine Fingers Healthcare`
+    : `Portal Security Verification Code: ${safeOtp}`;
+
+  const text =
+    `Hello ${userName},\n\n` +
+    (isReg 
+      ? `Thank you for registering your healthcare facility with Divine Fingers Healthcare Services.\nYour 6-digit account activation verification code is: ${otpCode}\n\n`
+      : `Your 6-digit Divine Fingers Portal sign-in verification code is: ${otpCode}\n\n`) +
+    `This code will expire in 15 minutes. Never share this code with anyone.\n\n` +
+    `Divine Fingers Healthcare Services Inc.`;
+
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 540px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 8px; background: #ffffff;">
+      <h3 style="color: #00a896; margin-top: 0;">${isReg ? 'Facility Account Verification' : 'Portal Identity Verification'}</h3>
+      <p>Hello <strong>${safeName}</strong>,</p>
+      <p>${isReg ? 'Thank you for registering your healthcare facility with Divine Fingers Healthcare Services Inc. Please enter the following 6-digit verification code to activate your account and access your dedicated portal:' : 'Please enter the following single-use verification code to complete your portal sign in:'}</p>
+      <div style="text-align: center; margin: 24px 0;">
+        <span style="display: inline-block; font-size: 32px; font-weight: 800; letter-spacing: 6px; color: #0a192f; background: #f0fdfa; padding: 12px 24px; border-radius: 6px; border: 1px solid #00a896;">
+          ${safeOtp}
+        </span>
+      </div>
+      <p style="font-size: 13px; color: #64748b;">This code expires in <strong>15 minutes</strong> and can only be used once.</p>
+      <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 20px 0;" />
+      <p style="font-size: 11px; color: #94a3b8; margin: 0;">Divine Fingers Healthcare Services Inc. (Corp ID: 1592082-5) &bull; Clinical Operations</p>
+    </div>
+  `;
+
+  return { subject, text, html };
+}
+
 function buildAdminVerificationOtpEmail(adminName, otpCode) {
   const safeName = escapeHtml(sanitizeHeader(adminName || 'Administrator'));
   const safeOtp = escapeHtml(sanitizeHeader(otpCode));
@@ -369,6 +405,7 @@ module.exports = {
   buildStaffingRequestAlertEmail,
   buildApplicantConfirmationEmail,
   buildAdminVerificationOtpEmail,
+  buildUserVerificationOtpEmail,
   buildPasswordResetEmail,
   buildAdminInviteEmail,
   buildStaffWelcomeNotificationEmail,

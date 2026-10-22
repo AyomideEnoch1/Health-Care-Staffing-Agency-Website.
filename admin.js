@@ -1036,7 +1036,8 @@
         fetchAndRenderApplicants(),
         fetchAndRenderAudit(),
         fetchAndRenderInquiries(),
-        fetchAndRenderAdminAccounts()
+        fetchAndRenderAdminAccounts(),
+        fetchAndRenderFacilities()
       ]);
 
       renderCompliance();
@@ -1064,7 +1065,7 @@
     try {
       const res = await apiRequest('/admin/kpis');
       LiveStore.kpis = res.data;
-      const { requests, applications, roster, shift_fill_rate } = res.data;
+      const { requests, applications, roster, facilities, shift_fill_rate } = res.data;
 
       setKpi('kpi-active-shifts',   requests.dispatched, requests.dispatched > 0 ? `${requests.dispatched} Dispatched` : 'None active');
       setKpi('kpi-open-requests',   requests.pending,    requests.urgent > 0 ? `${requests.urgent} Urgent Surge` : '0 Urgent');
@@ -1076,6 +1077,21 @@
       setBadge('badge-roster-count',     roster.total);
       setBadge('badge-requests-count',   requests.pending);
       setBadge('badge-applicants-count', applications.new);
+
+      const pendingFacCount = facilities ? (facilities.pending || 0) : 0;
+      const badgeFacilities = document.getElementById('badge-facilities-count');
+      if (badgeFacilities) {
+        if (pendingFacCount > 0) {
+          badgeFacilities.textContent = `${pendingFacCount} NEW`;
+          badgeFacilities.style.display = 'inline-flex';
+          badgeFacilities.classList.add('warning', 'pulse');
+        } else {
+          const totalFacs = facilities ? (facilities.total || 0) : 0;
+          badgeFacilities.textContent = totalFacs;
+          badgeFacilities.style.display = totalFacs > 0 ? 'inline-flex' : 'none';
+          badgeFacilities.classList.remove('warning', 'pulse');
+        }
+      }
     } catch { /* Ignore */ }
   }
 
@@ -4828,8 +4844,15 @@
       if (elClientBadge) elClientBadge.textContent = registeredClientsCount;
 
       if (badgeFacilitiesCount) {
-        badgeFacilitiesCount.textContent = LiveStore.facilities.length;
-        badgeFacilitiesCount.style.display = LiveStore.facilities.length > 0 ? 'inline-block' : 'none';
+        if (pendingCount > 0) {
+          badgeFacilitiesCount.textContent = `${pendingCount} NEW`;
+          badgeFacilitiesCount.style.display = 'inline-flex';
+          badgeFacilitiesCount.classList.add('warning', 'pulse');
+        } else {
+          badgeFacilitiesCount.textContent = LiveStore.facilities.length;
+          badgeFacilitiesCount.style.display = LiveStore.facilities.length > 0 ? 'inline-flex' : 'none';
+          badgeFacilitiesCount.classList.remove('warning', 'pulse');
+        }
       }
 
       renderFacilitiesList();
