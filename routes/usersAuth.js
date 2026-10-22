@@ -12,8 +12,11 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
+const fs = require('fs');
+const path = require('path');
 const { z } = require('zod');
 const pool = require('../db');
+const { uploadAvatar, validateAvatarContent } = require('../middleware/avatarUpload');
 const { authLoginLimiter, passwordResetLimiter } = require('../middleware/rateLimiter');
 const adminEvents = require('../utils/events');
 const { enqueueMail } = require('../utils/mailOutbox');
@@ -410,14 +413,14 @@ router.get('/me', async (req, res) => {
     let rows;
     try {
       [rows] = await pool.query(
-        'SELECT id, email, full_name, role, organization_name, facility_id, client_role, phone, is_active, created_at FROM users WHERE id = ? LIMIT 1',
+        'SELECT id, email, full_name, role, organization_name, facility_id, client_role, phone, avatar_url, is_active, created_at FROM users WHERE id = ? LIMIT 1',
         [decoded.id]
       );
     } catch (queryErr) {
       console.warn('[AUTH /me Query Warning (with facility_id)]:', queryErr.message);
       try {
         [rows] = await pool.query(
-          'SELECT id, email, full_name, role, organization_name, phone, is_active, created_at FROM users WHERE id = ? LIMIT 1',
+          'SELECT id, email, full_name, role, organization_name, phone, avatar_url, is_active, created_at FROM users WHERE id = ? LIMIT 1',
           [decoded.id]
         );
       } catch (innerErr) {
@@ -431,13 +434,13 @@ router.get('/me', async (req, res) => {
       const cleanEmail = decoded.email.toLowerCase().trim();
       try {
         [rows] = await pool.query(
-          'SELECT id, email, full_name, role, organization_name, facility_id, client_role, phone, is_active, created_at FROM users WHERE LOWER(email) = ? LIMIT 1',
+          'SELECT id, email, full_name, role, organization_name, facility_id, client_role, phone, avatar_url, is_active, created_at FROM users WHERE LOWER(email) = ? LIMIT 1',
           [cleanEmail]
         );
       } catch {
         try {
           [rows] = await pool.query(
-            'SELECT id, email, full_name, role, organization_name, phone, is_active, created_at FROM users WHERE LOWER(email) = ? LIMIT 1',
+            'SELECT id, email, full_name, role, organization_name, phone, avatar_url, is_active, created_at FROM users WHERE LOWER(email) = ? LIMIT 1',
             [cleanEmail]
           );
         } catch {
@@ -460,6 +463,7 @@ router.get('/me', async (req, res) => {
           facility_id: decoded.facility_id || null,
           client_role: decoded.client_role || 'requester',
           phone: decoded.phone || null,
+          avatar_url: decoded.avatar_url || null,
           created_at: new Date().toISOString()
         };
 
@@ -539,6 +543,7 @@ router.get('/me', async (req, res) => {
         staff_status: staffStatus,
         clinical_role: clinicalRole,
         staff_code: staffCode,
+        avatar_url: user.avatar_url || null,
         is_verified: credentialStatus === 'verified'
       }
     });
@@ -734,32 +739,43 @@ router.post('/forgot-password', passwordResetLimiter, async (req, res, next) => 
       }
     }
 
-    if (targetUser && targetUser.is_active !== 0) {
-      const { token, hash } = generateSecureToken(32);
+      let resetUrl = null;
+      if (targetUser && targetUser.is_active !== 0) {
+        const { token, hash } = generateSecureToken(32);
 
-      await pool.query(
-        'UPDATE users SET password_reset_token_hash = ?, password_reset_expires = DATE_ADD(NOW(), INTERVAL 20 MINUTE) WHERE id = ?',
-        [hash, targetUser.id]
-      );
+        await pool.query(
+          'UPDATE users SET password_reset_token_hash = ?, password_reset_expires = DATE_ADD(NOW(), INTERVAL 20 MINUTE) WHERE id = ?',
+          [hash, targetUser.id]
+        );
 
-      const appBaseUrl = (process.env.APP_BASE_URL || process.env.APP_URL || 'https://www.divinefingershealthcare.ca').replace(/\/$/, '');
-      const resetUrl = `${appBaseUrl}/login.html?action=reset&token=${token}&email=${encodeURIComponent(emailClean)}`;
+        const reqHost = req.get('host') || 'localhost:3000';
+        const reqProto = req.protocol || 'http';
+        const autoOrigin = `${reqProto}://${reqHost}`;
+        const appBaseUrl = (process.env.APP_BASE_URL || (process.env.NODE_ENV === 'production' ? 'https://www.divinefingershealthcare.ca' : autoOrigin)).replace(/\/$/, '');
+        resetUrl = `${appBaseUrl}/login.html?action=reset&token=${token}&email=${encodeURIComponent(emailClean)}`;
 
-      await enqueueMail({
-        type: 'password_reset',
-        to: emailClean,
-        userId: targetUser.id,
-        vars: {
-          full_name: targetUser.full_name,
-          reset_url: resetUrl
-        }
-      });
-    } else {
-      // Artificial delay to prevent timing-based user enumeration
-      await new Promise(r => setTimeout(r, 150));
-    }
+        await enqueueMail({
+          type: 'password_reset',
+          to: emailClean,
+          userId: targetUser.id,
+          vars: {
+            full_name: targetUser.full_name,
+            reset_url: resetUrl
+          }
+        });
+      } else {
+        // Artificial delay to prevent timing-based user enumeration
+        await new Promise(r => setTimeout(r, 150));
+      }
 
-    return res.json(genericResponse);
+      if (process.env.NODE_ENV !== 'production' && resetUrl) {
+        return res.json({
+          ...genericResponse,
+          dev_reset_url: resetUrl
+        });
+      }
+
+      return res.json(genericResponse);
   } catch (err) {
     if (err instanceof z.ZodError) {
       return res.status(400).json({ success: false, error: err.errors[0].message });
@@ -824,6 +840,134 @@ router.post('/reset-password', passwordResetLimiter, async (req, res, next) => {
 router.post('/logout', (req, res) => {
   res.clearCookie(USER_COOKIE_NAME, { path: '/' });
   return res.json({ success: true, message: 'Logged out successfully.' });
+});
+
+// ── CLIENT & HEALTHCARE WORKER AVATAR ENDPOINTS ─────────────────────────────
+
+// Helper to authenticate user from cookie or authorization header
+function requirePortalUser(req, res, next) {
+  const token = req.cookies[USER_COOKIE_NAME] || req.headers.authorization?.replace(/^Bearer\s+/i, '');
+  if (!token) {
+    return res.status(401).json({ success: false, error: 'Authentication required' });
+  }
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    req.user = decoded;
+    next();
+  } catch (err) {
+    return res.status(401).json({ success: false, error: 'Session expired or invalid. Please log in again.' });
+  }
+}
+
+// POST /api/users/profile/avatar — Upload / update user avatar
+router.post('/profile/avatar', requirePortalUser, uploadAvatar.single('avatar'), validateAvatarContent, async (req, res, next) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ success: false, error: 'Please choose an image file (JPG, PNG, or WebP) to upload.' });
+    }
+
+    const avatarUrl = `/uploads/avatars/${req.file.filename}`;
+
+    try {
+      const [curr] = await pool.query('SELECT avatar_url FROM users WHERE id = ?', [req.user.id]);
+      if (curr?.[0]?.avatar_url && curr[0].avatar_url.startsWith('/uploads/avatars/')) {
+        const oldFile = path.join(__dirname, '..', curr[0].avatar_url);
+        if (fs.existsSync(oldFile)) {
+          try { fs.unlinkSync(oldFile); } catch (_) {}
+        }
+      }
+    } catch (_) {}
+
+    await pool.query(
+      'UPDATE users SET avatar_url = ?, avatar_updated_at = NOW() WHERE id = ?',
+      [avatarUrl, req.user.id]
+    );
+
+    try {
+      await pool.query('UPDATE staff_roster SET avatar_url = ? WHERE id = ? OR email = ?', [avatarUrl, req.user.id, req.user.email]);
+    } catch (_) {}
+
+    res.json({
+      success: true,
+      message: 'Profile picture updated successfully.',
+      avatar_url: avatarUrl
+    });
+  } catch (err) {
+    if (req.file?.path) {
+      try { fs.unlinkSync(req.file.path); } catch (_) {}
+    }
+    next(err);
+  }
+});
+
+// DELETE /api/users/profile/avatar — Remove user avatar
+router.delete('/profile/avatar', requirePortalUser, async (req, res, next) => {
+  try {
+    const [curr] = await pool.query('SELECT avatar_url FROM users WHERE id = ?', [req.user.id]);
+    if (curr?.[0]?.avatar_url && curr[0].avatar_url.startsWith('/uploads/avatars/')) {
+      const oldFile = path.join(__dirname, '..', curr[0].avatar_url);
+      if (fs.existsSync(oldFile)) {
+        try { fs.unlinkSync(oldFile); } catch (_) {}
+      }
+    }
+
+    await pool.query(
+      'UPDATE users SET avatar_url = NULL, avatar_updated_at = NOW() WHERE id = ?',
+      [req.user.id]
+    );
+
+    try {
+      await pool.query('UPDATE staff_roster SET avatar_url = NULL WHERE id = ? OR email = ?', [req.user.id, req.user.email]);
+    } catch (_) {}
+
+    res.json({
+      success: true,
+      message: 'Profile picture removed. Reverted to initials monogram.'
+    });
+  } catch (err) { next(err); }
+});
+
+// POST /api/users/facility/logo — Upload facility logo
+router.post('/facility/logo', requirePortalUser, uploadAvatar.single('logo'), validateAvatarContent, async (req, res, next) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ success: false, error: 'Please choose an image file (JPG, PNG, or WebP) to upload.' });
+    }
+
+    const [uRows] = await pool.query('SELECT facility_id FROM users WHERE id = ?', [req.user.id]);
+    const facilityId = uRows?.[0]?.facility_id;
+    if (!facilityId) {
+      if (req.file?.path) {
+        try { fs.unlinkSync(req.file.path); } catch (_) {}
+      }
+      return res.status(400).json({ success: false, error: 'No healthcare facility is linked to this account.' });
+    }
+
+    const logoUrl = `/uploads/avatars/${req.file.filename}`;
+
+    try {
+      const [curr] = await pool.query('SELECT logo_url FROM facilities WHERE id = ?', [facilityId]);
+      if (curr?.[0]?.logo_url && curr[0].logo_url.startsWith('/uploads/avatars/')) {
+        const oldFile = path.join(__dirname, '..', curr[0].logo_url);
+        if (fs.existsSync(oldFile)) {
+          try { fs.unlinkSync(oldFile); } catch (_) {}
+        }
+      }
+    } catch (_) {}
+
+    await pool.query('UPDATE facilities SET logo_url = ? WHERE id = ?', [logoUrl, facilityId]);
+
+    res.json({
+      success: true,
+      message: 'Facility logo updated successfully.',
+      logo_url: logoUrl
+    });
+  } catch (err) {
+    if (req.file?.path) {
+      try { fs.unlinkSync(req.file.path); } catch (_) {}
+    }
+    next(err);
+  }
 });
 
 module.exports = router;

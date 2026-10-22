@@ -106,6 +106,15 @@ try {
         try { await conn.query('ALTER TABLE staffing_requests ADD COLUMN clock_out_time DATETIME NULL DEFAULT NULL'); } catch (_) {}
         try { await conn.query(`ALTER TABLE staffing_requests MODIFY COLUMN status ENUM('pending','confirmed','dispatched','in_session','completed','cancelled') NOT NULL DEFAULT 'pending'`); } catch (_) {}
         try { await conn.query('ALTER TABLE staffing_requests ADD COLUMN facility_id VARCHAR(36) NULL'); } catch (_) {}
+        try { await conn.query('ALTER TABLE admins ADD COLUMN avatar_url VARCHAR(500) NULL AFTER role'); } catch (_) {}
+        try { await conn.query('ALTER TABLE admins ADD COLUMN avatar_updated_at TIMESTAMP NULL AFTER avatar_url'); } catch (_) {}
+        try { await conn.query('ALTER TABLE users ADD COLUMN avatar_url VARCHAR(500) NULL AFTER organization_name'); } catch (_) {}
+        try { await conn.query('ALTER TABLE users ADD COLUMN avatar_updated_at TIMESTAMP NULL AFTER avatar_url'); } catch (_) {}
+        try { await conn.query('ALTER TABLE users ADD COLUMN password_reset_token_hash VARCHAR(128) NULL DEFAULT NULL'); } catch (_) {}
+        try { await conn.query('ALTER TABLE users ADD COLUMN password_reset_expires DATETIME NULL DEFAULT NULL'); } catch (_) {}
+        try { await conn.query('ALTER TABLE users ADD COLUMN token_version INT UNSIGNED NOT NULL DEFAULT 1'); } catch (_) {}
+        try { await conn.query('ALTER TABLE facilities ADD COLUMN logo_url VARCHAR(500) NULL AFTER facility_code'); } catch (_) {}
+        try { await conn.query('ALTER TABLE staff_roster MODIFY COLUMN avatar_url VARCHAR(500) NULL'); } catch (_) {}
 
         await conn.query(`
           CREATE TABLE IF NOT EXISTS facilities (

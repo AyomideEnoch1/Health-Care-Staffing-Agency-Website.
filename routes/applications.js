@@ -68,6 +68,8 @@ router.post(
         application_code: appCode,
         full_name:   validated.full_name,
         role_applied: validated.role_applied,
+        email: validated.email,
+        phone: validated.phone,
         stage: 'new',
         created_at: new Date().toISOString()
       });

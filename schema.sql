@@ -17,6 +17,8 @@ CREATE TABLE IF NOT EXISTS `admins` (
   `password_hash` VARCHAR(255) NOT NULL,
   `full_name` VARCHAR(100) NOT NULL,
   `role` ENUM('super-admin', 'dispatch', 'care-coordinator', 'recruiter', 'auditor', 'custom') NOT NULL DEFAULT 'care-coordinator',
+  `avatar_url` VARCHAR(500) NULL,
+  `avatar_updated_at` TIMESTAMP NULL,
   `failed_login_attempts` INT UNSIGNED NOT NULL DEFAULT 0,
   `lock_until` DATETIME NULL DEFAULT NULL,
   `totp_secret` VARCHAR(128) NULL DEFAULT NULL,
@@ -54,7 +56,7 @@ CREATE TABLE IF NOT EXISTS `staff_roster` (
   `cpr_expiry_date` DATE NOT NULL,
   `vss_status` VARCHAR(60) NOT NULL DEFAULT 'Clear',
   `n95_fit_test` VARCHAR(60) NOT NULL DEFAULT '3M Valid',
-  `avatar_url` VARCHAR(255) NULL,
+  `avatar_url` VARCHAR(500) NULL,
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
@@ -187,11 +189,16 @@ CREATE TABLE IF NOT EXISTS `users` (
   `full_name` VARCHAR(120) NOT NULL,
   `role` ENUM('client', 'healthcare_worker') NOT NULL DEFAULT 'client',
   `organization_name` VARCHAR(150) NULL,
+  `avatar_url` VARCHAR(500) NULL,
+  `avatar_updated_at` TIMESTAMP NULL,
   `facility_id` VARCHAR(36) NULL,
   `client_role` ENUM('requester', 'billing_admin', 'facility_director') NOT NULL DEFAULT 'requester',
   `phone` VARCHAR(30) NULL,
   `is_active` TINYINT(1) NOT NULL DEFAULT 1,
   `email_verified` TINYINT(1) NOT NULL DEFAULT 0,
+  `password_reset_token_hash` VARCHAR(128) NULL DEFAULT NULL,
+  `password_reset_expires` DATETIME NULL DEFAULT NULL,
+  `token_version` INT UNSIGNED NOT NULL DEFAULT 1,
   `last_login` TIMESTAMP NULL DEFAULT NULL,
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -206,6 +213,7 @@ CREATE TABLE IF NOT EXISTS `facilities` (
   `id` VARCHAR(36) NOT NULL,
   `name` VARCHAR(255) NOT NULL,
   `facility_code` VARCHAR(20) NOT NULL,
+  `logo_url` VARCHAR(500) NULL,
   `address` VARCHAR(255) NULL,
   `region` VARCHAR(80) NULL DEFAULT 'Greater Toronto Area',
   `contact_name` VARCHAR(100) NULL,
@@ -304,6 +312,24 @@ CREATE TABLE IF NOT EXISTS `sms_consent` (
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   UNIQUE KEY `idx_sms_phone_hash` (`phone_hash`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 14. ARCHIVED RECORDS RETENTION VAULT
+-- Purpose: Enterprise soft-delete archive preserving deleted clients, users, staff, and records.
+CREATE TABLE IF NOT EXISTS `archived_records` (
+  `id` VARCHAR(64) NOT NULL PRIMARY KEY,
+  `entity_type` VARCHAR(50) NOT NULL,
+  `original_id` VARCHAR(64) NOT NULL,
+  `display_name` VARCHAR(191) NOT NULL,
+  `identifier` VARCHAR(191) NOT NULL,
+  `data_payload` LONGTEXT NOT NULL,
+  `deleted_by_name` VARCHAR(100) NOT NULL DEFAULT 'Administrator',
+  `deleted_by_id` VARCHAR(64) NULL,
+  `deletion_reason` VARCHAR(255) NULL DEFAULT 'Manual deletion via Admin Console',
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  INDEX `idx_archived_type` (`entity_type`),
+  INDEX `idx_archived_orig` (`original_id`),
+  INDEX `idx_archived_created` (`created_at` DESC)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 

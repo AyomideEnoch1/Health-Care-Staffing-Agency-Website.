@@ -31,9 +31,11 @@ const pool = require('../db');
 const bcrypt = require('bcryptjs');
 const { z } = require('zod');
 const { uploadCredential } = require('../middleware/uploadCredentials');
+const { uploadAvatar, validateAvatarContent } = require('../middleware/avatarUpload');
 const { requireAdminAuth, requirePermission, normalizePermissions, ALL_PERMISSIONS } = require('../middleware/auth');
 const adminEvents = require('../utils/events');
 const { enqueueMail } = require('../utils/mailOutbox');
+const mailService = require('../services/mail/MailService');
 const { generateSecureToken } = require('../utils/cryptoUtils');
 
 // All admin routes require authentication
@@ -59,19 +61,23 @@ router.get('/stream', (req, res) => {
   res.write(`data: ${JSON.stringify({ type: 'connected', timestamp: new Date().toISOString() })}\n\n`);
 
   // Event listeners
-  const onRequest          = (data) => res.write(`data: ${JSON.stringify({ type: 'request:created',     payload: data })}\n\n`);
-  const onApplication      = (data) => res.write(`data: ${JSON.stringify({ type: 'application:created', payload: data })}\n\n`);
-  const onInquiry          = (data) => res.write(`data: ${JSON.stringify({ type: 'inquiry:created',     payload: data })}\n\n`);
-  const onStatusChange     = (data) => res.write(`data: ${JSON.stringify({ type: 'status:changed',      payload: data })}\n\n`);
-  const onClientRegistered = (data) => res.write(`data: ${JSON.stringify({ type: 'client:registered',  payload: data })}\n\n`);
-  const onFacilityCreated  = (data) => res.write(`data: ${JSON.stringify({ type: 'facility:created',   payload: data })}\n\n`);
+  const onRequest            = (data) => res.write(`data: ${JSON.stringify({ type: 'request:created',       payload: data })}\n\n`);
+  const onRequestCancelled   = (data) => res.write(`data: ${JSON.stringify({ type: 'request:cancelled',     payload: data })}\n\n`);
+  const onRequestRateUpdated = (data) => res.write(`data: ${JSON.stringify({ type: 'request:rate_updated',  payload: data })}\n\n`);
+  const onApplication        = (data) => res.write(`data: ${JSON.stringify({ type: 'application:created',   payload: data })}\n\n`);
+  const onInquiry            = (data) => res.write(`data: ${JSON.stringify({ type: 'inquiry:created',       payload: data })}\n\n`);
+  const onStatusChange       = (data) => res.write(`data: ${JSON.stringify({ type: 'status:changed',        payload: data })}\n\n`);
+  const onClientRegistered   = (data) => res.write(`data: ${JSON.stringify({ type: 'client:registered',    payload: data })}\n\n`);
+  const onFacilityCreated    = (data) => res.write(`data: ${JSON.stringify({ type: 'facility:created',     payload: data })}\n\n`);
 
-  adminEvents.on('request:created',     onRequest);
-  adminEvents.on('application:created', onApplication);
-  adminEvents.on('inquiry:created',     onInquiry);
-  adminEvents.on('status:changed',      onStatusChange);
-  adminEvents.on('client:registered',   onClientRegistered);
-  adminEvents.on('facility:created',    onFacilityCreated);
+  adminEvents.on('request:created',       onRequest);
+  adminEvents.on('request:cancelled',     onRequestCancelled);
+  adminEvents.on('request:rate_updated',  onRequestRateUpdated);
+  adminEvents.on('application:created',   onApplication);
+  adminEvents.on('inquiry:created',       onInquiry);
+  adminEvents.on('status:changed',        onStatusChange);
+  adminEvents.on('client:registered',     onClientRegistered);
+  adminEvents.on('facility:created',      onFacilityCreated);
 
   // Keep-alive heartbeat every 25 seconds (SSE comment lines — not parsed by client)
   const heartbeat = setInterval(() => {
@@ -81,12 +87,14 @@ router.get('/stream', (req, res) => {
   // Clean up all listeners when client disconnects
   req.on('close', () => {
     clearInterval(heartbeat);
-    adminEvents.off('request:created',     onRequest);
-    adminEvents.off('application:created', onApplication);
-    adminEvents.off('inquiry:created',     onInquiry);
-    adminEvents.off('status:changed',      onStatusChange);
-    adminEvents.off('client:registered',   onClientRegistered);
-    adminEvents.off('facility:created',    onFacilityCreated);
+    adminEvents.off('request:created',       onRequest);
+    adminEvents.off('request:cancelled',     onRequestCancelled);
+    adminEvents.off('request:rate_updated',  onRequestRateUpdated);
+    adminEvents.off('application:created',   onApplication);
+    adminEvents.off('inquiry:created',       onInquiry);
+    adminEvents.off('status:changed',        onStatusChange);
+    adminEvents.off('client:registered',     onClientRegistered);
+    adminEvents.off('facility:created',      onFacilityCreated);
   });
 });
 
@@ -124,6 +132,16 @@ router.get('/kpis', async (req, res, next) => {
       FROM staff_roster
     `);
 
+    const [regionalRows] = await pool.query(`
+      SELECT
+        COALESCE(NULLIF(TRIM(f.region), ''), 'Scarborough') AS region,
+        COUNT(*) AS count
+      FROM staffing_requests r
+      LEFT JOIN facilities f ON (r.facility_id = f.id OR LOWER(TRIM(r.facility_name)) = LOWER(TRIM(f.name)))
+      WHERE r.status != 'cancelled'
+      GROUP BY region
+    `);
+
     // Shift fill rate: completed / total * 100 (0 if no requests yet)
     const total = parseInt(requestCounts?.total_requests) || 0;
     const completed = parseInt(requestCounts?.completed_requests) || 0;
@@ -150,7 +168,8 @@ router.get('/kpis', async (req, res, next) => {
           available: parseInt(rosterCounts?.available_staff)      || 0,
           expiring:  parseInt(rosterCounts?.credentials_expiring) || 0
         },
-        shift_fill_rate: fillRate // null if no data yet — UI shows "N/A"
+        shift_fill_rate: fillRate, // null if no data yet — UI shows "N/A"
+        regional_demand: regionalRows || []
       }
     });
   } catch (err) { next(err); }
@@ -231,9 +250,13 @@ router.get('/requests', requirePermission('requests:view'), async (req, res, nex
   try {
     const [rows] = await pool.query(`
       SELECT r.*,
-             s.name  AS assigned_staff_name,
-             s.role  AS assigned_staff_role
+             COALESCE(r.facility_id, f.id) AS resolved_facility_id,
+             COALESCE(f.region, '')        AS facility_region,
+             COALESCE(f.address, '')       AS facility_address,
+             s.name                        AS assigned_staff_name,
+             s.role                        AS assigned_staff_role
       FROM staffing_requests r
+      LEFT JOIN facilities f ON (r.facility_id = f.id OR LOWER(TRIM(r.facility_name)) = LOWER(TRIM(f.name)))
       LEFT JOIN staff_roster s ON r.assigned_staff_id = s.id
       ORDER BY r.created_at DESC
     `);
@@ -724,12 +747,10 @@ router.post('/roster', requirePermission('roster:manage'), async (req, res, next
   } catch (err) { next(err); }
 });
 
-// POST /api/admin/staff/:id/reset-password — Admin resets caregiver portal password
+// POST /api/admin/staff/:id/reset-password — Admin dispatches secure password reset link to staff
 router.post('/staff/:id/reset-password', requirePermission('roster:manage'), async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { new_password } = req.body || {};
-    const temporaryPassword = new_password && new_password.trim() ? new_password.trim() : 'DivineFingers2026!';
 
     // Find staff via robust multi-entity resolver
     const staff = await ensureRosterStaff(id);
@@ -737,78 +758,50 @@ router.post('/staff/:id/reset-password', requirePermission('roster:manage'), asy
       return res.status(404).json({ success: false, error: 'Staff member not found on roster.' });
     }
 
-    // Hash new password
-    const salt = await bcrypt.genSalt(10);
-    const passwordHash = await bcrypt.hash(temporaryPassword, salt);
-
-    // Update in users table by email or id
-    const [updateRes] = await pool.query(
-      'UPDATE users SET password_hash = ?, is_active = 1 WHERE email = ? OR id = ?',
-      [passwordHash, staff.email, staff.id]
-    );
-
-    if (!updateRes || updateRes.affectedRows === 0) {
-      // If user row didn't exist, create it
-      await pool.query(
-        `INSERT INTO users (id, email, password_hash, full_name, role, is_active, email_verified)
-         VALUES (?, ?, ?, ?, 'healthcare_worker', 1, 1)`,
-        [staff.id, staff.email, passwordHash, staff.name]
-      );
+    if (!staff.email || !staff.email.includes('@')) {
+      return res.status(400).json({ success: false, error: 'Staff member does not have a valid email address on file.' });
     }
 
-    if (pool.inMemoryStore && pool.inMemoryStore.users) {
-      let foundInMem = false;
-      for (const u of pool.inMemoryStore.users) {
-        if (u.email === staff.email || u.id === staff.id) {
-          u.password_hash = passwordHash;
-          u.is_active = 1;
-          foundInMem = true;
-        }
-      }
-      if (!foundInMem) {
-        pool.inMemoryStore.users.push({
-          id: staff.id,
-          email: staff.email,
-          password_hash: passwordHash,
-          full_name: staff.name,
-          role: 'healthcare_worker',
-          is_active: 1,
-          email_verified: 1
-        });
-      }
-    }
-
-    // Generate secure single-use password reset token
+    // Invalidate existing sessions and generate single-use 30-min token
     const { token: resetToken, hash: resetHash } = generateSecureToken(32);
     await pool.query(
-      'UPDATE users SET password_reset_token_hash = ?, password_reset_expires = DATE_ADD(NOW(), INTERVAL 30 MINUTE), token_version = token_version + 1 WHERE email = ? OR id = ?',
+      `UPDATE users SET
+        password_reset_token_hash = ?,
+        password_reset_expires = DATE_ADD(NOW(), INTERVAL 30 MINUTE),
+        token_version = token_version + 1,
+        updated_at = NOW()
+       WHERE email = ? OR id = ?`,
       [resetHash, staff.email, staff.id]
     );
 
     const appBaseUrl = (process.env.APP_BASE_URL || process.env.APP_URL || 'https://www.divinefingershealthcare.ca').replace(/\/$/, '');
     const resetUrl = `${appBaseUrl}/portal.html?action=reset&token=${resetToken}&email=${encodeURIComponent(staff.email)}`;
 
-    // Enqueue password reset email (NO plaintext password in email or logs)
-    enqueueMail({
-      type: 'password_reset',
-      to: staff.email,
-      userId: staff.id,
-      vars: {
-        full_name: staff.name,
-        reset_url: resetUrl
-      }
-    }).catch(err => console.warn('[Mailer Error]:', err.message));
+    // Dispatch secure reset link via enterprise MailService
+    try {
+      await mailService.send('auth_password_reset', {
+        to: staff.email,
+        recipientType: 'staff',
+        userId: staff.id,
+        data: {
+          first_name: staff.name ? staff.name.split(' ')[0] : 'Clinician',
+          reset_url: resetUrl
+        }
+      });
+    } catch (mailErr) {
+      console.warn('[StaffPasswordReset Mailer Error]:', mailErr.message);
+    }
 
     // Audit log
     await pool.query(
       `INSERT INTO audit_logs (id, admin_id, actor_name, action, target_entity, target_id, details, severity, ip_address)
-       VALUES (?, ?, ?, 'STAFF_PASSWORD_RESET', 'staff_roster', ?, ?, 'warn', ?)`,
+       VALUES (?, ?, ?, 'STAFF_PASSWORD_RESET_DISPATCHED', 'staff_roster', ?, ?, 'info', ?)`,
       [crypto.randomUUID(), req.admin.id, req.admin.full_name, staff.id, `Dispatched secure password reset link for ${staff.name} (${staff.email})`, req.ip]
     ).catch(() => {});
 
     res.json({
       success: true,
-      message: `A secure password reset link has been dispatched to ${staff.name} (${staff.email}).`
+      message: `A secure, single-use password reset link has been dispatched directly to ${staff.name} (${staff.email}).`
     });
   } catch (err) { next(err); }
 });
@@ -1816,6 +1809,18 @@ router.delete('/admins/:id', requirePermission('admins:manage'), async (req, res
         ]
       );
 
+      // Archive deleted administrator record before removal
+      await recordArchive(conn, {
+        entityType: 'admin',
+        originalId: id,
+        displayName: targetAdmin.full_name,
+        identifier: targetAdmin.email,
+        dataPayload: targetAdmin,
+        deletedByName: req.admin.full_name,
+        deletedById: req.admin.id,
+        reason: 'Administrator account deleted by Super-Admin'
+      });
+
       await conn.query('DELETE FROM admins WHERE id = ?', [id]);
 
       await conn.commit();
@@ -2014,15 +2019,10 @@ router.patch('/registered-clients/:id/toggle-status', async (req, res, next) => 
   }
 });
 
-// POST /api/admin/registered-clients/:id/reset-password — Reset password for a registered client account
+// POST /api/admin/registered-clients/:id/reset-password — Admin dispatches secure password reset link to client
 router.post('/registered-clients/:id/reset-password', async (req, res, next) => {
   try {
     const userId = req.params.id;
-    const { new_password } = req.body;
-
-    if (!new_password || new_password.length < 6) {
-      return res.status(400).json({ success: false, error: 'Password must be at least 6 characters long.' });
-    }
 
     const [users] = await pool.query(
       'SELECT id, email, full_name FROM users WHERE id = ? AND role = ? LIMIT 1',
@@ -2034,33 +2034,61 @@ router.post('/registered-clients/:id/reset-password', async (req, res, next) => 
     }
 
     const user = users[0];
-    const salt = await bcrypt.genSalt(10);
-    const hash = await bcrypt.hash(new_password, salt);
+    if (!user.email || !user.email.includes('@')) {
+      return res.status(400).json({ success: false, error: 'Client account does not have a valid email address.' });
+    }
 
-    await pool.query('UPDATE users SET password_hash = ?, updated_at = NOW() WHERE id = ?', [hash, userId]);
+    // Invalidate existing sessions and generate single-use 30-min token
+    const { token: resetToken, hash: resetHash } = generateSecureToken(32);
+    await pool.query(
+      `UPDATE users SET
+        password_reset_token_hash = ?,
+        password_reset_expires = DATE_ADD(NOW(), INTERVAL 30 MINUTE),
+        token_version = token_version + 1,
+        updated_at = NOW()
+       WHERE id = ?`,
+      [resetHash, userId]
+    );
+
+    const appBaseUrl = (process.env.APP_BASE_URL || process.env.APP_URL || 'https://www.divinefingershealthcare.ca').replace(/\/$/, '');
+    const resetUrl = `${appBaseUrl}/login.html?action=reset&token=${resetToken}&email=${encodeURIComponent(user.email)}`;
+
+    // Dispatch secure reset link via enterprise MailService
+    try {
+      await mailService.send('auth_password_reset', {
+        to: user.email,
+        recipientType: 'client',
+        userId: user.id,
+        data: {
+          first_name: user.full_name ? user.full_name.split(' ')[0] : 'Client',
+          reset_url: resetUrl
+        }
+      });
+    } catch (mailErr) {
+      console.warn('[ClientPasswordReset Mailer Error]:', mailErr.message);
+    }
 
     // Record audit log
     try {
       await pool.query(
-        `INSERT INTO audit_logs (id, admin_id, actor_name, action, target_entity, target_id, details, severity)
-         VALUES (?, ?, ?, 'CLIENT_PASSWORD_RESET', 'users', ?, ?, 'critical')`,
+        `INSERT INTO audit_logs (id, admin_id, actor_name, action, target_entity, target_id, details, severity, ip_address)
+         VALUES (?, ?, ?, 'CLIENT_PASSWORD_RESET_DISPATCHED', 'users', ?, ?, 'info', ?)`,
         [
           crypto.randomUUID(),
           req.admin?.id || null,
-          req.admin?.name || 'Administrator',
+          req.admin?.name || req.admin?.full_name || 'Administrator',
           userId,
-          `Password reset performed by administrator for client account ${user.email} (${user.full_name})`
+          `Dispatched secure password reset link for client account ${user.email} (${user.full_name})`,
+          req.ip
         ]
       );
     } catch (_) {}
 
     res.json({
       success: true,
-      message: `Password reset successfully for client account ${user.email}.`
+      message: `A secure, single-use password reset link has been dispatched directly to ${user.full_name} (${user.email}).`
     });
-  } catch (err) {
-    next(err);
-  }
+  } catch (err) { next(err); }
 });
 
 // POST /api/admin/facilities — Create a new healthcare facility profile
@@ -2376,6 +2404,694 @@ router.patch('/requests/:id/rate-exception', async (req, res, next) => {
   } catch (err) {
     next(err);
   }
+});
+
+// =========================================================================
+// ARCHIVE RETENTION VAULT SYSTEM
+// Stores and restores any deleted client, user, staff, facility, or record
+// =========================================================================
+
+async function recordArchive(connOrPool, {
+  entityType,
+  originalId,
+  displayName,
+  identifier,
+  dataPayload,
+  deletedByName = 'Administrator',
+  deletedById = null,
+  reason = 'Deleted via Admin Console'
+}) {
+  const archiveId = crypto.randomUUID();
+  const payloadStr = typeof dataPayload === 'string' ? dataPayload : JSON.stringify(dataPayload || {});
+  await connOrPool.query(
+    `INSERT INTO archived_records 
+     (id, entity_type, original_id, display_name, identifier, data_payload, deleted_by_name, deleted_by_id, deletion_reason, created_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())`,
+    [
+      archiveId,
+      entityType,
+      originalId,
+      displayName || 'Unnamed Record',
+      identifier || 'N/A',
+      payloadStr,
+      deletedByName,
+      deletedById,
+      reason
+    ]
+  );
+  return archiveId;
+}
+
+// GET /api/admin/archives — List archived items with counts and filtering
+router.get('/archives', requirePermission('settings:view'), async (req, res, next) => {
+  try {
+    const { type = 'all', q = '' } = req.query;
+    let query = 'SELECT * FROM archived_records';
+    const params = [];
+    const conditions = [];
+
+    if (type && type !== 'all') {
+      conditions.push('entity_type = ?');
+      params.push(type);
+    }
+
+    if (q && q.trim()) {
+      conditions.push('(display_name LIKE ? OR identifier LIKE ? OR deletion_reason LIKE ?)');
+      const term = `%${q.trim()}%`;
+      params.push(term, term, term);
+    }
+
+    if (conditions.length > 0) {
+      query += ' WHERE ' + conditions.join(' AND ');
+    }
+    query += ' ORDER BY created_at DESC';
+
+    const [rows] = await pool.query(query, params);
+
+    // Compute breakdown counts
+    const [allRecords] = await pool.query('SELECT entity_type, COUNT(*) as count FROM archived_records GROUP BY entity_type');
+    const counts = {
+      total: 0,
+      client: 0,
+      facility: 0,
+      staff: 0,
+      user: 0,
+      admin: 0,
+      request: 0
+    };
+    (allRecords || []).forEach(r => {
+      const cnt = Number(r.count) || 0;
+      counts.total += cnt;
+      if (counts[r.entity_type] !== undefined) {
+        counts[r.entity_type] = cnt;
+      } else {
+        counts[r.entity_type] = cnt;
+      }
+    });
+
+    res.json({
+      success: true,
+      archives: rows || [],
+      counts
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// GET /api/admin/archives/:id — Inspect single archived record with parsed payload
+router.get('/archives/:id', requirePermission('settings:view'), async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const [rows] = await pool.query('SELECT * FROM archived_records WHERE id = ?', [id]);
+    if (!rows || rows.length === 0) {
+      return res.status(404).json({ success: false, error: 'Archived record not found.' });
+    }
+    const archive = rows[0];
+    let payload = null;
+    try {
+      payload = JSON.parse(archive.data_payload);
+    } catch (_) {
+      payload = archive.data_payload;
+    }
+    res.json({
+      success: true,
+      archive: {
+        ...archive,
+        payload
+      }
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// POST /api/admin/archives/:id/restore — Recover an archived client, staff, user, or record
+router.post('/archives/:id/restore', requirePermission('settings:edit'), async (req, res, next) => {
+  const conn = await pool.getConnection();
+  try {
+    await conn.beginTransaction();
+
+    const { id } = req.params;
+    const [rows] = await conn.query('SELECT * FROM archived_records WHERE id = ?', [id]);
+    if (!rows || rows.length === 0) {
+      await conn.rollback();
+      return res.status(404).json({ success: false, error: 'Archived record not found.' });
+    }
+    const rec = rows[0];
+    let payload = {};
+    try { payload = JSON.parse(rec.data_payload); } catch (_) {}
+
+    const entityType = rec.entity_type;
+
+    if (entityType === 'client' || entityType === 'facility') {
+      // Restore facility
+      await conn.query(
+        `INSERT INTO facilities 
+         (id, name, facility_code, address, region, contact_name, contact_email, contact_phone, msa_signed_date, msa_expiry_date, msa_document_url, status, created_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', NOW())
+         ON DUPLICATE KEY UPDATE status = 'active', updated_at = NOW()`,
+        [
+          rec.original_id,
+          payload.name || rec.display_name,
+          payload.facility_code || 'FAC-RESTORED',
+          payload.address || null,
+          payload.region || 'Greater Toronto Area',
+          payload.contact_name || null,
+          payload.contact_email || rec.identifier,
+          payload.contact_phone || null,
+          payload.msa_signed_date || null,
+          payload.msa_expiry_date || null,
+          payload.msa_document_url || null
+        ]
+      );
+      // If related rate cards exist in payload, restore them
+      if (Array.isArray(payload.rate_cards)) {
+        for (const card of payload.rate_cards) {
+          try {
+            await conn.query(
+              `INSERT INTO facility_rate_cards (id, facility_id, role, shift_type, bill_rate, pay_rate, effective_date)
+               VALUES (?, ?, ?, ?, ?, ?, NOW())
+               ON DUPLICATE KEY UPDATE bill_rate = VALUES(bill_rate)`,
+              [card.id || crypto.randomUUID(), rec.original_id, card.role || 'RN', card.shift_type || 'standard', card.bill_rate || 75.00, card.pay_rate || 50.00]
+            );
+          } catch (_) {}
+        }
+      }
+    } else if (entityType === 'staff') {
+      // Restore staff roster
+      await conn.query(
+        `INSERT INTO staff_roster 
+         (id, staff_code, name, role, specialty, region, phone, email, status, credential_status, rating, shifts_completed, hourly_rate, cpr_expiry_date, vss_status, n95_fit_test, created_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'available', ?, ?, ?, ?, ?, ?, ?, NOW())
+         ON DUPLICATE KEY UPDATE status = 'available', updated_at = NOW()`,
+        [
+          rec.original_id,
+          payload.staff_code || 'STF-RESTORED',
+          payload.name || rec.display_name,
+          payload.role || 'RN',
+          payload.specialty || 'General Care',
+          payload.region || 'Greater Toronto Area',
+          payload.phone || null,
+          payload.email || rec.identifier,
+          payload.credential_status || 'verified',
+          payload.rating || 5.0,
+          payload.shifts_completed || 0,
+          payload.hourly_rate || 35.0,
+          payload.cpr_expiry_date || null,
+          payload.vss_status || 'Clear',
+          payload.n95_fit_test || 'Valid'
+        ]
+      );
+    } else if (entityType === 'user') {
+      // Restore user account
+      await conn.query(
+        `INSERT INTO users 
+         (id, email, password_hash, full_name, phone, role, organization_name, is_active, created_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, 1, NOW())
+         ON DUPLICATE KEY UPDATE is_active = 1, updated_at = NOW()`,
+        [
+          rec.original_id,
+          payload.email || rec.identifier,
+          payload.password_hash || '$2a$10$dummyhashplaceholderforrestoredaccount',
+          payload.full_name || rec.display_name,
+          payload.phone || null,
+          payload.role || 'client',
+          payload.organization_name || null
+        ]
+      );
+    } else if (entityType === 'admin') {
+      // Restore admin operator
+      await conn.query(
+        `INSERT INTO admins 
+         (id, email, password_hash, full_name, role, is_active, created_at)
+         VALUES (?, ?, ?, ?, ?, 1, NOW())
+         ON DUPLICATE KEY UPDATE is_active = 1, updated_at = NOW()`,
+        [
+          rec.original_id,
+          payload.email || rec.identifier,
+          payload.password_hash || '$2a$10$dummyhashplaceholderforrestoredaccount',
+          payload.full_name || rec.display_name,
+          payload.role || 'operations'
+        ]
+      );
+    } else if (entityType === 'request') {
+      // Restore staffing request
+      await conn.query(
+        `INSERT INTO staffing_requests 
+         (id, request_code, facility_name, contact_name, contact_phone, role_requested, shift_type, start_date, urgency_level, special_instructions, status, created_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', NOW())
+         ON DUPLICATE KEY UPDATE status = 'pending', updated_at = NOW()`,
+        [
+          rec.original_id,
+          payload.request_code || 'REQ-RESTORED',
+          payload.facility_name || rec.display_name,
+          payload.contact_name || 'Coordinator',
+          payload.contact_phone || null,
+          payload.role_requested || 'RN',
+          payload.shift_type || 'Day',
+          payload.start_date || new Date().toISOString().split('T')[0],
+          payload.urgency_level || 'routine',
+          payload.special_instructions || null
+        ]
+      );
+    }
+
+    // Delete from archived_records now that it is restored
+    await conn.query('DELETE FROM archived_records WHERE id = ?', [id]);
+
+    // Record Audit Log
+    await conn.query(
+      `INSERT INTO audit_logs (id, admin_id, actor_name, action, target_entity, target_id, details, severity, ip_address)
+       VALUES (?, ?, ?, 'ARCHIVE_RECORD_RESTORED', 'archived_records', ?, ?, 'info', ?)`,
+      [
+        crypto.randomUUID(),
+        req.admin?.id || null,
+        req.admin?.full_name || 'Administrator',
+        id,
+        `Restored archived ${entityType} record: ${rec.display_name} (${rec.identifier}) back to active status`,
+        req.ip
+      ]
+    );
+
+    await conn.commit();
+
+    adminEvents.emit('archive:restored', {
+      id,
+      entity_type: entityType,
+      display_name: rec.display_name,
+      restored_by: req.admin?.full_name
+    });
+
+    res.json({
+      success: true,
+      message: `Successfully restored ${rec.display_name} back to active ${entityType} records.`,
+      restored_record: {
+        id: rec.original_id,
+        display_name: rec.display_name,
+        entity_type: entityType
+      }
+    });
+  } catch (err) {
+    await conn.rollback();
+    next(err);
+  } finally {
+    conn.release();
+  }
+});
+
+// DELETE /api/admin/archives/:id — Permanently purge an archived record (super-admin only)
+router.delete('/archives/:id', requirePermission('admins:manage'), async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const [rows] = await pool.query('SELECT * FROM archived_records WHERE id = ?', [id]);
+    if (!rows || rows.length === 0) {
+      return res.status(404).json({ success: false, error: 'Archived record not found.' });
+    }
+    const rec = rows[0];
+
+    await pool.query('DELETE FROM archived_records WHERE id = ?', [id]);
+
+    await pool.query(
+      `INSERT INTO audit_logs (id, admin_id, actor_name, action, target_entity, target_id, details, severity, ip_address)
+       VALUES (?, ?, ?, 'ARCHIVE_RECORD_PURGED', 'archived_records', ?, ?, 'warning', ?)`,
+      [
+        crypto.randomUUID(),
+        req.admin?.id || null,
+        req.admin?.full_name || 'Super Admin',
+        id,
+        `Permanently purged archived record: ${rec.display_name} (${rec.entity_type} - ${rec.identifier})`,
+        req.ip
+      ]
+    );
+
+    res.json({
+      success: true,
+      message: `Permanently purged archived record for ${rec.display_name}.`
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// DELETE /api/admin/registered-clients/:id — Archive & Delete client account
+router.delete('/registered-clients/:id', requirePermission('facilities:manage'), async (req, res, next) => {
+  const conn = await pool.getConnection();
+  try {
+    await conn.beginTransaction();
+
+    const { id } = req.params;
+    const [rows] = await conn.query('SELECT * FROM users WHERE id = ? AND role = ?', [id, 'client']);
+    if (!rows || rows.length === 0) {
+      await conn.rollback();
+      return res.status(404).json({ success: false, error: 'Client account not found.' });
+    }
+    const user = rows[0];
+
+    // Archive user snapshot
+    await recordArchive(conn, {
+      entityType: 'client',
+      originalId: id,
+      displayName: user.organization_name || user.full_name || user.email,
+      identifier: user.email,
+      dataPayload: user,
+      deletedByName: req.admin?.full_name || 'Administrator',
+      deletedById: req.admin?.id || null,
+      reason: req.body?.reason || 'Client account removed via Admin Console'
+    });
+
+    await conn.query('DELETE FROM users WHERE id = ?', [id]);
+
+    await conn.query(
+      `INSERT INTO audit_logs (id, admin_id, actor_name, action, target_entity, target_id, details, severity, ip_address)
+       VALUES (?, ?, ?, 'CLIENT_ACCOUNT_ARCHIVED_DELETED', 'users', ?, ?, 'warning', ?)`,
+      [
+        crypto.randomUUID(),
+        req.admin?.id || null,
+        req.admin?.full_name || 'Administrator',
+        id,
+        `Archived and deleted client account ${user.email} (${user.organization_name || user.full_name})`,
+        req.ip
+      ]
+    );
+
+    await conn.commit();
+
+    adminEvents.emit('client:deleted', { id, email: user.email });
+
+    res.json({
+      success: true,
+      message: `Client account for ${user.email} has been safely archived and removed.`
+    });
+  } catch (err) {
+    await conn.rollback();
+    next(err);
+  } finally {
+    conn.release();
+  }
+});
+
+// DELETE /api/admin/facilities/:id — Archive & Delete client facility profile
+router.delete('/facilities/:id', requirePermission('facilities:manage'), async (req, res, next) => {
+  const conn = await pool.getConnection();
+  try {
+    await conn.beginTransaction();
+
+    const { id } = req.params;
+    const [rows] = await conn.query('SELECT * FROM facilities WHERE id = ?', [id]);
+    if (!rows || rows.length === 0) {
+      await conn.rollback();
+      return res.status(404).json({ success: false, error: 'Facility profile not found.' });
+    }
+    const facility = rows[0];
+
+    // Fetch associated rate cards to preserve in archive snapshot
+    const [rateCards] = await conn.query('SELECT * FROM facility_rate_cards WHERE facility_id = ?', [id]);
+
+    const snapshot = {
+      ...facility,
+      rate_cards: rateCards || []
+    };
+
+    // Store in Archive Vault
+    await recordArchive(conn, {
+      entityType: 'facility',
+      originalId: id,
+      displayName: facility.name,
+      identifier: facility.facility_code || facility.contact_email || 'N/A',
+      dataPayload: snapshot,
+      deletedByName: req.admin?.full_name || 'Administrator',
+      deletedById: req.admin?.id || null,
+      reason: req.body?.reason || 'Facility profile removed via Admin Console'
+    });
+
+    // Remove rate cards and facility
+    await conn.query('DELETE FROM facility_rate_cards WHERE facility_id = ?', [id]);
+    await conn.query('DELETE FROM facilities WHERE id = ?', [id]);
+
+    await conn.query(
+      `INSERT INTO audit_logs (id, admin_id, actor_name, action, target_entity, target_id, details, severity, ip_address)
+       VALUES (?, ?, ?, 'FACILITY_ARCHIVED_DELETED', 'facilities', ?, ?, 'warning', ?)`,
+      [
+        crypto.randomUUID(),
+        req.admin?.id || null,
+        req.admin?.full_name || 'Administrator',
+        id,
+        `Archived and deleted facility profile: ${facility.name} (${facility.facility_code}) with ${rateCards.length} rate cards`,
+        req.ip
+      ]
+    );
+
+    await conn.commit();
+
+    adminEvents.emit('facility:deleted', { id, name: facility.name });
+
+    res.json({
+      success: true,
+      message: `Facility profile ${facility.name} has been safely archived and removed.`
+    });
+  } catch (err) {
+    await conn.rollback();
+    next(err);
+  } finally {
+    conn.release();
+  }
+});
+
+// DELETE /api/admin/roster/:id — Archive & Delete staff member / caregiver
+router.delete('/roster/:id', requirePermission('roster:manage'), async (req, res, next) => {
+  const conn = await pool.getConnection();
+  try {
+    await conn.beginTransaction();
+
+    const { id } = req.params;
+    const [rows] = await conn.query('SELECT * FROM staff_roster WHERE id = ?', [id]);
+    if (!rows || rows.length === 0) {
+      await conn.rollback();
+      return res.status(404).json({ success: false, error: 'Staff member not found in roster.' });
+    }
+    const staff = rows[0];
+
+    // Fetch documents to snapshot
+    const [docs] = await conn.query('SELECT id, doc_type, title, file_name, expiry_date FROM staff_documents WHERE staff_id = ?', [id]);
+
+    const snapshot = {
+      ...staff,
+      documents: docs || []
+    };
+
+    // Store in Archive Vault
+    await recordArchive(conn, {
+      entityType: 'staff',
+      originalId: id,
+      displayName: staff.name,
+      identifier: staff.staff_code || staff.email,
+      dataPayload: snapshot,
+      deletedByName: req.admin?.full_name || 'Administrator',
+      deletedById: req.admin?.id || null,
+      reason: req.body?.reason || 'Staff profile removed via Admin Console'
+    });
+
+    // Delete from staff_roster
+    await conn.query('DELETE FROM staff_roster WHERE id = ?', [id]);
+    // Also remove from users table if portal user exists
+    if (staff.email) {
+      await conn.query('DELETE FROM users WHERE email = ? AND role = ?', [staff.email, 'healthcare_worker']);
+    }
+
+    await conn.query(
+      `INSERT INTO audit_logs (id, admin_id, actor_name, action, target_entity, target_id, details, severity, ip_address)
+       VALUES (?, ?, ?, 'STAFF_MEMBER_ARCHIVED_DELETED', 'staff_roster', ?, ?, 'warning', ?)`,
+      [
+        crypto.randomUUID(),
+        req.admin?.id || null,
+        req.admin?.full_name || 'Administrator',
+        id,
+        `Archived and deleted staff caregiver ${staff.name} (${staff.staff_code})`,
+        req.ip
+      ]
+    );
+
+    await conn.commit();
+
+    adminEvents.emit('staff:deleted', { id, name: staff.name, email: staff.email });
+
+    res.json({
+      success: true,
+      message: `Staff caregiver ${staff.name} has been safely archived and removed.`
+    });
+  } catch (err) {
+    await conn.rollback();
+    next(err);
+  } finally {
+    conn.release();
+  }
+});
+
+// ── AVATAR & PROFILE PICTURE ENDPOINTS ────────────────────────────────────────
+
+// POST /api/admin/profile/avatar — Upload / update avatar for logged-in operator
+router.post('/profile/avatar', uploadAvatar.single('avatar'), validateAvatarContent, async (req, res, next) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ success: false, error: 'Please choose an image file (JPG, PNG, or WebP) to upload.' });
+    }
+
+    const avatarUrl = `/uploads/avatars/${req.file.filename}`;
+
+    try {
+      const [curr] = await pool.query('SELECT avatar_url FROM admins WHERE id = ?', [req.admin.id]);
+      if (curr?.[0]?.avatar_url && curr[0].avatar_url.startsWith('/uploads/avatars/')) {
+        const oldFile = path.join(__dirname, '..', curr[0].avatar_url);
+        if (fs.existsSync(oldFile)) {
+          try { fs.unlinkSync(oldFile); } catch (_) {}
+        }
+      }
+    } catch (_) {}
+
+    await pool.query(
+      'UPDATE admins SET avatar_url = ?, avatar_updated_at = NOW() WHERE id = ?',
+      [avatarUrl, req.admin.id]
+    );
+
+    await pool.query(
+      `INSERT INTO audit_logs (id, admin_id, actor_name, action, target_entity, target_id, details, severity, ip_address)
+       VALUES (?, ?, ?, 'ADMIN_AVATAR_UPDATED', 'admins', ?, 'Updated operator profile avatar', 'info', ?)`,
+      [crypto.randomUUID(), req.admin.id, req.admin.full_name || 'Admin', req.admin.id, req.ip]
+    );
+
+    res.json({
+      success: true,
+      message: 'Profile picture updated successfully.',
+      avatar_url: avatarUrl
+    });
+  } catch (err) {
+    if (req.file?.path) {
+      try { fs.unlinkSync(req.file.path); } catch (_) {}
+    }
+    next(err);
+  }
+});
+
+// DELETE /api/admin/profile/avatar — Remove operator avatar
+router.delete('/profile/avatar', async (req, res, next) => {
+  try {
+    const [curr] = await pool.query('SELECT avatar_url FROM admins WHERE id = ?', [req.admin.id]);
+    if (curr?.[0]?.avatar_url && curr[0].avatar_url.startsWith('/uploads/avatars/')) {
+      const oldFile = path.join(__dirname, '..', curr[0].avatar_url);
+      if (fs.existsSync(oldFile)) {
+        try { fs.unlinkSync(oldFile); } catch (_) {}
+      }
+    }
+
+    await pool.query(
+      'UPDATE admins SET avatar_url = NULL, avatar_updated_at = NOW() WHERE id = ?',
+      [req.admin.id]
+    );
+
+    await pool.query(
+      `INSERT INTO audit_logs (id, admin_id, actor_name, action, target_entity, target_id, details, severity, ip_address)
+       VALUES (?, ?, ?, 'ADMIN_AVATAR_REMOVED', 'admins', ?, 'Removed operator profile avatar', 'info', ?)`,
+      [crypto.randomUUID(), req.admin.id, req.admin.full_name || 'Admin', req.admin.id, req.ip]
+    );
+
+    res.json({
+      success: true,
+      message: 'Profile picture removed. Reverted to initials monogram.'
+    });
+  } catch (err) { next(err); }
+});
+
+// POST /api/admin/roster/:id/avatar — Upload / update staff clinician profile photo
+router.post('/roster/:id/avatar', requirePermission('roster:manage'), uploadAvatar.single('avatar'), validateAvatarContent, async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    if (!req.file) {
+      return res.status(400).json({ success: false, error: 'Please choose an image file (JPG, PNG, or WebP) to upload.' });
+    }
+
+    const [rows] = await pool.query('SELECT id, name, staff_code, avatar_url FROM staff_roster WHERE id = ?', [id]);
+    if (!rows || rows.length === 0) {
+      if (req.file?.path) {
+        try { fs.unlinkSync(req.file.path); } catch (_) {}
+      }
+      return res.status(404).json({ success: false, error: 'Staff member not found.' });
+    }
+    const staff = rows[0];
+    const avatarUrl = `/uploads/avatars/${req.file.filename}`;
+
+    if (staff.avatar_url && staff.avatar_url.startsWith('/uploads/avatars/')) {
+      const oldFile = path.join(__dirname, '..', staff.avatar_url);
+      if (fs.existsSync(oldFile)) {
+        try { fs.unlinkSync(oldFile); } catch (_) {}
+      }
+    }
+
+    await pool.query('UPDATE staff_roster SET avatar_url = ? WHERE id = ?', [avatarUrl, id]);
+
+    await pool.query(
+      `INSERT INTO audit_logs (id, admin_id, actor_name, action, target_entity, target_id, details, severity, ip_address)
+       VALUES (?, ?, ?, 'STAFF_AVATAR_UPDATED', 'staff_roster', ?, ?, 'info', ?)`,
+      [
+        crypto.randomUUID(),
+        req.admin.id,
+        req.admin.full_name || 'Admin',
+        id,
+        `Updated photo for staff member ${staff.name} (${staff.staff_code || id})`,
+        req.ip
+      ]
+    );
+
+    res.json({
+      success: true,
+      message: `Profile picture for ${staff.name} updated successfully.`,
+      avatar_url: avatarUrl
+    });
+  } catch (err) {
+    if (req.file?.path) {
+      try { fs.unlinkSync(req.file.path); } catch (_) {}
+    }
+    next(err);
+  }
+});
+
+// DELETE /api/admin/roster/:id/avatar — Remove staff clinician photo
+router.delete('/roster/:id/avatar', requirePermission('roster:manage'), async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const [rows] = await pool.query('SELECT id, name, staff_code, avatar_url FROM staff_roster WHERE id = ?', [id]);
+    if (!rows || rows.length === 0) {
+      return res.status(404).json({ success: false, error: 'Staff member not found.' });
+    }
+    const staff = rows[0];
+
+    if (staff.avatar_url && staff.avatar_url.startsWith('/uploads/avatars/')) {
+      const oldFile = path.join(__dirname, '..', staff.avatar_url);
+      if (fs.existsSync(oldFile)) {
+        try { fs.unlinkSync(oldFile); } catch (_) {}
+      }
+    }
+
+    await pool.query('UPDATE staff_roster SET avatar_url = NULL WHERE id = ?', [id]);
+
+    await pool.query(
+      `INSERT INTO audit_logs (id, admin_id, actor_name, action, target_entity, target_id, details, severity, ip_address)
+       VALUES (?, ?, ?, 'STAFF_AVATAR_REMOVED', 'staff_roster', ?, ?, 'info', ?)`,
+      [
+        crypto.randomUUID(),
+        req.admin.id,
+        req.admin.full_name || 'Admin',
+        id,
+        `Removed photo for staff member ${staff.name} (${staff.staff_code || id})`,
+        req.ip
+      ]
+    );
+
+    res.json({
+      success: true,
+      message: `Profile picture for ${staff.name} removed.`
+    });
+  } catch (err) { next(err); }
 });
 
 module.exports = router;

@@ -1116,7 +1116,7 @@
 
 .proto-value-header-row {
   display: flex;
-  align-items: center;
+  align-items: flex-start !important;
   gap: 1rem;
   margin-bottom: 1.1rem;
 }
@@ -1131,6 +1131,8 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  align-self: flex-start !important;
+  margin-top: 2px !important;
   box-shadow: 0 4px 14px rgba(60, 175, 138, 0.28);
   transition: transform 0.35s ease, background 0.35s ease, box-shadow 0.35s ease;
 }
@@ -1353,6 +1355,7 @@
   flex-shrink: 0;
   margin-top: 1px;
 }
+
 /* ═══════════════════════════════════════════════════════════════════════════
    REFERENCE SHOWCASE LAYOUT (EXPANDED X & Y AXIS FOR HIGH VISIBILITY)
    ═══════════════════════════════════════════════════════════════════════════ */
@@ -1613,23 +1616,26 @@
 
 .detail-item {
   display: flex;
-  align-items: center;
-  gap: 0.85rem;
-  padding: 0.6rem 0.85rem;
-  border-radius: 10px;
+  align-items: flex-start;
+  gap: 0.95rem;
+  padding: 0.85rem 1.15rem;
+  border-radius: 12px;
   background: var(--proto-bg-tint);
-  border: 1px solid rgba(11, 37, 69, 0.04);
-  transition: background 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  border: 1px solid rgba(11, 37, 69, 0.05);
+  transition: background 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease, transform 0.2s ease;
+  box-sizing: border-box;
 }
 .detail-item:hover {
   transform: translateX(4px);
   background: rgba(60, 175, 138, 0.08);
-  transition: transform 0.2s ease, background 0.2s ease;
+  border-color: rgba(60, 175, 138, 0.25);
+  box-shadow: 0 4px 14px rgba(11, 37, 69, 0.06);
 }
 
 .detail-icon {
   width: 36px;
   height: 36px;
+  min-width: 36px;
   border-radius: 50%;
   background: linear-gradient(135deg, var(--teal-green) 0%, var(--sky-blue) 100%);
   color: #ffffff;
@@ -1638,6 +1644,47 @@
   justify-content: center;
   flex-shrink: 0;
   box-shadow: 0 3px 10px rgba(60, 175, 138, 0.2);
+  margin-top: 1px;
+}
+
+/* Reversion: Section tablets & cards (Organizations We Serve, Roles We Hire For)
+   Header and Icon aligned horizontally; description paragraph strictly stays
+   within the text column indented to the right of the icon, NOT starting underneath the icon */
+.detail-item,
+.contact-detail-list .detail-item {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: flex-start !important;
+  gap: 0.95rem !important;
+}
+
+.detail-item .detail-icon,
+.contact-detail-list .detail-icon {
+  flex-shrink: 0 !important;
+  align-self: flex-start !important;
+  margin-top: 2px !important;
+}
+
+.detail-item .detail-text,
+.contact-detail-list .detail-text {
+  flex: 1 !important;
+  min-width: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important;
+}
+
+.detail-item .detail-text strong,
+.contact-detail-list .detail-text strong {
+  display: block !important;
+  margin-bottom: 0.25rem !important;
+}
+
+.detail-item .detail-text span,
+.contact-detail-list .detail-text span {
+  display: block !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
 /* Detail items with header row and indented body (Contact HQ card) */
@@ -1665,15 +1712,18 @@
 }
 
 .contact-detail-list .detail-icon {
-  width: 30px;
-  height: 30px;
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
   box-shadow: 0 2px 8px rgba(60, 175, 138, 0.25);
+  margin-top: 2px;
+  flex-shrink: 0;
 }
 
 .contact-detail-list .detail-icon i,
 .contact-detail-list .detail-icon svg {
-  width: 16px !important;
-  height: 16px !important;
+  width: 18px !important;
+  height: 18px !important;
 }
 
 .contact-detail-list .detail-body {
@@ -1979,7 +2029,7 @@
 
 .proto-card-header-icon-row {
   display: flex;
-  align-items: center;
+  align-items: flex-start !important;
   gap: 1rem;
   margin-bottom: 1.25rem;
   padding-bottom: 0.85rem;
@@ -1989,14 +2039,30 @@
 .proto-icon-box-md {
   width: 46px;
   height: 46px;
+  min-width: 46px;
+  min-height: 46px;
   border-radius: 12px;
   background: linear-gradient(135deg, var(--teal-green) 0%, var(--sky-blue) 100%);
   color: #ffffff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+  align-self: flex-start !important;
+  margin-top: 2px !important;
   box-shadow: 0 4px 12px rgba(60, 175, 138, 0.25);
+  box-sizing: border-box !important;
+  padding: 0 !important;
+}
+
+.proto-icon-box-md i,
+.proto-icon-box-md svg {
+  width: 24px !important;
+  height: 24px !important;
+  margin: 0 !important;
+  align-self: center !important;
+  display: block !important;
+  flex-shrink: 0 !important;
 }
 
 .proto-icon-box-md.icon-cyan {
@@ -2207,7 +2273,8 @@
     border-radius: 18px;
   }
   .contact-detail-list .detail-item {
-    padding: 0.75rem 0.9rem;
+    padding: 0.85rem 1.05rem;
+    align-items: flex-start;
   }
   .proto-mockup-phone {
     padding: 1.75rem 1.25rem;
@@ -3017,8 +3084,53 @@
     border-radius: 12px !important;
   }
   .contact-detail-list .detail-item {
-    padding: 0.8rem 0 !important;
-    border-bottom: 1px solid rgba(26, 58, 99, 0.06);
+    display: flex !important;
+    align-items: flex-start !important;
+    gap: 0.85rem !important;
+    padding: 0.85rem 1rem !important;
+    border-radius: 12px !important;
+    background: #F8FAFC !important;
+    border: 1px solid rgba(26, 58, 99, 0.07) !important;
+    box-shadow: 0 2px 8px rgba(11, 37, 69, 0.03) !important;
+    margin-bottom: 0.75rem !important;
+    box-sizing: border-box !important;
+  }
+  .contact-detail-list .detail-item:last-child {
+    margin-bottom: 0 !important;
+  }
+  .contact-detail-list .detail-icon {
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+    border-radius: 50% !important;
+    margin-top: 2px !important;
+    flex-shrink: 0 !important;
+  }
+  .contact-detail-list .detail-text {
+    flex: 1 !important;
+    min-width: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+  }
+  .contact-detail-list .detail-text strong {
+    display: block !important;
+    font-family: var(--font-heading) !important;
+    font-size: 0.94rem !important;
+    font-weight: 700 !important;
+    line-height: 1.32 !important;
+    color: var(--navy, #0B2545) !important;
+    margin-bottom: 0.25rem !important;
+    word-break: normal !important;
+    overflow-wrap: break-word !important;
+  }
+  .contact-detail-list .detail-text span {
+    display: block !important;
+    font-size: 0.85rem !important;
+    line-height: 1.48 !important;
+    color: #64748B !important;
+    word-break: normal !important;
+    overflow-wrap: break-word !important;
   }
   .detail-header-row strong {
     font-size: 0.88rem !important;
@@ -4353,4 +4465,94 @@ img, video, canvas, svg {
   .preview-style-info-card .info-item {
     gap: 0.75rem !important;
   }
+}
+
+/* ==========================================================================
+   UNIVERSAL HEADER & ICON HORIZONTAL ALIGNMENT ENGINE
+   Ensures headings and their icons remain on the same line, or top-aligned
+   with the first line on narrow screens without vertical floating/droop
+   ========================================================================== */
+.proto-card-title,
+.contact-card-title,
+.proto-value-title-2x2,
+.panel-title,
+.support-title,
+.client-section-title,
+.detail-item strong,
+.info-item strong {
+  line-height: 1.35;
+}
+
+/* Ensure flex rows with icons and titles align cleanly with the top line */
+.proto-card-header-icon-row,
+.proto-value-header-row,
+.panel-title,
+.support-title,
+.contact-detail-list .detail-header-row,
+.detail-item,
+.preview-style-info-card .info-item,
+.cookie-consent-header {
+  align-items: flex-start !important;
+}
+
+/* Keep icons and icon containers horizontally aligned with line 1 of header text */
+.panel-title > i,
+.panel-title > svg,
+.support-title > i,
+.support-title > svg,
+.modal-title > i,
+.modal-title > svg,
+.proto-card-header-icon-row > i,
+.proto-card-header-icon-row > svg,
+.proto-value-header-row > i,
+.proto-value-header-row > svg,
+.contact-detail-list .detail-header-row > i,
+.contact-detail-list .detail-header-row > svg,
+.proto-icon-box-md,
+.proto-value-icon-box-2x2,
+.proto-exec-icon-box,
+.detail-icon,
+.detail-item-icon,
+.cookie-consent-header > i,
+.cookie-consent-header > svg {
+  flex-shrink: 0 !important;
+  align-self: flex-start !important;
+  margin-top: 2px !important;
+}
+
+/* Icons inside dedicated icon boxes/containers MUST ALWAYS remain strictly centered */
+.proto-icon-box-md i,
+.proto-icon-box-md svg,
+.proto-value-icon-box-2x2 i,
+.proto-value-icon-box-2x2 svg,
+.proto-exec-icon-box i,
+.proto-exec-icon-box svg,
+.detail-icon i,
+.detail-icon svg,
+.detail-item-icon i,
+.detail-item-icon svg,
+.card-icon-box i,
+.card-icon-box svg,
+.shift-detail-icon-box i,
+.shift-detail-icon-box svg,
+.proto-badge-icon-box i,
+.proto-badge-icon-box svg,
+.opt1-icon-box i,
+.opt1-icon-box svg {
+  margin: 0 auto !important;
+  align-self: center !important;
+  display: block !important;
+  flex-shrink: 0 !important;
+}
+
+.proto-icon-box-md,
+.proto-value-icon-box-2x2,
+.proto-exec-icon-box,
+.detail-icon,
+.detail-item-icon,
+.card-icon-box,
+.shift-detail-icon-box {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 }

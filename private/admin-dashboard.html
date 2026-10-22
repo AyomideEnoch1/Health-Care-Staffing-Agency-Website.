@@ -159,6 +159,12 @@
           <span class="nav-badge" id="badge-admins-count" style="display:none;">0</span>
         </button>
 
+        <button type="button" class="nav-item-btn" data-tab="archive-tab" data-title="Archive Vault &amp; Deleted Records" id="nav-archive-vault" onclick="window.switchAdminTab('archive-tab', 'Archive Vault')">
+          <span class="nav-icon"><i data-lucide="archive"></i></span>
+          <span class="nav-label">Archive Vault</span>
+          <span class="nav-badge" id="badge-archive-count" style="display:none;">0</span>
+        </button>
+
         <button type="button" class="nav-item-btn" data-tab="settings-tab" data-title="Portal Settings &amp; Audit Log" onclick="window.switchAdminTab('settings-tab', 'Portal Settings & Audit Log')">
           <span class="nav-icon"><i data-lucide="settings"></i></span>
           <span class="nav-label">Settings &amp; Audit</span>
@@ -414,7 +420,7 @@
                     <span class="live-chart-pulse" style="background:#38bdf8;"></span>
                     <span class="chart-title">Regional Shift Demand Matrix</span>
                   </div>
-                  <span class="chart-subtitle">Hospital surge, LTC facilities, and Home Care allocations by GTA sector</span>
+                  <span class="chart-subtitle" id="regional-demand-subtitle">Hospital surge, LTC facilities, and Home Care allocations by GTA sector &bull; <strong id="regional-demand-total-badge" style="color:var(--brand-cyan);font-weight:700;">0 Active Shifts</strong></span>
                 </div>
               </div>
               <div class="chart-container-box">
@@ -1166,9 +1172,137 @@
           </div>
         </div>
 
+
+        <!-- TAB: ARCHIVE RETENTION VAULT -->
+        <div class="admin-view-tab" id="archive-tab">
+          
+          <!-- Archive Vault Header Banner -->
+          <div class="table-card" style="padding: 1.6rem 1.75rem; margin-bottom: 1.5rem; background: linear-gradient(135deg, rgba(11,37,69,0.95) 0%, rgba(15,23,42,0.98) 100%); border: 1px solid rgba(27,174,207,0.25); border-radius: 12px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+              <div>
+                <div style="display: flex; align-items: center; gap: 0.65rem; margin-bottom: 0.35rem;">
+                  <div style="width: 36px; height: 36px; border-radius: 8px; background: rgba(27,174,207,0.18); color: var(--sky-blue); display: flex; align-items: center; justify-content: center;">
+                    <i data-lucide="archive" style="width: 20px; height: 20px;"></i>
+                  </div>
+                  <h2 style="font-size: 1.35rem; font-weight: 800; color: #FFFFFF; margin: 0;">Archive Vault &amp; Retention System</h2>
+                </div>
+                <p style="font-size: 0.85rem; color: #94A3B8; margin: 0; max-width: 720px; line-height: 1.45;">
+                  Comprehensive soft-delete archive preserving deleted clients, facilities, staff members, user accounts, and administrative records. View full audit snapshots and instantly restore any deleted entity.
+                </p>
+              </div>
+              <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <button type="button" class="admin-action-btn" onclick="window.loadArchiveRecords()" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: #FFFFFF; padding: 0.55rem 1rem; border-radius: 6px; display: inline-flex; align-items: center; gap: 6px; font-weight: 600; cursor: pointer;">
+                  <i data-lucide="refresh-cw" style="width: 14px; height: 14px;"></i> Refresh Vault
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Archive KPI Metric Cubes -->
+          <div class="kpi-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+            <div class="kpi-card" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 1.25rem;">
+              <div style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.4rem;">Total Archived</div>
+              <div style="font-size: 1.85rem; font-weight: 800; color: #FFFFFF;" id="archive-stat-total">0</div>
+              <div style="font-size: 0.72rem; color: #64748B; margin-top: 0.25rem;">Preserved in database</div>
+            </div>
+            <div class="kpi-card" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 1.25rem;">
+              <div style="font-size: 0.78rem; font-weight: 700; color: #38BDF8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.4rem;">Clients &amp; Facilities</div>
+              <div style="font-size: 1.85rem; font-weight: 800; color: #38BDF8;" id="archive-stat-clients">0</div>
+              <div style="font-size: 0.72rem; color: #64748B; margin-top: 0.25rem;">Facilities and accounts</div>
+            </div>
+            <div class="kpi-card" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 1.25rem;">
+              <div style="font-size: 0.78rem; font-weight: 700; color: #34D399; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.4rem;">Staff &amp; Caregivers</div>
+              <div style="font-size: 1.85rem; font-weight: 800; color: #34D399;" id="archive-stat-staff">0</div>
+              <div style="font-size: 0.72rem; color: #64748B; margin-top: 0.25rem;">Clinical roster profiles</div>
+            </div>
+            <div class="kpi-card" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 1.25rem;">
+              <div style="font-size: 0.78rem; font-weight: 700; color: #A78BFA; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.4rem;">Users &amp; Admins</div>
+              <div style="font-size: 1.85rem; font-weight: 800; color: #A78BFA;" id="archive-stat-users">0</div>
+              <div style="font-size: 0.72rem; color: #64748B; margin-top: 0.25rem;">Portal &amp; operator users</div>
+            </div>
+          </div>
+
+          <!-- Archive Table Card with Search & Filters -->
+          <div class="table-card" style="padding: 1.5rem; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem;">
+              <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                <button type="button" class="archive-filter-pill active" onclick="window.filterArchiveType('all', this)" style="padding: 0.4rem 0.85rem; border-radius: 999px; font-size: 0.78rem; font-weight: 700; background: var(--brand-turquoise); color: #FFFFFF; border: none; cursor: pointer;">All Records</button>
+                <button type="button" class="archive-filter-pill" onclick="window.filterArchiveType('client', this)" style="padding: 0.4rem 0.85rem; border-radius: 999px; font-size: 0.78rem; font-weight: 600; background: rgba(255,255,255,0.06); color: #94A3B8; border: 1px solid var(--border-color); cursor: pointer;">Clients &amp; Facilities</button>
+                <button type="button" class="archive-filter-pill" onclick="window.filterArchiveType('staff', this)" style="padding: 0.4rem 0.85rem; border-radius: 999px; font-size: 0.78rem; font-weight: 600; background: rgba(255,255,255,0.06); color: #94A3B8; border: 1px solid var(--border-color); cursor: pointer;">Staff Caregivers</button>
+                <button type="button" class="archive-filter-pill" onclick="window.filterArchiveType('admin', this)" style="padding: 0.4rem 0.85rem; border-radius: 999px; font-size: 0.78rem; font-weight: 600; background: rgba(255,255,255,0.06); color: #94A3B8; border: 1px solid var(--border-color); cursor: pointer;">Admin Operators</button>
+                <button type="button" class="archive-filter-pill" onclick="window.filterArchiveType('user', this)" style="padding: 0.4rem 0.85rem; border-radius: 999px; font-size: 0.78rem; font-weight: 600; background: rgba(255,255,255,0.06); color: #94A3B8; border: 1px solid var(--border-color); cursor: pointer;">Portal Users</button>
+              </div>
+
+              <div style="position: relative; width: 280px; max-width: 100%;">
+                <input type="text" id="archive-search-input" oninput="window.debounceArchiveSearch()" placeholder="Search archived name, email..." style="width: 100%; box-sizing: border-box; padding: 0.5rem 0.85rem 0.5rem 2.2rem; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 6px; color: #FFFFFF; font-size: 0.82rem;">
+                <i data-lucide="search" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: #64748B;"></i>
+              </div>
+            </div>
+
+            <!-- Table of Archived Items -->
+            <div class="table-responsive" style="overflow-x: auto;">
+              <table class="admin-data-table" style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+                <thead>
+                  <tr style="border-bottom: 1px solid var(--border-color); text-align: left; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px;">
+                    <th style="padding: 0.75rem 1rem;">Entity Type</th>
+                    <th style="padding: 0.75rem 1rem;">Display Name</th>
+                    <th style="padding: 0.75rem 1rem;">Identifier</th>
+                    <th style="padding: 0.75rem 1rem;">Archived Date</th>
+                    <th style="padding: 0.75rem 1rem;">Deleted By</th>
+                    <th style="padding: 0.75rem 1rem;">Reason</th>
+                    <th style="padding: 0.75rem 1rem; text-align: right;">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="archive-records-table-body">
+                  <tr>
+                    <td colspan="7" style="text-align: center; color: #64748B; padding: 2.5rem 1rem;">
+                      Loading archived records...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+
+
         <!-- TAB 9: PORTAL SETTINGS & AUDIT LOG -->
         <div class="admin-view-tab" id="settings-tab">
           
+          <!-- 0. Operator Profile & Avatar Settings -->
+          <div class="table-card" style="padding: 1.5rem; margin-bottom: 1.5rem; background: var(--bg-surface-elevated); border: 1px solid var(--border-subtle); border-radius: 8px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.25rem;">
+              <div style="display: flex; align-items: center; gap: 1.25rem;">
+                <div style="position: relative; width: 68px; height: 68px; flex-shrink: 0;">
+                  <div id="settings-admin-avatar-preview" style="width: 68px; height: 68px; border-radius: 50%; overflow: hidden; background: linear-gradient(135deg, #0284C7, #0F766E); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 800; color: #FFFFFF; border: 2.5px solid var(--brand-turquoise); box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
+                    SA
+                  </div>
+                  <label for="admin-avatar-file-input" style="position: absolute; bottom: -2px; right: -2px; width: 26px; height: 26px; border-radius: 50%; background: var(--brand-turquoise); color: #0F172A; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.4);" title="Upload Profile Picture">
+                    <i data-lucide="camera" style="width: 14px; height: 14px;"></i>
+                  </label>
+                  <input type="file" id="admin-avatar-file-input" accept="image/jpeg,image/png,image/webp" style="display: none;" onchange="window.handleAdminAvatarSelected(this)">
+                </div>
+                <div>
+                  <h2 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.5rem; color: #FFFFFF;">
+                    <span id="settings-admin-name">Administrator</span>
+                    <span class="status-pill verified" id="settings-admin-role-badge" style="font-size: 0.72rem; padding: 2px 8px;">Super-Admin</span>
+                  </h2>
+                  <p style="color: var(--text-muted); font-size: 0.82rem; margin: 0;" id="settings-admin-email">admin@divinefingers.ca</p>
+                  <div style="font-size: 0.74rem; color: #64748B; margin-top: 4px;">PNG, JPG, or WebP. Max 2MB. Square 1:1 ratio recommended.</div>
+                </div>
+              </div>
+              <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+                <button type="button" class="btn-primary-action" onclick="document.getElementById('admin-avatar-file-input').click()" style="padding: 0.5rem 1rem; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px;">
+                  <i data-lucide="upload" style="width: 14px; height: 14px;"></i> Change Picture
+                </button>
+                <button type="button" class="btn-secondary-action" id="btn-remove-admin-avatar" onclick="window.removeAdminAvatar()" style="display: none; padding: 0.5rem 0.85rem; font-size: 0.85rem; align-items: center; gap: 6px; color: #f87171; border-color: rgba(239,68,68,0.3);">
+                  <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i> Remove
+                </button>
+              </div>
+            </div>
+          </div>
+
           <!-- 1. Operator Self-Security & Two-Factor Authentication -->
           <div class="table-card mfa-banner-card" style="padding: 1.5rem; margin-bottom: 1.5rem; background: var(--bg-surface-elevated); border: 1px solid var(--border-subtle); border-radius: 8px;">
             <div class="mfa-banner-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
@@ -1229,27 +1363,41 @@
           </div>
 
           <div class="table-card" style="padding: 1.75rem;">
-            <h2 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 0.5rem;">Security &amp; System Audit Log</h2>
-            <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.5rem;">
-              Immutable audit tracking for regulatory Canadian healthcare dispatch security.
-            </p>
-
-            <div class="table-responsive-container">
-              <table class="data-table mobile-stacked-table">
-                <thead>
-                  <tr>
-                    <th>Log ID</th>
-                    <th>Timestamp (EST)</th>
-                    <th>Actor / Operator</th>
-                    <th>Action Executed</th>
-                    <th>Target Module</th>
-                    <th>Details</th>
-                    <th>Severity</th>
-                  </tr>
-                </thead>
-                <tbody id="audit-logs-table-body"></tbody>
-              </table>
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem;">
+              <div>
+                <h2 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.5rem;">
+                  <i data-lucide="shield-check" style="width: 22px; height: 22px; color: var(--brand-turquoise);"></i>
+                  Security &amp; System Audit Log
+                </h2>
+                <p style="color: var(--text-muted); font-size: 0.85rem; margin: 0;">
+                  Immutable audit tracking for regulatory Canadian healthcare dispatch security &bull; Click any entry to inspect full metadata.
+                </p>
+              </div>
+              <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                <span class="badge" id="audit-count-badge" style="background: rgba(2, 132, 199, 0.08); color: #0369A1; border: 1px solid rgba(2, 132, 199, 0.25); font-weight: 700; padding: 4px 10px; border-radius: 8px;">
+                  0 Recorded Events
+                </span>
+              </div>
             </div>
+
+            <!-- Toolbar: Search & Filter -->
+            <div class="table-toolbar-row" style="margin-bottom: 1.25rem; gap: 0.75rem; display: flex; flex-wrap: wrap; align-items: center;">
+              <div class="search-input-wrapper" style="flex: 1; min-width: 240px; position: relative;">
+                <i data-lucide="search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--text-muted);"></i>
+                <input type="text" id="audit-search-input" class="filter-input" placeholder="Search by actor, action, target, IP or details..." style="padding-left: 36px; width: 100%;">
+              </div>
+              <div style="min-width: 160px;">
+                <select id="audit-severity-filter" class="filter-select" style="width: 100%;">
+                  <option value="">All Severities</option>
+                  <option value="info">Info / Normal</option>
+                  <option value="warning">Warnings</option>
+                  <option value="critical">Critical / Danger</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Full Interactive Audit Feed -->
+            <div class="audit-feed-list" id="audit-logs-feed"></div>
           </div>
         </div>
 
@@ -1990,35 +2138,72 @@
        CLIENT PORTAL PASSWORD RESET MODAL
        ========================================================================== -->
   <div class="admin-modal-overlay" id="modal-client-reset-password">
-    <div class="admin-modal-card" style="max-width: 460px;">
+    <div class="admin-modal-card" style="max-width: 480px;">
       <div class="modal-header">
         <h3 class="modal-title" id="client-reset-modal-title">
-          <i data-lucide="key" style="width: 20px; height: 20px; color: var(--brand-cyan);"></i> Reset Client Password
+          <i data-lucide="mail" style="width: 20px; height: 20px; color: var(--brand-cyan);"></i> Dispatch Password Reset Link
         </h3>
         <button type="button" class="modal-close-btn" onclick="window.closeClientResetModal()" aria-label="Close modal"><i data-lucide="x" style="width: 20px; height: 20px;"></i></button>
       </div>
       <form id="form-client-reset-password" onsubmit="window.saveClientResetPassword(event)">
         <input type="hidden" id="client-reset-user-id" value="">
         <div style="margin-bottom: 1.25rem;">
-          <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.75rem;">
-            Resetting portal password for: <strong id="client-reset-user-email" style="color: var(--text-primary);"></strong>
+          <div style="font-size: 0.88rem; color: var(--text-primary); margin-bottom: 0.5rem;">
+            Recipient: <strong id="client-reset-user-email" style="color: var(--brand-cyan);"></strong>
           </div>
-          <div class="modal-form-group">
-            <label for="client-new-password">New Password (Min. 6 characters) *</label>
-            <input type="text" class="modal-input" id="client-new-password" placeholder="Enter temporary or new password" required minlength="6">
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 0.85rem; font-size: 0.78rem; color: var(--text-muted); line-height: 1.5;">
+            Clicking below will invalidate any active sessions for this client and dispatch a cryptographically secure, single-use 30-minute password reset link directly to their inbox.
+            <div style="margin-top: 0.4rem; color: var(--text-secondary); font-weight: 600;">
+              Admins never set or view user passwords.
+            </div>
           </div>
         </div>
         <div class="modal-actions" style="display: flex; justify-content: flex-end; gap: 0.75rem;">
           <button type="button" class="btn-secondary-action" onclick="window.closeClientResetModal()">Cancel</button>
           <button type="submit" class="btn-primary-action" id="btn-submit-client-reset">
-            <i data-lucide="check" style="width: 15px; height: 15px;"></i> Save New Password
+            <i data-lucide="send" style="width: 15px; height: 15px;"></i> Dispatch Reset Link
           </button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- Core Dashboard Application Script -->
+    <!-- ==========================================================================
+       AVATAR / PROFILE PICTURE FULL PREVIEW LIGHTBOX MODAL
+       ========================================================================== -->
+  <div class="admin-modal-overlay" id="modal-avatar-preview" style="display:none;" onclick="if(event.target===this) window.closeAvatarPreviewModal()">
+    <div class="admin-modal-card avatar-preview-card" style="max-width: 440px; text-align: center; overflow: hidden; padding: 1.75rem; border-radius: 16px;">
+      <div class="modal-header" style="justify-content: space-between; align-items: center; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.85rem;">
+        <h3 class="modal-title" style="font-size: 1.05rem; display: flex; align-items: center; gap: 8px;">
+          <i data-lucide="image" style="width: 18px; height: 18px; color: var(--brand-cyan);"></i> Profile Picture Preview
+        </h3>
+        <button type="button" class="modal-close-btn" onclick="window.closeAvatarPreviewModal()" aria-label="Close modal">
+          <i data-lucide="x" style="width: 18px; height: 18px;"></i>
+        </button>
+      </div>
+
+      <div class="avatar-preview-lightbox-body" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.15rem; padding: 0.5rem 0;">
+        <div class="avatar-preview-large-frame" style="width: 220px; height: 220px; border-radius: 50%; overflow: hidden; border: 3.5px solid var(--brand-cyan); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25), 0 0 20px rgba(0, 168, 150, 0.2); background: #0F172A; display: flex; align-items: center; justify-content: center; position: relative;">
+          <img id="avatar-preview-img" src="" alt="Profile Picture" style="width: 100%; height: 100%; object-fit: cover; object-position: center; display: block;" onerror="this.src='assets/images/logo_icon.png'">
+        </div>
+
+        <div style="text-align: center; width: 100%;">
+          <h4 id="avatar-preview-name" style="margin: 0; font-size: 1.2rem; font-weight: 800; color: var(--text-primary); letter-spacing: -0.01em;"></h4>
+          <div id="avatar-preview-role-badge" style="margin-top: 0.4rem; display: inline-flex;"></div>
+          <div id="avatar-preview-meta" style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.35rem; font-weight: 500;"></div>
+        </div>
+      </div>
+
+      <div class="modal-actions" style="margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid var(--border-color); display: flex; justify-content: center; gap: 0.75rem;">
+        <a id="avatar-preview-open-btn" href="#" target="_blank" rel="noopener noreferrer" class="btn-primary-action" style="padding: 0.5rem 1.25rem; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; text-decoration: none;">
+          <i data-lucide="external-link" style="width: 14px; height: 14px;"></i> View Full Size
+        </a>
+        <button type="button" class="btn-secondary-action" onclick="window.closeAvatarPreviewModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+<!-- Core Dashboard Application Script -->
   <script src="admin.js?v=5.9.6"></script>
 
 </body>

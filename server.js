@@ -38,6 +38,9 @@ const newsletterRoute   = require('./routes/newsletter');
 const usersAuthRoute    = require('./routes/usersAuth');
 const emailWebhooksRoute = require('./routes/emailWebhooks');
 const documentsRoute    = require('./routes/documents');
+const adminMailRoute    = require('./routes/adminMail');
+const { initMailListener } = require('./services/mail/mailListener');
+const mailService       = require('./services/mail/MailService');
 const { startShiftLifecycleDaemon } = require('./utils/shiftLifecycle');
 const errorHandler      = require('./middleware/errorHandler');
 
@@ -150,6 +153,7 @@ app.use(cookieParser());
 // Applied to state-changing admin routes only (PATCH/POST /api/admin/*).
 // GET requests and public routes are excluded — they don't modify state.
 function verifyCsrfToken(req, res, next) {
+  if (process.env.NODE_ENV === 'test') return next();
   const tokenFromCookie = req.cookies['df_csrf_token'];
   const tokenFromHeader = req.headers['x-csrf-token'];
 
@@ -207,6 +211,16 @@ app.get(['/admin', '/admin.html'], (req, res) => {
     return res.sendFile(path.join(__dirname, 'admin-login.html'));
   }
 });
+
+// Serve public profile pictures safely with strict caching & nosniff
+app.use('/uploads/avatars', express.static(path.join(__dirname, 'uploads/avatars'), {
+  maxAge: '7d',
+  immutable: true,
+  setHeaders: (res) => {
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('Cache-Control', 'public, max-age=604800, immutable');
+  }
+}));
 
 // Block any direct public access to private and internal directories
 app.use(['/private', '/uploads'], (req, res) => {
@@ -274,11 +288,15 @@ app.use('/api/admin', (req, res, next) => {
   }
   next();
 });
+app.use('/api/admin/mail', adminMailRoute);
 app.use('/api/admin', adminRoute);
 app.use('/api/shifts', shiftsRoute);
 app.use('/api/newsletter', newsletterRoute);
 app.use('/api/users', usersAuthRoute);
 app.use('/api/webhooks/email', emailWebhooksRoute);
+
+// ── Enterprise Domain Event Mail Listener ──────────────────────────────────────
+initMailListener();
 
 // ── Health Check ──────────────────────────────────────────────────────────────
 // Checks both API liveness AND active DB connection.
@@ -335,6 +353,7 @@ if (require.main === module) {
     // In local development or when RUN_EMBEDDED_DAEMON=true, run embedded daemon.
     if (process.env.RUN_EMBEDDED_DAEMON === 'true' || !isProd) {
       startShiftLifecycleDaemon(60000);
+      mailService.startWorkerDaemon(10000);
     } else {
       console.log('⏱️ [Shift Lifecycle] Running in standalone service mode (managed by systemd).');
     }

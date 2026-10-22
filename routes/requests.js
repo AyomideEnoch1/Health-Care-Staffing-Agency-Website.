@@ -73,6 +73,8 @@ router.post('/', publicFormLimiter, async (req, res, next) => {
       role_requested: validated.role_requested,
       shift_type: validated.shift_type,
       urgency_level: validated.urgency_level,
+      contact_name: validated.contact_name,
+      contact_email: validated.contact_email,
       status: 'pending',
       created_at: new Date().toISOString()
     });
@@ -189,6 +191,8 @@ router.post('/bulk', publicFormLimiter, async (req, res, next) => {
           role_requested: item.role,
           shift_type: item.shift_type,
           urgency_level: validated.urgency_level,
+          contact_name: validated.contact_name,
+          contact_email: validated.contact_email,
           status: 'pending',
           created_at: new Date().toISOString()
         });
@@ -407,6 +411,8 @@ router.post('/recurring', publicFormLimiter, async (req, res, next) => {
       role_requested: validated.role_requested,
       shift_type: `${validated.recurrence_pattern.toUpperCase()} (${validated.recurrence_days})`,
       urgency_level: 'routine',
+      contact_name: validated.contact_name,
+      contact_email: validated.contact_email,
       is_recurring: true,
       status: 'pending',
       created_at: new Date().toISOString()
@@ -512,6 +518,8 @@ router.post('/surge', publicFormLimiter, async (req, res, next) => {
       role_requested: validated.role_requested,
       shift_type: validated.shift_type,
       urgency_level: 'emergency_surge',
+      contact_name: validated.contact_name,
+      contact_email: validated.contact_email,
       is_surge: true,
       status: 'pending',
       created_at: new Date().toISOString()

@@ -24,6 +24,8 @@ const pool = require('../db');
 const { authLoginLimiter } = require('../middleware/rateLimiter');
 const { requireAdminAuth, normalizePermissions } = require('../middleware/auth');
 const { enqueueMail } = require('../utils/mailOutbox');
+const mailService = require('../services/mail/MailService');
+const { maskEmail } = require('../utils/cryptoUtils');
 const JWT_ADMIN_SECRET = process.env.JWT_ADMIN_SECRET || process.env.JWT_SECRET || 'divine_fingers_default_admin_jwt_secret_key_2026';
 const JWT_SECRET = JWT_ADMIN_SECRET;
 
@@ -158,128 +160,59 @@ router.post('/login', authLoginLimiter, async (req, res, next) => {
       return res.status(401).json({ success: false, error: 'Invalid email or password.' });
     }
 
-    // ── STEP 1.5: EMAIL VERIFICATION GATE ──
-    // If corporate email is unverified, issue a 6-digit OTP to the email before login
-    if (!admin.email_verified) {
-      const emailOtp = crypto.randomInt(100000, 999999).toString();
-      const hashedOtp = crypto.createHash('sha256').update(emailOtp).digest('hex');
+    // ── STEP 2: MANDATORY REAL-TIME EMAIL OTP VERIFICATION (Option 1) ──
+    const emailOtp = crypto.randomInt(100000, 999999).toString();
+    const hashedOtp = crypto.createHash('sha256').update(emailOtp).digest('hex');
 
-      await pool.query(
-        'UPDATE admins SET email_verification_token = ?, email_verification_expires = DATE_ADD(NOW(), INTERVAL 15 MINUTE) WHERE id = ?',
-        [hashedOtp, admin.id]
-      );
-
-      // Enqueue OTP email via outbox
-      await enqueueMail({
-        type: 'admin_verification_otp',
-        to: admin.email,
-        userId: admin.id,
-        vars: { full_name: admin.full_name, otp_code: emailOtp }
-      });
-
-      const verifyToken = jwt.sign(
-        {
-          id: admin.id,
-          email: admin.email,
-          role: admin.role,
-          full_name: admin.full_name,
-          purpose: 'email_verification_pending',
-          subnet: clientFP.subnet,
-          uaHash: clientFP.uaHash
-        },
-        JWT_SECRET,
-        { expiresIn: '15m' }
-      );
-
-      await pool.query(
-        `INSERT INTO audit_logs (id, admin_id, actor_name, action, target_entity, details, severity, ip_address)
-         VALUES (?, ?, ?, 'EMAIL_VERIFICATION_CHALLENGE', 'admins', 'Email verification OTP dispatched to corporate address', 'info', ?)`,
-        [crypto.randomUUID(), admin.id, admin.full_name, clientFP.ip]
-      );
-
-      return res.json({
-        success: true,
-        requires_email_verification: true,
-        verify_token: verifyToken,
-        email: admin.email,
-        dev_otp: process.env.NODE_ENV === 'development' ? emailOtp : undefined,
-        message: `A 6-digit verification code has been sent to ${admin.email}. Please verify to complete login.`
-      });
-    }
-
-    // ── STEP 2: TOTP MFA ENFORCEMENT ──
-    if (admin.totp_enabled && admin.totp_secret) {
-      const mfaToken = jwt.sign(
-        {
-          id: admin.id,
-          email: admin.email,
-          role: admin.role,
-          full_name: admin.full_name,
-          purpose: 'mfa_pending',
-          subnet: clientFP.subnet,
-          uaHash: clientFP.uaHash
-        },
-        JWT_SECRET,
-        { expiresIn: '5m' }
-      );
-
-      await pool.query(
-        `INSERT INTO audit_logs (id, admin_id, actor_name, action, target_entity, details, severity, ip_address)
-         VALUES (?, ?, ?, 'MFA_CHALLENGE_ISSUED', 'admins', 'Primary credentials accepted; TOTP challenge issued', 'info', ?)`,
-        [crypto.randomUUID(), admin.id, admin.full_name, clientFP.ip]
-      );
-
-      return res.json({
-        success: true,
-        requires_mfa: true,
-        mfa_token: mfaToken,
-        message: 'Two-Factor Authentication required. Enter the 6-digit code from your authenticator app.'
-      });
-    }
-
-    // Successful Login (Email Verified, MFA not enabled) — reset failure counter & record telemetry
     await pool.query(
-      'UPDATE admins SET failed_login_attempts = 0, lock_until = NULL, last_login = NOW(), last_login_ip = ? WHERE id = ?',
-      [clientFP.ip, admin.id]
+      'UPDATE admins SET email_verification_token = ?, email_verification_expires = DATE_ADD(NOW(), INTERVAL 10 MINUTE) WHERE id = ?',
+      [hashedOtp, admin.id]
     );
 
-    const token = jwt.sign(
+    // Dispatch real-time OTP via MailService
+    try {
+      await mailService.send('auth_admin_login_otp', {
+        to: admin.email,
+        recipientType: 'admin',
+        userId: admin.id,
+        data: {
+          full_name: admin.full_name,
+          otp_code: emailOtp,
+          expires_in_minutes: '10'
+        }
+      });
+    } catch (mailErr) {
+      console.error('[AdminAuth] Real-time OTP dispatch warning:', mailErr.message);
+    }
+
+    const verifyToken = jwt.sign(
       {
         id: admin.id,
         email: admin.email,
         role: admin.role,
         full_name: admin.full_name,
+        purpose: 'email_verification_pending',
         subnet: clientFP.subnet,
         uaHash: clientFP.uaHash
       },
       JWT_SECRET,
-      { expiresIn: process.env.JWT_EXPIRES_IN || '8h' }
+      { expiresIn: '10m' }
     );
-
-    const csrfToken = crypto.randomBytes(32).toString('hex');
-    res.cookie('df_admin_session', token, buildCookieOptions());
-    res.cookie('df_csrf_token', csrfToken, { ...buildCookieOptions(), httpOnly: false });
 
     await pool.query(
       `INSERT INTO audit_logs (id, admin_id, actor_name, action, target_entity, details, severity, ip_address)
-       VALUES (?, ?, ?, 'AUTH_LOGIN', 'admins', 'Successful administrator login', 'info', ?)`,
+       VALUES (?, ?, ?, 'EMAIL_VERIFICATION_CHALLENGE', 'admins', 'Admin login OTP challenge dispatched to corporate address', 'info', ?)`,
       [crypto.randomUUID(), admin.id, admin.full_name, clientFP.ip]
     );
 
-    res.json({
+    return res.json({
       success: true,
-      csrfToken,
-      admin: {
-        id: admin.id,
-        email: admin.email,
-        full_name: admin.full_name,
-        role: admin.role,
-        permissions: normalizePermissions(admin.role, admin.permissions),
-        totp_enabled: Boolean(admin.totp_enabled),
-        email_verified: true
-      }
+      requires_email_verification: true,
+      verify_token: verifyToken,
+      email: maskEmail(admin.email),
+      dev_otp: process.env.NODE_ENV === 'development' ? emailOtp : undefined,
+      message: `A 6-digit verification code has been dispatched to ${maskEmail(admin.email)}. Please verify to complete sign in.`
     });
-
   } catch (err) {
     if (err instanceof z.ZodError) {
       return res.status(400).json({ success: false, error: err.errors[0].message });
@@ -442,21 +375,29 @@ router.post('/email/resend', authLoginLimiter, async (req, res, next) => {
     const hashedOtp = crypto.createHash('sha256').update(emailOtp).digest('hex');
 
     await pool.query(
-      'UPDATE admins SET email_verification_token = ?, email_verification_expires = DATE_ADD(NOW(), INTERVAL 15 MINUTE) WHERE id = ?',
+      'UPDATE admins SET email_verification_token = ?, email_verification_expires = DATE_ADD(NOW(), INTERVAL 10 MINUTE) WHERE id = ?',
       [hashedOtp, admin.id]
     );
 
-    await enqueueMail({
-      type: 'admin_verification_otp',
-      to: admin.email,
-      userId: admin.id,
-      vars: { full_name: admin.full_name, otp_code: emailOtp }
-    });
+    try {
+      await mailService.send('auth_admin_login_otp', {
+        to: admin.email,
+        recipientType: 'admin',
+        userId: admin.id,
+        data: {
+          full_name: admin.full_name,
+          otp_code: emailOtp,
+          expires_in_minutes: '10'
+        }
+      });
+    } catch (mailErr) {
+      console.error('[AdminAuth] Resend OTP dispatch warning:', mailErr.message);
+    }
 
     res.json({
       success: true,
       dev_otp: process.env.NODE_ENV === 'development' ? emailOtp : undefined,
-      message: `A fresh 6-digit verification code has been dispatched to ${admin.email}.`
+      message: `A fresh 6-digit verification code has been dispatched to ${maskEmail(admin.email)}.`
     });
   } catch (err) { next(err); }
 });
@@ -610,7 +551,7 @@ router.post('/mfa/confirm', requireAdminAuth(), async (req, res, next) => {
 router.get('/me', requireAdminAuth(), async (req, res, next) => {
   try {
     const [rows] = await pool.query(
-      'SELECT id, email, full_name, role, permissions, is_active, email_verified, totp_enabled, last_login, last_login_ip FROM admins WHERE id = ?',
+      'SELECT id, email, full_name, role, permissions, is_active, email_verified, totp_enabled, avatar_url, last_login, last_login_ip FROM admins WHERE id = ?',
       [req.admin.id]
     );
     if (!rows.length || !rows[0].is_active) {
@@ -627,6 +568,7 @@ router.get('/me', requireAdminAuth(), async (req, res, next) => {
         permissions: normalizePermissions(admin.role, admin.permissions),
         totp_enabled: Boolean(admin.totp_enabled),
         email_verified: Boolean(admin.email_verified),
+        avatar_url: admin.avatar_url || null,
         last_login: admin.last_login,
         last_login_ip: admin.last_login_ip
       }

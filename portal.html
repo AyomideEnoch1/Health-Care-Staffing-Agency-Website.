@@ -11,7 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Montserrat:wght@400;500;600;700;800;900&family=Open+Sans:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="style.css?v=5.7.0">
-  <link rel="stylesheet" href="prototype.css?v=5.4.3">
+  <link rel="stylesheet" href="prototype.css?v=5.7.0">
   <script src="https://unpkg.com/lucide@latest"></script>
 
   <style>
@@ -631,14 +631,19 @@
       font-weight: 800;
       color: var(--navy);
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       gap: 0.55rem;
+      line-height: 1.35;
     }
 
-    .panel-title i {
+    .panel-title i,
+    .panel-title svg {
       color: #1BAECF;
       width: 20px;
       height: 20px;
+      flex-shrink: 0;
+      margin-top: 2px;
+      align-self: flex-start;
     }
 
     .panel-action-link {
@@ -2824,12 +2829,44 @@
       background: #F8FAFC;
       border-color: #94A3B8;
     }
+    /* Live Tracker Responsive & Anti-Endless Scroll Engine */
+    .tracker-mobile-summary {
+      display: none;
+    }
+    .tracker-drawer-toggle {
+      display: none;
+    }
+    .tracker-details-drawer {
+      display: block;
+    }
+    .tracker-drawer-toggle:hover {
+      background: #F8FAFC !important;
+      border-color: #94A3B8 !important;
+    }
+    .tracker-drawer-toggle.active {
+      background: #0B2545 !important;
+      border-color: #0B2545 !important;
+      color: #FFFFFF !important;
+    }
+    .tracker-pagination-bar {
+      margin-top: 1rem;
+      padding: 1rem;
+      background: #F8FAFC;
+      border: 1px dashed #CBD5E1;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      text-align: center;
+    }
     @media (max-width: 640px) {
       .stepper {
         flex-direction: column !important;
         align-items: stretch !important;
-        gap: 12px !important;
-        margin: 14px 0 !important;
+        gap: 10px !important;
+        margin: 10px 0 14px 0 !important;
       }
       .stepper .step {
         flex-direction: row !important;
@@ -2837,10 +2874,16 @@
         gap: 12px !important;
         position: relative !important;
       }
+      .stepper .step-circle {
+        width: 26px !important;
+        height: 26px !important;
+        min-width: 26px !important;
+        font-size: 11px !important;
+      }
       .stepper .step-line {
         position: absolute !important;
-        top: -12px !important;
-        left: 11px !important;
+        top: -10px !important;
+        left: 12px !important;
         width: 2px !important;
         height: 100% !important;
       }
@@ -2850,7 +2893,12 @@
       .stepper .step-label {
         margin-top: 0 !important;
         text-align: left !important;
-        font-size: 11.5px !important;
+        font-size: 0.78rem !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        flex: 1 !important;
+        gap: 8px !important;
       }
     }
 
@@ -3126,7 +3174,8 @@
     }
     @media (max-width: 640px) {
       .tracker-metrics-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.65rem;
       }
     }
     .tracker-kpi-card {
@@ -4339,22 +4388,29 @@ html, body {
 }
 
 /* Section Headers & Fluid Responsive Typography */
-.panel-title {
+.panel-title,
+.support-title,
+.modal-title,
+.client-section-title {
   font-family: var(--font-heading, 'Plus Jakarta Sans', sans-serif);
-  font-size: clamp(0.95rem, 3.8vw, 1.15rem) !important;
+  font-size: clamp(0.85rem, 3.4vw, 1.12rem) !important;
   font-weight: 800;
   color: var(--navy);
-  display: flex;
-  align-items: center;
-  gap: 0.55rem;
-  flex-wrap: nowrap;
-  line-height: 1.35;
+  display: flex !important;
+  align-items: flex-start !important;
+  gap: 0.55rem !important;
+  line-height: 1.35 !important;
 }
 
-.panel-title i, .panel-title svg {
-  flex-shrink: 0;
-  width: 18px;
-  height: 18px;
+.panel-title i, .panel-title svg,
+.support-title i, .support-title svg,
+.modal-title i, .modal-title svg,
+.client-section-title i, .client-section-title svg {
+  flex-shrink: 0 !important;
+  width: 18px !important;
+  height: 18px !important;
+  align-self: flex-start !important;
+  margin-top: 2px !important;
 }
 
 .panel-header {
@@ -4653,15 +4709,90 @@ html, body {
     display: none !important;
   }
 
-  .metrics-grid {
-    grid-template-columns: 1fr !important;
-    gap: 0.85rem !important;
+  /* Mobile 2-in-a-Row Responsive Neo-Cubes (matching Admin Dashboard) */
+  .metrics-grid,
+  .tracker-metrics-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.65rem !important;
+    margin-bottom: 1.15rem !important;
+  }
+
+  .metric-card,
+  .tracker-kpi-card {
+    padding: 0.75rem 0.85rem !important;
+    border-radius: 14px !important;
+    min-height: 105px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    align-items: flex-start !important;
+    box-sizing: border-box !important;
+  }
+
+  .metric-icon-wrap {
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px !important;
+    min-height: 28px !important;
+    border-radius: 8px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+    margin-bottom: 0.35rem !important;
+  }
+
+  .metric-icon-wrap svg,
+  .metric-icon-wrap i {
+    width: 15px !important;
+    height: 15px !important;
+  }
+
+  .metric-data-group {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.2rem !important;
+    margin-top: auto !important;
+    width: 100% !important;
+  }
+
+  .metric-val {
+    font-size: clamp(1.4rem, 4.5vw, 1.7rem) !important;
+    font-weight: 800 !important;
+    line-height: 1 !important;
+    letter-spacing: -0.02em !important;
+  }
+
+  .metric-label {
+    font-size: clamp(0.68rem, 2.5vw, 0.78rem) !important;
+    font-weight: 600 !important;
+    line-height: 1.25 !important;
+    margin-top: 0 !important;
+    word-break: normal !important;
+    overflow-wrap: break-word !important;
   }
 
   .portal-panel {
     padding: 1.15rem 0.95rem !important;
     border-radius: 10px !important;
     margin-bottom: 1.25rem !important;
+  }
+
+  .panel-title,
+  .support-title {
+    font-size: clamp(0.82rem, 3.2vw, 1.02rem) !important;
+    display: flex !important;
+    align-items: flex-start !important;
+    line-height: 1.35 !important;
+  }
+  .panel-title i,
+  .panel-title svg,
+  .support-title i,
+  .support-title svg {
+    margin-top: 2px !important;
+    align-self: flex-start !important;
+    flex-shrink: 0 !important;
   }
 
   .panel-header {
@@ -5313,17 +5444,21 @@ html, body {
 /* Small Smartphone Layout (<= 540px) */
 @media (max-width: 540px) {
   #client-workspace-app .metrics-grid,
-  #worker-workspace-app .metrics-grid {
-    grid-template-columns: 1fr !important;
-    gap: 0.75rem !important;
-  }
+  #worker-workspace-app .metrics-grid,
   #client-workspace-app .tracker-metrics-grid {
-    grid-template-columns: 1fr !important;
-    gap: 0.75rem !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.65rem !important;
+    margin-bottom: 1rem !important;
   }
   #client-workspace-app .metric-card,
   #worker-workspace-app .metric-card {
-    padding: 1rem 1.1rem !important;
+    padding: 0.75rem 0.85rem !important;
+    border-radius: 14px !important;
+    min-height: 105px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    align-items: flex-start !important;
   }
   #client-workspace-app .panel-header,
   #worker-workspace-app .panel-header {
@@ -5422,6 +5557,103 @@ html, body {
     padding: 1rem !important;
   }
 
+  /* Live Personnel & EVV Tracker Anti-Endless Scroll Rules */
+  .tracker-controls-row {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.65rem !important;
+    padding: 0.5rem 0 0.85rem 0 !important;
+  }
+  .tracker-controls-row .tracker-search-wrap {
+    max-width: 100% !important;
+    width: 100% !important;
+    min-width: 100% !important;
+  }
+  .tracker-filter-bar {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    padding: 4px !important;
+    gap: 6px !important;
+  }
+  .tracker-filter-bar::-webkit-scrollbar {
+    display: none !important;
+  }
+  .client-tracker-pill {
+    flex: 0 0 auto !important;
+    white-space: nowrap !important;
+    padding: 0.38rem 0.75rem !important;
+    font-size: 0.74rem !important;
+  }
+  .tracker-mobile-summary {
+    display: block !important;
+  }
+  .tracker-drawer-toggle {
+    display: inline-flex !important;
+  }
+  #client-workspace-app .tracker-details-drawer {
+    display: none !important;
+  }
+  #client-workspace-app .tracker-details-drawer.expanded {
+    display: block !important;
+    animation: trackerDrawerSlide 0.22s ease-out forwards;
+  }
+  #client-workspace-app .tracker-shift-card {
+    margin-bottom: 0.85rem !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    border-radius: 12px !important;
+  }
+  #client-workspace-app .tracker-shift-card > div:first-child {
+    padding: 0.8rem 0.95rem !important;
+  }
+  #client-workspace-app #client-page-active {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  #client-workspace-app #client-page-active .portal-panel {
+    padding: 0.85rem 0.65rem !important;
+    border-radius: 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  .tracker-drawer-inner {
+    padding: 0.85rem 0.65rem !important;
+  }
+  .tracker-caregiver-box {
+    width: 100% !important;
+    box-sizing: border-box !important;
+    padding: 14px 14px !important;
+    border-radius: 10px !important;
+  }
+  .caregiver-name {
+    white-space: nowrap !important;
+  }
+  .caregiver-meta {
+    font-size: 0.78rem !important;
+    line-height: 1.4 !important;
+  }
+  .caregiver-actions-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)) !important;
+    gap: 8px !important;
+    width: 100% !important;
+  }
+  @keyframes trackerDrawerSlide {
+    from {
+      opacity: 0;
+      transform: translateY(-4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
   /* Modals full-width on mobile */
   .portal-modal-overlay {
     padding: 0.75rem !important;
@@ -5438,6 +5670,22 @@ html, body {
   .portal-modal-footer button {
     width: 100% !important;
     justify-content: center !important;
+  }
+}
+
+/* Broaden containers on mobile phones (<= 540px) */
+@media (max-width: 540px) {
+  #client-workspace-app .portal-content-body {
+    padding: 0.85rem 0.5rem 3rem 0.5rem !important;
+  }
+  #client-workspace-app #client-page-active .portal-panel {
+    padding: 0.75rem 0.45rem !important;
+  }
+  .tracker-drawer-inner {
+    padding: 0.75rem 0.45rem !important;
+  }
+  .tracker-caregiver-box {
+    padding: 12px 12px !important;
   }
 }
 
@@ -5669,7 +5917,7 @@ html, body {
               <!-- Today's Shifts Card -->
               <div class="portal-panel">
                 <div class="panel-header">
-                  <div class="panel-title" style="display: flex; align-items: center; gap: 0.55rem;">
+                  <div class="panel-title" style="display: flex; align-items: flex-start; gap: 0.55rem;">
                     <i data-lucide="calendar" style="color: #059669;"></i> Today's Shift Deployments
                   </div>
                   <button type="button" class="panel-action-btn" onclick="switchClientPage('client-page-active', 'Active Shifts & EVV')">
@@ -5685,7 +5933,7 @@ html, body {
               <!-- Recent Staffing Requests -->
               <div class="portal-panel">
                 <div class="panel-header">
-                  <div class="panel-title" style="display: flex; align-items: center; gap: 0.55rem;">
+                  <div class="panel-title" style="display: flex; align-items: flex-start; gap: 0.55rem;">
                     <i data-lucide="clipboard-list" style="color: #059669;"></i> Recent Shift Orders
                   </div>
                   <button type="button" class="btn-primary-action" onclick="switchClientPage('client-page-request', 'Request Staff')">
@@ -5703,8 +5951,8 @@ html, body {
             <!-- Right Column: Operations Coordinator Support -->
             <div class="portal-secondary-content" style="display: flex; flex-direction: column; gap: 1.5rem;">
               <div class="portal-panel support-card">
-                <div class="support-title" style="display: flex; align-items: center; gap: 0.5rem;">
-                  <i data-lucide="headphones" style="color: #059669;"></i> Priority Clinical Dispatch Desk
+                <div class="support-title" style="display: flex; align-items: flex-start; gap: 0.5rem;">
+                  <i data-lucide="headphones" style="color: #059669; margin-top: 2px; flex-shrink: 0;"></i> Priority Clinical Dispatch Desk
                 </div>
                 <p class="support-desc" style="margin-top: 0.75rem; font-size: 0.82rem; line-height: 1.45;">
                   Need urgent shift replacements, sudden surge staffing, or have emergency schedule modifications? The Divine Fingers Hospital Dispatch Desk is available 24/7.
@@ -5746,21 +5994,21 @@ html, body {
                 </div>
                 <div style="display: flex; flex-direction: column; gap: 0.65rem;">
                   <a href="#request" onclick="switchClientPage('client-page-request', 'Request Staff'); return false;" class="facility-tool-link">
-                    <span style="display: flex; align-items: center; gap: 0.55rem;">
+                    <span style="display: flex; align-items: flex-start; gap: 0.55rem;">
                       <i data-lucide="layers" style="width: 16px; height: 16px; color: #059669;"></i>
                       <span>Enterprise Multi-Week Scheduler</span>
                     </span>
                     <i data-lucide="chevron-right" class="arrow-indicator" style="width: 14px; height: 14px;"></i>
                   </a>
                   <a href="#roster" onclick="switchClientPage('client-page-roster', 'Facility Staff Roster'); return false;" class="facility-tool-link">
-                    <span style="display: flex; align-items: center; gap: 0.55rem;">
+                    <span style="display: flex; align-items: flex-start; gap: 0.55rem;">
                       <i data-lucide="file-check" style="width: 16px; height: 16px; color: #059669;"></i>
                       <span>Caregiver License &amp; VSS Verification</span>
                     </span>
                     <i data-lucide="chevron-right" class="arrow-indicator" style="width: 14px; height: 14px;"></i>
                   </a>
                   <a href="#billing" onclick="switchClientPage('client-page-billing', 'Invoices & Billing'); return false;" class="facility-tool-link">
-                    <span style="display: flex; align-items: center; gap: 0.55rem;">
+                    <span style="display: flex; align-items: flex-start; gap: 0.55rem;">
                       <i data-lucide="receipt" style="width: 16px; height: 16px; color: #059669;"></i>
                       <span>View Monthly Itemized Invoices</span>
                     </span>
@@ -5779,7 +6027,7 @@ html, body {
         <div class="portal-view-page" id="client-page-request">
           <div class="portal-panel" style="max-width: 960px; margin: 0 auto;">
             <div class="panel-header" style="flex-direction: column; align-items: flex-start; gap: 0.35rem; margin-bottom: 1.25rem;">
-              <div class="panel-title" style="display: flex; align-items: center; gap: 0.55rem; font-size: 1.2rem;">
+              <div class="panel-title" style="display: flex; align-items: flex-start; gap: 0.55rem; font-size: 1.2rem;">
                 <i data-lucide="layers" style="color: #059669;"></i> Enterprise Bulk Staffing &amp; Hospital Schedule Portal
               </div>
               <span id="client-request-eyebrow" style="font-size: 0.82rem; color: #64748B;">
@@ -6243,7 +6491,7 @@ html, body {
             <div class="portal-panel">
               <div class="panel-header" style="flex-wrap: wrap; gap: 0.75rem; align-items: center; justify-content: space-between;">
                 <div>
-                  <div class="panel-title" style="display: flex; align-items: center; gap: 0.55rem;">
+                  <div class="panel-title" style="display: flex; align-items: flex-start; gap: 0.55rem;">
                     <i data-lucide="activity" style="color: #059669;"></i> Live Personnel &amp; EVV Shift Tracker
                   </div>
                   <span id="client-active-eyebrow" style="font-size: 0.78rem; color: #64748B; font-weight: 600;">
@@ -6261,7 +6509,7 @@ html, body {
               </div>
 
               <!-- Interactive Filter & Search Controls -->
-              <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 0.75rem 0 1rem 0; border-bottom: 1px solid #E2E8F0; margin-bottom: 1rem;">
+              <div class="tracker-controls-row" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 0.75rem 0 1rem 0; border-bottom: 1px solid #E2E8F0; margin-bottom: 1rem;">
                 <div class="tracker-filter-bar" id="tracker-filter-pills">
                   <button type="button" class="client-tracker-pill active" onclick="setTrackerFilter('all')" data-filter="all">
                     <i data-lucide="layers" class="pill-icon"></i>
@@ -6295,7 +6543,7 @@ html, body {
                   </button>
                 </div>
 
-                <div style="display: flex; align-items: center; gap: 0.5rem; flex: 1; max-width: 320px; min-width: 210px;">
+                <div class="tracker-search-wrap" style="display: flex; align-items: center; gap: 0.5rem; flex: 1; max-width: 320px; min-width: 210px;">
                   <div style="position: relative; width: 100%;">
                     <i data-lucide="search" style="position: absolute; left: 11px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: #94A3B8; pointer-events: none;"></i>
                     <input type="text" id="tracker-search-input" oninput="applyTrackerSearch()" placeholder="Search caregiver, ID, unit..." style="width: 100%; padding: 0.44rem 0.8rem 0.44rem 2.15rem; font-size: 0.78rem; font-weight: 500; border-radius: 9px; border: 1px solid #CBD5E1; background: #FFFFFF; outline: none; box-sizing: border-box; transition: border-color 0.15s ease, box-shadow 0.15s ease;">
@@ -6312,8 +6560,8 @@ html, body {
             <!-- Unrated Shifts Review Section -->
             <div class="portal-panel" id="client-unrated-section">
               <div class="panel-header">
-                <div class="panel-title" style="display: flex; align-items: center; gap: 0.55rem;">
-                  <i data-lucide="star" style="color: #F59E0B;"></i> Completed Shifts Awaiting Quality Rating
+                <div class="panel-title" style="display: flex; align-items: flex-start; gap: 0.55rem;">
+                  <i data-lucide="star" style="color: #F59E0B; margin-top: 2px; flex-shrink: 0;"></i> Completed Shifts Awaiting Quality Rating
                 </div>
               </div>
               <div id="client-unrated-shifts-container">
@@ -6330,7 +6578,7 @@ html, body {
         <div class="portal-view-page" id="client-page-roster">
           <div class="portal-panel">
             <div class="panel-header" style="flex-direction: column; align-items: flex-start; gap: 0.35rem; margin-bottom: 1.25rem;">
-              <div class="panel-title" style="display: flex; align-items: center; gap: 0.55rem;">
+              <div class="panel-title" style="display: flex; align-items: flex-start; gap: 0.55rem;">
                 <i data-lucide="users" style="color: #059669;"></i> Facility Health Care Professional Roster
               </div>
               <span id="client-roster-eyebrow" style="font-size: 0.8rem; color: #64748B;">
@@ -6365,7 +6613,7 @@ html, body {
           <div class="portal-panel">
             <div class="panel-header" style="flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1.25rem;">
               <div>
-                <div class="panel-title" style="display: flex; align-items: center; gap: 0.55rem;">
+                <div class="panel-title" style="display: flex; align-items: flex-start; gap: 0.55rem;">
                   <i data-lucide="file-text" style="color: #059669;"></i> Invoices &amp; Shift Billing Statements
                 </div>
                 <span id="client-billing-eyebrow" style="font-size: 0.78rem; color: #64748B; font-weight: 600;">
@@ -6634,7 +6882,7 @@ html, body {
               <!-- Quick Clock Snapshot Card -->
               <div class="portal-panel">
                 <div class="panel-header">
-                  <div class="panel-title" style="display: flex; align-items: center; gap: 0.55rem;">
+                  <div class="panel-title" style="display: flex; align-items: flex-start; gap: 0.55rem;">
                     <i data-lucide="zap" style="color: #0284C7;"></i> Current Dispatch Status
                   </div>
                   <button type="button" class="btn-banner-action" onclick="switchStaffPage('staff-page-clock', 'EVV Clock Station')" style="padding: 0.35rem 0.8rem; font-size: 0.78rem;">
@@ -6703,8 +6951,8 @@ html, body {
             <div class="portal-secondary-content" style="display: flex; flex-direction: column; gap: 1.5rem;">
               <!-- Coordinator Card -->
               <div class="portal-panel support-card">
-                <div class="support-title" style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.95rem;">
-                  <i data-lucide="headphones" style="color: #0284C7;"></i> Dedicated Dispatch Coordinator
+                <div class="support-title" style="display: flex; align-items: flex-start; gap: 0.5rem; font-size: 0.95rem;">
+                  <i data-lucide="headphones" style="color: #0284C7; margin-top: 2px; flex-shrink: 0;"></i> Dedicated Dispatch Coordinator
                 </div>
                 <div style="margin-top: 0.75rem; display: flex; align-items: center; gap: 0.75rem;">
                   <div style="width: 42px; height: 42px; border-radius: 50%; background: #E0F2FE; color: #0369A1; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.95rem;">
@@ -6759,7 +7007,7 @@ html, body {
           <div class="portal-panel clock-station-panel" id="worker-clock-panel">
             <div class="panel-header" style="margin-bottom: 1.25rem;">
               <div>
-                <div class="panel-title" style="display: flex; align-items: center; gap: 0.55rem;">
+                <div class="panel-title" style="display: flex; align-items: flex-start; gap: 0.55rem;">
                   <i data-lucide="clock" style="color: #0284C7;"></i> Electronic Visit Verification &amp; Shift Timecard
                 </div>
                 <span style="font-size: 0.76rem; color: #64748B; font-weight: 600; margin-top: 2px; display: block;">
@@ -6920,7 +7168,7 @@ html, body {
 
                   <!-- Running Late Delay Notification Bar -->
                   <div class="running-late-box" id="allocated-late-container" style="margin-top: 1.25rem; padding: 0.85rem 1.15rem; background: #FFFDF5; border: 1px solid #FEF08A; border-radius: 10px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem;">
-                    <div style="display: flex; align-items: center; gap: 0.55rem;">
+                    <div style="display: flex; align-items: flex-start; gap: 0.55rem;">
                       <i data-lucide="clock-alert" style="width: 17px; height: 17px; color: #D97706;"></i>
                       <span style="font-size: 0.83rem; font-weight: 700; color: #854D0E;">Running behind schedule? Notify dispatch desk:</span>
                     </div>
@@ -7022,7 +7270,7 @@ html, body {
           <div class="portal-panel" id="worker-shifts-panel">
             <div class="panel-header" style="flex-wrap: wrap; gap: 0.75rem;">
               <div>
-                <div class="panel-title" style="display: flex; align-items: center; gap: 0.55rem;">
+                <div class="panel-title" style="display: flex; align-items: flex-start; gap: 0.55rem;">
                   <i data-lucide="calendar-check" style="color: #0284C7;"></i> Available Open Shifts (GTA &amp; Ontario)
                 </div>
                 <span style="font-size: 0.76rem; color: #64748B; font-weight: 600; margin-top: 2px; display: block;">
@@ -7079,7 +7327,7 @@ html, body {
           <div class="portal-panel" id="worker-schedule-panel">
             <div class="panel-header" style="margin-bottom: 1.25rem;">
               <div>
-                <div class="panel-title" style="display: flex; align-items: center; gap: 0.55rem;">
+                <div class="panel-title" style="display: flex; align-items: flex-start; gap: 0.55rem;">
                   <i data-lucide="calendar" style="color: #0284C7;"></i> My Confirmed Schedule &amp; 7-Day Availability
                 </div>
                 <span style="font-size: 0.76rem; color: #64748B; font-weight: 600; margin-top: 2px; display: block;">
@@ -7139,7 +7387,7 @@ html, body {
           <div class="portal-panel" id="worker-pay-panel">
             <div class="panel-header" style="flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1.25rem;">
               <div>
-                <div class="panel-title" style="display: flex; align-items: center; gap: 0.55rem;">
+                <div class="panel-title" style="display: flex; align-items: flex-start; gap: 0.55rem;">
                   <i data-lucide="wallet" style="color: #0284C7;"></i> Pay Ledger &amp; Itemized Shift Timesheets
                 </div>
                 <span style="font-size: 0.76rem; color: #64748B; font-weight: 600; margin-top: 2px; display: block;">
@@ -7205,7 +7453,7 @@ html, body {
           <div class="portal-panel" id="worker-credentials-panel">
             <div class="panel-header" style="flex-direction: column; align-items: flex-start; gap: 0.35rem; margin-bottom: 1.5rem;">
               <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 0.6rem;">
-                <div class="panel-title" style="display: flex; align-items: center; gap: 0.55rem;">
+                <div class="panel-title" style="display: flex; align-items: flex-start; gap: 0.55rem;">
                   <i data-lucide="award" style="color: #0284C7;"></i> Clinical Credentials &amp; Licenses Vault
                 </div>
                 <span class="badge-pill-verified" id="doc-count-badge">
@@ -7413,6 +7661,31 @@ html, body {
                   Active Verified Account
                 </span>
               </div>
+              <!-- Avatar Profile Photo Card -->
+              <div style="display:flex; align-items:center; gap:1.25rem; margin-bottom:1.25rem; padding:1rem 0; border-bottom:1px solid #E2E8F0;">
+                <div style="position:relative; width:72px; height:72px; flex-shrink:0;">
+                  <div id="staff-profile-avatar-container" style="width:72px; height:72px; border-radius:50%; overflow:hidden; background:linear-gradient(135deg, #0284C7, #0369A1); display:flex; align-items:center; justify-content:center; font-size:1.5rem; font-weight:800; color:#FFFFFF; border:2.5px solid #BAE6FD; box-shadow:0 4px 10px rgba(2,132,199,0.25);">
+                    DF
+                  </div>
+                  <label for="portal-avatar-file-input" style="position:absolute; bottom:-2px; right:-2px; width:26px; height:26px; border-radius:50%; background:#0284C7; color:#FFFFFF; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.2);" title="Change Photo">
+                    <i data-lucide="camera" style="width:13px; height:13px;"></i>
+                  </label>
+                  <input type="file" id="portal-avatar-file-input" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="window.handlePortalAvatarUpload(this)">
+                </div>
+                <div>
+                  <h3 style="margin:0; font-size:1.05rem; font-weight:800; color:var(--navy);">Profile Photo</h3>
+                  <div style="font-size:0.78rem; color:#64748B; margin-top:2px;">PNG, JPG, or WebP. Max 2MB. Square 1:1 ratio. This headshot is shown to facility coordinators when you are assigned to shifts.</div>
+                  <div style="margin-top:6px; display:flex; gap:8px;">
+                    <button type="button" class="btn-primary" onclick="document.getElementById('portal-avatar-file-input').click()" style="padding:0.35rem 0.75rem; font-size:0.78rem; border-radius:6px; display:inline-flex; align-items:center; gap:4px; cursor:pointer;">
+                      <i data-lucide="upload" style="width:12px; height:12px;"></i> Upload Photo
+                    </button>
+                    <button type="button" id="btn-portal-remove-avatar" onclick="window.handlePortalAvatarRemove()" style="display:none; background:none; border:1px solid #FCA5A5; color:#DC2626; padding:0.35rem 0.75rem; font-size:0.78rem; border-radius:6px; cursor:pointer; align-items:center; gap:4px;">
+                      <i data-lucide="trash-2" style="width:12px; height:12px;"></i> Remove
+                    </button>
+                  </div>
+                </div>
+              </div>
+
               <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.25rem; font-size: 0.85rem; padding: 0.5rem 0;">
                 <div>
                   <span style="color: #64748B; font-size: 0.72rem; display: block; font-weight: 700; text-transform: uppercase;">FULL LEGAL NAME</span>
@@ -7435,8 +7708,8 @@ html, body {
 
             <!-- Operations Desk & Support -->
             <div class="portal-panel support-card">
-              <div class="support-title" style="display: flex; align-items: center; gap: 0.5rem; font-size: 1.05rem;">
-                <i data-lucide="headphones" style="color: #0284C7;"></i> 24/7 Clinical Operations &amp; Dispatch Desk
+              <div class="support-title" style="display: flex; align-items: flex-start; gap: 0.5rem; font-size: 1.05rem;">
+                <i data-lucide="headphones" style="color: #0284C7; margin-top: 2px; flex-shrink: 0;"></i> 24/7 Clinical Operations &amp; Dispatch Desk
               </div>
               <div style="margin-top: 1rem; display: flex; align-items: center; gap: 1rem;">
                 <div style="width: 48px; height: 48px; border-radius: 50%; background: #E0F2FE; color: #0369A1; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.1rem; flex-shrink: 0;">
@@ -7773,15 +8046,30 @@ html, body {
         };
       }
 
-      renderPortalView(currentUser);
+      try {
+        renderPortalView(currentUser);
+      } catch (renderErr) {
+        console.error('Portal view render error:', renderErr);
+      } finally {
+        const loader = document.getElementById('portal-loader');
+        if (loader) {
+          loader.style.display = 'none';
+          loader.style.pointerEvents = 'none';
+          loader.classList.add('hidden');
+        }
+        if (window.lucide) lucide.createIcons();
+      }
+    }
+
+    // Failsafe watchdog: ensure loader is always dismissed even under slow networks
+    setTimeout(() => {
       const loader = document.getElementById('portal-loader');
-      if (loader) {
+      if (loader && loader.style.display !== 'none') {
         loader.style.display = 'none';
         loader.style.pointerEvents = 'none';
         loader.classList.add('hidden');
       }
-      if (window.lucide) lucide.createIcons();
-    }
+    }, 4000);
 
     // =========================================================================
     // ENTERPRISE CLIENT WORKSPACE CONTROLLER
@@ -8362,6 +8650,10 @@ html, body {
 
       const sideFac = document.getElementById('client-side-facility-name');
       if (sideFac) sideFac.textContent = facility;
+      const clientSideAvatar = document.getElementById('client-sidebar-avatar');
+      if (clientSideAvatar && user && user.avatar_url) {
+        clientSideAvatar.innerHTML = `<img src="${user.avatar_url}" alt="${escapeHTML(facility)}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;" onerror="this.parentElement.textContent='${facility.slice(0,2).toUpperCase()}'">`;
+      }
       const sideUnit = document.getElementById('client-side-unit-name');
       if (sideUnit) sideUnit.textContent = unit;
 
@@ -8673,23 +8965,68 @@ html, body {
     window._currentTrackerFilter = 'all';
     window._currentTrackerSearch = '';
     window._clientTrackerTimerInterval = null;
+    window._trackerPageLimit = 4;
+    window._trackerExpandedShiftIds = new Set();
 
     function setTrackerFilter(filterType) {
       window._currentTrackerFilter = filterType;
+      window._trackerPageLimit = 4;
       const pills = document.querySelectorAll('#tracker-filter-pills .client-tracker-pill');
       pills.forEach(p => {
         if (p.getAttribute('data-filter') === filterType) {
           p.classList.add('active');
+          if (window.innerWidth <= 768) {
+            p.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+          }
         } else {
           p.classList.remove('active');
         }
       });
+      renderClientTrackerShifts();
+      if (window.innerWidth <= 768) {
+        const filterBar = document.getElementById('tracker-filter-pills');
+        if (filterBar) {
+          filterBar.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+      }
+    }
+
+    function toggleTrackerDetails(id) {
+      if (window._trackerExpandedShiftIds.has(id)) {
+        window._trackerExpandedShiftIds.delete(id);
+      } else {
+        window._trackerExpandedShiftIds.add(id);
+      }
+      const drawer = document.getElementById('tracker-drawer-' + id);
+      const btn = document.getElementById('tracker-toggle-btn-' + id);
+      const isExpanded = window._trackerExpandedShiftIds.has(id);
+      if (drawer) {
+        drawer.classList.toggle('expanded', isExpanded);
+      }
+      if (btn) {
+        btn.classList.toggle('active', isExpanded);
+        btn.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
+        btn.innerHTML = isExpanded
+          ? '<span>Hide Details</span> <i data-lucide="chevron-up" style="width: 12px; height: 12px;"></i>'
+          : '<span>5-Stage Stepper &amp; GPS</span> <i data-lucide="chevron-down" style="width: 12px; height: 12px;"></i>';
+        if (window.lucide) lucide.createIcons();
+      }
+    }
+
+    function showMoreTrackerShifts(step = 4) {
+      window._trackerPageLimit = (window._trackerPageLimit || 4) + step;
+      renderClientTrackerShifts();
+    }
+
+    function showAllTrackerShifts() {
+      window._trackerPageLimit = 9999;
       renderClientTrackerShifts();
     }
 
     function applyTrackerSearch() {
       const input = document.getElementById('tracker-search-input');
       window._currentTrackerSearch = (input ? input.value : '').toLowerCase().trim();
+      window._trackerPageLimit = 4;
       renderClientTrackerShifts();
     }
 
@@ -8776,7 +9113,7 @@ html, body {
       }
 
       // Render cards with 5-stage tracker & EVV telemetry
-      allContainer.innerHTML = filtered.map(req => {
+      const cardsArray = filtered.map(req => {
         const code = req.request_code || (req.id ? req.id.toString().slice(-8) : 'REQ');
         const role = req.role_requested || 'RN';
         const unit = req.unit_department || 'General Ward';
@@ -8924,49 +9261,56 @@ html, body {
 
         if (staffName) {
           caregiverBoxHtml = `
-            <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 12px 14px; margin-top: 14px;">
-              <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
-                <div style="display: flex; align-items: center; gap: 10px;">
-                  <div class="caregiver-avatar" style="background: #E0F2FE; color: #0369A1; border-color: #BAE6FD; font-size: 13px;">
+            <div class="tracker-caregiver-box" style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 14px 16px; margin-top: 14px; width: 100%; box-sizing: border-box;">
+              
+              <!-- Caregiver Profile Header -->
+              <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; width: 100%;">
+                <div style="display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1;">
+                  <div class="caregiver-avatar" style="width: 42px; height: 42px; min-width: 42px; min-height: 42px; border-radius: 50%; font-size: 14px; font-weight: 800; background: #E0F2FE; color: #0369A1; border: 1.5px solid #BAE6FD; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
                     ${initials}
                   </div>
-                  <div>
-                    <h4 class="caregiver-name" style="margin: 0; font-size: 0.92rem; display: flex; align-items: center; gap: 6px;">
-                      ${staffName}
-                      <span style="font-size: 0.68rem; font-weight: 700; background: #ECFDF5; color: #065F46; border: 1px solid #A7F3D0; padding: 1px 6px; border-radius: 4px;">
+                  <div style="min-width: 0; flex: 1;">
+                    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                      <h4 class="caregiver-name" style="margin: 0; font-size: 0.98rem; font-weight: 800; color: #0F172A; white-space: nowrap; letter-spacing: -0.01em;">
+                        ${staffName}
+                      </h4>
+                      <span style="font-size: 0.68rem; font-weight: 700; background: #ECFDF5; color: #065F46; border: 1px solid #A7F3D0; padding: 2px 7px; border-radius: 4px; white-space: nowrap; display: inline-flex; align-items: center; gap: 3px;">
                         ✓ CNO Verified
                       </span>
-                    </h4>
-                    <p class="caregiver-meta" style="margin: 2px 0 0 0; font-size: 0.76rem;">
-                      ${staffRole} &bull; Rating: <strong style="color: #D97706;">★ ${staffRating}</strong> &bull; Ontario MOH Credentialed
+                    </div>
+                    <p class="caregiver-meta" style="margin: 3px 0 0 0; font-size: 0.78rem; color: #64748B; line-height: 1.4;">
+                      <strong style="color: #334155;">${staffRole}</strong> &bull; Rating: <strong style="color: #D97706;">★ ${staffRating}</strong> &bull; Ontario MOH Credentialed
                     </p>
                   </div>
                 </div>
+              </div>
 
-                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                  ${staffPhone ? `
-                    <a href="tel:${staffPhone}" class="client-btn client-btn-outline client-btn-xs" style="text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
-                      <i data-lucide="phone" style="width: 12px; height: 12px; color: #0284C7;"></i>
-                      <span>Call Caregiver (${staffPhone})</span>
-                    </a>
-                  ` : ''}
-                  <a href="tel:+18005550199" class="client-btn client-btn-ghost client-btn-xs" style="text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
-                    <i data-lucide="headphones" style="width: 12px; height: 12px; color: #64748B;"></i>
-                    <span>Dispatch Coordinator</span>
+              <!-- Spread out action buttons -->
+              <div class="caregiver-actions-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; margin-top: 12px; width: 100%;">
+                ${staffPhone ? `
+                  <a href="tel:${staffPhone}" class="client-btn client-btn-outline" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 0.5rem 0.85rem; font-size: 0.78rem; font-weight: 700; border-radius: 8px; background: #FFFFFF; border: 1px solid #CBD5E1; color: #0B2545;">
+                    <i data-lucide="phone" style="width: 14px; height: 14px; color: #0284C7;"></i>
+                    <span>Call Caregiver</span>
                   </a>
-                </div>
+                ` : ''}
+                <a href="tel:+18005550199" class="client-btn client-btn-ghost" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 0.5rem 0.85rem; font-size: 0.78rem; font-weight: 700; border-radius: 8px; background: #FFFFFF; border: 1px solid #E2E8F0; color: #475569;">
+                  <i data-lucide="headphones" style="width: 14px; height: 14px; color: #64748B;"></i>
+                  <span>Dispatch Coordinator</span>
+                </a>
               </div>
 
               ${isInSession && clockIn ? `
-                <div style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed #CBD5E1; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
-                  <div style="display: inline-flex; align-items: center; gap: 8px; background: #ECFDF5; border: 1px solid #A7F3D0; padding: 5px 12px; border-radius: 6px;">
-                    <span class="live-dot"></span>
-                    <span style="font-size: 0.78rem; font-weight: 700; color: #065F46;">Live On-Site EVV Duration:</span>
-                    <span class="client-live-clock-ticker" data-clockin="${clockIn.toISOString()}" style="font-family: monospace; font-size: 0.92rem; font-weight: 800; color: #047857;">
+                <div style="margin-top: 14px; padding-top: 12px; border-top: 1px dashed #CBD5E1; display: flex; flex-direction: column; gap: 8px;">
+                  <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; background: #ECFDF5; border: 1px solid #A7F3D0; padding: 8px 12px; border-radius: 8px;">
+                    <div style="display: inline-flex; align-items: center; gap: 8px;">
+                      <span class="live-dot" style="width: 8px; height: 8px;"></span>
+                      <span style="font-size: 0.8rem; font-weight: 700; color: #065F46;">Live On-Site EVV Duration:</span>
+                    </div>
+                    <span class="client-live-clock-ticker" data-clockin="${clockIn.toISOString()}" style="font-family: monospace; font-size: 0.95rem; font-weight: 800; color: #047857;">
                       Calculating...
                     </span>
                   </div>
-                  <div style="font-size: 0.75rem; color: #059669; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">
+                  <div style="font-size: 0.75rem; color: #059669; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; padding-left: 2px;">
                     <i data-lucide="map-pin" style="width: 13px; height: 13px;"></i>
                     <span>Device GPS Verified within 50m of facility boundary</span>
                   </div>
@@ -8974,20 +9318,27 @@ html, body {
               ` : ''}
 
               ${isDispatched ? `
-                <div style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed #CBD5E1; display: flex; align-items: center; gap: 6px; font-size: 0.76rem; color: #0284C7; font-weight: 600;">
-                  <i data-lucide="navigation" style="width: 13px; height: 13px;"></i>
+                <div style="margin-top: 12px; padding: 9px 12px; border-radius: 8px; background: #F0F9FF; border: 1px solid #BAE6FD; display: flex; align-items: center; gap: 8px; font-size: 0.78rem; color: #0369A1; font-weight: 600;">
+                  <i data-lucide="navigation" style="width: 14px; height: 14px; color: #0284C7; flex-shrink: 0;"></i>
                   <span>Transit active &bull; Caregiver en route &bull; Estimated arrival in approximately 15–25 minutes.</span>
                 </div>
               ` : ''}
 
               ${isCompleted && clockOut ? `
-                <div style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed #CBD5E1; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; font-size: 0.76rem; color: #475569;">
-                  <div>
-                    Clocked Out: <strong>${clockOut.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</strong> &bull; Total EVV Hours Verified: <strong>${req.hours_billed ? req.hours_billed + ' hrs' : 'Standard Shift'}</strong>
+                <div style="margin-top: 14px; padding-top: 12px; border-top: 1px dashed #CBD5E1; display: flex; flex-direction: column; gap: 8px;">
+                  <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; background: #F8FAFC; border: 1px solid #E2E8F0; padding: 8px 12px; border-radius: 8px; font-size: 0.8rem; color: #334155;">
+                    <div style="display: inline-flex; align-items: center; gap: 6px;">
+                      <i data-lucide="clock" style="width: 14px; height: 14px; color: #0284C7;"></i>
+                      <span>Clocked Out: <strong style="color: #0F172A;">${clockOut.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</strong></span>
+                    </div>
+                    <div>
+                      Total EVV Hours: <strong style="color: #0F172A;">${req.hours_billed ? req.hours_billed + ' hrs' : 'Standard Shift'}</strong>
+                    </div>
                   </div>
                   ${req.client_rating ? `
-                    <div style="color: #D97706; font-weight: 700;">
-                      Rated: ${'★'.repeat(req.client_rating)}${'☆'.repeat(5 - req.client_rating)} (${req.client_rating}.0)
+                    <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.8rem; background: #FFFBEB; border: 1px solid #FDE68A; padding: 6px 12px; border-radius: 8px;">
+                      <span style="color: #92400E; font-weight: 600;">Shift Performance:</span>
+                      <span style="color: #D97706; font-weight: 800;">★ ${Number(req.client_rating).toFixed(1)} (${'★'.repeat(req.client_rating)}${'☆'.repeat(5 - req.client_rating)})</span>
                     </div>
                   ` : ''}
                 </div>
@@ -8997,15 +9348,19 @@ html, body {
         } else {
           // No staff assigned yet (pending queue)
           caregiverBoxHtml = `
-            <div style="background: #FFFBEB; border: 1px solid #FDE68A; border-radius: 8px; padding: 12px 14px; margin-top: 14px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
-              <div style="display: flex; align-items: center; gap: 8px; font-size: 0.78rem; color: #92400E;">
-                <i data-lucide="hourglass" style="width: 16px; height: 16px; color: #D97706; flex-shrink: 0;"></i>
-                <span>Divine Fingers dispatch team is actively matching this order with pre-vetted Toronto healthcare professionals (average placement under 15 minutes).</span>
+            <div class="tracker-caregiver-box" style="background: #FFFBEB; border: 1px solid #FDE68A; border-radius: 10px; padding: 14px 16px; margin-top: 14px; display: flex; flex-direction: column; gap: 10px; width: 100%; box-sizing: border-box;">
+              <div style="display: flex; align-items: flex-start; gap: 10px; font-size: 0.82rem; color: #92400E; line-height: 1.45;">
+                <i data-lucide="hourglass" style="width: 18px; height: 18px; color: #D97706; flex-shrink: 0; margin-top: 2px;"></i>
+                <div>
+                  <strong>Dispatch team actively matching:</strong> Divine Fingers clinical coordination is matching this order with pre-vetted Toronto healthcare professionals (average placement under 15 minutes).
+                </div>
               </div>
-              <a href="tel:+18005550199" class="client-btn client-btn-outline client-btn-xs" style="text-decoration: none; display: inline-flex; align-items: center; gap: 4px; background: #FFFFFF;">
-                <i data-lucide="phone-call" style="width: 12px; height: 12px; color: #D97706;"></i>
-                <span>Urgent Dispatch Line</span>
-              </a>
+              <div style="display: flex; justify-content: flex-end;">
+                <a href="tel:+18005550199" class="client-btn client-btn-outline client-btn-sm" style="text-decoration: none; display: inline-flex; align-items: center; gap: 6px; background: #FFFFFF; font-weight: 700; color: #92400E; border-color: #FDE68A;">
+                  <i data-lucide="phone-call" style="width: 13px; height: 13px; color: #D97706;"></i>
+                  <span>Urgent Dispatch Line</span>
+                </a>
+              </div>
             </div>
           `;
         }
@@ -9027,18 +9382,24 @@ html, body {
           `;
         }
 
+        const isExpanded = window._trackerExpandedShiftIds.has(req.id);
+        const expandedClass = isExpanded ? 'expanded' : '';
+        const toggleBtnClass = isExpanded ? 'tracker-drawer-toggle active' : 'tracker-drawer-toggle';
+        const toggleBtnText = isExpanded ? 'Hide Details' : '5-Stage Stepper &amp; GPS';
+        const toggleBtnIcon = isExpanded ? 'chevron-up' : 'chevron-down';
+
         return `
-          <div class="request-card" id="tracker-card-${req.id}" style="border: 1px solid ${cardBorderColor}; margin-bottom: 1.25rem; border-radius: 10px; overflow: hidden; background: #FFFFFF; box-shadow: 0 2px 6px rgba(0,0,0,0.03);">
+          <div class="request-card tracker-shift-card" id="tracker-card-${req.id}" style="border: 1px solid ${cardBorderColor}; margin-bottom: 1rem; border-radius: 10px; overflow: hidden; background: #FFFFFF; box-shadow: 0 2px 6px rgba(0,0,0,0.03);">
             
             <!-- Shift Header -->
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 0.75rem; padding: 1rem 1.25rem; background: ${cardHeaderBg}; border-bottom: 1px solid #E2E8F0;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 0.75rem; padding: 0.85rem 1.15rem; background: ${cardHeaderBg}; border-bottom: 1px solid #E2E8F0;">
               <div>
                 <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
-                  <span class="request-id" style="background: #F1F5F9; padding: 2px 8px; border-radius: 4px; border: 1px solid #CBD5E1;">#${code}</span>
-                  <h3 class="request-role" style="margin: 0; font-size: 1.05rem;">${role} &bull; <span style="color: #475569; font-weight: 600;">${unit}</span></h3>
+                  <span class="request-id" style="background: #F1F5F9; padding: 2px 8px; border-radius: 4px; border: 1px solid #CBD5E1; font-weight: 700;">#${code}</span>
+                  <h3 class="request-role" style="margin: 0; font-size: 1.02rem; font-weight: 700; color: #0F172A;">${role} &bull; <span style="color: #475569; font-weight: 600;">${unit}</span></h3>
                   ${urgencyBadge}
                 </div>
-                <div style="font-size: 0.8rem; color: #64748B; margin-top: 4px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                <div style="font-size: 0.78rem; color: #64748B; margin-top: 4px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
                   <span><i data-lucide="calendar" style="width: 12px; height: 12px; display: inline-block;"></i> ${shiftType}</span>
                   <span>&bull;</span>
                   <span><i data-lucide="building" style="width: 12px; height: 12px; display: inline-block;"></i> ${facilityName}</span>
@@ -9049,53 +9410,153 @@ html, body {
               </div>
             </div>
 
-            <!-- Card Body with Stepper & Telemetry -->
-            <div style="padding: 1.25rem;">
-              <!-- Visual 5-Stage Stepper Tracker -->
-              <div class="stepper" style="margin: 0.5rem 0 1.25rem 0;">
-                <div class="step ${step1Class}">
-                  <div class="step-circle">${step1Icon}</div>
-                  <div class="step-label">1. Requested<br><span style="font-size: 0.68rem; color: #94A3B8; font-weight: 500;">${step1Time}</span></div>
-                </div>
-                <div class="step ${step2Class}">
-                  <div class="step-line"></div>
-                  <div class="step-circle">${step2Icon}</div>
-                  <div class="step-label">2. Confirmed<br><span style="font-size: 0.68rem; color: #94A3B8; font-weight: 500;">${step2Subtext}</span></div>
-                </div>
-                <div class="step ${step3Class}">
-                  <div class="step-line"></div>
-                  <div class="step-circle">${step3Icon}</div>
-                  <div class="step-label">3. En Route<br><span style="font-size: 0.68rem; color: #94A3B8; font-weight: 500;">${step3Subtext}</span></div>
-                </div>
-                <div class="step ${step4Class}">
-                  <div class="step-line"></div>
-                  <div class="step-circle">${step4Icon}</div>
-                  <div class="step-label">4. On-Site (EVV)<br><span style="font-size: 0.68rem; color: #94A3B8; font-weight: 500;">${step4Subtext}</span></div>
-                </div>
-                <div class="step ${step5Class}">
-                  <div class="step-line"></div>
-                  <div class="step-circle">${step5Icon}</div>
-                  <div class="step-label">5. Completed<br><span style="font-size: 0.68rem; color: #94A3B8; font-weight: 500;">${step5Subtext}</span></div>
-                </div>
+            <!-- Mobile Quick Executive Summary (Visible only on mobile <= 768px) -->
+            <div class="tracker-mobile-summary" style="padding: 0.75rem 1rem; border-bottom: 1px solid #F1F5F9; background: #FAFAFA;">
+              <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 8px; flex-wrap: wrap;">
+                ${staffName ? `
+                  <div style="display: flex; align-items: center; gap: 8px; min-width: 0;">
+                    <div class="caregiver-avatar" style="width: 30px; height: 30px; font-size: 11px; background: #E0F2FE; color: #0369A1; border-color: #BAE6FD;">
+                      ${initials}
+                    </div>
+                    <div style="min-width: 0;">
+                      <div style="font-size: 0.82rem; font-weight: 700; color: #0F172A; display: flex; align-items: center; gap: 4px;">
+                        <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${staffName}</span>
+                        <span style="font-size: 0.65rem; background: #ECFDF5; color: #065F46; padding: 1px 4px; border-radius: 3px; font-weight: 700;">✓ CNO</span>
+                      </div>
+                      <div style="font-size: 0.72rem; color: #64748B;">★ ${staffRating} &bull; ${staffRole}</div>
+                    </div>
+                  </div>
+                ` : `
+                  <div style="display: flex; align-items: center; gap: 6px; font-size: 0.76rem; color: #B45309; font-weight: 600;">
+                    <i data-lucide="hourglass" style="width: 13px; height: 13px;"></i>
+                    <span>Matching pre-vetted nurse...</span>
+                  </div>
+                `}
+
+                ${isInSession && clockIn ? `
+                  <div style="display: inline-flex; align-items: center; gap: 5px; background: #ECFDF5; border: 1px solid #A7F3D0; padding: 3px 8px; border-radius: 6px;">
+                    <span class="live-dot" style="width: 6px; height: 6px;"></span>
+                    <span style="font-size: 0.7rem; font-weight: 700; color: #065F46;">EVV:</span>
+                    <span class="client-live-clock-ticker" data-clockin="${clockIn.toISOString()}" style="font-family: monospace; font-size: 0.82rem; font-weight: 800; color: #047857;">
+                      Calculating...
+                    </span>
+                  </div>
+                ` : ''}
+
+                ${isDispatched ? `
+                  <span style="display: inline-flex; align-items: center; gap: 4px; font-size: 0.72rem; color: #0284C7; font-weight: 700; background: #F0F9FF; border: 1px solid #BAE6FD; padding: 3px 8px; border-radius: 6px;">
+                    <i data-lucide="navigation" style="width: 11px; height: 11px;"></i> ETA ~20m
+                  </span>
+                ` : ''}
               </div>
 
-              <!-- Caregiver Telemetry Box -->
-              ${caregiverBoxHtml}
-
-              <!-- Actions & EVV Compliance Footer -->
-              <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; margin-top: 1rem; padding-top: 0.85rem; border-top: 1px solid #F1F5F9;">
-                <div style="font-size: 0.74rem; color: #64748B; display: flex; align-items: center; gap: 4px;">
-                  <i data-lucide="shield-check" style="width: 13px; height: 13px; color: #059669;"></i>
-                  <span>Ontario EVV GPS Geofence Standard Verified</span>
+              <!-- Quick action links & drawer toggle button on mobile -->
+              <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-top: 8px; padding-top: 7px; border-top: 1px dashed #E2E8F0; width: 100%;">
+                <div style="display: flex; gap: 5px; align-items: center;">
+                  ${staffPhone ? `
+                    <a href="tel:${staffPhone}" class="client-btn client-btn-outline client-btn-xs" style="text-decoration: none; padding: 2px 7px; font-size: 0.7rem; display: inline-flex; align-items: center; gap: 3px;">
+                      <i data-lucide="phone" style="width: 11px; height: 11px; color: #0284C7;"></i> Call
+                    </a>
+                  ` : ''}
+                  <a href="tel:+18005550199" class="client-btn client-btn-ghost client-btn-xs" style="text-decoration: none; padding: 2px 7px; font-size: 0.7rem; display: inline-flex; align-items: center; gap: 3px;">
+                    <i data-lucide="headphones" style="width: 11px; height: 11px; color: #64748B;"></i> Dispatch
+                  </a>
                 </div>
-                <div style="display: flex; gap: 0.5rem; align-items: center;">
-                  ${actionButtonsHtml}
+                <button type="button" class="${toggleBtnClass}" onclick="toggleTrackerDetails('${req.id}')" id="tracker-toggle-btn-${req.id}" aria-expanded="${isExpanded ? 'true' : 'false'}" style="border: 1px solid #CBD5E1; background: #FFFFFF; color: #0F172A; font-size: 0.72rem; font-weight: 700; padding: 3px 9px; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: all 0.16s ease;">
+                  <span>${toggleBtnText}</span>
+                  <i data-lucide="${toggleBtnIcon}" style="width: 12px; height: 12px;"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Card Body / Collapsible Drawer with Stepper & Telemetry -->
+            <div class="tracker-details-drawer ${expandedClass}" id="tracker-drawer-${req.id}">
+              <div class="tracker-drawer-inner" style="padding: 1.15rem;">
+                <!-- Visual 5-Stage Stepper Tracker -->
+                <div class="stepper" style="margin: 0.25rem 0 1.25rem 0;">
+                  <div class="step ${step1Class}">
+                    <div class="step-circle">${step1Icon}</div>
+                    <div class="step-label">1. Requested<br><span style="font-size: 0.68rem; color: #94A3B8; font-weight: 500;">${step1Time}</span></div>
+                  </div>
+                  <div class="step ${step2Class}">
+                    <div class="step-line"></div>
+                    <div class="step-circle">${step2Icon}</div>
+                    <div class="step-label">2. Confirmed<br><span style="font-size: 0.68rem; color: #94A3B8; font-weight: 500;">${step2Subtext}</span></div>
+                  </div>
+                  <div class="step ${step3Class}">
+                    <div class="step-line"></div>
+                    <div class="step-circle">${step3Icon}</div>
+                    <div class="step-label">3. En Route<br><span style="font-size: 0.68rem; color: #94A3B8; font-weight: 500;">${step3Subtext}</span></div>
+                  </div>
+                  <div class="step ${step4Class}">
+                    <div class="step-line"></div>
+                    <div class="step-circle">${step4Icon}</div>
+                    <div class="step-label">4. On-Site (EVV)<br><span style="font-size: 0.68rem; color: #94A3B8; font-weight: 500;">${step4Subtext}</span></div>
+                  </div>
+                  <div class="step ${step5Class}">
+                    <div class="step-line"></div>
+                    <div class="step-circle">${step5Icon}</div>
+                    <div class="step-label">5. Completed<br><span style="font-size: 0.68rem; color: #94A3B8; font-weight: 500;">${step5Subtext}</span></div>
+                  </div>
+                </div>
+
+                <!-- Caregiver Telemetry Box -->
+                ${caregiverBoxHtml}
+
+                <!-- Actions & EVV Compliance Footer -->
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; margin-top: 1rem; padding-top: 0.85rem; border-top: 1px solid #F1F5F9;">
+                  <div style="font-size: 0.74rem; color: #64748B; display: flex; align-items: center; gap: 4px;">
+                    <i data-lucide="shield-check" style="width: 13px; height: 13px; color: #059669;"></i>
+                    <span>Ontario EVV GPS Geofence Standard Verified</span>
+                  </div>
+                  <div style="display: flex; gap: 0.5rem; align-items: center;">
+                    ${actionButtonsHtml}
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         `;
-      }).join('');
+      });
+
+      // Responsive mobile pagination
+      const isMobile = window.innerWidth <= 768;
+      const totalCount = filtered.length;
+      const limit = window._trackerPageLimit || 4;
+      let displayList = cardsArray;
+      let hasMore = false;
+
+      if (isMobile && totalCount > limit) {
+        displayList = cardsArray.slice(0, limit);
+        hasMore = true;
+      }
+
+      let paginationHtml = '';
+      if (hasMore) {
+        paginationHtml = `
+          <div class="tracker-pagination-bar">
+            <div style="font-size: 0.82rem; color: #64748B; font-weight: 600;">
+              Showing <strong>${displayList.length}</strong> of <strong>${totalCount}</strong> active shifts
+            </div>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; width: 100%;">
+              <button type="button" class="client-btn client-btn-primary client-btn-sm" onclick="showMoreTrackerShifts(4)" style="flex: 1; max-width: 220px; justify-content: center; display: inline-flex; align-items: center; gap: 6px;">
+                <i data-lucide="chevron-down" style="width: 14px; height: 14px;"></i> Show More (${totalCount - displayList.length} left)
+              </button>
+              <button type="button" class="client-btn client-btn-outline client-btn-sm" onclick="showAllTrackerShifts()" style="justify-content: center; display: inline-flex; align-items: center; gap: 4px;">
+                Show All (${totalCount})
+              </button>
+            </div>
+          </div>
+        `;
+      } else if (!hasMore && totalCount > 4 && isMobile) {
+        paginationHtml = `
+          <div style="text-align: center; padding: 0.85rem; font-size: 0.78rem; color: #94A3B8; font-weight: 600;">
+            ✓ All ${totalCount} shifts displayed
+          </div>
+        `;
+      }
+
+      allContainer.innerHTML = displayList.join('') + paginationHtml;
 
       if (window.lucide) lucide.createIcons();
     }
@@ -10395,7 +10856,27 @@ function initStaffWorkspace(user) {
     .slice(0, 2)
     .join('')
     .toUpperCase();
-  if (avatarEl) avatarEl.textContent = initials;
+
+  if (avatarEl) {
+    if (user.avatar_url) {
+      avatarEl.innerHTML = `<img src="${user.avatar_url}" alt="${escapeHTML(user.full_name || 'Caregiver')}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;" onerror="this.parentElement.textContent='${initials}'">`;
+    } else {
+      avatarEl.textContent = initials;
+    }
+  }
+
+  const profileAvatar = document.getElementById('staff-profile-avatar-container');
+  const btnRemovePortalAvatar = document.getElementById('btn-portal-remove-avatar');
+  if (profileAvatar) {
+    if (user.avatar_url) {
+      profileAvatar.innerHTML = `<img src="${user.avatar_url}" alt="${escapeHTML(user.full_name || 'Caregiver')}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;" onerror="this.parentElement.textContent='${initials}'">`;
+    } else {
+      profileAvatar.textContent = initials;
+    }
+  }
+  if (btnRemovePortalAvatar) {
+    btnRemovePortalAvatar.style.display = user.avatar_url ? 'inline-flex' : 'none';
+  }
 
   const firstName = (user.full_name || 'Caregiver').split(' ')[0];
   if (bannerFirst) bannerFirst.textContent = firstName;
@@ -10412,6 +10893,65 @@ function initStaffWorkspace(user) {
   if (pRoleRegion) {
     pRoleRegion.textContent = `${user.staff_role || 'Registered Nurse (RN)'} • ${user.region || 'Greater Toronto Area'}`;
   }
+
+  // ── Portal Avatar Upload Handlers ──────────────────────────────────────────
+  window.handlePortalAvatarUpload = async function(input) {
+    if (!input || !input.files || input.files.length === 0) return;
+    const file = input.files[0];
+
+    if (file.size > 2 * 1024 * 1024) {
+      alert('Image size exceeds 2MB limit. Please choose a smaller photo.');
+      input.value = '';
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('avatar', file);
+
+    try {
+      const res = await fetch(`${API_BASE}/users/profile/avatar`, {
+        method: 'POST',
+        body: formData,
+        credentials: 'include'
+      });
+      const data = await res.json();
+      if (data && data.success) {
+        const stored = JSON.parse(sessionStorage.getItem('df_portal_user') || '{}');
+        stored.avatar_url = data.avatar_url;
+        sessionStorage.setItem('df_portal_user', JSON.stringify(stored));
+        try { localStorage.setItem('df_portal_user', JSON.stringify(stored)); } catch (_) {}
+        if (typeof renderUserInfo === 'function') renderUserInfo(stored);
+      } else {
+        alert(data?.error || 'Failed to update profile picture.');
+      }
+    } catch (err) {
+      alert('Error uploading profile picture: ' + err.message);
+    } finally {
+      input.value = '';
+    }
+  };
+
+  window.handlePortalAvatarRemove = async function() {
+    if (!confirm('Are you sure you want to remove your profile picture?')) return;
+    try {
+      const res = await fetch(`${API_BASE}/users/profile/avatar`, {
+        method: 'DELETE',
+        credentials: 'include'
+      });
+      const data = await res.json();
+      if (data && data.success) {
+        const stored = JSON.parse(sessionStorage.getItem('df_portal_user') || '{}');
+        stored.avatar_url = null;
+        sessionStorage.setItem('df_portal_user', JSON.stringify(stored));
+        try { localStorage.setItem('df_portal_user', JSON.stringify(stored)); } catch (_) {}
+        if (typeof renderUserInfo === 'function') renderUserInfo(stored);
+      } else {
+        alert(data?.error || 'Failed to remove profile picture.');
+      }
+    } catch (err) {
+      alert('Error removing avatar: ' + err.message);
+    }
+  };
 
   // 3. Start Live Clocks & Modules
   startDeviceClock();

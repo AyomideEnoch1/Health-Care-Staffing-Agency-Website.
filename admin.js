@@ -40,7 +40,10 @@
     currentStaffId: null,
     schedulerWeekOffset: 0,
     charts:     {},
-    theme:      localStorage.getItem('df_admin_theme') || 'dark'
+    theme:      localStorage.getItem('df_admin_theme') || 'dark',
+    archives:   [],
+    archiveFilterType: 'all',
+    archiveSearchQuery: ''
   };
 
   // Helper to read CSRF token from cookie or sessionStorage
@@ -345,6 +348,10 @@
         themeIcon.setAttribute('data-lucide', LiveStore.theme === 'dark' ? 'sun' : 'moon');
         if (window.lucide) lucide.createIcons();
       }
+      if (LiveStore.charts.regional) {
+        LiveStore.charts.regional.destroy();
+        LiveStore.charts.regional = null;
+      }
       renderCharts();
     });
   }
@@ -414,6 +421,7 @@
       { tab: 'applicants-tab',  perm: 'applications:view' },
       { tab: 'reports-tab',     perm: 'reports:view' },
       { tab: 'admin-users-tab', perm: 'admins:manage' },
+      { tab: 'archive-tab',     perm: null },
       { tab: 'settings-tab',    perm: null }
     ];
 
@@ -468,9 +476,34 @@
         'custom': 'Custom Operator'
       };
       if (clearanceEl) clearanceEl.textContent = roleBadgeTitles[user.role] || (user.role || 'Coordinator');
+      const initials = (user.full_name || 'SA').split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
       if (avatarEl) {
-        const initials = (user.full_name || 'SA').split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
-        avatarEl.textContent = initials;
+        if (user.avatar_url) {
+          avatarEl.innerHTML = `<img src="${escapeHTML(user.avatar_url)}" alt="${escapeHTML(user.full_name || 'Admin')}" style="width:100%;height:100%;object-fit:cover;object-position:center;border-radius:inherit;display:block;cursor:pointer;" title="Click to preview photo" onclick="event.stopPropagation(); window.previewAvatarModal('${escapeHTML(user.avatar_url)}', '${escapeHTML(user.full_name || 'Administrator')}', '${escapeHTML(roleBadgeTitles[user.role] || user.role || 'Super-Admin')}', 'System Operator Profile')" onerror="this.parentElement.textContent='${escapeHTML(initials)}'">`;
+        } else {
+          avatarEl.textContent = initials;
+        }
+      }
+
+      // Sync settings tab operator profile
+      const settingsName = document.getElementById('settings-admin-name');
+      const settingsEmail = document.getElementById('settings-admin-email');
+      const settingsRole = document.getElementById('settings-admin-role-badge');
+      const settingsAvatar = document.getElementById('settings-admin-avatar-preview');
+      const btnRemoveAvatar = document.getElementById('btn-remove-admin-avatar');
+
+      if (settingsName) settingsName.textContent = user.full_name || 'Administrator';
+      if (settingsEmail) settingsEmail.textContent = user.email || 'admin@divinefingers.ca';
+      if (settingsRole) settingsRole.textContent = roleBadgeTitles[user.role] || (user.role || 'Super-Admin');
+      if (settingsAvatar) {
+        if (user.avatar_url) {
+          settingsAvatar.innerHTML = `<img src="${escapeHTML(user.avatar_url)}" alt="${escapeHTML(user.full_name || 'Admin')}" style="width:100%;height:100%;object-fit:cover;object-position:center;border-radius:inherit;display:block;cursor:pointer;" title="Click to preview photo" onclick="window.previewAvatarModal('${escapeHTML(user.avatar_url)}', '${escapeHTML(user.full_name || 'Administrator')}', '${escapeHTML(roleBadgeTitles[user.role] || user.role || 'Super-Admin')}', 'System Operator Profile')" onerror="this.parentElement.textContent='${escapeHTML(initials)}'">`;
+        } else {
+          settingsAvatar.textContent = initials;
+        }
+      }
+      if (btnRemoveAvatar) {
+        btnRemoveAvatar.style.display = user.avatar_url ? 'inline-flex' : 'none';
       }
       const mfaBadge = document.getElementById('mfa-current-status-badge');
       if (mfaBadge) {
@@ -788,6 +821,10 @@
           } else if (msg.type === 'request:created') {
             showToast(`🚨 New Staff Request: ${msg.payload.facility_name} (${msg.payload.role_requested})`, 'warning');
             loadAllDashboardData();
+          } else if (msg.type === 'request:cancelled') {
+            loadAllDashboardData();
+          } else if (msg.type === 'request:rate_updated') {
+            loadAllDashboardData();
           } else if (msg.type === 'application:created') {
             showToast(`📄 New ATS Application: ${msg.payload.full_name} (${msg.payload.role_applied})`, 'info');
             loadAllDashboardData();
@@ -1006,6 +1043,7 @@
       renderShiftScheduler();
       renderChatInbox();
       renderCharts();
+      renderOverviewActivityFeed();
       updateNotifications();
 
       if (window.lucide) lucide.createIcons();
@@ -1108,7 +1146,7 @@
           <td class="cell-primary" data-label="Staff Member">
             <div class="row-header-wrapper">
               <div class="table-user-cell">
-                <img src="${s.avatar_url || 'assets/images/logo_icon.png'}" alt="${s.name}" class="table-user-avatar" onerror="this.src='assets/images/logo_icon.png'">
+                <img src="${s.avatar_url || 'assets/images/logo_icon.png'}" alt="${escapeHTML(s.name)}" class="table-user-avatar" title="Click to preview photo" onclick="event.stopPropagation(); window.previewAvatarModal(this.src, '${escapeHTML(s.name)}', '${escapeHTML(s.role || 'Caregiver')}', 'Staff Code: ${escapeHTML(s.staff_code || s.employee_id || s.id.slice(0, 8))}')" onerror="this.src='assets/images/logo_icon.png'">
                 <div class="table-user-info">
                   <span class="user-display-name">${s.name}</span>
                   <span class="user-role-sub">${s.staff_code} &bull; ${s.phone || '—'}</span>
@@ -1145,6 +1183,9 @@
             ` : ''}
             <button type="button" class="btn-secondary-action" style="padding:.35rem .65rem;font-size:.75rem;display:inline-flex;align-items:center;gap:4px;width:100%;justify-content:center;" onclick="window.openStaffDrawer('${s.id}')">
               <i data-lucide="eye" style="width:12px;height:12px;"></i> View Full Profile
+            </button>
+            <button type="button" class="btn-secondary-action" style="padding:.25rem .5rem;font-size:.72rem;display:inline-flex;align-items:center;gap:4px;width:100%;justify-content:center;margin-top:4px;color:#f87171;border-color:rgba(239,68,68,0.25);" onclick="window.archiveDeleteStaff('${s.id}', '${escapeHTML(s.name || ((s.first_name || '') + ' ' + (s.last_name || '')).trim())}', '${escapeHTML(s.staff_code || s.employee_code || '')}')" title="Archive & Remove Staff">
+              <i data-lucide="archive" style="width:11px;height:11px;"></i> Archive Staff
             </button>
           </td>
         </tr>`;
@@ -1534,101 +1575,190 @@
     </span>`;
   }
 
-  // F. Audit Logs
+  // F. Audit Logs & Interactive Activity Feed
   async function fetchAndRenderAudit() {
     try {
       const res = await apiRequest('/admin/audit-logs');
-      LiveStore.auditLogs = res.data || [];
-
-      const tbody = document.getElementById('audit-logs-table-body');
-      if (tbody) {
-        if (LiveStore.auditLogs.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="7">${emptyState('🔒', 'Audit Ledger Empty', 'Immutable security events will record here.')}</td></tr>`;
-        } else {
-          tbody.innerHTML = LiveStore.auditLogs.map(l => {
-            const sev = (l.severity || 'info').toLowerCase();
-            const sevClass = (sev === 'critical' || sev === 'danger') ? 'urgent' : (sev === 'warning' ? 'expiring' : 'verified');
-            const sevIcon = (sev === 'critical' || sev === 'danger') ? 'alert-octagon' : (sev === 'warning' ? 'alert-triangle' : 'shield-check');
-            const initials = ((l.actor_name || 'AD').trim().split(/\s+/).map(w => w[0]).join('').slice(0, 2) || 'AD').toUpperCase();
-
-            return `
-            <tr class="table-card-row">
-              <td class="cell-grid-item tabular-nums" data-label="Log ID" style="font-family: monospace; font-size: 0.78rem; font-weight: 700; color: var(--brand-cyan);">
-                <div class="meta-label">Log ID</div>
-                <div class="meta-value">${l.id ? (l.id.length > 10 ? l.id.slice(0, 8) + '…' : l.id) : '—'}</div>
-              </td>
-              <td class="cell-grid-item" data-label="Timestamp (EST)">
-                <div class="meta-label">Timestamp</div>
-                <div class="meta-value">
-                  <div style="font-size: 0.82rem; font-weight: 600;" title="${formatUserDateTime(l.created_at, true)} (${USER_TIMEZONE})">${formatUserDateTime(l.created_at)}</div>
-                  <div style="font-size: 0.72rem; color: var(--text-muted); font-weight: 600;">${formatRelativeTime(l.created_at)}</div>
-                </div>
-              </td>
-              <td class="cell-primary" data-label="Actor / Operator">
-                <div class="meta-label">Actor</div>
-                <div class="meta-value" style="display: flex; align-items: center; gap: 8px;">
-                  <div class="user-avatar-initials" style="width: 28px; height: 28px; font-size: 0.72rem; border-radius: 8px; flex-shrink: 0; background: rgba(0, 168, 150, 0.16); color: var(--brand-cyan); font-weight: 900; display: inline-flex; align-items: center; justify-content: center;">
-                    ${initials}
-                  </div>
-                  <div>
-                    <span style="font-weight: 700; font-size: 0.85rem; color: var(--text-primary); display: block;">${escapeHTML(l.actor_name || 'System Operator')}</span>
-                    <span style="font-size: 0.72rem; color: var(--text-muted);">${escapeHTML(l.ip_address || '127.0.0.1')}</span>
-                  </div>
-                </div>
-              </td>
-              <td class="cell-grid-item" data-label="Action Executed">
-                <div class="meta-label">Action</div>
-                <div class="meta-value">
-                  ${getActionTagHTML(l.action)}
-                </div>
-              </td>
-              <td class="cell-grid-item" data-label="Target Module">
-                <div class="meta-label">Target Module</div>
-                <div class="meta-value" style="font-weight: 600; font-size: 0.84rem; color: var(--text-secondary);">
-                  <span style="display: inline-flex; align-items: center; gap: 4px;">
-                    <i data-lucide="layers" style="width: 13px; height: 13px; color: var(--brand-turquoise);"></i>
-                    ${escapeHTML(l.target_entity || 'System')}
-                  </span>
-                </div>
-              </td>
-              <td class="cell-subtitle" data-label="Details" style="max-width: 320px;">
-                <div class="meta-label">Details</div>
-                <div class="meta-value" style="font-size: 0.83rem; color: var(--text-secondary); line-height: 1.45; word-break: break-word;">
-                  ${escapeHTML(l.details || 'System operation executed and verified.')}
-                </div>
-              </td>
-              <td class="cell-grid-item" data-label="Severity" style="text-align: center;">
-                <div class="meta-label">Severity</div>
-                <div class="meta-value">
-                  <span class="status-pill ${sevClass}" style="font-weight: 900; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px;">
-                    <i data-lucide="${sevIcon}" style="width: 12px; height: 12px; vertical-align: middle; margin-right: 3px;"></i>
-                    ${sev.toUpperCase()}
-                  </span>
-                </div>
-              </td>
-            </tr>`;
-          }).join('');
-        }
+      if (res && Array.isArray(res.data)) {
+        LiveStore.auditLogs = res.data;
       }
+    } catch (err) {
+      console.warn('[Audit Logs Fetch Notification]:', err);
+    }
 
-      // Overview mini-feed (latest 5)
-      const feed = document.getElementById('overview-activity-feed');
-      if (feed) {
-        if (LiveStore.auditLogs.length === 0) {
-          feed.innerHTML = emptyState('⚡', 'No Recent Activity', 'Live operations will stream here.');
-        } else {
-          feed.innerHTML = LiveStore.auditLogs.slice(0, 5).map(l => `
-            <div class="activity-item">
-              <div class="activity-icon-badge" style="background:rgba(0,168,150,.15);color:var(--brand-cyan);display:flex;align-items:center;justify-content:center;border-radius:6px;width:32px;height:32px;">⚡</div>
-              <div class="activity-content">
-                <div class="activity-title" style="font-weight:700;font-size:0.85rem;">${l.actor_name}: ${l.details || l.action}</div>
-                <div class="activity-time" style="font-size:0.74rem;color:var(--text-muted);" title="${formatUserDateTime(l.created_at, true)} (${USER_TIMEZONE})">${formatRelativeTime(l.created_at)} &bull; ${l.target_entity}</div>
-              </div>
-            </div>`).join('');
-        }
-      }
-    } catch { /* Handle error */ }
+    try {
+      filterAndRenderAuditLogs();
+    } catch (err) {
+      console.warn('[Settings Audit Render Error]:', err);
+    }
+
+    try {
+      renderOverviewActivityFeed();
+    } catch (err) {
+      console.warn('[Overview Activity Feed Render Error]:', err);
+    }
   }
+
+  function filterAndRenderAuditLogs() {
+    const feed = document.getElementById('audit-logs-feed');
+    const badge = document.getElementById('audit-count-badge');
+    if (!feed) return;
+
+    const query = (document.getElementById('audit-search-input')?.value || '').toLowerCase().trim();
+    const sevFilter = (document.getElementById('audit-severity-filter')?.value || '').toLowerCase().trim();
+
+    const filtered = (LiveStore.auditLogs || []).filter(l => {
+      const matchesQuery = !query ||
+        (l.actor_name || '').toLowerCase().includes(query) ||
+        (l.action || '').toLowerCase().includes(query) ||
+        (l.target_entity || '').toLowerCase().includes(query) ||
+        (l.details || '').toLowerCase().includes(query) ||
+        (l.ip_address || '').toLowerCase().includes(query) ||
+        (l.id || '').toLowerCase().includes(query);
+
+      const sev = (l.severity || 'info').toLowerCase();
+      const matchesSev = !sevFilter || sev === sevFilter || (sevFilter === 'critical' && (sev === 'critical' || sev === 'danger'));
+
+      return matchesQuery && matchesSev;
+    });
+
+    if (badge) {
+      badge.textContent = `${filtered.length} Recorded Event${filtered.length === 1 ? '' : 's'}`;
+    }
+
+    if (filtered.length === 0) {
+      feed.innerHTML = emptyState('🔒', 'No Audit Records Match', query || sevFilter ? 'Adjust your search filters to view matching security events.' : 'Immutable security events will record here.');
+      return;
+    }
+
+    feed.innerHTML = filtered.map(l => {
+      const sev = (l.severity || 'info').toLowerCase();
+      const sevClass = (sev === 'critical' || sev === 'danger') ? 'urgent' : (sev === 'warning' ? 'expiring' : 'verified');
+      const sevIcon = (sev === 'critical' || sev === 'danger') ? 'alert-octagon' : (sev === 'warning' ? 'alert-triangle' : 'shield-check');
+
+      return `
+      <div class="audit-feed-item" id="audit-item-${l.id}" onclick="window.toggleAuditItem('${l.id}')">
+        <!-- Summary Header (Always Visible) -->
+        <div class="audit-item-summary">
+          <div class="audit-icon-badge ${sevClass}">
+            <i data-lucide="${sevIcon}" style="width:16px;height:16px;"></i>
+          </div>
+          <div class="audit-main-content">
+            <div class="audit-header-line">
+              <span class="audit-actor-name">${escapeHTML(l.actor_name || 'System Operator')}</span>
+              <span class="audit-action-pill">${getActionTagHTML(l.action)}</span>
+              <span class="status-pill ${sevClass} audit-sev-pill">${sev.toUpperCase()}</span>
+            </div>
+            <div class="audit-meta-line">
+              <span class="audit-summary-details">${escapeHTML(l.details || l.action)}</span>
+            </div>
+            <div class="audit-sub-line">
+              <span><i data-lucide="clock" style="width:12px;height:12px;"></i> ${formatRelativeTime(l.created_at)}</span>
+              <span>&bull;</span>
+              <span><i data-lucide="layers" style="width:12px;height:12px;"></i> ${escapeHTML(l.target_entity || 'System')}</span>
+              <span>&bull;</span>
+              <span class="audit-ip-mono"><i data-lucide="globe" style="width:12px;height:12px;"></i> ${escapeHTML(l.ip_address || '127.0.0.1')}</span>
+            </div>
+          </div>
+          <div class="audit-toggle-indicator">
+            <span class="audit-est-time">${formatUserDateTime(l.created_at)}</span>
+            <button type="button" class="audit-chevron-btn" aria-label="Toggle details">
+              <i data-lucide="chevron-down"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Collapsible Detailed Pane -->
+        <div class="audit-item-details" id="audit-details-${l.id}" style="display:none;">
+          <div class="audit-details-grid">
+            <div class="audit-detail-cell">
+              <span class="audit-cell-label"><i data-lucide="hash" style="width:12px;height:12px;"></i> Full Log ID</span>
+              <div class="audit-cell-val-copy">
+                <code class="audit-id-code">${l.id}</code>
+                <button type="button" class="btn-copy-id" onclick="event.stopPropagation(); window.copyAuditId('${l.id}', this)" title="Copy Log ID">
+                  <i data-lucide="copy" style="width:12px;height:12px;"></i>
+                </button>
+              </div>
+            </div>
+            <div class="audit-detail-cell">
+              <span class="audit-cell-label"><i data-lucide="calendar" style="width:12px;height:12px;"></i> Precise Timestamp</span>
+              <span class="audit-cell-val">${formatUserDateTime(l.created_at, true)} (${USER_TIMEZONE})</span>
+            </div>
+            <div class="audit-detail-cell">
+              <span class="audit-cell-label"><i data-lucide="layers" style="width:12px;height:12px;"></i> Target Module / Entity</span>
+              <span class="audit-cell-val">${escapeHTML(l.target_entity || 'System')} ${l.target_id ? `(#${escapeHTML(l.target_id)})` : ''}</span>
+            </div>
+            <div class="audit-detail-cell">
+              <span class="audit-cell-label"><i data-lucide="network" style="width:12px;height:12px;"></i> Operator IP Origin</span>
+              <span class="audit-cell-val" style="font-family:monospace;">${escapeHTML(l.ip_address || '127.0.0.1')}</span>
+            </div>
+            <div class="audit-detail-cell audit-full-width">
+              <span class="audit-cell-label"><i data-lucide="file-text" style="width:12px;height:12px;"></i> Complete Operation Payload &amp; Audit Trail</span>
+              <div class="audit-payload-box">${escapeHTML(l.details || 'System operation executed and verified.')}</div>
+            </div>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+
+    if (window.lucide) lucide.createIcons();
+  }
+
+  function renderOverviewActivityFeed() {
+    const feed = document.getElementById('overview-activity-feed');
+    if (!feed) return;
+
+    if (!LiveStore.auditLogs || LiveStore.auditLogs.length === 0) {
+      feed.innerHTML = emptyState('⚡', 'No Recent Activity', 'Live operations will stream here.');
+      return;
+    }
+
+    feed.innerHTML = LiveStore.auditLogs.slice(0, 5).map(l => `
+      <div class="activity-item">
+        <div class="activity-icon-badge" style="background:rgba(0,168,150,.15);color:var(--brand-cyan);display:flex;align-items:center;justify-content:center;border-radius:6px;width:32px;height:32px;">⚡</div>
+        <div class="activity-content">
+          <div class="activity-title" style="font-weight:700;font-size:0.85rem;">${escapeHTML(l.actor_name || 'System Operator')}: ${escapeHTML(l.details || l.action)}</div>
+          <div class="activity-time" style="font-size:0.74rem;color:var(--text-muted);" title="${formatUserDateTime(l.created_at, true)} (${USER_TIMEZONE})">${formatRelativeTime(l.created_at)} &bull; ${escapeHTML(l.target_entity || 'System')}</div>
+        </div>
+      </div>`).join('');
+  }
+
+  window.renderOverviewActivityFeed = renderOverviewActivityFeed;
+
+  // Global toggle and copy helpers for audit feed items
+  window.toggleAuditItem = function(id) {
+    const item = document.getElementById('audit-item-' + id);
+    const details = document.getElementById('audit-details-' + id);
+    if (!item || !details) return;
+
+    const isExpanded = item.classList.contains('expanded');
+    if (isExpanded) {
+      item.classList.remove('expanded');
+      details.style.display = 'none';
+    } else {
+      item.classList.add('expanded');
+      details.style.display = 'block';
+      if (window.lucide) lucide.createIcons();
+    }
+  };
+
+  window.copyAuditId = function(id, btn) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(id).then(() => {
+        const originalHTML = btn.innerHTML;
+        btn.innerHTML = '<i data-lucide="check" style="width:12px;height:12px;color:#10b981;"></i>';
+        if (window.lucide) lucide.createIcons();
+        setTimeout(() => {
+          btn.innerHTML = originalHTML;
+          if (window.lucide) lucide.createIcons();
+        }, 1800);
+      }).catch(() => {
+        showToast('Log ID: ' + id, 'info');
+      });
+    } else {
+      showToast('Log ID: ' + id, 'info');
+    }
+  };
 
   // ── Super-Admin: Administrator Account Management ──────────────────────────
   async function fetchAndRenderAdminAccounts() {
@@ -1688,6 +1818,7 @@
 
       const rowsHtml = admins.map(a => {
         const isSelf = a.id === user.id;
+        const initials = ((a.full_name || 'SA').trim().split(/\s+/).map(w => w[0]).join('').slice(0, 2) || 'SA').toUpperCase();
         const statusBadge = a.is_active
           ? '<span class="status-pill verified"><span class="pulse-dot"></span> Active</span>'
           : '<span class="status-pill urgent">Deactivated</span>';
@@ -1758,7 +1889,15 @@
         return `
           <tr class="table-card-row">
             <td class="cell-primary" data-label="Administrator">
-              <div class="row-header-wrapper">
+              <div class="row-header-wrapper" style="display: flex; align-items: center; gap: 10px;">
+                <div class="admin-table-avatar"
+                     style="width: 36px; height: 36px; border-radius: 50%; overflow: hidden; flex-shrink: 0; background: linear-gradient(135deg, #0284C7, #0F766E); display: flex; align-items: center; justify-content: center; font-size: 0.78rem; font-weight: 800; color: #FFFFFF; border: 1.5px solid var(--border-color); cursor: pointer;"
+                     title="Click to preview photo"
+                     onclick="event.stopPropagation(); window.previewAdminAvatar(this, '${escapeHTML(a.full_name)}', '${escapeHTML(roleLabel)}', '${escapeHTML(a.email)}')">
+                  ${a.avatar_url
+                    ? `<img src="${escapeHTML(a.avatar_url)}" alt="${escapeHTML(a.full_name)}" style="width: 100%; height: 100%; object-fit: cover; object-position: center; display: block;" onerror="this.parentElement.textContent='${escapeHTML(initials)}'">`
+                    : escapeHTML(initials)}
+                </div>
                 <div class="user-meta-name">
                   <span class="user-display-name">${escapeHTML(a.full_name)}</span>
                   <span class="user-role-sub">${isSelf ? '⭐️ You' : 'Staff Admin'}</span>
@@ -2397,7 +2536,7 @@
             <td class="cell-primary" data-label="Caregiver">
               <div class="row-header-wrapper">
                 <div style="display: flex; align-items: center; gap: 0.6rem;">
-                  <img src="${s.avatar_url || 'assets/images/logo_icon.png'}" alt="${s.name}" class="table-user-avatar" onerror="this.src='assets/images/logo_icon.png'">
+                  <img src="${s.avatar_url || 'assets/images/logo_icon.png'}" alt="${escapeHTML(s.name)}" class="table-user-avatar" title="Click to preview photo" onclick="event.stopPropagation(); window.previewAvatarModal(this.src, '${escapeHTML(s.name)}', '${escapeHTML(s.role || 'Caregiver')}', 'Staff Code: ${escapeHTML(s.staff_code || s.employee_id || s.id.slice(0, 8))}')" onerror="this.src='assets/images/logo_icon.png'">
                   <div>
                     <div class="user-display-name">${escapeHTML(s.name)}</div>
                     <div class="user-role-sub">${escapeHTML(s.staff_code || '')} &bull; ${escapeHTML(s.phone || '—')}</div>
@@ -2857,6 +2996,7 @@
   }
 
   function renderCharts() {
+    renderOverviewActivityFeed();
     if (typeof Chart === 'undefined') return;
     renderFulfillmentChart();
     renderRolesDonutChart();
@@ -3096,23 +3236,101 @@
     }
   }
 
-  // 3. Cyberpunk Regional Demand Matrix Bar Chart (Theme-Adaptive)
+  // 3. Cyberpunk Regional Demand Matrix Bar Chart (Theme-Adaptive & Real-Time)
   function renderRegionalDemandChart() {
     const canvas = document.getElementById('chart-regional-demand');
     if (!canvas || typeof Chart === 'undefined') return;
 
+    const isDark = (document.documentElement.getAttribute('data-theme') || LiveStore.theme) === 'dark';
+
+    // Canonical GTA sectors
+    const canonicalRegions = {
+      'Toronto': 0,
+      'Scarborough': 0,
+      'North York': 0,
+      'Peel Region': 0,
+      'York Region': 0,
+      'Durham Region': 0,
+      'Halton': 0
+    };
+
+    // Helper: Map request to canonical region
+    function resolveRegion(r) {
+      const explicitRegion = (r.facility_region || '').toLowerCase().trim();
+      if (explicitRegion) {
+        if (explicitRegion.includes('scarborough')) return 'Scarborough';
+        if (explicitRegion.includes('north york')) return 'North York';
+        if (explicitRegion.includes('peel') || explicitRegion.includes('mississauga') || explicitRegion.includes('brampton')) return 'Peel Region';
+        if (explicitRegion.includes('york') && !explicitRegion.includes('north')) return 'York Region';
+        if (explicitRegion.includes('durham') || explicitRegion.includes('ajax') || explicitRegion.includes('oshawa')) return 'Durham Region';
+        if (explicitRegion.includes('halton') || explicitRegion.includes('oakville') || explicitRegion.includes('burlington')) return 'Halton';
+        if (explicitRegion.includes('toronto') || explicitRegion.includes('downtown')) return 'Toronto';
+      }
+
+      // Check facility name & address & unit
+      const combined = (r.facility_name || '' + ' ' + (r.facility_address || '') + ' ' + (r.unit_department || '')).toLowerCase();
+      if (combined.includes('scarborough') || combined.includes('centenary') || combined.includes('birchmount') || combined.includes('rouge valley')) {
+        return 'Scarborough';
+      }
+      if (combined.includes('north york') || combined.includes('nygh') || combined.includes('humber river') || combined.includes('willowdale') || combined.includes('seneca')) {
+        return 'North York';
+      }
+      if (combined.includes('mississauga') || combined.includes('brampton') || combined.includes('peel') || combined.includes('credit valley') || combined.includes('trillium')) {
+        return 'Peel Region';
+      }
+      if (combined.includes('markham') || combined.includes('vaughan') || combined.includes('richmond hill') || combined.includes('newmarket') || combined.includes('mackenzie health') || combined.includes('southlake') || combined.includes('york region')) {
+        return 'York Region';
+      }
+      if (combined.includes('durham') || combined.includes('ajax') || combined.includes('pickering') || combined.includes('whitby') || combined.includes('oshawa') || combined.includes('bowmanville') || combined.includes('lakeridge')) {
+        return 'Durham Region';
+      }
+      if (combined.includes('oakville') || combined.includes('burlington') || combined.includes('milton') || combined.includes('halton') || combined.includes('joseph brant') || combined.includes('hamilton')) {
+        return 'Halton';
+      }
+      if (combined.includes('toronto') || combined.includes('sunnybrook') || combined.includes('sinai') || combined.includes('st. michael') || combined.includes('st michael') || combined.includes('sickkids') || combined.includes('uhn') || combined.includes('general') || combined.includes('downtown') || combined.includes('etobicoke') || combined.includes('baycrest')) {
+        return 'Toronto';
+      }
+      return 'Scarborough';
+    }
+
+    let totalActiveShifts = 0;
+    (LiveStore.requests || []).forEach(r => {
+      if (r.status !== 'cancelled') {
+        const reg = resolveRegion(r);
+        if (canonicalRegions[reg] !== undefined) {
+          canonicalRegions[reg]++;
+        } else {
+          canonicalRegions['Scarborough']++;
+        }
+        totalActiveShifts++;
+      }
+    });
+
+    // Update real-time subtitle badge
+    const badgeEl = document.getElementById('regional-demand-total-badge');
+    if (badgeEl) {
+      badgeEl.textContent = totalActiveShifts + ' Active Shift' + (totalActiveShifts === 1 ? '' : 's');
+    }
+
+    const labels = Object.keys(canonicalRegions);
+    const dataValues = Object.values(canonicalRegions);
+    const maxVal = Math.max(...dataValues, 0);
+
+    // If chart already exists: update data smoothly in real-time
     if (LiveStore.charts.regional) {
-      LiveStore.charts.regional.destroy();
-      LiveStore.charts.regional = null;
+      LiveStore.charts.regional.data.labels = labels;
+      LiveStore.charts.regional.data.datasets[0].data = dataValues;
+      LiveStore.charts.regional.options.scales.y.suggestedMax = Math.max(maxVal + 2, 5);
+      LiveStore.charts.regional.update();
+      return;
     }
 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
     const chartHeight = canvas.parentElement?.clientHeight || 280;
-    const isDark = (document.documentElement.getAttribute('data-theme') || LiveStore.theme) === 'dark';
 
     // Glowing vertical gradient bar fill
-    const gradBar = ctx.createLinearGradient(0, 0, 0, chartHeight);
+    const gradBar = ctx.createLinearGradient(0, 0, 0, Math.max(chartHeight, 150));
     if (isDark) {
       gradBar.addColorStop(0, '#00F5D4');
       gradBar.addColorStop(1, '#0284C7');
@@ -3121,33 +3339,27 @@
       gradBar.addColorStop(1, '#38BDF8');
     }
 
-    const regions = { 'Scarborough': 0, 'Toronto': 0, 'North York': 0, 'Peel Region': 0, 'York Region': 0, 'Durham': 0 };
-    LiveStore.requests.forEach(r => {
-      const fac = (r.facility_name || '').toLowerCase();
-      if (fac.includes('scarborough')) regions['Scarborough']++;
-      else if (fac.includes('sunnybrook') || fac.includes('toronto')) regions['Toronto']++;
-      else if (fac.includes('york')) regions['North York']++;
-      else if (fac.includes('mississauga') || fac.includes('brampton')) regions['Peel Region']++;
-      else regions['Scarborough']++;
-    });
-
     LiveStore.charts.regional = new Chart(canvas, {
       type: 'bar',
       data: {
-        labels: Object.keys(regions),
+        labels: labels,
         datasets: [{
           label: 'Hospital & LTC Shifts',
-          data: Object.values(regions),
+          data: dataValues,
           backgroundColor: gradBar,
           borderRadius: { topLeft: 8, topRight: 8, bottomLeft: 0, bottomRight: 0 },
           borderSkipped: false,
           hoverBackgroundColor: isDark ? '#38BDF8' : '#0369A1',
-          maxBarThickness: 36
+          maxBarThickness: 34
         }]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        animation: {
+          duration: 600,
+          easing: 'easeOutQuart'
+        },
         plugins: {
           legend: { display: false },
           tooltip: {
@@ -3157,18 +3369,33 @@
             borderColor: isDark ? 'rgba(0, 245, 212, 0.4)' : 'rgba(2, 132, 199, 0.3)',
             borderWidth: 1,
             padding: 10,
-            cornerRadius: 8
+            cornerRadius: 8,
+            callbacks: {
+              label: function(context) {
+                const val = context.parsed.y || 0;
+                return ' ' + val + ' Active Shift' + (val === 1 ? '' : 's');
+              }
+            }
           }
         },
         scales: {
           x: {
             grid: { display: false },
-            ticks: { color: isDark ? '#94A3B8' : '#64748B', font: { family: "'Plus Jakarta Sans', system-ui", size: 11 } }
+            ticks: {
+              color: isDark ? '#94A3B8' : '#64748B',
+              font: { family: "'Plus Jakarta Sans', system-ui", size: 11, weight: 600 }
+            }
           },
           y: {
             grid: { color: isDark ? 'rgba(0, 245, 212, 0.05)' : 'rgba(148, 163, 184, 0.15)', borderDash: [4, 4] },
-            ticks: { color: isDark ? '#94A3B8' : '#64748B', font: { family: "'Plus Jakarta Sans', system-ui", size: 11 }, precision: 0 },
-            beginAtZero: true
+            ticks: {
+              color: isDark ? '#94A3B8' : '#64748B',
+              font: { family: "'Plus Jakarta Sans', system-ui", size: 11 },
+              precision: 0,
+              stepSize: 1
+            },
+            beginAtZero: true,
+            suggestedMax: Math.max(maxVal + 2, 5)
           }
         }
       }
@@ -3272,13 +3499,29 @@
 
     if (tabName === 'tab-profile-overview') {
       drawerContent.innerHTML = `
-        <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem;">
-          <img src="${staff.avatar_url || 'assets/images/logo_icon.png'}" alt="${staff.name}"
-               style="width:64px;height:64px;border-radius:50%;border:3px solid var(--brand-cyan);object-fit:contain;background:#fff;padding:3px;" onerror="this.src='assets/images/logo_icon.png'">
-          <div>
-            <h4 style="font-size:1.15rem;font-weight:800;color:var(--text-primary);">${staff.name}</h4>
-            <span class="status-pill verified">${staff.role}</span>
-            <span class="status-pill ${staff.status === 'pending_verification' ? 'expiring' : staff.status}" style="margin-left:.4rem;">${(staff.status || '').replace('-', ' ').replace('_', ' ').toUpperCase()}</span>
+        <div style="display:flex;align-items:center;gap:1.25rem;margin-bottom:1.5rem;background:rgba(255,255,255,0.02);padding:1rem;border-radius:8px;border:1px solid rgba(255,255,255,0.06);">
+          <div style="position:relative;width:64px;height:64px;flex-shrink:0;">
+            <img id="staff-drawer-avatar-img" src="${staff.avatar_url || 'assets/images/logo_icon.png'}" alt="${escapeHTML(staff.name)}"
+                 style="width:64px;height:64px;border-radius:50%;border:2.5px solid var(--brand-cyan);object-fit:cover;object-position:center;background:#0F172A;display:block;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.3);"
+                 title="Click to preview photo"
+                 onclick="window.previewAvatarModal(this.src, '${escapeHTML(staff.name)}', '${escapeHTML(staff.role || 'Caregiver')}', 'Staff Code: ${escapeHTML(staff.staff_code || staff.employee_id || staff.id.slice(0, 8))}')"
+                 onerror="this.src='assets/images/logo_icon.png'">
+            <label for="staff-avatar-input-${staff.id}" style="position:absolute;bottom:-2px;right:-2px;width:24px;height:24px;border-radius:50%;background:var(--brand-cyan);color:#0F172A;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,0.5);" title="Change Clinician Photo">
+              <i data-lucide="camera" style="width:13px;height:13px;"></i>
+            </label>
+            <input type="file" id="staff-avatar-input-${staff.id}" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="window.handleStaffAvatarSelected(this, '${staff.id}')">
+          </div>
+          <div style="flex:1;">
+            <h4 style="font-size:1.15rem;font-weight:800;color:var(--text-primary);margin-bottom:4px;">${staff.name}</h4>
+            <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+              <span class="status-pill verified">${staff.role}</span>
+              <span class="status-pill ${staff.status === 'pending_verification' ? 'expiring' : staff.status}">${(staff.status || '').replace('-', ' ').replace('_', ' ').toUpperCase()}</span>
+              ${staff.avatar_url ? `
+                <button type="button" onclick="window.removeStaffAvatar('${staff.id}')" style="background:none;border:none;color:#f87171;font-size:0.72rem;cursor:pointer;padding:2px 6px;display:inline-flex;align-items:center;gap:3px;">
+                  <i data-lucide="trash-2" style="width:11px;height:11px;"></i> Remove Photo
+                </button>
+              ` : ''}
+            </div>
           </div>
         </div>
         ${(staff.credential_status === 'pending' || staff.status === 'pending_verification') ? `
@@ -3350,26 +3593,18 @@
           
           <div style="font-size:0.78rem;color:var(--text-secondary);margin-bottom:0.85rem;line-height:1.5;">
             Caregivers sign in to <code>portal.html</code> using their email: <strong>${escapeHTML(staff.email)}</strong>.
-            <div style="margin-top:0.5rem;display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
-              <span style="font-size:0.72rem;font-weight:700;color:var(--text-muted);">DEFAULT ONBOARDING PASSWORD:</span>
-              <code style="background:var(--bg-surface);padding:0.25rem 0.6rem;border-radius:6px;border:1px solid var(--border-subtle);font-weight:800;color:var(--text-primary);font-size:0.84rem;">DivineFingers2026!</code>
-              <button type="button" class="btn-secondary-action" style="padding:0.2rem 0.5rem;font-size:0.72rem;" onclick="navigator.clipboard.writeText('DivineFingers2026!');showToast('Default password copied to clipboard!','success');">
-                <i data-lucide="copy" style="width:11px;height:11px;"></i> Copy
-              </button>
-            </div>
           </div>
 
-          <div style="border-top:1px solid var(--border-subtle);padding-top:0.75rem;">
-            <label style="font-size:0.72rem;font-weight:700;color:var(--text-muted);display:block;margin-bottom:0.35rem;">ISSUE / RESET TEMPORARY PASSWORD</label>
-            <div style="display:flex;gap:0.5rem;">
-              <input type="text" id="drawer-reset-password-input" class="modal-input" value="DivineFingers2026!" style="font-family:monospace;font-weight:700;padding:0.45rem 0.65rem;font-size:0.82rem;">
-              <button type="button" class="btn-primary-action" style="padding:0.45rem 0.85rem;font-size:0.75rem;white-space:nowrap;" onclick="window.handleResetStaffPassword('${staff.id}', '${escapeHTML(staff.name)}')">
-                <i data-lucide="send" style="width:12px;height:12px;"></i> Reset &amp; Email
+          <div style="background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:8px;padding:0.9rem;">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:0.75rem;flex-wrap:wrap;">
+              <div>
+                <div style="font-size:0.8rem;font-weight:700;color:var(--text-primary);">Secure Password Reset</div>
+                <div style="font-size:0.72rem;color:var(--text-muted);margin-top:2px;">Dispatches a secure, single-use 30-minute reset link directly to the clinician's verified email. Admins cannot view or set private passwords.</div>
+              </div>
+              <button type="button" class="btn-primary-action" id="btn-staff-reset-link" style="padding:0.45rem 0.95rem;font-size:0.75rem;white-space:nowrap;" onclick="window.handleResetStaffPassword('${staff.id}', '${escapeHTML(staff.name)}')">
+                <i data-lucide="send" style="width:12px;height:12px;"></i> Send Reset Link
               </button>
             </div>
-            <span style="font-size:0.7rem;color:var(--text-muted);margin-top:4px;display:block;">
-              Updates the caregiver's password in the database and sends their login credentials to their email.
-            </span>
           </div>
         </div>`;
     } else if (tabName === 'tab-profile-docs') {
@@ -3575,22 +3810,26 @@
   };
 
   window.handleResetStaffPassword = async function(staffId, staffName) {
-    const input = document.getElementById('drawer-reset-password-input');
-    const newPassword = input ? input.value.trim() : 'DivineFingers2026!';
-    if (!newPassword || newPassword.length < 6) {
-      showToast('Password must be at least 6 characters long.', 'warning');
-      return;
+    const btn = document.getElementById('btn-staff-reset-link');
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = 'Dispatching...';
     }
 
     try {
       const res = await apiRequest(`/admin/staff/${staffId}/reset-password`, {
-        method: 'POST',
-        body: JSON.stringify({ new_password: newPassword })
+        method: 'POST'
       });
-      showToast(res.message || `Password for ${staffName} reset successfully!`, 'success');
+      showToast(res.message || `Password reset link dispatched to ${staffName}!`, 'success');
       await fetchAndRenderAudit();
     } catch (err) {
-      showToast(`Failed to reset password: ${err.message}`, 'warning');
+      showToast(`Failed to dispatch reset link: ${err.message}`, 'warning');
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = '<i data-lucide="send" style="width:12px;height:12px;"></i> Send Reset Link';
+        if (window.lucide) lucide.createIcons();
+      }
     }
   };
 
@@ -4806,12 +5045,15 @@
 
           <!-- Actions -->
           <td class="cell-actions" data-label="Actions">
-            <div class="admin-action-toolbar" style="width: 100%; display: flex; gap: 0.5rem;">
+            <div class="admin-action-toolbar" style="width: 100%; display: flex; gap: 0.5rem; flex-wrap: wrap;">
               <button type="button" class="btn-primary-action" style="flex: 1 1 calc(50% - 0.25rem); height: 42px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-weight: 700; font-size: 0.82rem;" onclick="window.openFacilityRateCardsModal('${f.id}')" title="Manage Contracted Rates">
                 <i data-lucide="badge-dollar-sign" style="width: 14px; height: 14px;"></i> Rate Cards
               </button>
               <button type="button" class="btn-secondary-action" style="flex: 1 1 calc(50% - 0.25rem); height: 42px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-weight: 700; font-size: 0.82rem;" onclick="window.openFacilityModal('${f.id}')" title="Edit Profile">
                 <i data-lucide="edit-3" style="width: 14px; height: 14px;"></i> Edit Facility
+              </button>
+              <button type="button" class="btn-secondary-action" style="flex: 1 1 100%; height: 32px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-weight: 600; font-size: 0.74rem; color: #f87171; border-color: rgba(239, 68, 68, 0.25);" onclick="window.archiveDeleteFacility('${f.id}', '${escapeHTML(f.name || f.facility_name)}')" title="Archive & Remove Facility">
+                <i data-lucide="archive" style="width: 12px; height: 12px;"></i> Archive Facility
               </button>
             </div>
           </td>
@@ -4942,6 +5184,9 @@
                   <i data-lucide="badge-dollar-sign" style="width: 12px; height: 12px;"></i> Rates
                 </button>
               ` : ''}
+              <button type="button" class="btn-secondary-action" style="flex: 1 1 100%; min-width: 80px; height: 32px; font-size: 0.72rem; padding: 0.2rem 0.4rem; display: inline-flex; align-items: center; justify-content: center; gap: 4px; color: #f87171; border-color: rgba(239, 68, 68, 0.25);" onclick="window.archiveDeleteClient('${c.id}', '${escapeHTML(c.full_name || c.email)}')" title="Archive & Remove Client Account">
+                <i data-lucide="archive" style="width: 12px; height: 12px;"></i> Archive Client
+              </button>
             </div>
           </td>
         </tr>
@@ -4987,32 +5232,31 @@
   window.saveClientResetPassword = async function(e) {
     if (e) e.preventDefault();
     const userId = document.getElementById('client-reset-user-id')?.value;
-    const newPassword = document.getElementById('client-new-password')?.value;
     const btn = document.getElementById('btn-submit-client-reset');
 
-    if (!userId || !newPassword || newPassword.length < 6) {
-      showToast('Password must be at least 6 characters long.', 'warning');
+    if (!userId) {
+      showToast('Client identifier is missing.', 'warning');
       return;
     }
 
     if (btn) {
       btn.disabled = true;
-      btn.textContent = 'Saving...';
+      btn.textContent = 'Dispatching...';
     }
 
     try {
       const res = await apiRequest(`/admin/registered-clients/${userId}/reset-password`, {
-        method: 'POST',
-        body: JSON.stringify({ new_password: newPassword })
+        method: 'POST'
       });
-      showToast(res.message || 'Password reset successfully.', 'success');
+      showToast(res.message || 'Secure password reset link dispatched to client.', 'success');
       window.closeClientResetModal();
+      await fetchAndRenderAudit();
     } catch (err) {
-      showToast(`Password reset failed: ${err.message}`, 'danger');
+      showToast(`Failed to dispatch reset link: ${err.message}`, 'danger');
     } finally {
       if (btn) {
         btn.disabled = false;
-        btn.innerHTML = '<i data-lucide="check" style="width: 15px; height: 15px;"></i> Save New Password';
+        btn.innerHTML = '<i data-lucide="send" style="width: 15px; height: 15px;"></i> Dispatch Reset Link';
         if (window.lucide) lucide.createIcons();
       }
     }
@@ -5521,7 +5765,7 @@
 
     // Tab-specific lifecycle activations inside safe try-catch
     try {
-      if (targetTab === 'overview-tab') renderCharts();
+      if (targetTab === 'overview-tab') requestAnimationFrame(() => { renderCharts(); renderOverviewActivityFeed(); });
       else if (targetTab === 'roster-tab') fetchAndRenderRoster();
       else if (targetTab === 'requests-tab') fetchAndRenderRequests();
       else if (targetTab === 'facilities-tab') fetchAndRenderFacilities();
@@ -5529,7 +5773,11 @@
       else if (targetTab === 'scheduler-tab') renderShiftScheduler();
       else if (targetTab === 'compliance-tab') renderCompliance();
       else if (targetTab === 'reports-tab') fetchAndRenderReportViewer();
-      else if (targetTab === 'admin-users-tab' || targetTab === 'settings-tab') fetchAndRenderAdminAccounts();
+      else if (targetTab === 'admin-users-tab' || targetTab === 'settings-tab') {
+        fetchAndRenderAdminAccounts();
+        fetchAndRenderAudit();
+      }
+      else if (targetTab === 'archive-tab') loadArchiveRecords();
     } catch (e) {
       console.warn('[Tab Activation Error]:', e);
     }
@@ -5661,6 +5909,540 @@
       if (kanban) kanban.style.display = isTable ? 'none' : 'grid';
       if (table)  table.style.display  = isTable ? 'block' : 'none';
     });
+  });
+
+  
+  // ── 16B. Archive Retention Vault Controller ────────────────────────────────
+  async function loadArchiveRecords() {
+    const tableBody = document.getElementById('archive-records-table-body');
+    if (!tableBody) return;
+
+    try {
+      const type = LiveStore.archiveFilterType || 'all';
+      const q = LiveStore.archiveSearchQuery || '';
+      const params = new URLSearchParams();
+      if (type !== 'all') params.set('type', type);
+      if (q) params.set('q', q);
+
+      const url = '/admin/archives' + (params.toString() ? '?' + params.toString() : '');
+      const res = await apiRequest(url);
+
+      if (res && res.success) {
+        LiveStore.archives = res.archives || [];
+        const counts = res.counts || {};
+
+        // Update Neo-Cubes
+        const statTotal = document.getElementById('archive-stat-total');
+        const statClients = document.getElementById('archive-stat-clients');
+        const statStaff = document.getElementById('archive-stat-staff');
+        const statUsers = document.getElementById('archive-stat-users');
+        const badgeArchive = document.getElementById('badge-archive-count');
+
+        if (statTotal) statTotal.textContent = counts.total || 0;
+        if (statClients) statClients.textContent = (counts.client || 0) + (counts.facility || 0);
+        if (statStaff) statStaff.textContent = counts.staff || 0;
+        if (statUsers) statUsers.textContent = (counts.user || 0) + (counts.admin || 0);
+
+        if (badgeArchive) {
+          if (counts.total > 0) {
+            badgeArchive.style.display = 'inline-flex';
+            badgeArchive.textContent = counts.total;
+          } else {
+            badgeArchive.style.display = 'none';
+          }
+        }
+
+        renderArchiveTable();
+      }
+    } catch (err) {
+      console.error('[Archive Records Load Error]:', err);
+      tableBody.innerHTML = `
+        <tr>
+          <td colspan="7" style="text-align: center; color: var(--status-danger, #ef4444); padding: 2.5rem 1rem;">
+            <i data-lucide="alert-circle" style="width: 28px; height: 28px; margin-bottom: 0.5rem; opacity: 0.8;"></i>
+            <div>Failed to load archive vault records. Please check database connectivity.</div>
+          </td>
+        </tr>`;
+      if (window.lucide) lucide.createIcons();
+    }
+  }
+
+  function renderArchiveTable() {
+    const tableBody = document.getElementById('archive-records-table-body');
+    if (!tableBody) return;
+
+    const list = LiveStore.archives || [];
+    if (list.length === 0) {
+      tableBody.innerHTML = `
+        <tr>
+          <td colspan="7" style="text-align: center; padding: 3.5rem 1.5rem; color: var(--text-muted);">
+            <div style="display: inline-flex; align-items: center; justify-content: center; width: 56px; height: 56px; border-radius: 50%; background: rgba(255,255,255,0.04); margin-bottom: 1rem; border: 1px solid var(--border-color);">
+              <i data-lucide="archive" style="width: 26px; height: 26px; color: var(--brand-turquoise); opacity: 0.6;"></i>
+            </div>
+            <div style="font-weight: 700; font-size: 1rem; color: #FFFFFF; margin-bottom: 4px;">Archive Vault is Empty</div>
+            <div style="font-size: 0.82rem; max-width: 440px; margin: 0 auto; color: #94A3B8;">Any deleted client account, healthcare facility profile, staff caregiver, or portal user will be captured and safely preserved here for instant recovery.</div>
+          </td>
+        </tr>`;
+      if (window.lucide) lucide.createIcons();
+      return;
+    }
+
+    const typeBadges = {
+      client:   { label: 'Client Account', bg: 'rgba(56, 189, 248, 0.12)', color: '#38BDF8', border: 'rgba(56, 189, 248, 0.3)', icon: 'building-2' },
+      facility: { label: 'Facility Profile', bg: 'rgba(99, 102, 241, 0.12)', color: '#818CF8', border: 'rgba(99, 102, 241, 0.3)', icon: 'hospital' },
+      staff:    { label: 'Staff Caregiver', bg: 'rgba(52, 211, 153, 0.12)', color: '#34D399', border: 'rgba(52, 211, 153, 0.3)', icon: 'stethoscope' },
+      user:     { label: 'Portal User', bg: 'rgba(167, 139, 250, 0.12)', color: '#A78BFA', border: 'rgba(167, 139, 250, 0.3)', icon: 'user' },
+      admin:    { label: 'Admin Operator', bg: 'rgba(251, 191, 36, 0.12)', color: '#FBBF24', border: 'rgba(251, 191, 36, 0.3)', icon: 'shield-alert' },
+      request:  { label: 'Shift Request', bg: 'rgba(45, 212, 191, 0.12)', color: '#2DD4BF', border: 'rgba(45, 212, 191, 0.3)', icon: 'calendar-clock' }
+    };
+
+    tableBody.innerHTML = list.map(item => {
+      const typeInfo = typeBadges[item.entity_type] || {
+        label: (item.entity_type || 'record').toUpperCase(),
+        bg: 'rgba(255,255,255,0.06)',
+        color: '#E2E8F0',
+        border: 'rgba(255,255,255,0.15)',
+        icon: 'archive'
+      };
+
+      const dateStr = item.created_at ? formatUserDateTime(item.created_at) : '—';
+
+      return `
+        <tr class="table-card-row" style="border-bottom: 1px solid var(--border-color);">
+          <td class="cell-primary" data-label="Entity Type" style="padding: 0.85rem 1rem;">
+            <span style="display: inline-flex; align-items: center; gap: 5px; background: ${typeInfo.bg}; color: ${typeInfo.color}; border: 1px solid ${typeInfo.border}; padding: 3px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 700;">
+              <i data-lucide="${typeInfo.icon}" style="width: 12px; height: 12px;"></i>
+              ${typeInfo.label}
+            </span>
+          </td>
+
+          <td class="cell-block-item" data-label="Display Name" style="padding: 0.85rem 1rem;">
+            <strong style="color: #FFFFFF; font-size: 0.88rem;">${escapeHTML(item.display_name || '—')}</strong>
+          </td>
+
+          <td class="cell-grid-item" data-label="Identifier" style="padding: 0.85rem 1rem;">
+            <code style="font-family: monospace; font-size: 0.76rem; background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 4px; color: var(--brand-turquoise, #2DD4BF);">${escapeHTML(item.identifier || '—')}</code>
+          </td>
+
+          <td class="cell-grid-item" data-label="Archived Date" style="padding: 0.85rem 1rem; font-size: 0.8rem; color: #CBD5E1;">
+            ${dateStr}
+          </td>
+
+          <td class="cell-grid-item" data-label="Deleted By" style="padding: 0.85rem 1rem; font-size: 0.8rem; color: #94A3B8;">
+            <div style="display: flex; align-items: center; gap: 4px;">
+              <i data-lucide="user-x" style="width: 12px; height: 12px; opacity: 0.6;"></i>
+              <span>${escapeHTML(item.deleted_by_name || 'System Admin')}</span>
+            </div>
+          </td>
+
+          <td class="cell-grid-item" data-label="Reason" style="padding: 0.85rem 1rem; font-size: 0.78rem; color: #94A3B8; max-width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${escapeHTML(item.deletion_reason || '')}">
+            ${escapeHTML(item.deletion_reason || 'Administrative action')}
+          </td>
+
+          <td class="cell-actions" data-label="Actions" style="padding: 0.85rem 1rem; text-align: right;">
+            <div style="display: inline-flex; gap: 6px; align-items: center; justify-content: flex-end; flex-wrap: wrap;">
+              <button type="button" class="btn-secondary-action" style="padding: 0.35rem 0.65rem; font-size: 0.75rem; display: inline-flex; align-items: center; gap: 4px; border-radius: 4px;" onclick="window.viewArchivePayload('${item.id}')" title="Inspect Record Snapshot">
+                <i data-lucide="eye" style="width: 12px; height: 12px;"></i> Snapshot
+              </button>
+              <button type="button" class="btn-primary-action" style="padding: 0.35rem 0.75rem; font-size: 0.75rem; display: inline-flex; align-items: center; gap: 4px; background: #10B981; border: none; border-radius: 4px;" onclick="window.restoreArchivedRecord('${item.id}', '${escapeHTML(item.display_name)}')" title="Restore to Active Database">
+                <i data-lucide="rotate-ccw" style="width: 12px; height: 12px;"></i> Restore
+              </button>
+              <button type="button" class="btn-secondary-action" style="padding: 0.35rem 0.55rem; font-size: 0.75rem; display: inline-flex; align-items: center; gap: 4px; color: #f87171; border-color: rgba(239,68,68,0.25); border-radius: 4px;" onclick="window.purgeArchivedRecord('${item.id}', '${escapeHTML(item.display_name)}')" title="Permanently Purge Record">
+                <i data-lucide="trash-2" style="width: 12px; height: 12px;"></i>
+              </button>
+            </div>
+          </td>
+        </tr>`;
+    }).join('');
+
+    if (window.lucide) lucide.createIcons();
+  }
+
+  window.filterArchiveType = function(type, pillBtn) {
+    LiveStore.archiveFilterType = type;
+    document.querySelectorAll('.archive-filter-pill').forEach(btn => {
+      const isTarget = btn === pillBtn;
+      btn.classList.toggle('active', isTarget);
+      if (isTarget) {
+        btn.style.background = 'var(--brand-turquoise)';
+        btn.style.color = '#FFFFFF';
+        btn.style.borderColor = 'transparent';
+      } else {
+        btn.style.background = 'rgba(255,255,255,0.06)';
+        btn.style.color = '#94A3B8';
+        btn.style.borderColor = 'var(--border-color)';
+      }
+    });
+    loadArchiveRecords();
+  };
+
+  let archiveSearchDebounceTimer = null;
+  window.debounceArchiveSearch = function() {
+    clearTimeout(archiveSearchDebounceTimer);
+    archiveSearchDebounceTimer = setTimeout(() => {
+      const input = document.getElementById('archive-search-input');
+      LiveStore.archiveSearchQuery = input ? input.value.trim() : '';
+      loadArchiveRecords();
+    }, 250);
+  };
+
+  window.viewArchivePayload = async function(id) {
+    try {
+      const res = await apiRequest(`/admin/archives/${id}`);
+      if (!res || !res.success || !res.archive) {
+        showToast('Unable to fetch archive record details.', 'error');
+        return;
+      }
+      const item = res.archive;
+      const formattedJson = JSON.stringify(item.payload, null, 2);
+
+      let modal = document.getElementById('archive-inspect-modal');
+      if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'archive-inspect-modal';
+        modal.className = 'admin-modal-backdrop';
+        modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(6px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1.5rem;';
+        document.body.appendChild(modal);
+      }
+
+      modal.innerHTML = `
+        <div class="admin-modal-dialog" style="background:#0F172A;border:1px solid rgba(255,255,255,0.15);border-radius:12px;width:100%;max-width:720px;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 25px 50px -12px rgba(0,0,0,0.7);overflow:hidden;">
+          <div style="padding:1.25rem 1.5rem;border-bottom:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.02);">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div style="width:36px;height:36px;border-radius:8px;background:rgba(45,212,191,0.15);display:flex;align-items:center;justify-content:center;color:var(--brand-turquoise);">
+                <i data-lucide="archive" style="width:18px;height:18px;"></i>
+              </div>
+              <div>
+                <h3 style="margin:0;font-size:1.1rem;font-weight:700;color:#FFFFFF;">Archive Retention Snapshot</h3>
+                <div style="font-size:0.75rem;color:#94A3B8;">${escapeHTML(item.display_name)} &bull; ${(item.entity_type || 'record').toUpperCase()}</div>
+              </div>
+            </div>
+            <button type="button" onclick="document.getElementById('archive-inspect-modal').remove()" style="background:none;border:none;color:#94A3B8;cursor:pointer;padding:6px;border-radius:6px;">
+              <i data-lucide="x" style="width:20px;height:20px;"></i>
+            </button>
+          </div>
+
+          <div style="padding:1.25rem 1.5rem;overflow-y:auto;flex:1;">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));gap:0.75rem;margin-bottom:1.25rem;background:rgba(255,255,255,0.03);padding:0.85rem;border-radius:8px;border:1px solid rgba(255,255,255,0.06);">
+              <div>
+                <div style="font-size:0.7rem;color:#64748B;text-transform:uppercase;font-weight:700;">Entity Type</div>
+                <div style="font-size:0.85rem;color:#FFFFFF;font-weight:600;margin-top:2px;">${item.entity_type}</div>
+              </div>
+              <div>
+                <div style="font-size:0.7rem;color:#64748B;text-transform:uppercase;font-weight:700;">Identifier</div>
+                <div style="font-size:0.85rem;color:var(--brand-turquoise);font-family:monospace;margin-top:2px;">${escapeHTML(item.identifier || '—')}</div>
+              </div>
+              <div>
+                <div style="font-size:0.7rem;color:#64748B;text-transform:uppercase;font-weight:700;">Deleted By</div>
+                <div style="font-size:0.85rem;color:#FFFFFF;margin-top:2px;">${escapeHTML(item.deleted_by_name || 'Admin')}</div>
+              </div>
+              <div>
+                <div style="font-size:0.7rem;color:#64748B;text-transform:uppercase;font-weight:700;">Deletion Reason</div>
+                <div style="font-size:0.85rem;color:#E2E8F0;margin-top:2px;">${escapeHTML(item.deletion_reason || '—')}</div>
+              </div>
+            </div>
+
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;">
+              <span style="font-size:0.78rem;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:0.5px;">Saved Data Snapshot (JSON)</span>
+              <button type="button" id="btn-copy-archive-payload" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:#FFFFFF;font-size:0.72rem;padding:3px 8px;border-radius:4px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;">
+                <i data-lucide="copy" style="width:11px;height:11px;"></i> Copy JSON
+              </button>
+            </div>
+            <pre style="background:#020617;border:1px solid rgba(255,255,255,0.1);border-radius:6px;padding:1rem;font-family:monospace;font-size:0.78rem;color:#38BDF8;overflow-x:auto;max-height:280px;margin:0;line-height:1.4;">${escapeHTML(formattedJson)}</pre>
+          </div>
+
+          <div style="padding:1rem 1.5rem;border-top:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.02);">
+            <button type="button" class="btn-secondary-action" onclick="document.getElementById('archive-inspect-modal').remove()" style="padding:0.5rem 1rem;">Close</button>
+            <button type="button" class="btn-primary-action" style="background:#10B981;border:none;padding:0.5rem 1.25rem;display:inline-flex;align-items:center;gap:6px;" onclick="document.getElementById('archive-inspect-modal').remove();window.restoreArchivedRecord('${item.id}', '${escapeHTML(item.display_name)}');">
+              <i data-lucide="rotate-ccw" style="width:14px;height:14px;"></i> Restore This Record
+            </button>
+          </div>
+        </div>
+      `;
+
+      const copyBtn = document.getElementById('btn-copy-archive-payload');
+      if (copyBtn) {
+        copyBtn.addEventListener('click', () => {
+          navigator.clipboard.writeText(formattedJson).then(() => {
+            showToast('Snapshot payload copied to clipboard!', 'success');
+          });
+        });
+      }
+
+      if (window.lucide) lucide.createIcons();
+    } catch (e) {
+      showToast('Error loading archive snapshot: ' + e.message, 'error');
+    }
+  };
+
+  window.restoreArchivedRecord = async function(id, displayName) {
+    if (!confirm(`Are you sure you want to restore "${displayName || 'this record'}" back to the active system?\n\nIt will be removed from the archive vault and immediately reactivated.`)) {
+      return;
+    }
+    try {
+      const res = await apiRequest(`/admin/archives/${id}/restore`, { method: 'POST' });
+      if (res && res.success) {
+        showToast(res.message || `Successfully restored ${displayName || 'record'}.`, 'success');
+        await loadArchiveRecords();
+        try { if (typeof fetchAndRenderFacilities === 'function') await fetchAndRenderFacilities(); } catch (_) {}
+        try { if (typeof fetchAndRenderRoster === 'function') await fetchAndRenderRoster(); } catch (_) {}
+        try { if (typeof fetchAndRenderRequests === 'function') await fetchAndRenderRequests(); } catch (_) {}
+      } else {
+        showToast(res?.error || 'Failed to restore archived record.', 'error');
+      }
+    } catch (err) {
+      showToast('Error restoring record: ' + err.message, 'error');
+    }
+  };
+
+  window.purgeArchivedRecord = async function(id, displayName) {
+    const confirmation = prompt(`⚠️ PERMANENT PURGE WARNING:\n\nYou are about to permanently destroy the archived record for:\n"${displayName}"\n\nThis cannot be undone. To proceed, type "DELETE" below:`);
+    if (confirmation !== 'DELETE') {
+      if (confirmation !== null) showToast('Purge cancelled (confirmation text did not match).', 'info');
+      return;
+    }
+    try {
+      const res = await apiRequest(`/admin/archives/${id}`, { method: 'DELETE' });
+      if (res && res.success) {
+        showToast(res.message || 'Record permanently deleted from archives.', 'success');
+        await loadArchiveRecords();
+      } else {
+        showToast(res?.error || 'Failed to purge record.', 'error');
+      }
+    } catch (err) {
+      showToast('Error purging record: ' + err.message, 'error');
+    }
+  };
+
+  window.archiveDeleteClient = async function(userId, name) {
+    const reason = prompt(`Archive & Delete Client Account: "${name}"\n\nThis client will be removed from active accounts and safely preserved in the Archive Vault for audit & recovery.\n\nEnter reason for removal (optional):`, 'Administrative client offboarding');
+    if (reason === null) return;
+
+    try {
+      const res = await apiRequest(`/admin/registered-clients/${userId}`, {
+        method: 'DELETE',
+        body: JSON.stringify({ reason: reason.trim() || 'Client account removed via Admin Console' })
+      });
+      if (res && res.success) {
+        showToast(res.message || `Client "${name}" has been archived successfully.`, 'success');
+        await fetchAndRenderFacilities();
+        try { loadArchiveRecords(); } catch (_) {}
+      } else {
+        showToast(res?.error || 'Failed to archive client.', 'error');
+      }
+    } catch (err) {
+      showToast('Error archiving client: ' + err.message, 'error');
+    }
+  };
+
+  window.archiveDeleteFacility = async function(facilityId, name) {
+    const reason = prompt(`Archive & Delete Facility Profile: "${name}"\n\nThe facility and its contracted rate cards will be preserved in the Archive Vault.\n\nEnter reason for removal (optional):`, 'Facility profile offboarding');
+    if (reason === null) return;
+
+    try {
+      const res = await apiRequest(`/admin/facilities/${facilityId}`, {
+        method: 'DELETE',
+        body: JSON.stringify({ reason: reason.trim() || 'Facility removed via Admin Console' })
+      });
+      if (res && res.success) {
+        showToast(res.message || `Facility "${name}" has been archived successfully.`, 'success');
+        await fetchAndRenderFacilities();
+        try { loadArchiveRecords(); } catch (_) {}
+      } else {
+        showToast(res?.error || 'Failed to archive facility.', 'error');
+      }
+    } catch (err) {
+      showToast('Error archiving facility: ' + err.message, 'error');
+    }
+  };
+
+  window.archiveDeleteStaff = async function(staffId, name, code) {
+    const label = name + (code ? ` (${code})` : '');
+    const reason = prompt(`Archive & Delete Staff Caregiver: "${label}"\n\nTheir clinical profile and compliance credentials will be safely preserved in the Archive Vault.\n\nEnter reason for removal (optional):`, 'Staff member offboarded');
+    if (reason === null) return;
+
+    try {
+      const res = await apiRequest(`/admin/roster/${staffId}`, {
+        method: 'DELETE',
+        body: JSON.stringify({ reason: reason.trim() || 'Staff member removed via Admin Console' })
+      });
+      if (res && res.success) {
+        showToast(res.message || `Staff "${label}" archived successfully.`, 'success');
+        await fetchAndRenderRoster();
+        try { loadArchiveRecords(); } catch (_) {}
+      } else {
+        showToast(res?.error || 'Failed to archive staff member.', 'error');
+      }
+    } catch (err) {
+      showToast('Error archiving staff member: ' + err.message, 'error');
+    }
+  };
+
+  window.loadArchiveRecords = loadArchiveRecords;
+
+  // ── Operator Avatar Management Handlers ───────────────────────────────────
+  window.handleAdminAvatarSelected = async function(input) {
+    if (!input || !input.files || input.files.length === 0) return;
+    const file = input.files[0];
+
+    if (file.size > 2 * 1024 * 1024) {
+      showToast('Image size exceeds 2MB limit. Please choose a smaller photo.', 'error');
+      input.value = '';
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('avatar', file);
+
+    try {
+      showToast('Uploading profile picture...', 'info');
+      const res = await apiRequest('/admin/profile/avatar', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (res && res.success) {
+        showToast(res.message || 'Profile picture updated successfully!', 'success');
+        const user = JSON.parse(sessionStorage.getItem('df_admin_user') || '{}');
+        user.avatar_url = res.avatar_url;
+        sessionStorage.setItem('df_admin_user', JSON.stringify(user));
+        updateUserHeader();
+      } else {
+        showToast(res?.error || 'Failed to update profile picture.', 'error');
+      }
+    } catch (err) {
+      showToast('Upload error: ' + err.message, 'error');
+    } finally {
+      input.value = '';
+    }
+  };
+
+  window.removeAdminAvatar = async function() {
+    if (!confirm('Are you sure you want to remove your profile picture?')) return;
+    try {
+      const res = await apiRequest('/admin/profile/avatar', { method: 'DELETE' });
+      if (res && res.success) {
+        showToast(res.message || 'Profile picture removed.', 'success');
+        const user = JSON.parse(sessionStorage.getItem('df_admin_user') || '{}');
+        user.avatar_url = null;
+        sessionStorage.setItem('df_admin_user', JSON.stringify(user));
+        updateUserHeader();
+      } else {
+        showToast(res?.error || 'Failed to remove profile picture.', 'error');
+      }
+    } catch (err) {
+      showToast('Error removing avatar: ' + err.message, 'error');
+    }
+  };
+
+  // ── Staff Caregiver Avatar Handlers ───────────────────────────────────────
+  window.handleStaffAvatarSelected = async function(input, staffId) {
+    if (!input || !input.files || input.files.length === 0) return;
+    const file = input.files[0];
+
+    if (file.size > 2 * 1024 * 1024) {
+      showToast('Image size exceeds 2MB limit. Please choose a smaller photo.', 'error');
+      input.value = '';
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('avatar', file);
+
+    try {
+      showToast('Uploading clinician photo...', 'info');
+      const res = await apiRequest(`/admin/roster/${staffId}/avatar`, {
+        method: 'POST',
+        body: formData
+      });
+
+      if (res && res.success) {
+        showToast(res.message || 'Clinician photo updated successfully!', 'success');
+        // Update local store
+        const staff = LiveStore.staff.find(s => s.id === staffId);
+        if (staff) staff.avatar_url = res.avatar_url;
+        const img = document.getElementById('staff-drawer-avatar-img');
+        if (img) img.src = res.avatar_url;
+        if (typeof filterAndRenderRosterTable === 'function') filterAndRenderRosterTable();
+        if (window.lucide) lucide.createIcons();
+      } else {
+        showToast(res?.error || 'Failed to upload photo.', 'error');
+      }
+    } catch (err) {
+      showToast('Upload error: ' + err.message, 'error');
+    } finally {
+      input.value = '';
+    }
+  };
+
+  window.removeStaffAvatar = async function(staffId) {
+    if (!confirm('Are you sure you want to remove this clinician photo?')) return;
+    try {
+      const res = await apiRequest(`/admin/roster/${staffId}/avatar`, { method: 'DELETE' });
+      if (res && res.success) {
+        showToast(res.message || 'Clinician photo removed.', 'success');
+        const staff = LiveStore.staff.find(s => s.id === staffId);
+        if (staff) staff.avatar_url = null;
+        const img = document.getElementById('staff-drawer-avatar-img');
+        if (img) img.src = 'assets/images/logo_icon.png';
+        if (typeof filterAndRenderRosterTable === 'function') filterAndRenderRosterTable();
+        if (window.lucide) lucide.createIcons();
+      } else {
+        showToast(res?.error || 'Failed to remove photo.', 'error');
+      }
+    } catch (err) {
+      showToast('Error removing photo: ' + err.message, 'error');
+    }
+  };
+
+
+
+  // ── Global Avatar Preview Modal Lightbox ──────────────────────────────────
+  
+  window.previewAdminAvatar = function(el, name, role, email) {
+    const img = el ? el.querySelector('img') : null;
+    const url = img ? img.src : '';
+    window.previewAvatarModal(url, name, role, email ? `Administrator &bull; ${email}` : 'Administrator Profile');
+  };
+
+  window.previewAvatarModal = function(imageUrl, name, role, metaText) {
+    const modal = document.getElementById('modal-avatar-preview');
+    const img = document.getElementById('avatar-preview-img');
+    const nameEl = document.getElementById('avatar-preview-name');
+    const roleEl = document.getElementById('avatar-preview-role-badge');
+    const metaEl = document.getElementById('avatar-preview-meta');
+    const openBtn = document.getElementById('avatar-preview-open-btn');
+    if (!modal || !img) return;
+
+    const resolvedUrl = imageUrl || 'assets/images/logo_icon.png';
+    img.src = resolvedUrl;
+    if (nameEl) nameEl.textContent = name || 'User Profile';
+    if (roleEl) {
+      roleEl.innerHTML = role ? `<span class="status-pill verified" style="font-size:0.74rem;padding:3px 10px;font-weight:700;">${escapeHTML(role)}</span>` : '';
+    }
+    if (metaEl) metaEl.innerHTML = metaText ? metaText : '';
+    if (openBtn) {
+      openBtn.href = resolvedUrl;
+      openBtn.style.display = (imageUrl && !imageUrl.includes('logo_icon.png')) ? 'inline-flex' : 'none';
+    }
+
+    modal.classList.add('open');
+    modal.style.display = 'flex';
+    if (window.lucide) lucide.createIcons();
+  };
+
+  window.closeAvatarPreviewModal = function() {
+    const modal = document.getElementById('modal-avatar-preview');
+    if (modal) {
+      modal.classList.remove('open');
+      modal.style.display = 'none';
+    }
+  };
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      window.closeAvatarPreviewModal();
+    }
   });
 
   // ── 17. Initialization ──────────────────────────────────────────────────────

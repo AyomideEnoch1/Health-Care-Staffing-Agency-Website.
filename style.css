@@ -4397,12 +4397,12 @@ button.btn.btn-subscribe svg {
   }
 
   .subpage-hero {
-    min-height: 340px !important;
+    min-height: clamp(380px, 45vh, 520px) !important;
   }
 
   .subpage-hero .hero-content {
-    padding-top: 3.2rem !important;
-    padding-bottom: 2.6rem !important;
+    padding-top: clamp(4.8rem, 9vw, 6.5rem) !important;
+    padding-bottom: clamp(2.8rem, 5vw, 4rem) !important;
   }
 
   .subpage-hero .hero-title {
@@ -4665,33 +4665,56 @@ button.btn.btn-subscribe svg {
     font-weight: 700 !important;
     color: #1A3A63 !important;
     letter-spacing: 0.3px !important;
-    padding: 0.72rem 0.5rem !important;
+    padding: 0.72rem 0.75rem !important;
     display: flex !important;
     align-items: center !important;
     justify-content: space-between !important;
     width: 100% !important;
     box-sizing: border-box !important;
-    transition: all 0.2s ease !important;
-    border-radius: 4px !important;
+    transition: all 0.22s ease !important;
+    border-radius: 8px !important;
+    border-left: none !important;
   }
 
   .nav-link:hover,
   .nav-link:focus {
     color: var(--teal-green, #3CAF8A) !important;
-    background-color: rgba(60, 175, 138, 0.05) !important;
-    padding-left: 0.75rem !important;
+    background: linear-gradient(90deg, rgba(60, 175, 138, 0.08) 0%, rgba(27, 174, 207, 0.04) 100%) !important;
+    padding-left: 0.85rem !important;
+    padding-right: 0.85rem !important;
+    border-left: none !important;
+    transform: translateX(4px) !important;
   }
 
   .nav-link.active {
     color: var(--teal-green, #3CAF8A) !important;
     font-weight: 800 !important;
-    background-color: rgba(60, 175, 138, 0.06) !important;
-    border-left: 3px solid var(--teal-green, #3CAF8A) !important;
-    padding-left: 0.75rem !important;
+    background: linear-gradient(90deg, rgba(60, 175, 138, 0.12) 0%, rgba(27, 174, 207, 0.06) 100%) !important;
+    padding-left: 0.85rem !important;
+    padding-right: 0.85rem !important;
+    border-left: none !important;
+    transform: translateX(4px) !important;
   }
 
   .nav-link::after {
-    display: none !important;
+    content: '›' !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 1.35rem !important;
+    font-weight: 700 !important;
+    color: var(--teal-green, #3CAF8A) !important;
+    opacity: 0 !important;
+    transform: translateX(-4px) !important;
+    transition: opacity 0.2s ease, transform 0.2s ease !important;
+    line-height: 1 !important;
+  }
+
+  .nav-link:hover::after,
+  .nav-link:focus::after,
+  .nav-link.active::after {
+    opacity: 1 !important;
+    transform: translateX(0) !important;
   }
 
   .mobile-nav-action {
@@ -4967,6 +4990,8 @@ button.btn.btn-subscribe svg {
     align-items: flex-start !important;
     justify-content: center !important;
     text-align: left !important;
+    padding-top: clamp(5rem, 10vw, 6.5rem) !important;
+    padding-bottom: clamp(2.8rem, 5vw, 4rem) !important;
     padding-left: 1.5rem !important;
     padding-right: 1.5rem !important;
   }
@@ -5422,6 +5447,8 @@ button.btn.btn-subscribe svg {
   .subpage-hero .hero-content {
     width: 100% !important;
     max-width: 100% !important;
+    padding-top: clamp(5.2rem, 11vw, 6.8rem) !important;
+    padding-bottom: clamp(2.5rem, 5vw, 3.8rem) !important;
     padding-left: 1.25rem !important;
     padding-right: 1.25rem !important;
     box-sizing: border-box !important;
@@ -5598,6 +5625,8 @@ button.btn.btn-subscribe svg {
   .subpage-hero .hero-content {
     width: 100% !important;
     max-width: 100% !important;
+    padding-top: clamp(5.2rem, 12vw, 6.8rem) !important;
+    padding-bottom: clamp(2.2rem, 5vw, 3.5rem) !important;
     padding-left: 1.25rem !important;
     padding-right: 1.25rem !important;
   }
@@ -5922,10 +5951,10 @@ button.btn.btn-subscribe svg {
 /* ── Small Mobile (up to 480px) ── */
 @media (max-width: 480px) {
 
-  /* Reduce container side padding */
+  /* Container side padding on small mobile */
   .sectors-section {
-    padding-left: 0.6rem !important;
-    padding-right: 0.6rem !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
   }
 
   /* Service offering card icons: smaller on tiny screens */
