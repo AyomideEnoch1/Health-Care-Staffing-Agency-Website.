@@ -1,5 +1,15 @@
 {
   "version": 2,
+  "env": {
+    "SMTP_HOST": "smtp.gmail.com",
+    "SMTP_PORT": "465",
+    "SMTP_SECURE": "true",
+    "SMTP_USER": "ayomidenoch15@gmail.com",
+    "SMTP_PASS": "uphd xpar idfv ocht",
+    "SYSTEM_FROM_EMAIL": "\"Divine Fingers Healthcare\" <ayomidenoch15@gmail.com>",
+    "AGENCY_ALERT_EMAIL": "ayomidenoch15@gmail.com",
+    "MAIL_DRIVER": "smtp"
+  },
   "functions": {
     "api/index.js": {
       "includeFiles": "admin-login.html,private/**"

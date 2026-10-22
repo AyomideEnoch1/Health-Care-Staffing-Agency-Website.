@@ -26,6 +26,7 @@ const { requireAdminAuth, normalizePermissions } = require('../middleware/auth')
 const { enqueueMail } = require('../utils/mailOutbox');
 const mailService = require('../services/mail/MailService');
 const { maskEmail } = require('../utils/cryptoUtils');
+const { sendRawMail, buildAdminVerificationOtpEmail } = require('../utils/mailer');
 const JWT_ADMIN_SECRET = process.env.JWT_ADMIN_SECRET || process.env.JWT_SECRET || 'divine_fingers_default_admin_jwt_secret_key_2026';
 const JWT_SECRET = JWT_ADMIN_SECRET;
 
@@ -160,7 +161,7 @@ router.post('/login', authLoginLimiter, async (req, res, next) => {
       return res.status(401).json({ success: false, error: 'Invalid email or password.' });
     }
 
-    // ── STEP 2: MANDATORY REAL-TIME EMAIL OTP VERIFICATION (Option 1) ──
+    // ── STEP 2: MANDATORY REAL-TIME EMAIL OTP VERIFICATION ──
     const emailOtp = crypto.randomInt(100000, 999999).toString();
     const hashedOtp = crypto.createHash('sha256').update(emailOtp).digest('hex');
 
@@ -169,36 +170,39 @@ router.post('/login', authLoginLimiter, async (req, res, next) => {
       [hashedOtp, admin.id]
     );
 
-    // Determine if running on serverless preview or non-production environment
-    const isServerlessOrPreview = Boolean(process.env.VERCEL || process.env.NODE_ENV !== 'production' || !process.env.SMTP_USER);
+    // Target email: If admin has corporate address without active MX records, deliver to master administrator inbox (SMTP_USER)
+    let targetEmail = admin.email;
+    if (admin.email.endsWith('@divinefingershealthcare.ca') && process.env.SMTP_USER && process.env.SMTP_USER.includes('@')) {
+      targetEmail = process.env.SMTP_USER;
+    }
 
-    // Dispatch real-time OTP via MailService
+    // Deliver OTP strictly to email via hardened SMTP mailer
     try {
-      await mailService.send('auth_admin_login_otp', {
-        to: admin.email,
-        recipientType: 'admin',
-        userId: admin.id,
-        data: {
-          full_name: admin.full_name,
-          otp_code: emailOtp,
-          expires_in_minutes: '10'
-        }
+      const emailContent = buildAdminVerificationOtpEmail(admin.full_name, emailOtp);
+      await sendRawMail({
+        to: targetEmail,
+        subject: emailContent.subject,
+        text: emailContent.text,
+        html: emailContent.html
       });
-      // If logging in with corporate address, mirror copy to configured SMTP account (e.g. ayomidenoch15@gmail.com)
-      if (admin.email.endsWith('@divinefingershealthcare.ca') && process.env.SMTP_USER && process.env.SMTP_USER.includes('@') && process.env.SMTP_USER !== admin.email) {
+      console.log(`[AdminAuth] ✅ OTP verification code delivered to ${targetEmail}`);
+    } catch (mailErr) {
+      console.error('[AdminAuth] Direct SMTP OTP dispatch error:', mailErr.message);
+      // Secondary fallback via MailService
+      try {
         await mailService.send('auth_admin_login_otp', {
-          to: process.env.SMTP_USER,
+          to: targetEmail,
           recipientType: 'admin',
           userId: admin.id,
           data: {
-            full_name: `${admin.full_name} (${admin.email})`,
+            full_name: admin.full_name,
             otp_code: emailOtp,
             expires_in_minutes: '10'
           }
-        }).catch(() => {});
+        });
+      } catch (backupErr) {
+        console.error('[AdminAuth] MailService fallback error:', backupErr.message);
       }
-    } catch (mailErr) {
-      console.error('[AdminAuth] Real-time OTP dispatch warning:', mailErr.message);
     }
 
     const verifyToken = jwt.sign(
@@ -225,9 +229,8 @@ router.post('/login', authLoginLimiter, async (req, res, next) => {
       success: true,
       requires_email_verification: true,
       verify_token: verifyToken,
-      email: maskEmail(admin.email),
-      dev_otp: isServerlessOrPreview ? emailOtp : undefined,
-      message: `A 6-digit verification code has been dispatched to ${maskEmail(admin.email)}. Please verify to complete sign in.`
+      email: maskEmail(targetEmail),
+      message: `A 6-digit verification code has been dispatched to ${maskEmail(targetEmail)}. Please check your email inbox to complete sign in.`
     });
   } catch (err) {
     if (err instanceof z.ZodError) {
@@ -395,39 +398,41 @@ router.post('/email/resend', authLoginLimiter, async (req, res, next) => {
       [hashedOtp, admin.id]
     );
 
-    const isServerlessOrPreview = Boolean(process.env.VERCEL || process.env.NODE_ENV !== 'production' || !process.env.SMTP_USER);
+    let targetEmail = admin.email;
+    if (admin.email.endsWith('@divinefingershealthcare.ca') && process.env.SMTP_USER && process.env.SMTP_USER.includes('@')) {
+      targetEmail = process.env.SMTP_USER;
+    }
 
     try {
-      await mailService.send('auth_admin_login_otp', {
-        to: admin.email,
-        recipientType: 'admin',
-        userId: admin.id,
-        data: {
-          full_name: admin.full_name,
-          otp_code: emailOtp,
-          expires_in_minutes: '10'
-        }
+      const emailContent = buildAdminVerificationOtpEmail(admin.full_name, emailOtp);
+      await sendRawMail({
+        to: targetEmail,
+        subject: emailContent.subject,
+        text: emailContent.text,
+        html: emailContent.html
       });
-      if (admin.email.endsWith('@divinefingershealthcare.ca') && process.env.SMTP_USER && process.env.SMTP_USER.includes('@') && process.env.SMTP_USER !== admin.email) {
+      console.log(`[AdminAuth] ✅ Resent OTP delivered to ${targetEmail}`);
+    } catch (mailErr) {
+      console.error('[AdminAuth] Direct SMTP Resend dispatch error:', mailErr.message);
+      try {
         await mailService.send('auth_admin_login_otp', {
-          to: process.env.SMTP_USER,
+          to: targetEmail,
           recipientType: 'admin',
           userId: admin.id,
           data: {
-            full_name: `${admin.full_name} (${admin.email})`,
+            full_name: admin.full_name,
             otp_code: emailOtp,
             expires_in_minutes: '10'
           }
-        }).catch(() => {});
+        });
+      } catch (backupErr) {
+        console.error('[AdminAuth] MailService resend fallback error:', backupErr.message);
       }
-    } catch (mailErr) {
-      console.error('[AdminAuth] Resend OTP dispatch warning:', mailErr.message);
     }
 
     res.json({
       success: true,
-      dev_otp: isServerlessOrPreview ? emailOtp : undefined,
-      message: `A fresh 6-digit verification code has been dispatched to ${maskEmail(admin.email)}.`
+      message: `A fresh 6-digit verification code has been dispatched to ${maskEmail(targetEmail)}. Please check your email inbox.`
     });
   } catch (err) { next(err); }
 });

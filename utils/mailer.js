@@ -70,7 +70,7 @@ const transporter = nodemailer.createTransport({
   },
   auth: (process.env.SMTP_USER && process.env.SMTP_PASS) ? {
     user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS
+    pass: (process.env.SMTP_PASS || '').replace(/\s+/g, '').trim()
   } : undefined
 });
 
