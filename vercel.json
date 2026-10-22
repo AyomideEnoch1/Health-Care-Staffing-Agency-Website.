@@ -1,8 +1,17 @@
 {
   "version": 2,
+  "functions": {
+    "api/index.js": {
+      "includeFiles": "admin-login.html,private/**"
+    }
+  },
   "rewrites": [
     {
-      "source": "/admin(.*)",
+      "source": "/admin",
+      "destination": "/api/index.js"
+    },
+    {
+      "source": "/admin.html",
       "destination": "/api/index.js"
     },
     {

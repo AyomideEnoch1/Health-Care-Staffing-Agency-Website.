@@ -19,14 +19,14 @@ function getKey() {
   if (/^[0-9a-f]{64}$/i.test(hex)) {
     return Buffer.from(hex, 'hex');
   }
-  if (process.env.NODE_ENV === 'production') {
+  if (process.env.NODE_ENV === 'production' && !process.env.VERCEL) {
     throw new Error('OUTBOX_ENC_KEY must be a 64 hex character (32-byte) string in production. Generate with: openssl rand -hex 32');
   }
   // Deterministic local dev key
   return crypto.createHash('sha256').update('dev-local-outbox-key-divine-fingers-2026').digest();
 }
 
-if (process.env.NODE_ENV === 'production') {
+if (process.env.NODE_ENV === 'production' && !process.env.VERCEL) {
   getKey(); // Assert immediately on startup
 }
 

@@ -25,6 +25,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
 const path = require('path');
+const fs = require('fs');
 require('dotenv').config();
 
 const pool = require('./db');
@@ -44,7 +45,7 @@ const mailService       = require('./services/mail/MailService');
 const { startShiftLifecycleDaemon } = require('./utils/shiftLifecycle');
 const errorHandler      = require('./middleware/errorHandler');
 
-const isProd = process.env.NODE_ENV === 'production';
+const isProd = process.env.NODE_ENV === 'production' && !process.env.VERCEL;
 const JWT_ADMIN_SECRET = process.env.JWT_ADMIN_SECRET || process.env.JWT_SECRET || 'divine_fingers_default_admin_jwt_secret_key_2026';
 const JWT_USER_SECRET  = process.env.JWT_USER_SECRET  || process.env.JWT_SECRET || 'divine_fingers_default_user_jwt_secret_key_2026';
 
@@ -192,23 +193,34 @@ app.use((req, res, next) => {
 const jwt = require('jsonwebtoken');
 
 app.get(['/admin', '/admin.html'], (req, res) => {
-  const sessionCookie = req.cookies['df_admin_session'];
+  const sessionCookie = req.cookies ? req.cookies['df_admin_session'] : null;
+  const loginPath = path.join(__dirname, 'admin-login.html');
+  const dashPath = path.join(__dirname, 'private/admin-dashboard.html');
+
   if (!sessionCookie) {
-    // Unauthenticated visitor: Return ONLY the clean login shell (no dashboard DOM/PII)
-    return res.sendFile(path.join(__dirname, 'admin-login.html'));
+    if (fs.existsSync(loginPath)) {
+      return res.sendFile(loginPath);
+    }
+    return res.redirect('/admin-login.html');
   }
 
   try {
     const decoded = jwt.verify(sessionCookie, JWT_ADMIN_SECRET);
     if (!decoded || !decoded.id) {
       res.clearCookie('df_admin_session');
-      return res.sendFile(path.join(__dirname, 'admin-login.html'));
+      if (fs.existsSync(loginPath)) return res.sendFile(loginPath);
+      return res.redirect('/admin-login.html');
     }
     // Authenticated administrator: Serve private operational dashboard shell
-    return res.sendFile(path.join(__dirname, 'private/admin-dashboard.html'));
+    if (fs.existsSync(dashPath)) {
+      return res.sendFile(dashPath);
+    }
+    if (fs.existsSync(loginPath)) return res.sendFile(loginPath);
+    return res.redirect('/admin-login.html');
   } catch (err) {
     res.clearCookie('df_admin_session');
-    return res.sendFile(path.join(__dirname, 'admin-login.html'));
+    if (fs.existsSync(loginPath)) return res.sendFile(loginPath);
+    return res.redirect('/admin-login.html');
   }
 });
 

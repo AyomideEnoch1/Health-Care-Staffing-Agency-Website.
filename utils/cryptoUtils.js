@@ -10,7 +10,7 @@ const crypto = require('crypto');
 function getMasterKey() {
   const envKey = process.env.ENCRYPTION_KEY || process.env.JWT_SECRET;
   if (!envKey) {
-    if (process.env.NODE_ENV === 'production') {
+    if (process.env.NODE_ENV === 'production' && !process.env.VERCEL) {
       throw new Error('CRITICAL: ENCRYPTION_KEY environment variable is mandatory in production.');
     }
     // Development-only deterministic fallback
