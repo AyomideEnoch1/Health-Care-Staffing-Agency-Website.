@@ -3463,13 +3463,18 @@ button.btn.btn-subscribe svg {
   transform: translate(0, 0) !important;
 }
 
-/* Non-GSAP CSS Fallback: only apply CSS transitions when .slide-hidden or .active-slide is present */
-.slide-hidden .detail-item,
-.slide-hidden .proto-gradient-callout,
-.active-slide .detail-item,
-.active-slide .proto-gradient-callout {
-  transition: transform 0.95s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.95s ease;
+/* Non-GSAP CSS Fallback: only apply CSS transitions when GSAP is not running */
+body:not(.has-gsap) .slide-hidden .detail-item,
+body:not(.has-gsap) .slide-hidden .proto-gradient-callout,
+body:not(.has-gsap) .active-slide .detail-item,
+body:not(.has-gsap) .active-slide .proto-gradient-callout {
+  transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.85s ease;
   will-change: transform, opacity;
+}
+
+body.has-gsap .detail-item,
+body.has-gsap .proto-gradient-callout {
+  transition: none !important;
 }
 
 .proto-content-card .detail-item:nth-child(1),

@@ -15,7 +15,9 @@ const crypto = require('crypto');
 const fs = require('fs');
 const { execFile } = require('child_process');
 
-const uploadDir = process.env.UPLOAD_DIR || path.join(__dirname, '../uploads/resumes');
+const os = require('os');
+const isServerless = Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME || process.env.LAMBDA_TASK_ROOT);
+const uploadDir = process.env.UPLOAD_DIR || (isServerless ? path.join(os.tmpdir(), 'uploads', 'resumes') : path.join(__dirname, '../uploads/resumes'));
 try {
   if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
@@ -25,7 +27,22 @@ try {
 }
 
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadDir),
+  destination: (req, file, cb) => {
+    try {
+      if (!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir, { recursive: true });
+      }
+      cb(null, uploadDir);
+    } catch (err) {
+      const fallbackDir = path.join(os.tmpdir(), 'uploads', 'resumes');
+      try {
+        if (!fs.existsSync(fallbackDir)) fs.mkdirSync(fallbackDir, { recursive: true });
+        cb(null, fallbackDir);
+      } catch (fallbackErr) {
+        cb(null, os.tmpdir());
+      }
+    }
+  },
   filename: (req, file, cb) => {
     const uniqueId = crypto.randomUUID();
     const safeExt = path.extname(file.originalname).toLowerCase().replace(/[^.a-z0-9]/g, '');
@@ -64,8 +81,8 @@ const uploadResume = multer({
  */
 function scanWithClamAV(filePath) {
   return new Promise((resolve) => {
-    // If CLAMAV_ENABLED is explicitly false, skip
-    if (process.env.CLAMAV_ENABLED === 'false') return resolve(true);
+    // If CLAMAV_ENABLED is explicitly false or running in serverless Vercel, skip
+    if (process.env.CLAMAV_ENABLED === 'false' || process.env.VERCEL) return resolve(true);
 
     execFile('clamscan', ['--no-summary', filePath], (error, stdout, stderr) => {
       if (error) {

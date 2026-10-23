@@ -264,6 +264,90 @@
       box-shadow: 0 0 0 3px rgba(27, 174, 207, 0.15);
     }
 
+    /* Integrated Country Code & Phone Input Group */
+    .phone-composite-wrapper {
+      display: flex;
+      align-items: center;
+      background: #F8FAFC;
+      border: 1.5px solid #E2E8F0;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+      overflow: hidden;
+      width: 100%;
+      padding: 0;
+      gap: 0 !important;
+    }
+
+    .phone-composite-wrapper:focus-within {
+      background: #FFFFFF;
+      border-color: #1BAECF;
+      box-shadow: 0 0 0 3px rgba(27, 174, 207, 0.15);
+    }
+
+    .phone-country-addon {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      padding: 0 0.4rem 0 0.75rem;
+      flex-shrink: 0;
+      height: 100%;
+    }
+
+    .phone-country-select {
+      appearance: none;
+      -webkit-appearance: none;
+      background: transparent;
+      border: none;
+      font-family: var(--font-body);
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--navy);
+      padding: 0.75rem 18px 0.75rem 0;
+      cursor: pointer;
+      outline: none;
+      line-height: normal;
+    }
+
+    .phone-country-arrow {
+      position: absolute;
+      right: 4px;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+      width: 13px;
+      height: 13px;
+      color: #64748B;
+      transition: color 0.2s ease;
+    }
+
+    .phone-composite-wrapper:focus-within .phone-country-arrow {
+      color: #1BAECF;
+    }
+
+    .phone-country-divider {
+      width: 1.5px;
+      height: 22px;
+      background: #CBD5E1;
+      flex-shrink: 0;
+      margin: 0 4px;
+    }
+
+    .phone-number-input {
+      flex: 1;
+      width: 100%;
+      border: none;
+      outline: none;
+      background: transparent;
+      padding: 0.75rem 0.85rem;
+      font-family: var(--font-body);
+      font-size: 0.92rem;
+      color: var(--navy);
+    }
+
+    .phone-number-input::placeholder {
+      color: #94A3B8;
+    }
+
     .auth-input:focus ~ .field-icon,
     .input-wrapper:focus-within .field-icon,
     .input-wrapper:focus-within i.field-icon,
@@ -633,29 +717,28 @@
 
               <div class="form-group">
                 <label class="form-label" for="reg-phone">Direct Contact Phone *</label>
-                <div class="phone-input-group">
-                  <div class="country-code-wrapper">
-                    <select id="reg-country-code" class="country-code-select" aria-label="Country Dial Code">
-                      <option value="+1" selected>🇨🇦 +1 (CA)</option>
-                      <option value="+1">🇺🇸 +1 (US)</option>
-                      <option value="+44">🇬🇧 +44 (UK)</option>
-                      <option value="+234">🇳🇬 +234 (NG)</option>
-                      <option value="+233">🇬🇭 +233 (GH)</option>
-                      <option value="+61">🇦🇺 +61 (AU)</option>
-                      <option value="+91">🇮🇳 +91 (IN)</option>
-                      <option value="+63">🇵🇭 +63 (PH)</option>
-                      <option value="+353">🇮🇪 +353 (IE)</option>
-                      <option value="+27">🇿🇦 +27 (ZA)</option>
-                      <option value="+1-876">🇯🇲 +1-876 (JM)</option>
-                      <option value="+49">🇩🇪 +49 (DE)</option>
-                      <option value="+33">🇫🇷 +33 (FR)</option>
-                      <option value="+971">🇦🇪 +971 (AE)</option>
+                <div class="input-wrapper phone-composite-wrapper">
+                  <div class="phone-country-addon">
+                    <select id="reg-country-code" class="phone-country-select" aria-label="Country Dial Code">
+                      <option value="+1" selected>🇨🇦 +1</option>
+                      <option value="+1">🇺🇸 +1</option>
+                      <option value="+44">🇬🇧 +44</option>
+                      <option value="+234">🇳🇬 +234</option>
+                      <option value="+233">🇬🇭 +233</option>
+                      <option value="+61">🇦🇺 +61</option>
+                      <option value="+91">🇮🇳 +91</option>
+                      <option value="+63">🇵🇭 +63</option>
+                      <option value="+353">🇮🇪 +353</option>
+                      <option value="+27">🇿🇦 +27</option>
+                      <option value="+1-876">🇯🇲 +1-876</option>
+                      <option value="+49">🇩🇪 +49</option>
+                      <option value="+33">🇫🇷 +33</option>
+                      <option value="+971">🇦🇪 +971</option>
                     </select>
+                    <i data-lucide="chevron-down" class="phone-country-arrow"></i>
                   </div>
-                  <div class="input-wrapper" style="flex: 1;">
-                    <i data-lucide="phone" class="field-icon"></i>
-                    <input type="tel" id="reg-phone" class="auth-input" placeholder="e.g. (647) 555-0144" autocomplete="tel" required>
-                  </div>
+                  <div class="phone-country-divider"></div>
+                  <input type="tel" id="reg-phone" class="phone-number-input" placeholder="e.g. (647) 555-0144" autocomplete="tel" required>
                 </div>
               </div>
 

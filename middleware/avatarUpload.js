@@ -15,7 +15,9 @@ const path = require('path');
 const crypto = require('crypto');
 const fs = require('fs');
 
-const avatarUploadDir = process.env.AVATAR_UPLOAD_DIR || path.join(__dirname, '../uploads/avatars');
+const os = require('os');
+const isServerless = Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME || process.env.LAMBDA_TASK_ROOT);
+const avatarUploadDir = process.env.AVATAR_UPLOAD_DIR || (isServerless ? path.join(os.tmpdir(), 'uploads', 'avatars') : path.join(__dirname, '../uploads/avatars'));
 try {
   if (!fs.existsSync(avatarUploadDir)) {
     fs.mkdirSync(avatarUploadDir, { recursive: true });
@@ -25,7 +27,22 @@ try {
 }
 
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, avatarUploadDir),
+  destination: (req, file, cb) => {
+    try {
+      if (!fs.existsSync(avatarUploadDir)) {
+        fs.mkdirSync(avatarUploadDir, { recursive: true });
+      }
+      cb(null, avatarUploadDir);
+    } catch (err) {
+      const fallbackDir = path.join(os.tmpdir(), 'uploads', 'avatars');
+      try {
+        if (!fs.existsSync(fallbackDir)) fs.mkdirSync(fallbackDir, { recursive: true });
+        cb(null, fallbackDir);
+      } catch (fallbackErr) {
+        cb(null, os.tmpdir());
+      }
+    }
+  },
   filename: (req, file, cb) => {
     const uniqueId = crypto.randomUUID();
     const safeExt = path.extname(file.originalname).toLowerCase().replace(/[^.a-z0-9]/g, '');

@@ -22,6 +22,7 @@ const JWT_USER_SECRET = process.env.JWT_USER_SECRET || process.env.JWT_SECRET ||
 
 const RESUME_DIR = process.env.UPLOAD_DIR || path.join(__dirname, '../uploads/resumes');
 const CREDENTIAL_DIR = process.env.CREDENTIALS_UPLOAD_DIR || path.join(__dirname, '../uploads/credentials');
+const CONTRACT_DIR = process.env.CONTRACTS_UPLOAD_DIR || path.join(__dirname, '../uploads/contracts');
 
 function verifyAdmin(req) {
   const token = req.cookies && (req.cookies['df_admin_session'] || req.cookies['df_session']);
@@ -103,6 +104,37 @@ router.get('/credential/:filename', async (req, res) => {
   res.setHeader('Content-Disposition', `attachment; filename="${safeFilename}"`);
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('Content-Security-Policy', "default-src 'none'");
+  return res.sendFile(filePath);
+});
+
+// GET /api/documents/msa/:filename — Authenticated Admin or Portal Access
+router.get('/msa/:filename', async (req, res) => {
+  const admin = verifyAdmin(req);
+  const user = verifyUser(req);
+
+  if (!admin && !user) {
+    return res.status(401).json({ error: 'Authentication required to view contract documents.' });
+  }
+
+  const safeFilename = path.basename(req.params.filename);
+  const filePath = path.resolve(CONTRACT_DIR, safeFilename);
+
+  if (!filePath.startsWith(path.resolve(CONTRACT_DIR) + path.sep)) {
+    return res.status(400).json({ error: 'Invalid contract file reference.' });
+  }
+
+  if (!fs.existsSync(filePath)) {
+    return res.status(404).json({ error: 'Contract document not found on server.' });
+  }
+
+  const isPdf = safeFilename.toLowerCase().endsWith('.pdf');
+  const disposition = isPdf ? 'inline' : 'attachment';
+
+  if (isPdf) {
+    res.setHeader('Content-Type', 'application/pdf');
+  }
+  res.setHeader('Content-Disposition', `${disposition}; filename="${safeFilename}"`);
+  res.setHeader('X-Content-Type-Options', 'nosniff');
   return res.sendFile(filePath);
 });
 

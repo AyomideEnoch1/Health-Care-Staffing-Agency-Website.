@@ -4322,11 +4322,25 @@ html, body {
 
   .sidebar .brand-info,
   .sidebar .nav-label,
-  .sidebar .nav-badge,
   .sidebar .sidebar-user-meta,
   .sidebar .nav-section-title {
     display: flex !important;
     opacity: 1 !important;
+  }
+
+  .sidebar.mobile-open .nav-badge,
+  .sidebar .nav-item-btn .nav-badge {
+    display: inline-flex !important;
+    position: static !important;
+    width: auto !important;
+    min-width: 20px !important;
+    height: 20px !important;
+    padding: 0 6px !important;
+    text-indent: 0 !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    margin-left: auto !important;
+    align-self: center !important;
   }
 
   .sidebar-collapse-btn {
@@ -5500,10 +5514,16 @@ html, body {
     padding: 0 0.25rem !important;
   }
 
-  /* Staff Availability Days: compact auto-fit on small phones */
+  /* Staff Availability Days: responsive neat 4-col grid */
   .avail-days-row {
-    grid-template-columns: repeat(auto-fit, minmax(64px, 1fr)) !important;
-    gap: 0.35rem !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 0.4rem !important;
+  }
+  @media (max-width: 360px) {
+    .avail-days-row {
+      grid-template-columns: repeat(2, 1fr) !important;
+      gap: 0.35rem !important;
+    }
   }
   .avail-day-card {
     padding: 0.6rem 0.2rem !important;
@@ -7005,7 +7025,7 @@ html, body {
         <!-- =================================================================== -->
         <div class="portal-view-page" id="staff-page-clock">
           <div class="portal-panel clock-station-panel" id="worker-clock-panel">
-            <div class="panel-header" style="margin-bottom: 1.25rem;">
+            <div class="panel-header" style="margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
               <div>
                 <div class="panel-title" style="display: flex; align-items: flex-start; gap: 0.55rem;">
                   <i data-lucide="clock" style="color: #0284C7;"></i> Electronic Visit Verification &amp; Shift Timecard
@@ -11973,8 +11993,8 @@ async function toggleStaffDayAvailability(idx) {
   staffAvailabilityDays[idx] = !staffAvailabilityDays[idx];
   renderStaffAvailabilityGrid();
 
-  const syncBadge = document.getElementById('avail-sync-badge');
-  if (syncBadge) syncBadge.textContent = 'Saving...';
+  const syncBadges = document.querySelectorAll('#avail-sync-badge, [id*="avail-sync"]');
+  syncBadges.forEach(b => b.textContent = 'Saving...');
 
   try {
     await fetch(`${API_BASE}/shifts/availability`, {
@@ -11983,9 +12003,9 @@ async function toggleStaffDayAvailability(idx) {
       credentials: 'include',
       body: JSON.stringify({ days: staffAvailabilityDays })
     });
-    if (syncBadge) syncBadge.textContent = '✓ Synced with Dispatch';
+    syncBadges.forEach(b => b.textContent = '✓ Synced with Dispatch');
   } catch (e) {
-    if (syncBadge) syncBadge.textContent = '✓ Preferences Saved';
+    syncBadges.forEach(b => b.textContent = '✓ Preferences Saved');
   }
 }
 

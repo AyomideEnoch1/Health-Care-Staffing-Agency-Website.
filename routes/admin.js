@@ -32,6 +32,7 @@ const bcrypt = require('bcryptjs');
 const { z } = require('zod');
 const { uploadCredential } = require('../middleware/uploadCredentials');
 const { uploadAvatar, validateAvatarContent } = require('../middleware/avatarUpload');
+const { uploadContract, validateContractMime } = require('../middleware/contractUpload');
 const { requireAdminAuth, requirePermission, normalizePermissions, ALL_PERMISSIONS } = require('../middleware/auth');
 const adminEvents = require('../utils/events');
 const { enqueueMail } = require('../utils/mailOutbox');
@@ -2110,6 +2111,27 @@ router.post('/registered-clients/:id/reset-password', async (req, res, next) => 
       message: `A secure, single-use password reset link has been dispatched directly to ${user.full_name} (${user.email}).`
     });
   } catch (err) { next(err); }
+});
+
+// POST /api/admin/facilities/upload-msa — Direct upload of executed Master Services Agreement
+router.post('/facilities/upload-msa', uploadContract.single('msa_document'), validateContractMime, async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ success: false, error: 'No contract file was provided for upload.' });
+    }
+
+    const fileUrl = `/api/documents/msa/${req.file.filename}`;
+    res.json({
+      success: true,
+      file_url: fileUrl,
+      filename: req.file.originalname,
+      disk_filename: req.file.filename,
+      size: req.file.size,
+      mimetype: req.file.mimetype
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message || 'Failed to process contract document.' });
+  }
 });
 
 // POST /api/admin/facilities — Create a new healthcare facility profile

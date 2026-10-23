@@ -12,7 +12,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
 
   <!-- Core Dashboard Design System -->
-  <link rel="stylesheet" href="admin.css?v=6.0.4">
+  <link rel="stylesheet" href="admin.css?v=6.1.3">
 
   <!-- Chart.js CDN for Gradient Visualizations -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -551,8 +551,8 @@
           <div class="table-toolbar" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); margin-bottom: 1.25rem;">
             <div class="table-filter-group">
               <div class="chart-segmented-control" id="requests-view-toggle">
-                <button class="segmented-btn active" data-view="kanban"><i data-lucide="kanban" style="width: 14px; height: 14px; vertical-align: middle;"></i> Kanban Board</button>
-                <button class="segmented-btn" data-view="table"><i data-lucide="table" style="width: 14px; height: 14px; vertical-align: middle;"></i> Data Table</button>
+                <button type="button" class="segmented-btn active" data-view="kanban" onclick="window.switchRequestsView('kanban')"><i data-lucide="kanban" style="width: 14px; height: 14px; vertical-align: middle;"></i> Kanban Board</button>
+                <button type="button" class="segmented-btn" data-view="table" onclick="window.switchRequestsView('table')"><i data-lucide="table" style="width: 14px; height: 14px; vertical-align: middle;"></i> Data Table</button>
               </div>
               <input type="text" class="search-input filter-search-box" id="requests-search-input" placeholder="Search facility, unit, or shift...">
             </div>
@@ -1155,6 +1155,29 @@
               </div>
             </form>
 
+            <!-- Admin Operators Search & Filter Toolbar -->
+            <div class="table-toolbar" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1.25rem;">
+              <div style="position: relative; flex: 1; min-width: 240px; max-width: 380px;">
+                <i data-lucide="search" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: var(--text-muted); pointer-events: none;"></i>
+                <input type="text" id="admin-users-search-input" placeholder="Search administrators by name or email..." class="search-input" style="width: 100%; box-sizing: border-box; padding: 0.5rem 0.85rem 0.5rem 2.2rem; font-size: 0.82rem; border-radius: var(--radius-sm);">
+              </div>
+              <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                <select id="admin-users-role-filter" class="filter-select" style="padding: 0.45rem 0.75rem; font-size: 0.82rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary);">
+                  <option value="">All Access Roles</option>
+                  <option value="super-admin">Super Admin</option>
+                  <option value="admin">Operations Admin</option>
+                  <option value="dispatch">Dispatch Officer</option>
+                  <option value="recruiter">Recruiter / HR</option>
+                  <option value="auditor">Compliance Auditor</option>
+                </select>
+                <select id="admin-users-status-filter" class="filter-select" style="padding: 0.45rem 0.75rem; font-size: 0.82rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary);">
+                  <option value="">All Statuses</option>
+                  <option value="active">Active Operators</option>
+                  <option value="inactive">Deactivated</option>
+                </select>
+              </div>
+            </div>
+
             <!-- Admin Accounts Table -->
             <div class="table-responsive-container">
               <table class="data-table mobile-stacked-table">
@@ -1385,18 +1408,19 @@
             </div>
 
             <!-- Toolbar: Search & Filter -->
-            <div class="table-toolbar-row" style="margin-bottom: 1.25rem; gap: 0.75rem; display: flex; flex-wrap: wrap; align-items: center;">
-              <div class="search-input-wrapper" style="flex: 1; min-width: 240px; position: relative;">
-                <i data-lucide="search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--text-muted);"></i>
-                <input type="text" id="audit-search-input" class="filter-input" placeholder="Search by actor, action, target, IP or details..." style="padding-left: 36px; width: 100%;">
+            <div class="audit-search-toolbar">
+              <div class="audit-search-wrapper">
+                <i data-lucide="search" class="audit-search-icon"></i>
+                <input type="text" id="audit-search-input" class="audit-search-input" placeholder="Search by actor, action, target, IP or details...">
               </div>
-              <div style="min-width: 160px;">
-                <select id="audit-severity-filter" class="filter-select" style="width: 100%;">
+              <div class="audit-filter-wrapper">
+                <select id="audit-severity-filter" class="audit-severity-select">
                   <option value="">All Severities</option>
                   <option value="info">Info / Normal</option>
                   <option value="warning">Warnings</option>
                   <option value="critical">Critical / Danger</option>
                 </select>
+                <i data-lucide="chevron-down" class="audit-filter-arrow"></i>
               </div>
             </div>
 
@@ -1450,14 +1474,17 @@
       <button type="button" class="bottom-nav-item" data-tab="roster-tab" onclick="window.switchAdminTab('roster-tab', 'Staff Roster')">
         <i data-lucide="users" style="width: 18px; height: 18px;"></i>
         <span>Roster</span>
+        <span class="bottom-nav-badge" id="bottom-badge-roster-count" style="display:none;">0</span>
       </button>
       <button type="button" class="bottom-nav-item" data-tab="requests-tab" onclick="window.switchAdminTab('requests-tab', 'Client Requests')">
         <i data-lucide="building-2" style="width: 18px; height: 18px;"></i>
         <span>Requests</span>
+        <span class="bottom-nav-badge danger" id="bottom-badge-requests-count" style="display:none;">0</span>
       </button>
       <button type="button" class="bottom-nav-item" data-tab="applicants-tab" onclick="window.switchAdminTab('applicants-tab', 'Job Applications (ATS)')">
         <i data-lucide="file-text" style="width: 18px; height: 18px;"></i>
         <span>ATS</span>
+        <span class="bottom-nav-badge" id="bottom-badge-applicants-count" style="display:none;">0</span>
       </button>
       <button type="button" class="bottom-nav-item" data-tab="admin-users-tab" onclick="window.switchAdminTab('admin-users-tab', 'Admin Operators')">
         <i data-lucide="shield-check" style="width: 18px; height: 18px;"></i>
@@ -1940,8 +1967,47 @@
         </div>
 
         <div class="modal-form-group" style="margin-bottom: 1.25rem;">
-          <label for="facility-msa-url">Executed MSA Agreement Document (URL or File Link)</label>
-          <input type="text" class="modal-input" id="facility-msa-url" placeholder="e.g. https://storage.divinefingershealthcare.ca/contracts/msa-shn-2026.pdf">
+          <label style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+            <span>Executed Master Services Agreement (MSA Document)</span>
+            <span style="font-size: 0.72rem; color: var(--text-muted); font-weight: normal;">PDF, DOC, DOCX up to 25MB</span>
+          </label>
+
+          <!-- Direct File Upload Dropzone -->
+          <div class="admin-file-upload-box" id="facility-msa-dropzone">
+            <input type="file" id="facility-msa-file" class="admin-hidden-file-input" accept=".pdf,.doc,.docx" onchange="window.handleFacilityMsaFileChange(this)">
+            <label for="facility-msa-file" class="admin-file-upload-label" id="facility-msa-file-label">
+              <div class="admin-file-upload-icon-circle">
+                <i data-lucide="file-up" id="facility-msa-file-icon" style="width: 18px; height: 18px;"></i>
+              </div>
+              <div class="admin-file-upload-text-group">
+                <span class="admin-file-upload-title" id="facility-msa-title">Upload Signed Contract Document</span>
+                <span class="admin-file-upload-subtitle" id="facility-msa-subtitle">Drag &amp; drop or click to choose MSA contract (.pdf, .docx)</span>
+              </div>
+              <span class="admin-file-upload-btn-chip" id="facility-msa-browse-btn">Browse File</span>
+            </label>
+            <div id="facility-msa-preview-bar" style="display: none; align-items: center; justify-content: space-between; margin-top: 0.5rem; padding: 0.5rem 0.75rem; background: rgba(2, 132, 199, 0.1); border: 1px solid rgba(2, 132, 199, 0.3); border-radius: 6px; font-size: 0.75rem;">
+              <div style="display: flex; align-items: center; gap: 0.5rem; overflow: hidden; min-width: 0;">
+                <i data-lucide="file-check-2" style="width: 16px; height: 16px; color: #10B981; flex-shrink: 0;"></i>
+                <a id="facility-msa-active-link" href="#" target="_blank" rel="noopener noreferrer" style="color: var(--brand-turquoise); font-weight: 600; text-decoration: underline; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"></a>
+              </div>
+              <button type="button" onclick="window.clearFacilityMsaFile()" style="background: none; border: none; color: #EF4444; font-size: 0.72rem; cursor: pointer; display: flex; align-items: center; gap: 2px; flex-shrink: 0; padding: 2px 6px; border-radius: 4px;">
+                <i data-lucide="x" style="width: 13px; height: 13px;"></i> Remove
+              </button>
+            </div>
+          </div>
+
+          <!-- Stored file path / URL hidden input -->
+          <input type="hidden" id="facility-msa-url">
+
+          <!-- Optional manual URL fallback -->
+          <div style="margin-top: 0.45rem;">
+            <a href="javascript:void(0)" onclick="window.toggleMsaUrlInput()" id="facility-msa-url-toggle" style="font-size: 0.72rem; color: var(--text-muted); text-decoration: underline;">
+              Or link to an external document URL instead
+            </a>
+            <div id="facility-msa-url-wrapper" style="display: none; margin-top: 0.45rem;">
+              <input type="text" class="modal-input" id="facility-msa-url-manual" placeholder="https://external-storage.ca/contracts/msa-shn-2026.pdf" oninput="document.getElementById('facility-msa-url').value = this.value.trim();">
+            </div>
+          </div>
         </div>
 
         <div class="modal-actions" style="display: flex; justify-content: flex-end; gap: 0.75rem;">
@@ -1957,7 +2023,7 @@
   <!-- ==========================================================================
        CONTRACTED RATE CARD TERM MODAL
        ========================================================================== -->
-  <div class="admin-modal-overlay" id="modal-rate-card-term">
+  <div class="admin-modal-overlay" id="modal-rate-card-term" onclick="if(event.target===this) window.closeRateCardModal()">
     <div class="admin-modal-card" style="max-width: 540px;">
       <div class="modal-header">
         <h3 class="modal-title">
@@ -2188,7 +2254,7 @@
 
       <div class="avatar-preview-lightbox-body" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.15rem; padding: 0.5rem 0;">
         <div class="avatar-preview-large-frame" style="width: 220px; height: 220px; border-radius: 50%; overflow: hidden; border: 3.5px solid var(--brand-cyan); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25), 0 0 20px rgba(0, 168, 150, 0.2); background: #0F172A; display: flex; align-items: center; justify-content: center; position: relative;">
-          <img id="avatar-preview-img" src="" alt="Profile Picture" style="width: 100%; height: 100%; object-fit: cover; object-position: center; display: block;" onerror="this.src='assets/images/logo_icon.png'">
+          <img id="avatar-preview-img" src="" alt="Profile Picture" style="width: 100%; height: 100%; object-fit: cover; object-position: center; display: block;" onerror="this.src='assets/images/default_avatar.svg'">
         </div>
 
         <div style="text-align: center; width: 100%;">
@@ -2208,7 +2274,7 @@
   </div>
 
 <!-- Core Dashboard Application Script -->
-  <script src="admin.js?v=6.0.4"></script>
+  <script src="admin.js?v=6.1.5"></script>
 
 </body>
 </html>

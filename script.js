@@ -790,6 +790,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const slideBottomEls = document.querySelectorAll('.slide-from-bottom');
 
   const hasGsap = typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined';
+  if (hasGsap && typeof document !== 'undefined') document.body.classList.add('has-gsap');
 
   // Only apply CSS fallback class when GSAP is not present (avoids CSS transitions fighting GSAP)
   if (!hasGsap) {
@@ -839,7 +840,7 @@ document.addEventListener('DOMContentLoaded', () => {
           cardDelay = 0.18;
         }
 
-        // Luxurious, smooth, relaxed entrance animation with reverse-scroll capability
+        // Silky smooth, natural entrance animation
         gsap.fromTo(
           el,
           fromState,
@@ -847,47 +848,43 @@ document.addEventListener('DOMContentLoaded', () => {
             x: 0,
             y: 0,
             opacity: 1,
-            duration: 1.25,
+            duration: 0.85,
             delay: cardDelay,
-            ease: 'power3.out',
+            ease: 'power2.out',
             force3D: true,
+            clearProps: 'transform,opacity',
             scrollTrigger: {
               trigger: el,
-              start: 'top 90%',
-              toggleActions: 'play none none reverse'
+              start: 'top 88%',
+              toggleActions: 'play none none none',
+              once: true
             }
           }
         );
 
-        // Alternating Left-and-Right Ripple Scroll Animation for Card Tablets (Silky Smooth)
-        const innerTablets = el.querySelectorAll('.detail-item, .contact-detail-list > div, .proto-gradient-callout, div[style*="border-left"]');
+        // Subtle, cohesive stagger for inner card tablets (no opposing horizontal jitter)
+        const innerTablets = el.querySelectorAll('.detail-item, .proto-gradient-callout');
         if (innerTablets.length > 0) {
-          innerTablets.forEach((tablet, tIdx) => {
-            // Gentle alternating entrance: even from Left (-22px), odd from Right (+22px)
-            const tabletStartX = tIdx % 2 === 0 ? -22 : 22;
-            const tabletDelay = cardDelay + 0.18 + (tIdx * 0.11);
-
-            gsap.fromTo(
-              tablet,
-              {
-                x: tabletStartX,
-                opacity: 0
-              },
-              {
-                x: 0,
-                opacity: 1,
-                duration: 1.15,
-                delay: tabletDelay,
-                ease: 'power3.out',
-                force3D: true,
-                scrollTrigger: {
-                  trigger: el,
-                  start: 'top 88%',
-                  toggleActions: 'play none none reverse'
-                }
+          gsap.fromTo(
+            innerTablets,
+            { y: 14, opacity: 0 },
+            {
+              y: 0,
+              opacity: 1,
+              duration: 0.65,
+              stagger: 0.08,
+              delay: cardDelay + 0.15,
+              ease: 'power2.out',
+              force3D: true,
+              clearProps: 'all',
+              scrollTrigger: {
+                trigger: el,
+                start: 'top 88%',
+                toggleActions: 'play none none none',
+                once: true
               }
-            );
-          });
+            }
+          );
         }
       } else {
         // IntersectionObserver CSS-transition fallback with reverse-scroll support

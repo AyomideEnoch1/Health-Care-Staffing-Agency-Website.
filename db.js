@@ -36,7 +36,7 @@ try {
     queueLimit: 0,
     enableKeepAlive: true,
     keepAliveInitialDelay: 10000,
-    timezone: '+00:00',
+    timezone: 'local',
     connectTimeout: 5000
   });
 
@@ -1061,8 +1061,24 @@ function handleInMemoryQuery(sql, params = []) {
   if (normalized.includes('job_applications')) {
     if (normalized.startsWith('select')) return [inMemoryStore.job_applications];
     if (normalized.startsWith('insert')) {
-      inMemoryStore.job_applications.push({ id: params[0] || crypto.randomUUID(), full_name: params[1] || 'Applicant', created_at: new Date().toISOString() });
-      return [{ affectedRows: 1 }];
+      inMemoryStore.job_applications.push({
+        id: params[0] || crypto.randomUUID(),
+        application_code: params[1] || 'APP-100',
+        full_name: params[2] || 'Applicant',
+        role_applied: params[3] || 'RN',
+        email: params[4] || '',
+        phone: params[5] || '',
+        license_registration: params[6] || '',
+        stage: 'new',
+        resume_original_name: params[7] || '',
+        resume_stored_name: params[8] || '',
+        resume_mime_type: params[9] || '',
+        resume_file_size: params[10] || 0,
+        resume_storage_path: params[11] || '',
+        ip_address: params[12] || '',
+        created_at: new Date().toISOString()
+      });
+      return [{ affectedRows: 1, insertId: params[0] }];
     }
     if (normalized.startsWith('delete')) {
       inMemoryStore.job_applications = [];

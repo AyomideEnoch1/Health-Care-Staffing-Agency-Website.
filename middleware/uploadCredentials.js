@@ -3,7 +3,9 @@ const path = require('path');
 const crypto = require('crypto');
 const fs = require('fs');
 
-const uploadDir = process.env.CREDENTIALS_UPLOAD_DIR || path.join(__dirname, '../uploads/credentials');
+const os = require('os');
+const isServerless = Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME || process.env.LAMBDA_TASK_ROOT);
+const uploadDir = process.env.CREDENTIALS_UPLOAD_DIR || (isServerless ? path.join(os.tmpdir(), 'uploads', 'credentials') : path.join(__dirname, '../uploads/credentials'));
 
 try {
   if (!fs.existsSync(uploadDir)) {
