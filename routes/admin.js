@@ -1899,7 +1899,15 @@ router.get('/facilities', async (req, res, next) => {
         COUNT(DISTINCT u.id) AS registered_users_count,
         GROUP_CONCAT(DISTINCT u.email SEPARATOR ', ') AS registered_user_emails,
         MAX(u.created_at) AS latest_user_registered_at,
-        COUNT(DISTINCT sr.id) AS total_shifts_requested
+        COUNT(DISTINCT sr.id) AS total_shifts_requested,
+        GROUP_CONCAT(
+          DISTINCT CASE 
+            WHEN (frc.expiry_date IS NULL OR frc.expiry_date >= CURDATE()) 
+            THEN CONCAT(frc.role, ':$', ROUND(frc.bill_rate))
+          END 
+          ORDER BY frc.role ASC
+          SEPARATOR '|'
+        ) AS active_terms_tags
       FROM facilities f
       LEFT JOIN facility_rate_cards frc ON frc.facility_id = f.id
       LEFT JOIN users u ON (u.facility_id = f.id OR LOWER(TRIM(u.organization_name)) = LOWER(TRIM(f.name))) AND u.role = 'client'
@@ -1937,7 +1945,8 @@ router.get('/facilities', async (req, res, next) => {
         registered_user_emails: fac.registered_user_emails || '',
         registered_users_count: Number(fac.registered_users_count || 0),
         latest_user_registered_at: fac.latest_user_registered_at || null,
-        total_shifts_requested: Number(fac.total_shifts_requested || 0)
+        total_shifts_requested: Number(fac.total_shifts_requested || 0),
+        active_terms_tags: fac.active_terms_tags || ''
       };
     });
 

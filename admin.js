@@ -4917,6 +4917,48 @@
     }
   };
 
+  function renderContractedTermsCell(f) {
+    let tags = [];
+    if (f.active_terms_tags) {
+      tags = String(f.active_terms_tags).split('|').filter(Boolean);
+    }
+    
+    if (tags.length > 0) {
+      const pills = tags.map(tag => {
+        const parts = tag.split(':');
+        const role = parts[0] || 'Role';
+        const rate = parts[1] || '';
+        return `<span class="term-badge-pill"><i data-lucide="tag" style="width: 10px; height: 10px; opacity: 0.85;"></i> ${escapeHTML(role)}: ${escapeHTML(rate)}/hr</span>`;
+      }).join('');
+
+      return `
+        <div style="display: flex; flex-wrap: wrap; gap: 3px; align-items: center;">
+          ${pills}
+        </div>
+        <div style="font-size: 0.68rem; color: var(--text-muted); margin-top: 3px; font-weight: 600;">
+          ${f.active_rate_cards_count || tags.length} Active Contracted ${(f.active_rate_cards_count || tags.length) === 1 ? 'Rate' : 'Rates'}
+        </div>
+      `;
+    }
+
+    if (f.active_rate_cards_count > 0) {
+      return `
+        <span class="status-pill verified" style="font-size: 0.72rem; padding: 2px 8px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
+          <i data-lucide="tag" style="width: 10px; height: 10px;"></i>
+          <strong>${f.active_rate_cards_count}</strong> active terms
+        </span>
+        <div style="font-size: 0.68rem; color: var(--text-muted); margin-top: 3px;">Custom contracted rate terms</div>
+      `;
+    }
+
+    return `
+      <span class="status-pill pending" style="font-size: 0.72rem; padding: 3px 8px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; background: rgba(245, 158, 11, 0.12); color: #d97706; border: 1px solid rgba(245, 158, 11, 0.35); border-radius: 5px;">
+        <i data-lucide="file-text" style="width: 11px; height: 11px;"></i> Agency Standard Rates
+      </span>
+      <div style="font-size: 0.68rem; color: var(--text-muted); margin-top: 3px;">Standard tier pricing applied</div>
+    `;
+  }
+
   function renderFacilitiesList() {
     if (!facilitiesTableBody) return;
 
@@ -4943,6 +4985,15 @@
 
       return matchesSearch && matchesStatus;
     });
+
+    const resultsCountEl = document.getElementById('facilities-view-results-text');
+    if (resultsCountEl) {
+      if (filtered.length === LiveStore.facilities.length) {
+        resultsCountEl.textContent = `Showing ${filtered.length} Healthcare Facilities`;
+      } else {
+        resultsCountEl.textContent = `Showing ${filtered.length} of ${LiveStore.facilities.length} Facilities`;
+      }
+    }
 
     if (filtered.length === 0) {
       facilitiesTableBody.innerHTML = `
@@ -5068,10 +5119,7 @@
           <td class="cell-grid-item" data-label="Contracted Terms">
             <div class="meta-label">Contracted Terms</div>
             <div class="meta-value">
-              <span class="status-pill ${f.active_rate_cards_count > 0 ? 'verified' : ''}" style="font-size: 0.72rem; padding: 2px 7px; ${f.active_rate_cards_count > 0 ? '' : 'background: rgba(255,255,255,0.06); color: var(--text-muted);'}">
-                <strong style="color: ${f.active_rate_cards_count > 0 ? 'var(--brand-turquoise)' : 'inherit'};">${f.active_rate_cards_count || 0}</strong> active
-              </span>
-              <span style="font-size: 0.7rem; color: var(--text-muted); margin-left: 4px;">(${f.total_rate_cards_count || 0} total)</span>
+              ${renderContractedTermsCell(f)}
             </div>
           </td>
 
@@ -5133,6 +5181,17 @@
         (c.facility_code && c.facility_code.toLowerCase().includes(query))
       );
     });
+
+    const resultsCountEl = document.getElementById('facilities-view-results-text');
+    if (resultsCountEl) {
+      if (filtered.length === clients.length) {
+        resultsCountEl.textContent = `Showing ${filtered.length} Registered Client Accounts`;
+      } else {
+        resultsCountEl.textContent = `Showing ${filtered.length} of ${clients.length} Client Accounts`;
+      }
+    }
+    const badgeClients = document.getElementById('badge-client-users-count');
+    if (badgeClients) badgeClients.textContent = clients.length;
 
     if (filtered.length === 0) {
       tableBody.innerHTML = `
@@ -5214,10 +5273,11 @@
           </td>
 
           <td class="cell-grid-item" data-label="Total Requests">
-            <div class="meta-label">Shifts Placed</div>
+            <div class="meta-label">Total Requests</div>
             <div class="meta-value">
-              <span class="status-pill ${Number(c.total_requests_count) > 0 ? 'verified' : ''}" style="font-size: 0.72rem; padding: 2px 7px;">
-                <strong>${c.total_requests_count || 0}</strong> requests
+              <span class="status-pill ${Number(c.total_requests_count) > 0 ? 'verified' : 'neutral'}" style="font-size: 0.72rem; padding: 3px 9px; font-weight: 700; display: inline-flex; align-items: center; gap: 5px; ${Number(c.total_requests_count) > 0 ? '' : 'background: rgba(255, 255, 255, 0.08); color: var(--text-primary); border: 1px solid rgba(255, 255, 255, 0.18);'}">
+                <i data-lucide="clipboard-list" style="width: 12px; height: 12px; opacity: 0.85;"></i>
+                <span><strong>${c.total_requests_count || 0}</strong> ${Number(c.total_requests_count) === 1 ? 'Request' : 'Requests'}</span>
               </span>
             </div>
           </td>

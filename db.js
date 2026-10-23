@@ -162,6 +162,29 @@ try {
             INDEX idx_rate_cards_facility (facility_id)
           ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
         `);
+        // Auto-seed baseline facility rate cards if table is empty
+        try {
+          const [rcCount] = await conn.query('SELECT COUNT(*) AS total FROM facility_rate_cards');
+          if (rcCount && rcCount[0] && Number(rcCount[0].total) === 0) {
+            console.log('🌱 [Database] Seeding initial facility rate cards...');
+            const [existingFacs] = await conn.query('SELECT id, name FROM facilities LIMIT 5');
+            if (existingFacs && existingFacs.length > 0) {
+              for (const ef of existingFacs) {
+                await conn.query(`
+                  INSERT INTO facility_rate_cards (id, facility_id, role, shift_type, bill_rate, pay_rate, effective_date, expiry_date, notes)
+                  VALUES 
+                    (UUID(), ?, 'RN', 'standard', 85.00, 55.00, '2026-01-10', '2027-01-10', 'Master Service Agreement'),
+                    (UUID(), ?, 'RPN', 'standard', 65.00, 42.00, '2026-01-10', '2027-01-10', 'Master Service Agreement'),
+                    (UUID(), ?, 'PSW', 'standard', 45.00, 28.00, '2026-01-10', '2027-01-10', 'Master Service Agreement')
+                  ON DUPLICATE KEY UPDATE bill_rate = VALUES(bill_rate)
+                `, [ef.id, ef.id, ef.id]);
+              }
+            }
+          }
+        } catch (seedErr) {
+          console.warn('⚠️ [Rate Cards Seed Notice]:', seedErr.message);
+        }
+
       } catch (schemaNotice) {
         console.warn('⚠️ [Database Schema Verification Notice]:', schemaNotice.message);
       } finally {
@@ -282,7 +305,106 @@ const inMemoryStore = {
       updated_at: new Date().toISOString()
     }
   ],
-  facility_rate_cards: [],
+  facility_rate_cards: [
+    {
+      id: 'rc-sb-rn-001',
+      facility_id: 'fac-sunnybrook-001',
+      role: 'RN',
+      shift_type: 'standard',
+      bill_rate: 85.00,
+      pay_rate: 55.00,
+      overtime_multiplier: 1.50,
+      effective_date: '2026-01-10',
+      expiry_date: '2027-01-10',
+      notes: 'Master Service Agreement Contracted Rate',
+      created_by: 'admin',
+      created_at: new Date(Date.now() - 30 * 24 * 3600 * 1000).toISOString()
+    },
+    {
+      id: 'rc-sb-rpn-002',
+      facility_id: 'fac-sunnybrook-001',
+      role: 'RPN',
+      shift_type: 'standard',
+      bill_rate: 65.00,
+      pay_rate: 42.00,
+      overtime_multiplier: 1.50,
+      effective_date: '2026-01-10',
+      expiry_date: '2027-01-10',
+      notes: 'Master Service Agreement Contracted Rate',
+      created_by: 'admin',
+      created_at: new Date(Date.now() - 30 * 24 * 3600 * 1000).toISOString()
+    },
+    {
+      id: 'rc-sb-psw-003',
+      facility_id: 'fac-sunnybrook-001',
+      role: 'PSW',
+      shift_type: 'standard',
+      bill_rate: 45.00,
+      pay_rate: 28.00,
+      overtime_multiplier: 1.50,
+      effective_date: '2026-01-10',
+      expiry_date: '2027-01-10',
+      notes: 'Master Service Agreement Contracted Rate',
+      created_by: 'admin',
+      created_at: new Date(Date.now() - 30 * 24 * 3600 * 1000).toISOString()
+    },
+    {
+      id: 'rc-hrh-rn-004',
+      facility_id: 'fac-humber-002',
+      role: 'RN',
+      shift_type: 'standard',
+      bill_rate: 82.50,
+      pay_rate: 52.00,
+      overtime_multiplier: 1.50,
+      effective_date: '2026-02-15',
+      expiry_date: '2027-02-15',
+      notes: 'Master Service Agreement Contracted Rate',
+      created_by: 'admin',
+      created_at: new Date(Date.now() - 20 * 24 * 3600 * 1000).toISOString()
+    },
+    {
+      id: 'rc-hrh-psw-005',
+      facility_id: 'fac-humber-002',
+      role: 'PSW',
+      shift_type: 'standard',
+      bill_rate: 44.00,
+      pay_rate: 28.00,
+      overtime_multiplier: 1.50,
+      effective_date: '2026-02-15',
+      expiry_date: '2027-02-15',
+      notes: 'Master Service Agreement Contracted Rate',
+      created_by: 'admin',
+      created_at: new Date(Date.now() - 20 * 24 * 3600 * 1000).toISOString()
+    },
+    {
+      id: 'rc-smh-rn-006',
+      facility_id: 'fac-stmichael-003',
+      role: 'RN',
+      shift_type: 'standard',
+      bill_rate: 85.00,
+      pay_rate: 55.00,
+      overtime_multiplier: 1.50,
+      effective_date: '2026-03-01',
+      expiry_date: '2027-03-01',
+      notes: 'Master Service Agreement Contracted Rate',
+      created_by: 'admin',
+      created_at: new Date(Date.now() - 10 * 24 * 3600 * 1000).toISOString()
+    },
+    {
+      id: 'rc-smh-tn-007',
+      facility_id: 'fac-stmichael-003',
+      role: 'Travel Nurse',
+      shift_type: 'standard',
+      bill_rate: 110.00,
+      pay_rate: 75.00,
+      overtime_multiplier: 1.50,
+      effective_date: '2026-03-01',
+      expiry_date: '2027-03-01',
+      notes: 'Master Service Agreement Contracted Rate',
+      created_by: 'admin',
+      created_at: new Date(Date.now() - 10 * 24 * 3600 * 1000).toISOString()
+    }
+  ],
   email_outbox: [],
   email_suppressions: [],
   email_audit_logs: [],
@@ -464,13 +586,19 @@ function handleInMemoryQuery(sql, params = []) {
           else if (diffDays <= 30) isExpiringSoon = true;
         }
 
+        const activeCards = rateCards.filter(rc => !rc.expiry_date || new Date(rc.expiry_date) >= today);
+        const termsTags = activeCards.map(rc => `${rc.role}:${Math.round(Number(rc.bill_rate))}`).join('|');
+        const termsSummary = activeCards.map(rc => `${rc.role}: ${Number(rc.bill_rate).toFixed(0)}/hr`).join(', ');
+
         return {
           ...fac,
           effective_status: isExpired ? 'expired' : (fac.status || 'pending'),
           is_expiring_soon: isExpiringSoon,
           days_until_expiry: daysUntilExpiry,
-          active_rate_cards_count: rateCards.length,
+          active_rate_cards_count: activeCards.length,
           total_rate_cards_count: rateCards.length,
+          active_terms_tags: termsTags,
+          active_terms_summary: termsSummary,
           has_portal_account: users.length > 0,
           registered_user_emails: users.map(u => u.email).join(', '),
           registered_users_count: users.length,
@@ -1443,7 +1571,14 @@ function handleInMemoryQuery(sql, params = []) {
   // 11. FACILITY RATE CARDS
   if (normalized.includes('from facility_rate_cards') || normalized.includes('from `facility_rate_cards`') || normalized.includes('into facility_rate_cards')) {
     if (normalized.startsWith('select')) {
-      return [inMemoryStore.facility_rate_cards || []];
+      let cards = inMemoryStore.facility_rate_cards || [];
+      if (normalized.includes('facility_id = ?') && params && params[0]) {
+        cards = cards.filter(c => c.facility_id === params[0]);
+      }
+      return [cards.map(c => ({
+        ...c,
+        is_active: (!c.expiry_date || new Date(c.expiry_date) >= new Date()) ? 1 : 0
+      }))];
     }
     if (normalized.startsWith('insert')) {
       const card = {
