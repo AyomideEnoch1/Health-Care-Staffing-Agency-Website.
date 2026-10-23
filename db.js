@@ -290,7 +290,83 @@ const inMemoryStore = {
   // IMPORTANT: users[] must NEVER contain administrator emails.
   // Admins live exclusively in admins[]. Mixing them here bypasses the
   // /api/users/login 403 rejection check and lets admins access the public portal.
-  users: []
+  users: [
+    {
+      id: 'usr-laura-rossi-001',
+      email: 'clinical.staffing@sunnybrook.ca',
+      password_hash: '$2b$10$ICqO6AZ.OprBLcm5OT5Nm.aWhldo4q3dLx6tHzcaFg6PwaX23uUPG',
+      full_name: 'Director Laura Rossi',
+      role: 'client',
+      organization_name: 'Sunnybrook Health Sciences Centre',
+      facility_id: 'fac-sunnybrook-001',
+      phone: '+1 (416) 480-6100',
+      client_role: 'Director of Clinical Staffing',
+      is_active: 1,
+      email_verified: 1,
+      created_at: new Date(Date.now() - 30 * 24 * 3600 * 1000).toISOString(),
+      updated_at: new Date().toISOString()
+    },
+    {
+      id: 'usr-james-patel-002',
+      email: 'dispatch@hrh.ca',
+      password_hash: '$2b$10$ICqO6AZ.OprBLcm5OT5Nm.aWhldo4q3dLx6tHzcaFg6PwaX23uUPG',
+      full_name: 'Lead Coordinator James Patel',
+      role: 'client',
+      organization_name: 'Humber River Hospital',
+      facility_id: 'fac-humber-002',
+      phone: '+1 (416) 242-1000',
+      client_role: 'Lead Staffing Coordinator',
+      is_active: 1,
+      email_verified: 1,
+      created_at: new Date(Date.now() - 20 * 24 * 3600 * 1000).toISOString(),
+      updated_at: new Date().toISOString()
+    },
+    {
+      id: 'usr-marcus-wong-003',
+      email: 'dispatch@unityhealth.to',
+      password_hash: '$2b$10$ICqO6AZ.OprBLcm5OT5Nm.aWhldo4q3dLx6tHzcaFg6PwaX23uUPG',
+      full_name: 'Supervisor Marcus Wong',
+      role: 'client',
+      organization_name: "St. Michael's Hospital (Unity Health)",
+      facility_id: 'fac-stmichael-003',
+      phone: '+1 (416) 864-6060',
+      client_role: 'Clinical Operations Supervisor',
+      is_active: 1,
+      email_verified: 1,
+      created_at: new Date(Date.now() - 10 * 24 * 3600 * 1000).toISOString(),
+      updated_at: new Date().toISOString()
+    },
+    {
+      id: 'usr-client-login-004',
+      email: 'client.test.login@hospital.ca',
+      password_hash: '$2b$10$ICqO6AZ.OprBLcm5OT5Nm.aWhldo4q3dLx6tHzcaFg6PwaX23uUPG',
+      full_name: 'Client Test Login',
+      role: 'client',
+      organization_name: 'City Care Hospital',
+      facility_id: 'fac-citycare-004',
+      phone: '+1 (647) 123-4567',
+      client_role: 'Staffing Coordinator',
+      is_active: 1,
+      email_verified: 1,
+      created_at: new Date(Date.now() - 2 * 24 * 3600 * 1000).toISOString(),
+      updated_at: new Date().toISOString()
+    },
+    {
+      id: 'usr-dr-adeleke-005',
+      email: 'dr.adeleke@stmaryshospital.org',
+      password_hash: '$2b$10$ICqO6AZ.OprBLcm5OT5Nm.aWhldo4q3dLx6tHzcaFg6PwaX23uUPG',
+      full_name: 'Dr. Samuel Adeleke',
+      role: 'client',
+      organization_name: 'St. Mary Medical Centre',
+      facility_id: 'fac-stmary-005',
+      phone: '+234 803 123 4567',
+      client_role: 'Medical Director & Staffing Lead',
+      is_active: 1,
+      email_verified: 1,
+      created_at: new Date(Date.now() - 1 * 24 * 3600 * 1000).toISOString(),
+      updated_at: new Date().toISOString()
+    }
+  ]
 };
 
 // Set of admin emails for fast O(1) lookup — used to guard users[] queries.
@@ -879,27 +955,55 @@ function handleInMemoryQuery(sql, params = []) {
     if (normalized.startsWith('select')) {
       // Handle registered-clients join query
       if (normalized.includes('facilities f') || normalized.includes('linked_facility_name')) {
+        const facs = inMemoryStore.facilities || [];
         const clientUsers = (inMemoryStore.users || []).filter(u => u.role === 'client');
-        const enriched = clientUsers.map(u => {
-          const fac = (inMemoryStore.facilities || []).find(f => 
-            (u.facility_id && f.id === u.facility_id) || 
-            (f.name && u.organization_name && f.name.toLowerCase().trim() === u.organization_name.toLowerCase().trim())
+        
+        // Map from facilities first so EVERY registered facility is guaranteed to appear
+        const facList = facs.map(f => {
+          const matchedUser = clientUsers.find(u => 
+            (u.facility_id && u.facility_id === f.id) ||
+            (u.organization_name && f.name && u.organization_name.toLowerCase().trim() === f.name.toLowerCase().trim()) ||
+            (u.email && f.contact_email && u.email.toLowerCase() === f.contact_email.toLowerCase())
           );
           const reqCount = (inMemoryStore.staffing_requests || []).filter(sr => 
-            (fac && sr.facility_id === fac.id) || 
-            (fac && sr.facility_name && fac.name && sr.facility_name.toLowerCase().trim() === fac.name.toLowerCase().trim()) || 
-            (sr.contact_email && sr.contact_email.toLowerCase() === u.email.toLowerCase())
+            sr.facility_id === f.id || 
+            (sr.facility_name && f.name && sr.facility_name.toLowerCase().trim() === f.name.toLowerCase().trim()) || 
+            (matchedUser && sr.contact_email && sr.contact_email.toLowerCase() === matchedUser.email.toLowerCase())
           ).length;
 
           return {
-            ...u,
-            facility_code: fac ? fac.facility_code : null,
-            linked_facility_name: fac ? fac.name : (u.organization_name || null),
-            facility_status: fac ? fac.status : 'pending',
+            id: matchedUser ? matchedUser.id : f.id,
+            email: matchedUser ? matchedUser.email : (f.contact_email || 'client@hospital.ca'),
+            full_name: matchedUser ? matchedUser.full_name : (f.contact_name || 'Facility Administrator'),
+            organization_name: f.name || (matchedUser ? matchedUser.organization_name : 'Healthcare Facility'),
+            facility_id: f.id,
+            client_role: matchedUser ? (matchedUser.client_role || 'Staffing Requester') : 'Facility Coordinator',
+            phone: matchedUser ? (matchedUser.phone || f.contact_phone) : (f.contact_phone || '—'),
+            is_active: matchedUser ? Number(matchedUser.is_active) : 1,
+            email_verified: matchedUser ? Number(matchedUser.email_verified) : 1,
+            last_login: matchedUser ? matchedUser.last_login : null,
+            created_at: matchedUser ? matchedUser.created_at : f.created_at,
+            facility_code: f.facility_code || 'FAC',
+            linked_facility_name: f.name,
+            facility_status: f.status || 'pending',
             total_requests_count: reqCount
           };
         });
-        return [enriched];
+
+        const standaloneClients = clientUsers.filter(u => 
+          !facs.some(f => 
+            (u.facility_id && u.facility_id === f.id) ||
+            (u.organization_name && f.name && u.organization_name.toLowerCase().trim() === f.name.toLowerCase().trim())
+          )
+        ).map(u => ({
+          ...u,
+          facility_code: 'FAC',
+          linked_facility_name: u.organization_name || 'Individual Facility',
+          facility_status: 'pending',
+          total_requests_count: 0
+        }));
+
+        return [[...facList, ...standaloneClients]];
       }
       if (normalized.includes('where (id = ? or email = ?)') || normalized.includes('where id = ? or email = ?') || normalized.includes('where lower(email) = ? or id = ?') || normalized.includes('where email = ? or id = ?')) {
         const p0 = String(params[0] || '').toLowerCase().trim();

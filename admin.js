@@ -264,6 +264,8 @@
     if (endpoint === '/admin/applications') return { success: true, data: LiveStore.applicants || [] };
     if (endpoint === '/admin/inquiries') return { success: true, data: LiveStore.inquiries || [] };
     if (endpoint === '/admin/audit-logs') return { success: true, data: LiveStore.auditLogs || [] };
+    if (endpoint === '/admin/facilities') return { success: true, data: LiveStore.facilities || [] };
+    if (endpoint === '/admin/registered-clients') return { success: true, data: LiveStore.registeredClients || [] };
     if (endpoint === '/admin/admins') {
       return {
         success: true,
@@ -4829,7 +4831,9 @@
       const expiringCount = LiveStore.facilities.filter(f => f.is_expiring_soon).length;
       const pendingCount  = LiveStore.facilities.filter(f => f.effective_status === 'pending').length;
       const totalTerms    = LiveStore.facilities.reduce((acc, f) => acc + (f.active_rate_cards_count || 0), 0);
-      const registeredClientsCount = LiveStore.registeredClients.length;
+      const registeredClientsCount = (LiveStore.registeredClients && LiveStore.registeredClients.length > 0) 
+        ? LiveStore.registeredClients.length 
+        : (LiveStore.facilities ? LiveStore.facilities.length : 0);
 
       const elActive   = document.getElementById('stat-active-facilities');
       const elTerms    = document.getElementById('stat-active-rate-cards');
@@ -5098,7 +5102,26 @@
     if (!tableBody) return;
 
     const query = (facilitiesSearchInput?.value || '').trim().toLowerCase();
-    const clients = LiveStore.registeredClients || [];
+    let clients = (LiveStore.registeredClients && LiveStore.registeredClients.length > 0) ? LiveStore.registeredClients : [];
+    
+    // Auto-fallback: If registeredClients array is empty but facilities exist, map facilities so they are always visible
+    if (clients.length === 0 && LiveStore.facilities && LiveStore.facilities.length > 0) {
+      clients = LiveStore.facilities.map(f => ({
+        id: f.id,
+        email: f.contact_email || (f.registered_user_emails ? f.registered_user_emails.split(',')[0].trim() : 'client@hospital.ca'),
+        full_name: f.contact_name || 'Facility Administrator',
+        organization_name: f.name,
+        facility_id: f.id,
+        facility_code: f.facility_code || 'FAC',
+        linked_facility_name: f.name,
+        facility_status: f.effective_status || f.status || 'pending',
+        phone: f.contact_phone || '—',
+        is_active: 1,
+        email_verified: 1,
+        created_at: f.created_at,
+        total_requests_count: f.total_shifts_requested || 0
+      }));
+    }
 
     const filtered = clients.filter(c => {
       if (!query) return true;

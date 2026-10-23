@@ -1956,27 +1956,26 @@ router.get('/registered-clients', async (req, res, next) => {
   try {
     const [clients] = await pool.query(`
       SELECT 
-        u.id,
-        u.email,
-        u.full_name,
-        u.organization_name,
-        u.facility_id,
-        u.client_role,
-        u.phone,
-        u.is_active,
-        u.email_verified,
+        COALESCE(u.id, f.id) AS id,
+        COALESCE(u.email, f.contact_email, 'no-email@facility.local') AS email,
+        COALESCE(u.full_name, f.contact_name, 'Facility Coordinator') AS full_name,
+        COALESCE(f.name, u.organization_name, 'Healthcare Facility') AS organization_name,
+        f.id AS facility_id,
+        COALESCE(u.client_role, 'Staffing Requester') AS client_role,
+        COALESCE(u.phone, f.contact_phone, '—') AS phone,
+        COALESCE(u.is_active, 1) AS is_active,
+        COALESCE(u.email_verified, 1) AS email_verified,
         u.last_login,
-        u.created_at,
-        MAX(f.facility_code) AS facility_code,
-        MAX(f.name) AS linked_facility_name,
-        MAX(f.status) AS facility_status,
+        COALESCE(u.created_at, f.created_at) AS created_at,
+        COALESCE(f.facility_code, 'FAC') AS facility_code,
+        COALESCE(f.name, u.organization_name) AS linked_facility_name,
+        COALESCE(f.status, 'pending') AS facility_status,
         COUNT(DISTINCT sr.id) AS total_requests_count
-      FROM users u
-      LEFT JOIN facilities f ON (f.id = u.facility_id OR LOWER(TRIM(f.name)) = LOWER(TRIM(u.organization_name)))
-      LEFT JOIN staffing_requests sr ON (sr.facility_id = f.id OR LOWER(TRIM(sr.facility_name)) = LOWER(TRIM(u.organization_name)) OR sr.contact_email = u.email)
-      WHERE u.role = 'client'
-      GROUP BY u.id
-      ORDER BY u.created_at DESC
+      FROM facilities f
+      LEFT JOIN users u ON (u.facility_id = f.id OR LOWER(TRIM(u.organization_name)) = LOWER(TRIM(f.name))) AND u.role = 'client'
+      LEFT JOIN staffing_requests sr ON (sr.facility_id = f.id OR LOWER(TRIM(sr.facility_name)) = LOWER(TRIM(f.name)) OR (u.email IS NOT NULL AND sr.contact_email = u.email))
+      GROUP BY f.id, u.id
+      ORDER BY created_at DESC
     `);
 
     res.json({

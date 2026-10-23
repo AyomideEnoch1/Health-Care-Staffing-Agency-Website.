@@ -22,3 +22,6 @@ scratch/
 deploy-bundle/
 *.zip
 *.docx
+
+.vercel
+.env*
