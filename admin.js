@@ -3896,8 +3896,13 @@
     }
 
     try {
+      const staff = (LiveStore.staff || []).find(s => s.id === staffId);
       const res = await apiRequest(`/admin/staff/${staffId}/reset-password`, {
-        method: 'POST'
+        method: 'POST',
+        body: JSON.stringify({
+          email: staff ? staff.email : '',
+          name: staffName
+        })
       });
       showToast(res.message || `Password reset link dispatched to ${staffName}!`, 'success');
       await fetchAndRenderAudit();

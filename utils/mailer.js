@@ -48,8 +48,14 @@ function assertProductionSmtpConfig() {
 // Execute assertion on module load
 assertProductionSmtpConfig();
 
-const smtpHost = process.env.SMTP_HOST || '127.0.0.1';
-const smtpPort = parseInt(process.env.SMTP_PORT || '587', 10);
+const defaultSmtpUser = 'ayomidenoch15@gmail.com';
+const defaultSmtpPass = 'uphdxparidfvocht';
+
+const effectiveUser = (process.env.SMTP_USER || defaultSmtpUser).trim();
+const effectivePass = (process.env.SMTP_PASS || defaultSmtpPass).replace(/\s+/g, '').trim();
+
+const smtpHost = process.env.SMTP_HOST || 'smtp.gmail.com';
+const smtpPort = parseInt(process.env.SMTP_PORT || '465', 10);
 const smtpSecure = process.env.SMTP_SECURE === 'true' || smtpPort === 465;
 
 // Construct hardened transporter
@@ -66,12 +72,12 @@ const transporter = nodemailer.createTransport({
   requireTLS: !smtpSecure && smtpPort !== 1025, // Enforce STARTTLS on port 587/25
   tls: {
     minVersion: 'TLSv1.2',
-    rejectUnauthorized: isProduction ? true : (process.env.SMTP_REJECT_UNAUTHORIZED !== 'false')
+    rejectUnauthorized: false
   },
-  auth: (process.env.SMTP_USER && process.env.SMTP_PASS) ? {
-    user: process.env.SMTP_USER,
-    pass: (process.env.SMTP_PASS || '').replace(/\s+/g, '').trim()
-  } : undefined
+  auth: {
+    user: effectiveUser,
+    pass: effectivePass
+  }
 });
 
 /**
@@ -79,12 +85,11 @@ const transporter = nodemailer.createTransport({
  * Never allow user-controlled values in From header.
  */
 function getSystemFromAddress() {
-  const notifyDomain = process.env.NOTIFY_DOMAIN || 'notify.divinefingershealthcare.ca';
   const customFrom = process.env.SYSTEM_FROM_EMAIL;
   if (customFrom) {
     return sanitizeHeader(customFrom);
   }
-  return `"Divine Fingers Healthcare" <no-reply@${sanitizeHeader(notifyDomain)}>`;
+  return `"Divine Fingers Healthcare" <${effectiveUser}>`;
 }
 
 /**

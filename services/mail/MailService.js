@@ -21,11 +21,11 @@ class MailService {
    * Determine active adapter based on environment or fallback
    */
   getAdapter() {
-    const driver = process.env.MAIL_DRIVER || (process.env.NODE_ENV === 'production' ? 'smtp' : 'console');
-    if (driver === 'smtp') {
-      return this.smtpAdapter;
+    const driver = process.env.MAIL_DRIVER || 'smtp';
+    if (driver === 'console') {
+      return this.consoleAdapter;
     }
-    return this.consoleAdapter;
+    return this.smtpAdapter;
   }
 
   /**
@@ -153,8 +153,11 @@ class MailService {
       ]
     );
 
-    // 5. Trigger Immediate Dispatch in Background (Non-blocking for caller)
-    setImmediate(async () => {
+    // 5. Trigger Immediate Dispatch (synchronously in serverless/critical auth context to prevent freeze)
+    const isServerless = Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
+    const isCritical = ['auth_password_reset', 'staff_welcome', 'password_reset'].includes(templateKey);
+
+    if (isServerless || isCritical) {
       try {
         await this.dispatchLog(logId, {
           to: to.trim().toLowerCase(),
@@ -166,7 +169,21 @@ class MailService {
       } catch (err) {
         console.error(`[MailService] Immediate dispatch error for ${logId}:`, err.message);
       }
-    });
+    } else {
+      setImmediate(async () => {
+        try {
+          await this.dispatchLog(logId, {
+            to: to.trim().toLowerCase(),
+            subject: renderedSubject,
+            html: renderedHtml,
+            text: renderedText,
+            replyTo
+          });
+        } catch (err) {
+          console.error(`[MailService] Immediate dispatch error for ${logId}:`, err.message);
+        }
+      });
+    }
 
     return {
       id: logId,

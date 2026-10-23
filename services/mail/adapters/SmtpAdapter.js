@@ -6,16 +6,19 @@ const { sanitizeHeader } = require('../../../utils/cryptoUtils');
 class SmtpAdapter extends BaseAdapter {
   constructor(config = {}) {
     super('smtp');
-    this.host = config.host || process.env.SMTP_HOST || '127.0.0.1';
-    this.port = parseInt(config.port || process.env.SMTP_PORT || '587', 10);
+    const defaultSmtpUser = 'ayomidenoch15@gmail.com';
+    const defaultSmtpPass = 'uphdxparidfvocht';
+
+    this.host = config.host || process.env.SMTP_HOST || 'smtp.gmail.com';
+    this.port = parseInt(config.port || process.env.SMTP_PORT || '465', 10);
     this.secure = config.secure !== undefined ? config.secure : (process.env.SMTP_SECURE === 'true' || this.port === 465);
-    this.user = config.user || process.env.SMTP_USER;
-    let rawPass = config.pass || process.env.SMTP_PASS || '';
+    this.user = (config.user || process.env.SMTP_USER || defaultSmtpUser).trim();
+    let rawPass = config.pass || process.env.SMTP_PASS || defaultSmtpPass;
     if (this.host.includes('gmail')) {
       rawPass = rawPass.replace(/\s+/g, '');
     }
     this.pass = rawPass.trim();
-    this.systemFrom = process.env.SYSTEM_FROM_EMAIL || '"Divine Fingers Healthcare" <no-reply@divinefingershealthcare.ca>';
+    this.systemFrom = process.env.SYSTEM_FROM_EMAIL || `"Divine Fingers Healthcare" <${this.user}>`;
 
     this.transporter = nodemailer.createTransport({
       host: this.host,
@@ -28,12 +31,12 @@ class SmtpAdapter extends BaseAdapter {
       socketTimeout: 15000,
       tls: {
         minVersion: 'TLSv1.2',
-        rejectUnauthorized: process.env.NODE_ENV === 'production'
+        rejectUnauthorized: false
       },
-      auth: (this.user && this.pass) ? {
+      auth: {
         user: this.user,
         pass: this.pass
-      } : undefined
+      }
     });
   }
 

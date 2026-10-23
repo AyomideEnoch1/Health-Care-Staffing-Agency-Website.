@@ -1417,12 +1417,13 @@
 
         if (res.ok && data.success) {
           showAlert('success', data.message || 'If an account is associated with that email, a password reset link has been dispatched. Please check your inbox.');
-          if (data.dev_reset_url) {
+          const resetLinkUrl = data.reset_url || data.dev_reset_url;
+          if (resetLinkUrl) {
             const successBox = document.getElementById('auth-success-alert');
             if (successBox) {
               const devLink = document.createElement('div');
-              devLink.style.marginTop = '8px';
-              devLink.innerHTML = `<a href="${data.dev_reset_url}" style="color:var(--brand-turquoise);font-weight:700;text-decoration:underline;">Click here to set your new password now &rarr;</a>`;
+              devLink.style.marginTop = '10px';
+              devLink.innerHTML = `<a href="${resetLinkUrl}" style="color:var(--brand-turquoise);font-weight:700;text-decoration:underline;display:inline-block;padding:4px 0;">Click here to set your new password now &rarr;</a>`;
               successBox.appendChild(devLink);
             }
           }

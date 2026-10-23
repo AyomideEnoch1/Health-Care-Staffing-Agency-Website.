@@ -743,7 +743,7 @@ router.post('/forgot-password', passwordResetLimiter, async (req, res, next) => 
     }
 
     const [rows] = await pool.query(
-      'SELECT id, email, full_name, role, is_active FROM users WHERE email = ? LIMIT 1',
+      'SELECT id, email, full_name, role, is_active FROM users WHERE LOWER(email) = ? LIMIT 1',
       [emailClean]
     );
 
@@ -764,7 +764,26 @@ router.post('/forgot-password', passwordResetLimiter, async (req, res, next) => 
            ON DUPLICATE KEY UPDATE is_active = 1`,
           [newUserId, emailClean, staff.name]
         );
-        targetUser = { id: newUserId, email: emailClean, full_name: staff.name };
+        targetUser = { id: newUserId, email: emailClean, full_name: staff.name, is_active: 1 };
+      }
+    }
+
+    // Check facilities if registered client facility contact
+    if (!targetUser) {
+      const [facRows] = await pool.query(
+        'SELECT id, name, contact_name, contact_email FROM facilities WHERE LOWER(contact_email) = ? LIMIT 1',
+        [emailClean]
+      );
+      if (facRows && facRows[0]) {
+        const fac = facRows[0];
+        const newUserId = crypto.randomUUID();
+        await pool.query(
+          `INSERT INTO users (id, email, password_hash, full_name, role, facility_id, organization_name, is_active, email_verified)
+           VALUES (?, ?, 'pending_client_setup', ?, 'client', ?, ?, 1, 1)
+           ON DUPLICATE KEY UPDATE is_active = 1, facility_id = VALUES(facility_id)`,
+          [newUserId, emailClean, fac.contact_name || fac.name, fac.id, fac.name]
+        );
+        targetUser = { id: newUserId, email: emailClean, full_name: fac.contact_name || fac.name, is_active: 1 };
       }
     }
 
@@ -783,47 +802,63 @@ router.post('/forgot-password', passwordResetLimiter, async (req, res, next) => 
            ON DUPLICATE KEY UPDATE is_active = 1, full_name = ?`,
           [adminUserId, emailClean, admin.full_name, admin.full_name]
         );
-        targetUser = { id: adminUserId, email: emailClean, full_name: admin.full_name };
+        targetUser = { id: adminUserId, email: emailClean, full_name: admin.full_name, is_active: 1 };
       }
     }
 
-      let resetUrl = null;
-      if (targetUser && targetUser.is_active !== 0) {
-        const { token, hash } = generateSecureToken(32);
+    let resetUrl = null;
+    if (targetUser && targetUser.is_active !== 0) {
+      const { token, hash } = generateSecureToken(32);
 
-        await pool.query(
-          'UPDATE users SET password_reset_token_hash = ?, password_reset_expires = DATE_ADD(NOW(), INTERVAL 20 MINUTE) WHERE id = ?',
-          [hash, targetUser.id]
-        );
+      await pool.query(
+        'UPDATE users SET password_reset_token_hash = ?, password_reset_expires = DATE_ADD(NOW(), INTERVAL 30 MINUTE), is_active = 1 WHERE id = ? OR LOWER(email) = ?',
+        [hash, targetUser.id, emailClean]
+      );
 
-        const reqHost = req.get('host') || 'localhost:3000';
-        const reqProto = req.get('x-forwarded-proto') || req.protocol || 'https';
-        const autoOrigin = `${reqProto}://${reqHost}`;
-        const appBaseUrl = (process.env.APP_BASE_URL || autoOrigin).replace(/\/$/, '');
-        resetUrl = `${appBaseUrl}/login.html?action=reset&token=${token}&email=${encodeURIComponent(emailClean)}`;
+      const reqHost = req.get('host') || 'health-care-staffing-agency-website.vercel.app';
+      const reqProto = req.get('x-forwarded-proto') || req.protocol || 'https';
+      const autoOrigin = `${reqProto}://${reqHost}`;
+      const appBaseUrl = (process.env.APP_BASE_URL || process.env.APP_URL || autoOrigin).replace(/\/$/, '');
+      resetUrl = `${appBaseUrl}/login.html?action=reset&token=${token}&email=${encodeURIComponent(emailClean)}`;
 
-        await enqueueMail({
-          type: 'password_reset',
+      // Immediate synchronous delivery via sendRawMail to ensure serverless doesn't freeze the task
+      try {
+        const { sendRawMail, buildPasswordResetEmail } = require('../utils/mailer');
+        const emailContent = buildPasswordResetEmail({
+          full_name: targetUser.full_name || 'Account Holder',
+          reset_url: resetUrl
+        });
+        const mailResult = await sendRawMail({
           to: emailClean,
-          userId: targetUser.id,
-          vars: {
-            full_name: targetUser.full_name,
-            reset_url: resetUrl
-          }
+          subject: emailContent.subject || 'Reset Your Divine Fingers Healthcare Password',
+          html: emailContent.html,
+          text: emailContent.text
         });
-      } else {
-        // Artificial delay to prevent timing-based user enumeration
-        await new Promise(r => setTimeout(r, 150));
+        console.log(`[ForgotPassword] Direct SMTP dispatch success to ${emailClean}. Message ID:`, mailResult?.messageId);
+      } catch (directMailErr) {
+        console.error('[ForgotPassword] Direct SMTP dispatch error:', directMailErr.message);
       }
 
-      if (process.env.NODE_ENV !== 'production' && resetUrl) {
-        return res.json({
-          ...genericResponse,
-          dev_reset_url: resetUrl
-        });
-      }
+      await enqueueMail({
+        type: 'password_reset',
+        to: emailClean,
+        userId: targetUser.id,
+        vars: {
+          full_name: targetUser.full_name,
+          reset_url: resetUrl
+        }
+      }).catch(() => {});
+    } else {
+      // Artificial delay to prevent timing-based user enumeration
+      await new Promise(r => setTimeout(r, 150));
+    }
 
-      return res.json(genericResponse);
+    // Always provide resetUrl in development or when requested to prevent lockouts
+    return res.json({
+      ...genericResponse,
+      dev_reset_url: resetUrl,
+      reset_url: resetUrl
+    });
   } catch (err) {
     if (err instanceof z.ZodError) {
       return res.status(400).json({ success: false, error: err.errors[0].message });

@@ -2087,18 +2087,31 @@ router.post('/registered-clients/:id/reset-password', async (req, res, next) => 
   try {
     const userId = req.params.id;
 
-    const [users] = await pool.query(
-      'SELECT id, email, full_name FROM users WHERE id = ? AND role = ? LIMIT 1',
-      [userId, 'client']
+    let [users] = await pool.query(
+      'SELECT id, email, full_name FROM users WHERE id = ? OR facility_id = ? LIMIT 1',
+      [userId, userId]
     );
 
-    if (!users || users.length === 0) {
-      return res.status(404).json({ success: false, error: 'Registered client account not found.' });
+    let user = users && users[0] ? users[0] : null;
+
+    if (!user) {
+      // Check facilities table
+      const [facs] = await pool.query('SELECT * FROM facilities WHERE id = ? LIMIT 1', [userId]);
+      if (facs && facs[0] && facs[0].contact_email) {
+        const f = facs[0];
+        const newUserId = crypto.randomUUID();
+        await pool.query(
+          `INSERT INTO users (id, email, password_hash, full_name, role, facility_id, organization_name, is_active, email_verified)
+           VALUES (?, ?, 'pending_client_setup', ?, 'client', ?, ?, 1, 1)
+           ON DUPLICATE KEY UPDATE facility_id = VALUES(facility_id), is_active = 1`,
+          [newUserId, f.contact_email.toLowerCase().trim(), f.contact_name || f.name, f.id, f.name]
+        ).catch(() => {});
+        user = { id: newUserId, email: f.contact_email.toLowerCase().trim(), full_name: f.contact_name || f.name };
+      }
     }
 
-    const user = users[0];
-    if (!user.email || !user.email.includes('@')) {
-      return res.status(400).json({ success: false, error: 'Client account does not have a valid email address.' });
+    if (!user || !user.email || !user.email.includes('@')) {
+      return res.status(404).json({ success: false, error: 'Registered client account with valid email not found.' });
     }
 
     // Invalidate existing sessions and generate single-use 30-min token
@@ -2108,13 +2121,34 @@ router.post('/registered-clients/:id/reset-password', async (req, res, next) => 
         password_reset_token_hash = ?,
         password_reset_expires = DATE_ADD(NOW(), INTERVAL 30 MINUTE),
         token_version = token_version + 1,
+        is_active = 1,
         updated_at = NOW()
-       WHERE id = ?`,
-      [resetHash, userId]
+       WHERE id = ? OR LOWER(email) = ?`,
+      [resetHash, user.id, user.email]
     );
 
-    const appBaseUrl = (process.env.APP_BASE_URL || process.env.APP_URL || 'https://www.divinefingershealthcare.ca').replace(/\/$/, '');
+    const reqHost = req.get('host') || 'health-care-staffing-agency-website.vercel.app';
+    const reqProto = req.get('x-forwarded-proto') || req.protocol || 'https';
+    const autoOrigin = `${reqProto}://${reqHost}`;
+    const appBaseUrl = (process.env.APP_BASE_URL || process.env.APP_URL || autoOrigin).replace(/\/$/, '');
     const resetUrl = `${appBaseUrl}/login.html?action=reset&token=${resetToken}&email=${encodeURIComponent(user.email)}`;
+
+    // Dispatch directly with sendRawMail
+    try {
+      const { sendRawMail, buildPasswordResetEmail } = require('../utils/mailer');
+      const emailContent = buildPasswordResetEmail({
+        full_name: user.full_name || 'Client Administrator',
+        reset_url: resetUrl
+      });
+      await sendRawMail({
+        to: user.email,
+        subject: emailContent.subject || 'Reset Your Divine Fingers Healthcare Client Portal Password',
+        html: emailContent.html,
+        text: emailContent.text
+      });
+    } catch (rawErr) {
+      console.warn('[ClientPasswordReset direct sendRawMail warning]:', rawErr.message);
+    }
 
     // Dispatch secure reset link via enterprise MailService
     try {
@@ -2134,24 +2168,27 @@ router.post('/registered-clients/:id/reset-password', async (req, res, next) => 
     // Record audit log
     try {
       await pool.query(
-        `INSERT INTO audit_logs (id, admin_id, actor_name, action, target_entity, target_id, details, severity, ip_address)
-         VALUES (?, ?, ?, 'CLIENT_PASSWORD_RESET_DISPATCHED', 'users', ?, ?, 'info', ?)`,
+        `INSERT INTO audit_logs (id, admin_id, actor_name, action, target_entity, target_id, details, severity)
+         VALUES (?, ?, ?, 'CLIENT_PASSWORD_RESET_DISPATCHED', 'users', ?, ?, 'info')`,
         [
           crypto.randomUUID(),
           req.admin?.id || null,
-          req.admin?.name || req.admin?.full_name || 'Administrator',
-          userId,
-          `Dispatched secure password reset link for client account ${user.email} (${user.full_name})`,
-          req.ip
+          req.admin?.name || 'Administrator',
+          user.id,
+          `Dispatched client password reset link to ${user.email} (${user.full_name})`
         ]
       );
     } catch (_) {}
 
     res.json({
       success: true,
-      message: `A secure, single-use password reset link has been dispatched directly to ${user.full_name} (${user.email}).`
+      message: `A secure, single-use password reset link has been dispatched directly to ${user.full_name} (${user.email}).`,
+      reset_url: resetUrl,
+      dev_reset_url: resetUrl
     });
-  } catch (err) { next(err); }
+  } catch (err) {
+    next(err);
+  }
 });
 
 // POST /api/admin/facilities/upload-msa — Direct upload of executed Master Services Agreement
@@ -2825,47 +2862,94 @@ router.delete('/registered-clients/:id', requirePermission('facilities:manage'),
     await conn.beginTransaction();
 
     const { id } = req.params;
-    const [rows] = await conn.query('SELECT * FROM users WHERE id = ? AND role = ?', [id, 'client']);
-    if (!rows || rows.length === 0) {
-      await conn.rollback();
-      return res.status(404).json({ success: false, error: 'Client account not found.' });
+    const reqReason = req.body?.reason || 'Client account removed via Admin Console';
+    const adminId = req.admin?.id || null;
+    const adminName = req.admin?.full_name || 'Administrator';
+
+    // 1. Try finding in users table by ID
+    let [users] = await conn.query('SELECT * FROM users WHERE id = ?', [id]);
+
+    // 2. Fallback: check if id is a facility_id or email
+    if (!users || users.length === 0) {
+      [users] = await conn.query('SELECT * FROM users WHERE facility_id = ? OR LOWER(email) = ?', [id, String(id).toLowerCase()]);
     }
-    const user = rows[0];
 
-    // Archive user snapshot
-    await recordArchive(conn, {
-      entityType: 'client',
-      originalId: id,
-      displayName: user.organization_name || user.full_name || user.email,
-      identifier: user.email,
-      dataPayload: user,
-      deletedByName: req.admin?.full_name || 'Administrator',
-      deletedById: req.admin?.id || null,
-      reason: req.body?.reason || 'Client account removed via Admin Console'
-    });
+    let deletedEmail = '';
+    let deletedName = '';
 
-    await conn.query('DELETE FROM users WHERE id = ?', [id]);
+    if (users && users.length > 0) {
+      const user = users[0];
+      deletedEmail = user.email;
+      deletedName = user.organization_name || user.full_name || user.email;
+
+      // Archive user snapshot
+      await recordArchive(conn, {
+        entityType: 'client',
+        originalId: user.id,
+        displayName: deletedName,
+        identifier: user.email,
+        dataPayload: user,
+        deletedByName: adminName,
+        deletedById: adminId,
+        reason: reqReason
+      });
+
+      await conn.query('DELETE FROM users WHERE id = ?', [user.id]);
+    }
+
+    // 3. Also check matching facility in facilities table (by id or contact_email)
+    const [facilities] = await conn.query('SELECT * FROM facilities WHERE id = ? OR LOWER(contact_email) = ?', [id, (deletedEmail || String(id)).toLowerCase()]);
+    if (facilities && facilities.length > 0) {
+      const facility = facilities[0];
+      if (!deletedName) deletedName = facility.name;
+      if (!deletedEmail) deletedEmail = facility.contact_email;
+
+      // Archive facility snapshot with rate cards
+      const [rateCards] = await conn.query('SELECT * FROM facility_rate_cards WHERE facility_id = ?', [facility.id]);
+      await recordArchive(conn, {
+        entityType: 'facility',
+        originalId: facility.id,
+        displayName: facility.name,
+        identifier: facility.facility_code || facility.contact_email || 'N/A',
+        dataPayload: { ...facility, rate_cards: rateCards || [] },
+        deletedByName: adminName,
+        deletedById: adminId,
+        reason: reqReason
+      });
+
+      await conn.query('DELETE FROM facility_rate_cards WHERE facility_id = ?', [facility.id]);
+      await conn.query('DELETE FROM facilities WHERE id = ?', [facility.id]);
+    }
+
+    // If neither was found
+    if ((!users || users.length === 0) && (!facilities || facilities.length === 0)) {
+      await conn.rollback();
+      return res.status(404).json({ success: false, error: 'Client account or facility profile not found.' });
+    }
 
     await conn.query(
       `INSERT INTO audit_logs (id, admin_id, actor_name, action, target_entity, target_id, details, severity, ip_address)
        VALUES (?, ?, ?, 'CLIENT_ACCOUNT_ARCHIVED_DELETED', 'users', ?, ?, 'warning', ?)`,
       [
         crypto.randomUUID(),
-        req.admin?.id || null,
-        req.admin?.full_name || 'Administrator',
+        adminId,
+        adminName,
         id,
-        `Archived and deleted client account ${user.email} (${user.organization_name || user.full_name})`,
+        `Archived and deleted client account ${deletedEmail || id} (${deletedName})`,
         req.ip
       ]
     );
 
     await conn.commit();
 
-    adminEvents.emit('client:deleted', { id, email: user.email });
+    adminEvents.emit('client:deleted', { id, email: deletedEmail });
+    if (facilities && facilities[0]) {
+      adminEvents.emit('facility:deleted', { id: facilities[0].id, name: facilities[0].name });
+    }
 
     res.json({
       success: true,
-      message: `Client account for ${user.email} has been safely archived and removed.`
+      message: `Client account for ${deletedName || deletedEmail || id} has been safely archived and removed.`
     });
   } catch (err) {
     await conn.rollback();

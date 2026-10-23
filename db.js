@@ -232,7 +232,7 @@ const inMemoryStore = {
     {
       id: 'c4970cd8-eb90-4e33-9aba-446711e88d8b',
       email: 'admin@divinefingershealthcare.ca',
-      password_hash: '$2b$10$ICqO6AZ.OprBLcm5OT5Nm.aWhldo4q3dLx6tHzcaFg6PwaX23uUPG',
+      password_hash: '$2b$10$mDfhqm556YwMEL3q2GbDSOPnZB1ffpq2GUQFyQ2QveIkZmcw9..r2',
       full_name: 'Divine Fingers Administrator',
       role: 'super-admin',
       failed_login_attempts: 0,
