@@ -12,7 +12,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
 
   <!-- Core Dashboard Design System -->
-  <link rel="stylesheet" href="admin.css?v=6.0.2">
+  <link rel="stylesheet" href="admin.css?v=6.0.3">
 
   <!-- Chart.js CDN for Gradient Visualizations -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -1181,21 +1181,21 @@
         <div class="admin-view-tab" id="archive-tab">
           
           <!-- Archive Vault Header Banner -->
-          <div class="table-card" style="padding: 1.6rem 1.75rem; margin-bottom: 1.5rem; background: linear-gradient(135deg, rgba(11,37,69,0.95) 0%, rgba(15,23,42,0.98) 100%); border: 1px solid rgba(27,174,207,0.25); border-radius: 12px;">
+          <div class="table-card archive-vault-hero-card">
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
               <div>
-                <div style="display: flex; align-items: center; gap: 0.65rem; margin-bottom: 0.35rem;">
-                  <div style="width: 36px; height: 36px; border-radius: 8px; background: rgba(27,174,207,0.18); color: var(--sky-blue); display: flex; align-items: center; justify-content: center;">
+                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.35rem;">
+                  <div class="archive-vault-hero-icon">
                     <i data-lucide="archive" style="width: 20px; height: 20px;"></i>
                   </div>
-                  <h2 style="font-size: 1.35rem; font-weight: 800; color: #FFFFFF; margin: 0;">Archive Vault &amp; Retention System</h2>
+                  <h2 class="archive-vault-hero-title">Archive Vault &amp; Retention System</h2>
                 </div>
-                <p style="font-size: 0.85rem; color: #94A3B8; margin: 0; max-width: 720px; line-height: 1.45;">
+                <p class="archive-vault-hero-desc">
                   Comprehensive soft-delete archive preserving deleted clients, facilities, staff members, user accounts, and administrative records. View full audit snapshots and instantly restore any deleted entity.
                 </p>
               </div>
               <div style="display: flex; align-items: center; gap: 0.75rem;">
-                <button type="button" class="admin-action-btn" onclick="window.loadArchiveRecords()" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: #FFFFFF; padding: 0.55rem 1rem; border-radius: 6px; display: inline-flex; align-items: center; gap: 6px; font-weight: 600; cursor: pointer;">
+                <button type="button" class="btn-secondary-action" onclick="window.loadArchiveRecords()">
                   <i data-lucide="refresh-cw" style="width: 14px; height: 14px;"></i> Refresh Vault
                 </button>
               </div>
@@ -1204,42 +1204,42 @@
 
           <!-- Archive KPI Metric Cubes -->
           <div class="kpi-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
-            <div class="kpi-card" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 1.25rem;">
-              <div style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.4rem;">Total Archived</div>
-              <div style="font-size: 1.85rem; font-weight: 800; color: #FFFFFF;" id="archive-stat-total">0</div>
-              <div style="font-size: 0.72rem; color: #64748B; margin-top: 0.25rem;">Preserved in database</div>
+            <div class="archive-metric-cube">
+              <div style="font-size: 0.76rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.4rem;">Total Preserved</div>
+              <div class="archive-metric-number" id="archive-stat-total">0</div>
+              <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.25rem;">Safely preserved in vault</div>
             </div>
-            <div class="kpi-card" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 1.25rem;">
-              <div style="font-size: 0.78rem; font-weight: 700; color: #38BDF8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.4rem;">Clients &amp; Facilities</div>
-              <div style="font-size: 1.85rem; font-weight: 800; color: #38BDF8;" id="archive-stat-clients">0</div>
-              <div style="font-size: 0.72rem; color: #64748B; margin-top: 0.25rem;">Facilities and accounts</div>
+            <div class="archive-metric-cube">
+              <div style="font-size: 0.76rem; font-weight: 700; color: #0284c7; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.4rem;">Clients &amp; Facilities</div>
+              <div class="archive-metric-number" style="color: #0284c7;" id="archive-stat-clients">0</div>
+              <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.25rem;">Facilities and accounts</div>
             </div>
-            <div class="kpi-card" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 1.25rem;">
-              <div style="font-size: 0.78rem; font-weight: 700; color: #34D399; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.4rem;">Staff &amp; Caregivers</div>
-              <div style="font-size: 1.85rem; font-weight: 800; color: #34D399;" id="archive-stat-staff">0</div>
-              <div style="font-size: 0.72rem; color: #64748B; margin-top: 0.25rem;">Clinical roster profiles</div>
+            <div class="archive-metric-cube">
+              <div style="font-size: 0.76rem; font-weight: 700; color: #059669; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.4rem;">Staff &amp; Caregivers</div>
+              <div class="archive-metric-number" style="color: #059669;" id="archive-stat-staff">0</div>
+              <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.25rem;">Clinical roster profiles</div>
             </div>
-            <div class="kpi-card" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 1.25rem;">
-              <div style="font-size: 0.78rem; font-weight: 700; color: #A78BFA; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.4rem;">Users &amp; Admins</div>
-              <div style="font-size: 1.85rem; font-weight: 800; color: #A78BFA;" id="archive-stat-users">0</div>
-              <div style="font-size: 0.72rem; color: #64748B; margin-top: 0.25rem;">Portal &amp; operator users</div>
+            <div class="archive-metric-cube">
+              <div style="font-size: 0.76rem; font-weight: 700; color: #7c3aed; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.4rem;">Users &amp; Admins</div>
+              <div class="archive-metric-number" style="color: #7c3aed;" id="archive-stat-users">0</div>
+              <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.25rem;">Portal &amp; operator users</div>
             </div>
           </div>
 
           <!-- Archive Table Card with Search & Filters -->
-          <div class="table-card" style="padding: 1.5rem; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px;">
+          <div class="table-card" style="padding: 1.5rem;">
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem;">
               <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
-                <button type="button" class="archive-filter-pill active" onclick="window.filterArchiveType('all', this)" style="padding: 0.4rem 0.85rem; border-radius: 999px; font-size: 0.78rem; font-weight: 700; background: var(--brand-turquoise); color: #FFFFFF; border: none; cursor: pointer;">All Records</button>
-                <button type="button" class="archive-filter-pill" onclick="window.filterArchiveType('client', this)" style="padding: 0.4rem 0.85rem; border-radius: 999px; font-size: 0.78rem; font-weight: 600; background: rgba(255,255,255,0.06); color: #94A3B8; border: 1px solid var(--border-color); cursor: pointer;">Clients &amp; Facilities</button>
-                <button type="button" class="archive-filter-pill" onclick="window.filterArchiveType('staff', this)" style="padding: 0.4rem 0.85rem; border-radius: 999px; font-size: 0.78rem; font-weight: 600; background: rgba(255,255,255,0.06); color: #94A3B8; border: 1px solid var(--border-color); cursor: pointer;">Staff Caregivers</button>
-                <button type="button" class="archive-filter-pill" onclick="window.filterArchiveType('admin', this)" style="padding: 0.4rem 0.85rem; border-radius: 999px; font-size: 0.78rem; font-weight: 600; background: rgba(255,255,255,0.06); color: #94A3B8; border: 1px solid var(--border-color); cursor: pointer;">Admin Operators</button>
-                <button type="button" class="archive-filter-pill" onclick="window.filterArchiveType('user', this)" style="padding: 0.4rem 0.85rem; border-radius: 999px; font-size: 0.78rem; font-weight: 600; background: rgba(255,255,255,0.06); color: #94A3B8; border: 1px solid var(--border-color); cursor: pointer;">Portal Users</button>
+                <button type="button" class="archive-filter-pill active" onclick="window.filterArchiveType('all', this)">All Records</button>
+                <button type="button" class="archive-filter-pill" onclick="window.filterArchiveType('client', this)">Clients &amp; Facilities</button>
+                <button type="button" class="archive-filter-pill" onclick="window.filterArchiveType('staff', this)">Staff Caregivers</button>
+                <button type="button" class="archive-filter-pill" onclick="window.filterArchiveType('admin', this)">Admin Operators</button>
+                <button type="button" class="archive-filter-pill" onclick="window.filterArchiveType('user', this)">Portal Users</button>
               </div>
 
               <div style="position: relative; width: 280px; max-width: 100%;">
-                <input type="text" id="archive-search-input" oninput="window.debounceArchiveSearch()" placeholder="Search archived name, email..." style="width: 100%; box-sizing: border-box; padding: 0.5rem 0.85rem 0.5rem 2.2rem; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 6px; color: #FFFFFF; font-size: 0.82rem;">
-                <i data-lucide="search" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: #64748B;"></i>
+                <input type="text" id="archive-search-input" class="search-input" oninput="window.debounceArchiveSearch()" placeholder="Search archived name, email..." style="width: 100%; box-sizing: border-box; padding: 0.5rem 0.85rem 0.5rem 2.2rem; font-size: 0.82rem; border-radius: var(--radius-sm);">
+                <i data-lucide="search" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: var(--text-muted);"></i>
               </div>
             </div>
 
@@ -2208,7 +2208,7 @@
   </div>
 
 <!-- Core Dashboard Application Script -->
-  <script src="admin.js?v=6.0.2"></script>
+  <script src="admin.js?v=6.0.3"></script>
 
 </body>
 </html>

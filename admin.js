@@ -6090,8 +6090,8 @@
             <div style="display: inline-flex; align-items: center; justify-content: center; width: 56px; height: 56px; border-radius: 50%; background: rgba(255,255,255,0.04); margin-bottom: 1rem; border: 1px solid var(--border-color);">
               <i data-lucide="archive" style="width: 26px; height: 26px; color: var(--brand-turquoise); opacity: 0.6;"></i>
             </div>
-            <div style="font-weight: 700; font-size: 1rem; color: #FFFFFF; margin-bottom: 4px;">Archive Vault is Empty</div>
-            <div style="font-size: 0.82rem; max-width: 440px; margin: 0 auto; color: #94A3B8;">Any deleted client account, healthcare facility profile, staff caregiver, or portal user will be captured and safely preserved here for instant recovery.</div>
+            <div style="font-weight: 700; font-size: 1rem; color: var(--text-primary); margin-bottom: 4px;">Archive Vault is Empty</div>
+            <div style="font-size: 0.82rem; max-width: 440px; margin: 0 auto; color: var(--text-muted);">Any deleted client account, healthcare facility profile, staff caregiver, or portal user will be captured and safely preserved here for instant recovery.</div>
           </td>
         </tr>`;
       if (window.lucide) lucide.createIcons();
@@ -6128,25 +6128,25 @@
           </td>
 
           <td class="cell-block-item" data-label="Display Name" style="padding: 0.85rem 1rem;">
-            <strong style="color: #FFFFFF; font-size: 0.88rem;">${escapeHTML(item.display_name || '—')}</strong>
+            <strong style="color: var(--text-primary); font-size: 0.88rem;">${escapeHTML(item.display_name || '—')}</strong>
           </td>
 
           <td class="cell-grid-item" data-label="Identifier" style="padding: 0.85rem 1rem;">
-            <code style="font-family: monospace; font-size: 0.76rem; background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 4px; color: var(--brand-turquoise, #2DD4BF);">${escapeHTML(item.identifier || '—')}</code>
+            <code style="font-family: monospace; font-size: 0.76rem; background: var(--bg-subtle); padding: 2px 6px; border-radius: 4px; color: var(--brand-teal); border: 1px solid var(--border-color);">${escapeHTML(item.identifier || '—')}</code>
           </td>
 
-          <td class="cell-grid-item" data-label="Archived Date" style="padding: 0.85rem 1rem; font-size: 0.8rem; color: #CBD5E1;">
+          <td class="cell-grid-item" data-label="Archived Date" style="padding: 0.85rem 1rem; font-size: 0.8rem; color: var(--text-secondary);">
             ${dateStr}
           </td>
 
-          <td class="cell-grid-item" data-label="Deleted By" style="padding: 0.85rem 1rem; font-size: 0.8rem; color: #94A3B8;">
+          <td class="cell-grid-item" data-label="Deleted By" style="padding: 0.85rem 1rem; font-size: 0.8rem; color: var(--text-muted);">
             <div style="display: flex; align-items: center; gap: 4px;">
               <i data-lucide="user-x" style="width: 12px; height: 12px; opacity: 0.6;"></i>
               <span>${escapeHTML(item.deleted_by_name || 'System Admin')}</span>
             </div>
           </td>
 
-          <td class="cell-grid-item" data-label="Reason" style="padding: 0.85rem 1rem; font-size: 0.78rem; color: #94A3B8; max-width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${escapeHTML(item.deletion_reason || '')}">
+          <td class="cell-grid-item" data-label="Reason" style="padding: 0.85rem 1rem; font-size: 0.78rem; color: var(--text-secondary); max-width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${escapeHTML(item.deletion_reason || '')}">
             ${escapeHTML(item.deletion_reason || 'Administrative action')}
           </td>
 
@@ -6172,17 +6172,7 @@
   window.filterArchiveType = function(type, pillBtn) {
     LiveStore.archiveFilterType = type;
     document.querySelectorAll('.archive-filter-pill').forEach(btn => {
-      const isTarget = btn === pillBtn;
-      btn.classList.toggle('active', isTarget);
-      if (isTarget) {
-        btn.style.background = 'var(--brand-turquoise)';
-        btn.style.color = '#FFFFFF';
-        btn.style.borderColor = 'transparent';
-      } else {
-        btn.style.background = 'rgba(255,255,255,0.06)';
-        btn.style.color = '#94A3B8';
-        btn.style.borderColor = 'var(--border-color)';
-      }
+      btn.classList.toggle('active', btn === pillBtn);
     });
     loadArchiveRecords();
   };
@@ -6217,52 +6207,52 @@
       }
 
       modal.innerHTML = `
-        <div class="admin-modal-dialog" style="background:#0F172A;border:1px solid rgba(255,255,255,0.15);border-radius:12px;width:100%;max-width:720px;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 25px 50px -12px rgba(0,0,0,0.7);overflow:hidden;">
-          <div style="padding:1.25rem 1.5rem;border-bottom:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.02);">
+        <div class="admin-modal-dialog" style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:12px;width:100%;max-width:720px;max-height:85vh;display:flex;flex-direction:column;box-shadow:var(--shadow-lg);overflow:hidden;">
+          <div style="padding:1.25rem 1.5rem;border-bottom:1px solid var(--border-color);display:flex;align-items:center;justify-content:space-between;background:var(--bg-surface-elevated);">
             <div style="display:flex;align-items:center;gap:10px;">
-              <div style="width:36px;height:36px;border-radius:8px;background:rgba(45,212,191,0.15);display:flex;align-items:center;justify-content:center;color:var(--brand-turquoise);">
+              <div style="width:36px;height:36px;border-radius:8px;background:rgba(27,174,207,0.15);display:flex;align-items:center;justify-content:center;color:var(--brand-teal);">
                 <i data-lucide="archive" style="width:18px;height:18px;"></i>
               </div>
               <div>
-                <h3 style="margin:0;font-size:1.1rem;font-weight:700;color:#FFFFFF;">Archive Retention Snapshot</h3>
-                <div style="font-size:0.75rem;color:#94A3B8;">${escapeHTML(item.display_name)} &bull; ${(item.entity_type || 'record').toUpperCase()}</div>
+                <h3 style="margin:0;font-size:1.1rem;font-weight:700;color:var(--text-primary);">Archive Retention Snapshot</h3>
+                <div style="font-size:0.75rem;color:var(--text-muted);">${escapeHTML(item.display_name)} &bull; ${(item.entity_type || 'record').toUpperCase()}</div>
               </div>
             </div>
-            <button type="button" onclick="document.getElementById('archive-inspect-modal').remove()" style="background:none;border:none;color:#94A3B8;cursor:pointer;padding:6px;border-radius:6px;">
+            <button type="button" onclick="document.getElementById('archive-inspect-modal').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;padding:6px;border-radius:6px;">
               <i data-lucide="x" style="width:20px;height:20px;"></i>
             </button>
           </div>
 
           <div style="padding:1.25rem 1.5rem;overflow-y:auto;flex:1;">
-            <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));gap:0.75rem;margin-bottom:1.25rem;background:rgba(255,255,255,0.03);padding:0.85rem;border-radius:8px;border:1px solid rgba(255,255,255,0.06);">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));gap:0.75rem;margin-bottom:1.25rem;background:var(--bg-surface-elevated);padding:0.85rem;border-radius:8px;border:1px solid var(--border-color);">
               <div>
-                <div style="font-size:0.7rem;color:#64748B;text-transform:uppercase;font-weight:700;">Entity Type</div>
-                <div style="font-size:0.85rem;color:#FFFFFF;font-weight:600;margin-top:2px;">${item.entity_type}</div>
+                <div style="font-size:0.7rem;color:var(--text-muted);text-transform:uppercase;font-weight:700;">Entity Type</div>
+                <div style="font-size:0.85rem;color:var(--text-primary);font-weight:600;margin-top:2px;">${item.entity_type}</div>
               </div>
               <div>
-                <div style="font-size:0.7rem;color:#64748B;text-transform:uppercase;font-weight:700;">Identifier</div>
-                <div style="font-size:0.85rem;color:var(--brand-turquoise);font-family:monospace;margin-top:2px;">${escapeHTML(item.identifier || '—')}</div>
+                <div style="font-size:0.7rem;color:var(--text-muted);text-transform:uppercase;font-weight:700;">Identifier</div>
+                <div style="font-size:0.85rem;color:var(--brand-teal);font-family:monospace;margin-top:2px;">${escapeHTML(item.identifier || '—')}</div>
               </div>
               <div>
-                <div style="font-size:0.7rem;color:#64748B;text-transform:uppercase;font-weight:700;">Deleted By</div>
-                <div style="font-size:0.85rem;color:#FFFFFF;margin-top:2px;">${escapeHTML(item.deleted_by_name || 'Admin')}</div>
+                <div style="font-size:0.7rem;color:var(--text-muted);text-transform:uppercase;font-weight:700;">Deleted By</div>
+                <div style="font-size:0.85rem;color:var(--text-primary);margin-top:2px;">${escapeHTML(item.deleted_by_name || 'Admin')}</div>
               </div>
               <div>
-                <div style="font-size:0.7rem;color:#64748B;text-transform:uppercase;font-weight:700;">Deletion Reason</div>
-                <div style="font-size:0.85rem;color:#E2E8F0;margin-top:2px;">${escapeHTML(item.deletion_reason || '—')}</div>
+                <div style="font-size:0.7rem;color:var(--text-muted);text-transform:uppercase;font-weight:700;">Deletion Reason</div>
+                <div style="font-size:0.85rem;color:var(--text-secondary);margin-top:2px;">${escapeHTML(item.deletion_reason || '—')}</div>
               </div>
             </div>
 
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;">
-              <span style="font-size:0.78rem;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:0.5px;">Saved Data Snapshot (JSON)</span>
-              <button type="button" id="btn-copy-archive-payload" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:#FFFFFF;font-size:0.72rem;padding:3px 8px;border-radius:4px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;">
+              <span style="font-size:0.78rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;">Saved Data Snapshot (JSON)</span>
+              <button type="button" id="btn-copy-archive-payload" class="btn-secondary-action" style="font-size:0.72rem;padding:3px 8px;border-radius:4px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;">
                 <i data-lucide="copy" style="width:11px;height:11px;"></i> Copy JSON
               </button>
             </div>
-            <pre style="background:#020617;border:1px solid rgba(255,255,255,0.1);border-radius:6px;padding:1rem;font-family:monospace;font-size:0.78rem;color:#38BDF8;overflow-x:auto;max-height:280px;margin:0;line-height:1.4;">${escapeHTML(formattedJson)}</pre>
+            <pre style="background:var(--bg-app);border:1px solid var(--border-color);border-radius:6px;padding:1rem;font-family:monospace;font-size:0.78rem;color:var(--brand-teal);overflow-x:auto;max-height:280px;margin:0;line-height:1.4;">${escapeHTML(formattedJson)}</pre>
           </div>
 
-          <div style="padding:1rem 1.5rem;border-top:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.02);">
+          <div style="padding:1rem 1.5rem;border-top:1px solid var(--border-color);display:flex;align-items:center;justify-content:space-between;background:var(--bg-surface-elevated);">
             <button type="button" class="btn-secondary-action" onclick="document.getElementById('archive-inspect-modal').remove()" style="padding:0.5rem 1rem;">Close</button>
             <button type="button" class="btn-primary-action" style="background:#10B981;border:none;padding:0.5rem 1.25rem;display:inline-flex;align-items:center;gap:6px;" onclick="document.getElementById('archive-inspect-modal').remove();window.restoreArchivedRecord('${item.id}', '${escapeHTML(item.display_name)}');">
               <i data-lucide="rotate-ccw" style="width:14px;height:14px;"></i> Restore This Record
