@@ -1292,9 +1292,26 @@ router.post('/requests', async (req, res, next) => {
       assigned_staff_id, status
     } = req.body;
 
-    if (!facility_name || !contact_name || !contact_email || !contact_phone) {
-      return res.status(400).json({ success: false, error: 'Facility, contact name, email, and phone are required.' });
+    if (!facility_name) {
+      return res.status(400).json({ success: false, error: 'Facility name is required.' });
     }
+
+    let finalContactName = contact_name;
+    let finalContactEmail = contact_email;
+    let finalContactPhone = contact_phone;
+
+    if (!finalContactName || !finalContactEmail || !finalContactPhone) {
+      const [fRows] = await pool.query('SELECT contact_name, contact_email, contact_phone FROM facilities WHERE name = ? OR id = ? LIMIT 1', [facility_name, facility_name]);
+      if (fRows && fRows.length > 0) {
+        finalContactName = finalContactName || fRows[0].contact_name;
+        finalContactEmail = finalContactEmail || fRows[0].contact_email;
+        finalContactPhone = finalContactPhone || fRows[0].contact_phone;
+      }
+    }
+
+    finalContactName = finalContactName || (req.admin?.full_name || 'Staffing Coordinator');
+    finalContactEmail = finalContactEmail || (req.admin?.email || 'staffing@divinefingershealthcare.ca');
+    finalContactPhone = finalContactPhone || '4165550100';
 
     const id = crypto.randomUUID();
     const reqCode = `REQ-${Date.now().toString().slice(-4)}${Math.floor(10 + Math.random() * 90)}`;
@@ -1305,7 +1322,7 @@ router.post('/requests', async (req, res, next) => {
          role_requested, shift_type, start_date, urgency_level, special_instructions, assigned_staff_id, status, ip_address)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
-        id, reqCode, facility_name, unit_department || 'General Care', contact_name, contact_email, contact_phone,
+        id, reqCode, facility_name, unit_department || 'General Care', finalContactName, finalContactEmail, finalContactPhone,
         role_requested || 'RN', shift_type || 'Day Shift', start_date || new Date().toISOString().slice(0, 10),
         urgency_level || 'routine', special_instructions || null, assigned_staff_id || null,
         status || (assigned_staff_id ? 'dispatched' : 'pending'), req.ip
