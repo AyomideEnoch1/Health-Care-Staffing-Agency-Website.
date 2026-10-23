@@ -5225,7 +5225,7 @@
                   <strong class="user-display-name">${escapeHTML(c.organization_name || c.linked_facility_name || 'Individual Facility')}</strong>
                   ${c.facility_code ? `<span style="font-family: monospace; font-size: 0.72rem; background: rgba(255,255,255,0.06); padding: 1px 5px; border-radius: 4px; color: var(--text-muted); font-weight: 700;">${escapeHTML(c.facility_code)}</span>` : ''}
                 </div>
-                <span class="user-role-sub" style="font-size: 0.74rem; color: var(--brand-turquoise);">Client Portal Account</span>
+                <span class="user-role-sub client-portal-badge">Client Portal Account</span>
               </div>
               <div class="row-status-top">${statusBadge}</div>
             </div>
@@ -5245,8 +5245,8 @@
           <td class="cell-block-item" data-label="Login & Contact">
             <div class="meta-label">Login Credentials &amp; Phone</div>
             <div class="meta-value">
-              <div style="font-weight: 600; color: var(--brand-turquoise); font-size: 0.82rem; word-break: break-all; display: flex; align-items: center; gap: 6px;">
-                <i data-lucide="mail" style="width: 13px; height: 13px; color: var(--brand-turquoise); flex-shrink: 0;"></i>
+              <div class="client-email-link">
+                <i data-lucide="mail" style="width: 13px; height: 13px; flex-shrink: 0; opacity: 0.85;"></i>
                 <span>${escapeHTML(c.email)}</span>
               </div>
               ${c.phone ? `
@@ -5275,7 +5275,7 @@
           <td class="cell-grid-item" data-label="Total Requests">
             <div class="meta-label">Total Requests</div>
             <div class="meta-value">
-              <span class="status-pill ${Number(c.total_requests_count) > 0 ? 'verified' : 'neutral'}" style="font-size: 0.72rem; padding: 3px 9px; font-weight: 700; display: inline-flex; align-items: center; gap: 5px; ${Number(c.total_requests_count) > 0 ? '' : 'background: rgba(255, 255, 255, 0.08); color: var(--text-primary); border: 1px solid rgba(255, 255, 255, 0.18);'}">
+              <span class="requests-count-pill ${Number(c.total_requests_count) > 0 ? 'has-requests' : 'no-requests'}">
                 <i data-lucide="clipboard-list" style="width: 12px; height: 12px; opacity: 0.85;"></i>
                 <span><strong>${c.total_requests_count || 0}</strong> ${Number(c.total_requests_count) === 1 ? 'Request' : 'Requests'}</span>
               </span>

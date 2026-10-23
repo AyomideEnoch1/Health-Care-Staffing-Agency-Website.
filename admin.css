@@ -9,7 +9,7 @@
   --brand-cyan-light: #38BDF8;
   --brand-teal: #00A896;
   --brand-teal-light: #2DD4BF;
-  --brand-turquoise: #00F5D4;
+  --brand-turquoise: #0D9488;
   --brand-navy: #0A0F1D;
   --brand-slate: #0F172A;
 
@@ -6140,4 +6140,64 @@ select optgroup,
   font-weight: 800;
   color: var(--text-primary);
   line-height: 1.2;
+}
+
+/* Light/Dark Adaptive Client Table Styles */
+.client-portal-badge {
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: #0D9488;
+}
+[data-theme="dark"] .client-portal-badge {
+  color: #2DD4BF;
+}
+
+.client-email-link {
+  font-weight: 600;
+  font-size: 0.82rem;
+  word-break: break-all;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #0D9488;
+}
+[data-theme="dark"] .client-email-link {
+  color: #2DD4BF;
+}
+
+.requests-count-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  line-height: 1.3;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.requests-count-pill.has-requests {
+  background: rgba(16, 185, 129, 0.14);
+  color: #059669;
+  border: 1px solid rgba(16, 185, 129, 0.35);
+}
+
+[data-theme="dark"] .requests-count-pill.has-requests {
+  background: rgba(16, 185, 129, 0.22);
+  color: #34D399;
+  border: 1px solid rgba(52, 211, 153, 0.45);
+}
+
+.requests-count-pill.no-requests {
+  background: var(--bg-surface-elevated);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+}
+
+[data-theme="dark"] .requests-count-pill.no-requests {
+  background: rgba(255, 255, 255, 0.05);
+  color: #94A3B8;
+  border: 1px solid rgba(255, 255, 255, 0.12);
 }
