@@ -988,8 +988,12 @@
       const tokenInput = document.getElementById('user-verify-token');
       const submitBtn = document.getElementById('btn-verify-otp-submit');
 
-      const code = codeInput ? codeInput.value.trim() : '';
-      const token = tokenInput ? tokenInput.value.trim() : '';
+      const code = codeInput ? codeInput.value.replace(/\D/g, '').trim() : '';
+      let token = tokenInput ? tokenInput.value.trim() : '';
+      if (!token) {
+        token = sessionStorage.getItem('df_verify_token') || '';
+        if (token && tokenInput) tokenInput.value = token;
+      }
 
       if (!code || code.length !== 6) {
         showAlert('error', 'Please enter the complete 6-digit security code dispatched to your email.');
@@ -1040,7 +1044,11 @@
     async function handleResendUserOtp() {
       clearAlerts();
       const tokenInput = document.getElementById('user-verify-token');
-      const token = tokenInput ? tokenInput.value.trim() : '';
+      let token = tokenInput ? tokenInput.value.trim() : '';
+      if (!token) {
+        token = sessionStorage.getItem('df_verify_token') || '';
+        if (token && tokenInput) tokenInput.value = token;
+      }
       const resendBtn = document.getElementById('btn-user-resend-otp');
 
       if (!token) {
@@ -1063,8 +1071,9 @@
         const result = await response.json();
 
         if (response.ok && result.success) {
-          if (result.verify_token && tokenInput) {
-            tokenInput.value = result.verify_token;
+          if (result.verify_token) {
+            if (tokenInput) tokenInput.value = result.verify_token;
+            try { sessionStorage.setItem('df_verify_token', result.verify_token); } catch(e) {}
           }
           showAlert('success', result.message || 'A fresh 6-digit verification code has been dispatched to your email.');
           if (resendBtn) resendBtn.textContent = 'Code Sent!';
@@ -1168,6 +1177,7 @@
         if (response.ok && result.success) {
           if (result.requires_email_verification) {
             document.getElementById('user-verify-token').value = result.verify_token;
+            try { sessionStorage.setItem('df_verify_token', result.verify_token); } catch(e) {}
             const desc = document.getElementById('verify-recipient-desc');
             if (desc) desc.textContent = `A 6-digit security verification code has been dispatched to ${result.email}. Please enter it below to complete sign in.`;
             submitBtn.disabled = false;
@@ -1252,6 +1262,7 @@
         if (response.ok && result.success) {
           if (result.requires_email_verification) {
             document.getElementById('user-verify-token').value = result.verify_token;
+            try { sessionStorage.setItem('df_verify_token', result.verify_token); } catch(e) {}
             const desc = document.getElementById('verify-recipient-desc');
             if (desc) desc.textContent = `Facility account created! A 6-digit verification code has been dispatched to ${result.email}. Please enter it below to activate your account.`;
             submitBtn.disabled = false;

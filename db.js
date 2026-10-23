@@ -1005,7 +1005,7 @@ function handleInMemoryQuery(sql, params = []) {
 
         return [[...facList, ...standaloneClients]];
       }
-      if (normalized.includes('where (id = ? or email = ?)') || normalized.includes('where id = ? or email = ?') || normalized.includes('where lower(email) = ? or id = ?') || normalized.includes('where email = ? or id = ?')) {
+      if (normalized.includes('where (id = ? or email = ?)') || normalized.includes('where id = ? or email = ?') || normalized.includes('where lower(email) = ? or id = ?') || normalized.includes('where email = ? or id = ?') || normalized.includes('where id = ? or lower(email) = lower(?)') || normalized.includes('where id = ? or lower(email) = ?')) {
         const p0 = String(params[0] || '').toLowerCase().trim();
         const p1 = String(params[1] || p0).toLowerCase().trim();
         const found = inMemoryStore.users.filter(u => 
@@ -1115,11 +1115,12 @@ function handleInMemoryQuery(sql, params = []) {
     }
     if (normalized.startsWith('update')) {
       if (normalized.includes('email_verification_token = ?')) {
-        const targetId = params[params.length - 1];
-        const user = inMemoryStore.users.find(u => u.id === targetId || u.email === targetId);
+        const targetId = String(params[params.length - 1] || '').toLowerCase().trim();
+        const user = inMemoryStore.users.find(u => u.id === params[params.length - 1] || (u.email && u.email.toLowerCase() === targetId));
         if (user) {
           user.email_verification_token = params[0];
-          user.email_verification_expires = new Date(Date.now() + 15 * 60 * 1000).toISOString();
+          const exp = (params.length > 2 && params[1]) ? params[1] : null;
+          user.email_verification_expires = exp ? (exp instanceof Date ? exp.toISOString() : String(exp)) : new Date(Date.now() + 15 * 60 * 1000).toISOString();
         }
         return [{ affectedRows: 1, changedRows: 1 }];
       }

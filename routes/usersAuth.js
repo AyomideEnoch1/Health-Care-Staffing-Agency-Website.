@@ -215,10 +215,11 @@ router.post('/register', async (req, res, next) => {
     // ── MANDATORY EMAIL OTP VERIFICATION FOR NEW CLIENT REGISTRATION ──
     const emailOtp = crypto.randomInt(100000, 999999).toString();
     const hashedOtp = crypto.createHash('sha256').update(emailOtp).digest('hex');
+    const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
 
     await pool.query(
-      'UPDATE users SET email_verified = 0, email_verification_token = ?, email_verification_expires = DATE_ADD(NOW(), INTERVAL 15 MINUTE) WHERE id = ?',
-      [hashedOtp, userId]
+      'UPDATE users SET email_verified = 0, email_verification_token = ?, email_verification_expires = ? WHERE id = ?',
+      [hashedOtp, expiresAt, userId]
     );
 
     try {
@@ -235,7 +236,18 @@ router.post('/register', async (req, res, next) => {
     }
 
     const verifyToken = jwt.sign(
-      { id: userId, email: emailClean, purpose: 'user_verify_pending' },
+      {
+        id: userId,
+        email: emailClean,
+        full_name: data.full_name.trim(),
+        role: data.role,
+        organization_name: orgName,
+        facility_id: facilityId,
+        phone: data.phone ? data.phone.trim() : null,
+        otp_hash: hashedOtp,
+        otp_exp: expiresAt.getTime(),
+        purpose: 'user_verify_pending'
+      },
       JWT_SECRET,
       { expiresIn: '15m' }
     );
@@ -351,10 +363,11 @@ router.post('/login', authLoginLimiter, async (req, res, next) => {
       // ── MANDATORY REAL-TIME EMAIL OTP VERIFICATION FOR SIGN IN ──
       const emailOtp = crypto.randomInt(100000, 999999).toString();
       const hashedOtp = crypto.createHash('sha256').update(emailOtp).digest('hex');
+      const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
 
       await pool.query(
-        'UPDATE users SET email_verification_token = ?, email_verification_expires = DATE_ADD(NOW(), INTERVAL 15 MINUTE) WHERE id = ?',
-        [hashedOtp, authenticatedUser.id]
+        'UPDATE users SET email_verification_token = ?, email_verification_expires = ? WHERE id = ?',
+        [hashedOtp, expiresAt, authenticatedUser.id]
       );
 
       try {
@@ -371,7 +384,18 @@ router.post('/login', authLoginLimiter, async (req, res, next) => {
       }
 
       const verifyToken = jwt.sign(
-        { id: authenticatedUser.id, email: authenticatedUser.email, purpose: 'user_verify_pending' },
+        {
+          id: authenticatedUser.id,
+          email: authenticatedUser.email,
+          full_name: authenticatedUser.full_name,
+          role: authenticatedUser.role,
+          organization_name: authenticatedUser.organization_name,
+          facility_id: authenticatedUser.facility_id,
+          phone: authenticatedUser.phone,
+          otp_hash: hashedOtp,
+          otp_exp: expiresAt.getTime(),
+          purpose: 'user_verify_pending'
+        },
         JWT_SECRET,
         { expiresIn: '15m' }
       );
@@ -993,32 +1017,73 @@ router.post('/verify-otp', authLoginLimiter, async (req, res, next) => {
       return res.status(401).json({ success: false, error: 'Verification session expired. Please sign in again.' });
     }
 
-    const hashedInput = crypto.createHash('sha256').update(String(email_code).trim()).digest('hex');
+    const cleanCode = String(email_code).replace(/\D/g, '').trim();
+    if (!cleanCode || cleanCode.length !== 6) {
+      return res.status(400).json({ success: false, error: 'Please enter the complete 6-digit security code.' });
+    }
+    const hashedInput = crypto.createHash('sha256').update(cleanCode).digest('hex');
 
-    const [rows] = await pool.query(
-      'SELECT id, email, full_name, role, organization_name, facility_id, phone, is_active, email_verified, email_verification_token, email_verification_expires FROM users WHERE id = ? LIMIT 1',
-      [decoded.id]
+    // 1. Check persistent database or memory store for existing account
+    let [rows] = await pool.query(
+      'SELECT id, email, full_name, role, organization_name, facility_id, phone, is_active, email_verified, email_verification_token, email_verification_expires FROM users WHERE id = ? OR LOWER(email) = LOWER(?) LIMIT 1',
+      [decoded.id, decoded.email]
     );
 
-    if (!rows || rows.length === 0 || !rows[0].is_active) {
+    let user = rows && rows.length > 0 ? rows[0] : null;
+
+    // 2. Resilient Serverless / Cold-Start Recovery:
+    // If running in an ephemeral/recycled container without persistent database,
+    // construct the user directly from the verified cryptographically signed JWT.
+    if (!user && decoded.id) {
+      user = {
+        id: decoded.id,
+        email: decoded.email,
+        full_name: decoded.full_name || 'Client Administrator',
+        role: decoded.role || 'client',
+        organization_name: decoded.organization_name || null,
+        facility_id: decoded.facility_id || null,
+        phone: decoded.phone || null,
+        is_active: 1,
+        email_verified: 0,
+        email_verification_token: decoded.otp_hash,
+        email_verification_expires: decoded.otp_exp ? new Date(decoded.otp_exp) : null
+      };
+
+      try {
+        await pool.query(
+          `INSERT INTO users (id, email, password_hash, full_name, role, organization_name, facility_id, phone, is_active, email_verified, created_at, updated_at)
+           VALUES (?, ?, 'SERVERLESS_PREVIEW_USER', ?, ?, ?, ?, ?, 1, 1, NOW(), NOW())`,
+          [user.id, user.email, user.full_name, user.role, user.organization_name, user.facility_id, user.phone]
+        );
+      } catch (_) {}
+    }
+
+    if (!user || (user.is_active !== undefined && !user.is_active)) {
       return res.status(401).json({ success: false, error: 'Account not found or inactive.' });
     }
 
-    const user = rows[0];
+    // Determine effective expiration: prefer database datetime, fall back to signed JWT timestamp
+    const effectiveExpiry = user.email_verification_expires 
+      ? new Date(user.email_verification_expires) 
+      : (decoded.otp_exp ? new Date(decoded.otp_exp) : null);
 
-    if (!user.email_verification_token || !user.email_verification_expires || new Date(user.email_verification_expires) < new Date()) {
+    if (!effectiveExpiry || effectiveExpiry.getTime() < Date.now()) {
       return res.status(400).json({ success: false, error: 'Verification code has expired. Please click "Resend Code".' });
     }
 
-    if (user.email_verification_token !== hashedInput) {
+    // Determine expected token hash: database column or signed JWT claim
+    const expectedHash = user.email_verification_token || decoded.otp_hash;
+    if (!expectedHash || expectedHash !== hashedInput) {
       return res.status(400).json({ success: false, error: 'Invalid verification code. Please check your email and try again.' });
     }
 
     // Success: activate email verification, clear tokens, and update last_login
-    await pool.query(
-      'UPDATE users SET email_verified = 1, email_verification_token = NULL, email_verification_expires = NULL, last_login = NOW() WHERE id = ?',
-      [user.id]
-    );
+    try {
+      await pool.query(
+        'UPDATE users SET email_verified = 1, email_verification_token = NULL, email_verification_expires = NULL, last_login = NOW() WHERE id = ? OR LOWER(email) = LOWER(?)',
+        [user.id, user.email]
+      );
+    } catch (_) {}
 
     let credentialStatus = 'verified';
     let staffStatus = 'available';
@@ -1096,19 +1161,39 @@ router.post('/resend-otp', authLoginLimiter, async (req, res, next) => {
       return res.status(401).json({ success: false, error: 'Session expired. Please sign in again.' });
     }
 
-    const [rows] = await pool.query('SELECT id, email, full_name, is_active FROM users WHERE id = ? LIMIT 1', [decoded.id]);
-    if (!rows || rows.length === 0 || !rows[0].is_active) {
-      return res.status(401).json({ success: false, error: 'Account not found.' });
+    let [rows] = await pool.query(
+      'SELECT id, email, full_name, role, organization_name, facility_id, phone, is_active FROM users WHERE id = ? OR LOWER(email) = LOWER(?) LIMIT 1',
+      [decoded.id, decoded.email]
+    );
+    let user = rows && rows.length > 0 ? rows[0] : null;
+
+    if (!user && decoded.id) {
+      user = {
+        id: decoded.id,
+        email: decoded.email,
+        full_name: decoded.full_name || 'Client Administrator',
+        role: decoded.role || 'client',
+        organization_name: decoded.organization_name || null,
+        facility_id: decoded.facility_id || null,
+        phone: decoded.phone || null,
+        is_active: 1
+      };
     }
 
-    const user = rows[0];
+    if (!user || (user.is_active !== undefined && !user.is_active)) {
+      return res.status(401).json({ success: false, error: 'Account not found or inactive.' });
+    }
+
     const emailOtp = crypto.randomInt(100000, 999999).toString();
     const hashedOtp = crypto.createHash('sha256').update(emailOtp).digest('hex');
+    const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
 
-    await pool.query(
-      'UPDATE users SET email_verification_token = ?, email_verification_expires = DATE_ADD(NOW(), INTERVAL 15 MINUTE) WHERE id = ?',
-      [hashedOtp, user.id]
-    );
+    try {
+      await pool.query(
+        'UPDATE users SET email_verification_token = ?, email_verification_expires = ? WHERE id = ? OR LOWER(email) = LOWER(?)',
+        [hashedOtp, expiresAt, user.id, user.email]
+      );
+    } catch (_) {}
 
     try {
       const emailContent = buildUserVerificationOtpEmail(user.full_name, emailOtp, 'sign-in');
@@ -1118,16 +1203,36 @@ router.post('/resend-otp', authLoginLimiter, async (req, res, next) => {
         text: emailContent.text,
         html: emailContent.html
       });
-      console.log(`[AUTH RESEND] ✅ Resent OTP to ${user.email}`);
+      console.log(`[AUTH RESEND-OTP] ✅ Fresh verification code dispatched to ${user.email}`);
     } catch (mailErr) {
-      console.error('[AUTH RESEND] OTP dispatch error:', mailErr.message);
+      console.error('[AUTH RESEND-OTP] Direct mail dispatch warning:', mailErr.message);
     }
 
-    res.json({
+    const freshVerifyToken = jwt.sign(
+      {
+        id: user.id,
+        email: user.email,
+        full_name: user.full_name,
+        role: user.role || decoded.role || 'client',
+        organization_name: user.organization_name || decoded.organization_name || null,
+        facility_id: user.facility_id || decoded.facility_id || null,
+        phone: user.phone || decoded.phone || null,
+        otp_hash: hashedOtp,
+        otp_exp: expiresAt.getTime(),
+        purpose: 'user_verify_pending'
+      },
+      JWT_SECRET,
+      { expiresIn: '15m' }
+    );
+
+    return res.json({
       success: true,
+      verify_token: freshVerifyToken,
       message: `A fresh 6-digit verification code has been dispatched to ${maskEmail(user.email)}. Please check your email inbox.`
     });
-  } catch (err) { next(err); }
+  } catch (err) {
+    next(err);
+  }
 });
 
 module.exports = router;
