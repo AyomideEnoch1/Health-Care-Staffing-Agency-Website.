@@ -205,7 +205,9 @@ router.post('/clean-dummy-data', async (req, res, next) => {
       'newsletter_subscribers',
       'facility_rate_cards',
       'users',
-      'facilities'
+      'facilities',
+      'email_outbox',
+      'email_logs'
     ];
 
     const results = {};

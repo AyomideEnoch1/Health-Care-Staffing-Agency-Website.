@@ -366,6 +366,9 @@ if (require.main === module) {
     if (process.env.RUN_EMBEDDED_DAEMON === 'true' || !isProd) {
       startShiftLifecycleDaemon(60000);
       mailService.startWorkerDaemon(10000);
+      const { drainPendingOutbox } = require('./utils/mailOutbox');
+      setInterval(() => drainPendingOutbox(10).catch(() => {}), 15000);
+      drainPendingOutbox(20).catch(() => {});
     } else {
       console.log('⏱️ [Shift Lifecycle] Running in standalone service mode (managed by systemd).');
     }

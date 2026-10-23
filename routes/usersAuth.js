@@ -768,6 +768,25 @@ router.post('/forgot-password', passwordResetLimiter, async (req, res, next) => 
       }
     }
 
+    // Check admins if not yet initialized in users table
+    if (!targetUser) {
+      const [adminRows] = await pool.query(
+        'SELECT id, full_name, email, role, is_active FROM admins WHERE LOWER(email) = ? LIMIT 1',
+        [emailClean]
+      );
+      if (adminRows && adminRows[0]) {
+        const admin = adminRows[0];
+        const adminUserId = admin.id || crypto.randomUUID();
+        await pool.query(
+          `INSERT INTO users (id, email, password_hash, full_name, role, is_active, email_verified)
+           VALUES (?, ?, 'pending_admin_sync', ?, 'super-admin', 1, 1)
+           ON DUPLICATE KEY UPDATE is_active = 1, full_name = ?`,
+          [adminUserId, emailClean, admin.full_name, admin.full_name]
+        );
+        targetUser = { id: adminUserId, email: emailClean, full_name: admin.full_name };
+      }
+    }
+
       let resetUrl = null;
       if (targetUser && targetUser.is_active !== 0) {
         const { token, hash } = generateSecureToken(32);
@@ -778,9 +797,9 @@ router.post('/forgot-password', passwordResetLimiter, async (req, res, next) => 
         );
 
         const reqHost = req.get('host') || 'localhost:3000';
-        const reqProto = req.protocol || 'http';
+        const reqProto = req.get('x-forwarded-proto') || req.protocol || 'https';
         const autoOrigin = `${reqProto}://${reqHost}`;
-        const appBaseUrl = (process.env.APP_BASE_URL || (process.env.NODE_ENV === 'production' ? 'https://www.divinefingershealthcare.ca' : autoOrigin)).replace(/\/$/, '');
+        const appBaseUrl = (process.env.APP_BASE_URL || autoOrigin).replace(/\/$/, '');
         resetUrl = `${appBaseUrl}/login.html?action=reset&token=${token}&email=${encodeURIComponent(emailClean)}`;
 
         await enqueueMail({
@@ -849,6 +868,12 @@ router.post('/reset-password', passwordResetLimiter, async (req, res, next) => {
        WHERE id = ?`,
       [passwordHash, user.id]
     );
+
+    // If an administrator account exists with this email, keep admin password synchronized
+    await pool.query(
+      `UPDATE admins SET password_hash = ?, failed_login_attempts = 0, lock_until = NULL WHERE LOWER(email) = ?`,
+      [passwordHash, user.email.toLowerCase()]
+    ).catch(() => {});
 
     // Invalidate any active cookie on the client
     res.clearCookie(USER_COOKIE_NAME, { path: '/' });

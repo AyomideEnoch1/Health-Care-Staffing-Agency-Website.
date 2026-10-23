@@ -82,7 +82,100 @@ async function enqueueMail({ type, to, userId = null, vars = {}, sendAfter = nul
     status: suppressed ? 'suppressed' : 'queued'
   }).catch(() => {});
 
+  // Immediate Outbox Dispatch — prevents orphaned queue entries in serverless and local dev
+  if (!suppressed && (!sendAfter || new Date(sendAfter) <= new Date())) {
+    const isServerless = Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
+    const isCritical = ['password_reset', 'staff_welcome', 'auth_password_reset', 'applicant_confirmation', 'application_alert'].includes(type);
+
+    if (isServerless || isCritical) {
+      await dispatchOutboxEntry(outboxId, type, addr, vars);
+    } else {
+      dispatchOutboxEntry(outboxId, type, addr, vars).catch(() => {});
+    }
+  }
+
   return { success: true, outboxId, status: initialStatus };
+}
+
+/**
+ * Dispatch an individual outbox record via SMTP immediately.
+ */
+async function dispatchOutboxEntry(outboxId, type, recipient, vars) {
+  try {
+    const { sendRawMail } = require('./mailer');
+    const { render } = require('./mailTemplates');
+
+    const { subject, html, text } = render(type, vars);
+    const info = await sendRawMail({
+      to: recipient,
+      subject,
+      html,
+      text
+    });
+
+    const messageId = info && info.messageId ? String(info.messageId).slice(0, 255) : null;
+
+    if (outboxId) {
+      await pool.query(
+        `UPDATE email_outbox SET status = 'sent', attempts = attempts + 1, provider_message_id = ?, sent_at = NOW(), error_code = NULL WHERE id = ?`,
+        [messageId, outboxId]
+      ).catch(() => {});
+
+      await logEmailAudit({
+        outboxId,
+        type,
+        recipientHash: hashEmail(recipient),
+        providerMessageId: messageId,
+        status: 'sent'
+      }).catch(() => {});
+    }
+
+    return { success: true, messageId };
+  } catch (err) {
+    console.error(`[Mail Outbox Immediate Dispatch Error - ${type}]:`, err.message);
+    if (outboxId) {
+      const code = String(err.responseCode || err.code || 'SMTP_ERR').slice(0, 50);
+      await pool.query(
+        `UPDATE email_outbox SET status = 'retry', attempts = attempts + 1, error_code = ?, next_attempt_at = DATE_ADD(NOW(), INTERVAL 1 MINUTE) WHERE id = ?`,
+        [code, outboxId]
+      ).catch(() => {});
+
+      await logEmailAudit({
+        outboxId,
+        type,
+        recipientHash: hashEmail(recipient),
+        status: 'retry',
+        errorCode: code
+      }).catch(() => {});
+    }
+    return { success: false, error: err.message };
+  }
+}
+
+/**
+ * Drain pending/retry messages from email_outbox.
+ */
+async function drainPendingOutbox(limit = 10) {
+  try {
+    const [rows] = await pool.query(
+      `SELECT id, type, to_encrypted, payload FROM email_outbox
+       WHERE status IN ('pending', 'retry') AND next_attempt_at <= NOW()
+       ORDER BY id ASC LIMIT ?`,
+      [limit]
+    );
+
+    if (!rows || rows.length === 0) return 0;
+
+    for (const r of rows) {
+      let recipient = '';
+      try { recipient = decrypt(r.to_encrypted); } catch (_) { continue; }
+      const vars = typeof r.payload === 'string' ? JSON.parse(r.payload) : (r.payload || {});
+      await dispatchOutboxEntry(r.id, r.type, recipient, vars);
+    }
+    return rows.length;
+  } catch (e) {
+    return 0;
+  }
 }
 
 /**
@@ -141,6 +234,8 @@ async function logEmailAudit({ outboxId = null, type, recipientHash, providerMes
 
 module.exports = {
   enqueueMail,
+  dispatchOutboxEntry,
+  drainPendingOutbox,
   isSuppressed,
   suppress,
   decrypt,
