@@ -378,6 +378,111 @@ const _adminEmailSet = new Set(
 function handleInMemoryQuery(sql, params = []) {
   const normalized = sql.trim().toLowerCase();
 
+  // ── SPECIAL HANDLER: /api/admin/registered-clients ──────────────────────
+  if ((normalized.includes('from facilities') && normalized.includes('client_role')) || (normalized.includes('from users') && normalized.includes('facility_code')) || (normalized.includes('from facilities') && normalized.includes('left join users') && normalized.includes('coalesce(u.id'))) {
+    const facs = inMemoryStore.facilities || [];
+    const clientUsers = (inMemoryStore.users || []).filter(u => u.role === 'client');
+    
+    // Map from facilities first so EVERY registered facility is guaranteed to appear
+    const facList = facs.map(f => {
+      const matchedUser = clientUsers.find(u => 
+        (u.facility_id && u.facility_id === f.id) ||
+        (u.organization_name && f.name && u.organization_name.toLowerCase().trim() === f.name.toLowerCase().trim()) ||
+        (u.email && f.contact_email && u.email.toLowerCase() === f.contact_email.toLowerCase())
+      );
+      const reqCount = (inMemoryStore.staffing_requests || []).filter(sr => 
+        sr.facility_id === f.id || 
+        (sr.facility_name && f.name && sr.facility_name.toLowerCase().trim() === f.name.toLowerCase().trim()) || 
+        (matchedUser && sr.contact_email && sr.contact_email.toLowerCase() === matchedUser.email.toLowerCase())
+      ).length;
+
+      return {
+        id: matchedUser ? matchedUser.id : f.id,
+        email: matchedUser ? matchedUser.email : (f.contact_email || 'client@hospital.ca'),
+        full_name: matchedUser ? matchedUser.full_name : (f.contact_name || 'Facility Coordinator'),
+        organization_name: f.name || (matchedUser ? matchedUser.organization_name : 'Healthcare Facility'),
+        facility_id: f.id,
+        client_role: matchedUser ? (matchedUser.client_role || 'Staffing Requester') : 'Facility Coordinator',
+        phone: matchedUser ? (matchedUser.phone || f.contact_phone) : (f.contact_phone || '—'),
+        is_active: matchedUser ? Number(matchedUser.is_active) : 1,
+        email_verified: matchedUser ? Number(matchedUser.email_verified) : 1,
+        last_login: matchedUser ? matchedUser.last_login : null,
+        created_at: matchedUser ? matchedUser.created_at : f.created_at,
+        facility_code: f.facility_code || 'FAC',
+        linked_facility_name: f.name,
+        facility_status: f.status || 'pending',
+        total_requests_count: reqCount
+      };
+    });
+
+    const standaloneClients = clientUsers.filter(u => 
+      !facs.some(f => 
+        (u.facility_id && u.facility_id === f.id) ||
+        (u.organization_name && f.name && u.organization_name.toLowerCase().trim() === f.name.toLowerCase().trim())
+      )
+    ).map(u => ({
+      ...u,
+      facility_code: 'FAC',
+      linked_facility_name: u.organization_name || 'Individual Facility',
+      facility_status: 'pending',
+      total_requests_count: 0
+    }));
+
+    return [[...facList, ...standaloneClients]];
+  }
+
+  // ── SPECIAL HANDLER: /api/admin/facilities ──────────────────────────────
+  if ((normalized.includes('from facilities') || normalized.includes('from `facilities`')) && !normalized.includes('client_role')) {
+    if (normalized.startsWith('select')) {
+      if (normalized.includes('count(*) as total') || normalized.includes('count(*)')) {
+        const total = (inMemoryStore.facilities || []).length;
+        const pending = (inMemoryStore.facilities || []).filter(f => f.status === 'pending').length;
+        const active = (inMemoryStore.facilities || []).filter(f => f.status === 'active').length;
+        return [[{ total_facilities: total, pending_facilities: pending, active_facilities: active, total, count: total }]];
+      }
+      if (normalized.includes('where id = ?') || normalized.includes('where lower(trim(name)) = lower(trim(?))')) {
+        const p0 = String(params[0] || '').toLowerCase().trim();
+        const found = (inMemoryStore.facilities || []).filter(f => f.id === params[0] || (f.name && f.name.toLowerCase().trim() === p0));
+        return [found];
+      }
+
+      // Return enriched facilities with rate card stats and client user info
+      const today = new Date();
+      const enriched = (inMemoryStore.facilities || []).map(fac => {
+        const rateCards = (inMemoryStore.facility_rate_cards || []).filter(rc => rc.facility_id === fac.id);
+        const users = (inMemoryStore.users || []).filter(u => u.facility_id === fac.id || (u.organization_name && fac.name && u.organization_name.toLowerCase().trim() === fac.name.toLowerCase().trim()));
+        const requests = (inMemoryStore.staffing_requests || []).filter(r => r.facility_id === fac.id || (r.facility_name && fac.name && r.facility_name.toLowerCase().trim() === fac.name.toLowerCase().trim()));
+
+        let isExpired = fac.status === 'expired';
+        let isExpiringSoon = false;
+        let daysUntilExpiry = null;
+        if (fac.msa_expiry_date) {
+          const expDate = new Date(fac.msa_expiry_date);
+          const diffDays = Math.ceil((expDate - today) / (1000 * 60 * 60 * 24));
+          daysUntilExpiry = diffDays;
+          if (diffDays <= 0) isExpired = true;
+          else if (diffDays <= 30) isExpiringSoon = true;
+        }
+
+        return {
+          ...fac,
+          effective_status: isExpired ? 'expired' : (fac.status || 'pending'),
+          is_expiring_soon: isExpiringSoon,
+          days_until_expiry: daysUntilExpiry,
+          active_rate_cards_count: rateCards.length,
+          total_rate_cards_count: rateCards.length,
+          has_portal_account: users.length > 0,
+          registered_user_emails: users.map(u => u.email).join(', '),
+          registered_users_count: users.length,
+          latest_user_registered_at: users.length > 0 ? users[users.length - 1].created_at : null,
+          total_shifts_requested: requests.length
+        };
+      });
+
+      return [enriched];
+    }
+  }
+
   // Health check query
   if (normalized.startsWith('select 1')) {
     return [[{ '1': 1 }]];
