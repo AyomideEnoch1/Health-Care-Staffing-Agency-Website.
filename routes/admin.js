@@ -893,18 +893,30 @@ router.post('/roster/:id/approve', requirePermission('roster:manage'), async (re
     // Also activate corresponding users record if present
     if (cur.email) {
       await pool.query(
-        `UPDATE users SET is_active = 1 WHERE email = ?`,
+        `UPDATE users SET is_active = 1 WHERE LOWER(email) = ?`,
         [cur.email.toLowerCase().trim()]
       ).catch(() => {});
     }
 
+    // Mark all pending documents for this staff member as verified
+    const adminName = (req.admin && req.admin.full_name) || 'Administrator';
+    await pool.query(
+      `UPDATE staff_documents 
+       SET status = 'verified', verified_at = NOW(), verified_by = ? 
+       WHERE (staff_id = ? OR staff_id = ? 
+              OR staff_id IN (SELECT id FROM users WHERE LOWER(email) = ?) 
+              OR staff_id IN (SELECT id FROM staff_roster WHERE LOWER(email) = ?)) 
+         AND status != 'verified'`,
+      [adminName, cur.id, id, (cur.email || '').toLowerCase().trim(), (cur.email || '').toLowerCase().trim()]
+    ).catch(() => {});
+
     await pool.query(
       `INSERT INTO audit_logs (id, admin_id, actor_name, action, target_entity, target_id, details, severity, ip_address)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [crypto.randomUUID(), req.admin.id, req.admin.full_name,
-       'STAFF_APPROVED', 'staff_roster', id,
-       `Approved clinical credentials and activated dispatch for ${cur.name} (${cur.staff_code || id})`, 'info', req.ip]
-    );
+      [crypto.randomUUID(), req.admin ? req.admin.id : null, adminName,
+       'STAFF_APPROVED', 'staff_roster', cur.id,
+       `Approved clinical credentials and activated dispatch for ${cur.name} (${cur.staff_code || cur.id})`, 'info', req.ip]
+    ).catch(() => {});
 
     adminEvents.emit('status:changed', { entity: 'staff_roster', id, action: 'verified' });
 
@@ -953,8 +965,9 @@ router.get('/staff/:id/documents', async (req, res, next) => {
        WHERE staff_id = ? 
           OR staff_id = ?
           OR staff_id IN (SELECT id FROM staff_roster WHERE email = ? OR email IN (SELECT email FROM users WHERE id = ?))
+          OR staff_id IN (SELECT id FROM users WHERE email = ? AND email IS NOT NULL AND email != '')
        ORDER BY created_at DESC`,
-      [id, targetId, targetEmail, id]
+      [id, targetId, targetEmail, id, targetEmail]
     );
     res.json({ success: true, data: docs });
   } catch (err) { next(err); }
@@ -1065,8 +1078,18 @@ router.patch('/staff/documents/:docId/verify', async (req, res, next) => {
       return res.status(404).json({ success: false, error: 'Credential document not found.' });
     }
     const doc = docs[0];
-    const finalDocType = doc_type || doc.doc_type || 'other';
-    const finalExpiry = expiry_date || doc.expiry_date;
+    let finalDocType = (doc_type || doc.doc_type || 'other').toString().toLowerCase().trim();
+    if (finalDocType === 'cpr_bls') finalDocType = 'cpr_card';
+    if (finalDocType === 'vss') finalDocType = 'vss_check';
+    if (finalDocType === 'n95_mask_fit') finalDocType = 'n95_fit';
+    if (finalDocType === 'photo_id') finalDocType = 'driver_license';
+
+    const VALID_DOC_TYPES = ['cno_license', 'cpr_card', 'vss_check', 'n95_fit', 'immunization', 'diploma', 'work_auth', 'driver_license', 'other'];
+    if (!VALID_DOC_TYPES.includes(finalDocType)) {
+      finalDocType = 'other';
+    }
+
+    const finalExpiry = expiry_date || doc.expiry_date || null;
     const finalValue = credential_value || doc.credential_value || null;
     const adminName = (req.admin && req.admin.full_name) || 'Administrator';
 
@@ -1075,25 +1098,22 @@ router.patch('/staff/documents/:docId/verify', async (req, res, next) => {
       `UPDATE staff_documents
        SET status = ?, verified_at = NOW(), verified_by = ?, doc_type = ?, expiry_date = ?, credential_value = ?
        WHERE id = ?`,
-      [status, adminName, finalDocType, finalExpiry || null, finalValue, docId]
+      [status, adminName, finalDocType, finalExpiry, finalValue, docId]
     );
 
-    // 2. Update staff_roster record to record the credential
-    const [staffRows] = await pool.query('SELECT * FROM staff_roster WHERE id = ?', [doc.staff_id]);
-    if (staffRows.length > 0) {
-      const staff = staffRows[0];
+    // 2. Locate staff roster entry via ensureRosterStaff
+    const staff = await ensureRosterStaff(doc.staff_id);
+    if (staff) {
       const updates = [];
       const params = [];
 
-      if (finalDocType === 'cno_license' || finalValue) {
+      if (finalDocType === 'cno_license' && finalValue) {
         updates.push('cno_registration_num = ?');
-        params.push(finalValue || staff.cno_registration_num || 'CNO-RN-884920');
+        params.push(finalValue);
       }
-      if (finalDocType === 'cpr_card' || finalExpiry) {
-        if (finalExpiry) {
-          updates.push('cpr_expiry_date = ?');
-          params.push(finalExpiry);
-        }
+      if (finalDocType === 'cpr_card' && finalExpiry) {
+        updates.push('cpr_expiry_date = ?');
+        params.push(finalExpiry);
       }
       if (finalDocType === 'vss_check') {
         updates.push("vss_status = 'Clear'");
@@ -1102,10 +1122,13 @@ router.patch('/staff/documents/:docId/verify', async (req, res, next) => {
         updates.push("n95_fit_test = '3M Valid'");
       }
 
-      // Check all documents for this staff member to ensure all core requirements are satisfied
+      // Check all documents for this staff member
       const [allStaffDocs] = await pool.query(
-        'SELECT doc_type, status FROM staff_documents WHERE staff_id = ?',
-        [doc.staff_id]
+        `SELECT id, doc_type, status FROM staff_documents 
+         WHERE staff_id = ? OR staff_id = ? 
+            OR staff_id IN (SELECT id FROM staff_roster WHERE email = ? OR email IN (SELECT email FROM users WHERE id = ?))
+            OR staff_id IN (SELECT id FROM users WHERE email = ? AND email IS NOT NULL AND email != '')`,
+        [doc.staff_id, staff.id, staff.email || '', doc.staff_id, staff.email || '']
       );
       const verifiedTypes = new Set(
         allStaffDocs.filter(d => d.status === 'verified' || (d.id === docId && status === 'verified')).map(d => d.doc_type)
@@ -1118,14 +1141,13 @@ router.patch('/staff/documents/:docId/verify', async (req, res, next) => {
       const hasLicense = isNurse ? verifiedTypes.has('cno_license') : true;
       const allCoreDone = hasLicense && verifiedTypes.has('cpr_card') && verifiedTypes.has('vss_check') && verifiedTypes.has('n95_fit');
 
-      if (allCoreDone) {
+      if (allCoreDone || status === 'verified') {
         updates.push("credential_status = 'verified'");
-      } else {
-        updates.push("credential_status = 'pending'");
+        updates.push("status = 'available'");
       }
 
       if (updates.length > 0) {
-        params.push(doc.staff_id);
+        params.push(staff.id);
         await pool.query(`UPDATE staff_roster SET ${updates.join(', ')} WHERE id = ?`, params);
       }
     }

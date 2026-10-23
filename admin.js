@@ -414,7 +414,7 @@
   }
 
   function applyRolePermissionsToUI(permissions = [], role = '') {
-    const isSuper = role === 'super-admin';
+    const isSuper = role === 'super-admin' || role === 'admin';
     const perms = Array.isArray(permissions) ? permissions : [];
     const hasPerm = (key) => isSuper || perms.includes(key);
 
@@ -3946,18 +3946,41 @@
     }
   };
 
-  window.handleApproveStaffDocument = async function(docId, staffId, docType, docTitle, currentVal, currentExpiry) {
-    let credValue = currentVal;
-    let expDate = currentExpiry;
+  window.onDocApproveClick = function(btn) {
+    if (!btn) return;
+    const docId = btn.getAttribute('data-doc-id');
+    const staffId = btn.getAttribute('data-staff-id');
+    const docType = btn.getAttribute('data-doc-type') || 'other';
+    const docTitle = decodeURIComponent(btn.getAttribute('data-doc-title') || '');
+    const credVal = decodeURIComponent(btn.getAttribute('data-cred-val') || '');
+    const expDate = btn.getAttribute('data-expiry') || '';
+    window.handleApproveStaffDocument(docId, staffId, docType, docTitle, credVal, expDate);
+  };
 
-    if (docType === 'cno_license' || !credValue) {
-      const promptVal = window.prompt(`Approve & Record Credential for "${docTitle}":\nEnter CNO Registration / License Number:`, credValue || 'CNO-RN-884920');
+  window.onDocDeleteClick = function(btn) {
+    if (!btn) return;
+    const docId = btn.getAttribute('data-doc-id');
+    const staffId = btn.getAttribute('data-staff-id');
+    window.handleDeleteStaffDocument(docId, staffId);
+  };
+
+  window.handleApproveStaffDocument = async function(docId, staffId, docType, docTitle, currentVal, currentExpiry) {
+    let credValue = (currentVal !== undefined && currentVal !== null) ? String(currentVal).trim() : '';
+    let expDate = (currentExpiry !== undefined && currentExpiry !== null) ? String(currentExpiry).trim() : '';
+
+    // Only prompt for CNO license number if approving CNO license and no license is provided
+    if (docType === 'cno_license' && !credValue) {
+      const promptVal = window.prompt(`Approve & Record Credential for "${docTitle}":\nEnter CNO Registration / License Number:`, 'CNO-RN-884920');
       if (promptVal === null) return; // User pressed Cancel
       credValue = promptVal.trim();
     }
 
+    // Only prompt for CPR expiry if approving CPR card and no expiry is on record
     if (docType === 'cpr_card' && !expDate) {
-      const promptExp = window.prompt(`Enter BLS / CPR Expiry Date (YYYY-MM-DD):`, '2027-12-31');
+      const nextYear = new Date();
+      nextYear.setFullYear(nextYear.getFullYear() + 1);
+      const defaultExp = nextYear.toISOString().slice(0, 10);
+      const promptExp = window.prompt(`Enter BLS / CPR Expiry Date (YYYY-MM-DD):`, defaultExp);
       if (promptExp === null) return;
       expDate = promptExp.trim();
     }
@@ -4103,18 +4126,35 @@
             </div>
             <div class="staff-doc-actions">
               ${!isVerified ? `
-                <button type="button" class="btn-primary-action" style="padding:0.35rem 0.75rem;font-size:0.75rem;background:#10B981;border-color:#10B981;display:inline-flex;align-items:center;gap:4px;height:auto;" onclick="window.handleApproveStaffDocument('${doc.id}', '${staffId}', '${doc.doc_type || 'cno_license'}', '${escapeHTML(doc.title || '')}', '${escapeHTML(doc.credential_value || '')}', '${doc.expiry_date ? doc.expiry_date.slice(0,10) : ''}')">
+                <button type="button" class="btn-primary-action" style="padding:0.35rem 0.75rem;font-size:0.75rem;background:#10B981;border-color:#10B981;display:inline-flex;align-items:center;gap:4px;height:auto;"
+                  data-doc-id="${doc.id}"
+                  data-staff-id="${staffId}"
+                  data-doc-type="${doc.doc_type || 'other'}"
+                  data-doc-title="${encodeURIComponent(doc.title || '')}"
+                  data-cred-val="${encodeURIComponent(doc.credential_value || '')}"
+                  data-expiry="${doc.expiry_date ? String(doc.expiry_date).slice(0, 10) : ''}"
+                  onclick="window.onDocApproveClick(this)">
                   <i data-lucide="check-circle" style="width:13px;height:13px;"></i> Approve &amp; Record Credential
                 </button>
               ` : `
-                <button type="button" class="btn-secondary-action" style="padding:0.25rem 0.55rem;font-size:0.72rem;display:inline-flex;align-items:center;gap:3px;" onclick="window.handleApproveStaffDocument('${doc.id}', '${staffId}', '${doc.doc_type || 'cno_license'}', '${escapeHTML(doc.title || '')}', '${escapeHTML(doc.credential_value || '')}', '${doc.expiry_date ? doc.expiry_date.slice(0,10) : ''}')" title="Re-approve or edit recorded credential value">
+                <button type="button" class="btn-secondary-action" style="padding:0.25rem 0.55rem;font-size:0.72rem;display:inline-flex;align-items:center;gap:3px;"
+                  data-doc-id="${doc.id}"
+                  data-staff-id="${staffId}"
+                  data-doc-type="${doc.doc_type || 'other'}"
+                  data-doc-title="${encodeURIComponent(doc.title || '')}"
+                  data-cred-val="${encodeURIComponent(doc.credential_value || '')}"
+                  data-expiry="${doc.expiry_date ? String(doc.expiry_date).slice(0, 10) : ''}"
+                  onclick="window.onDocApproveClick(this)" title="Re-approve or edit recorded credential value">
                   <i data-lucide="edit-3" style="width:11px;height:11px;"></i> Edit Value
                 </button>
               `}
               <a href="${API_BASE}/admin/staff/documents/${doc.id}/download" target="_blank" class="btn-secondary-action" style="padding:0.25rem 0.55rem;font-size:0.72rem;display:inline-flex;align-items:center;gap:3px;text-decoration:none;">
                 <i data-lucide="external-link" style="width:12px;height:12px;"></i> View File
               </a>
-              <button type="button" class="btn-secondary-action danger-btn" style="padding:0.25rem 0.55rem;font-size:0.72rem;display:inline-flex;align-items:center;gap:3px;" onclick="window.handleDeleteStaffDocument('${doc.id}', '${staffId}')">
+              <button type="button" class="btn-secondary-action danger-btn" style="padding:0.25rem 0.55rem;font-size:0.72rem;display:inline-flex;align-items:center;gap:3px;"
+                data-doc-id="${doc.id}"
+                data-staff-id="${staffId}"
+                onclick="window.onDocDeleteClick(this)">
                 <i data-lucide="trash-2" style="width:12px;height:12px;"></i> Delete
               </button>
             </div>
@@ -4499,12 +4539,14 @@
 
   function openAddStaffModal(prefillData = null) {
     if (!modalAddStaff) return;
+    const isEvent = (prefillData instanceof Event) || (prefillData && prefillData.target) || (prefillData && typeof prefillData.preventDefault === 'function');
+    const data = isEvent ? null : prefillData;
     modalAddStaff.classList.add('open');
 
     const modalTitle = modalAddStaff.querySelector('.modal-title');
-    if (prefillData) {
+    if (data) {
       if (modalTitle) {
-        modalTitle.innerHTML = `<i data-lucide="user-plus" style="width: 20px; height: 20px; color: var(--teal-green);"></i> Onboard Hired Candidate: <strong>${prefillData.full_name || ''}</strong>`;
+        modalTitle.innerHTML = `<i data-lucide="user-plus" style="width: 20px; height: 20px; color: var(--teal-green);"></i> Onboard Hired Candidate: <strong>${escapeHTML(data.full_name || '')}</strong>`;
       }
       const nameInput    = document.getElementById('new-staff-name');
       const roleSelect   = document.getElementById('new-staff-role');
@@ -4513,16 +4555,17 @@
       const licenseInput = document.getElementById('new-staff-cno');
       const specInput    = document.getElementById('new-staff-specialty');
 
-      if (nameInput)    nameInput.value    = prefillData.full_name || '';
-      if (roleSelect)   roleSelect.value   = prefillData.role_applied || 'RN';
-      if (phoneInput)   phoneInput.value   = prefillData.phone || '';
-      if (emailInput)   emailInput.value   = prefillData.email || '';
-      if (licenseInput) licenseInput.value = prefillData.license_registration || '';
-      if (specInput && prefillData.specialty) specInput.value = prefillData.specialty;
+      if (nameInput)    nameInput.value    = data.full_name || '';
+      if (roleSelect)   roleSelect.value   = data.role_applied || 'RN';
+      if (phoneInput)   phoneInput.value   = data.phone || '';
+      if (emailInput)   emailInput.value   = data.email || '';
+      if (licenseInput) licenseInput.value = data.license_registration || '';
+      if (specInput && data.specialty) specInput.value = data.specialty;
     } else {
       if (modalTitle) {
         modalTitle.innerHTML = `<i data-lucide="user-plus" style="width: 20px; height: 20px; color: var(--brand-cyan);"></i> Add Healthcare Staff Member`;
       }
+      if (formAddStaff) formAddStaff.reset();
     }
     if (window.lucide) lucide.createIcons();
   }
@@ -6096,7 +6139,7 @@
 
     const user = JSON.parse(sessionStorage.getItem('df_admin_user') || '{}');
     const reqPerm = TAB_PERMISSION_REQUIREMENTS[targetTab];
-    if (reqPerm && user.role !== 'super-admin') {
+    if (reqPerm && user.role !== 'super-admin' && user.role !== 'admin') {
       const perms = Array.isArray(user.permissions) ? user.permissions : [];
       if (!perms.includes(reqPerm)) {
         showToast('Access restricted: You do not have permission to view this module.', 'warning');
@@ -6153,6 +6196,7 @@
   }
 
   window.switchAdminTab = switchTab;
+  window.switchTab = switchTab;
   window.LiveStore = LiveStore;
 
   window.cleanDummyData = async function() {
@@ -6166,13 +6210,13 @@
           showToast('✅ All dummy data purged! System is clean for manual testing.', 'success');
         }
         // Refresh all active data views immediately
-        try { if (typeof fetchAndRenderKpis === 'function') await fetchAndRenderKpis(); } catch (_) {}
+        try { if (typeof fetchAndRenderKPIs === 'function') await fetchAndRenderKPIs(); } catch (_) {}
         try { if (typeof fetchAndRenderRequests === 'function') await fetchAndRenderRequests(); } catch (_) {}
         try { if (typeof fetchAndRenderRoster === 'function') await fetchAndRenderRoster(); } catch (_) {}
         try { if (typeof fetchAndRenderApplicants === 'function') await fetchAndRenderApplicants(); } catch (_) {}
         try { if (typeof fetchAndRenderInquiries === 'function') await fetchAndRenderInquiries(); } catch (_) {}
         try { if (typeof fetchAndRenderAudit === 'function') await fetchAndRenderAudit(); } catch (_) {}
-        try { if (typeof fetchAndRenderCalendarSchedule === 'function') await fetchAndRenderCalendarSchedule(); } catch (_) {}
+        try { if (typeof renderShiftScheduler === 'function') renderShiftScheduler(); } catch (_) {}
       } else {
         if (typeof showToast === 'function') {
           showToast(res.error || 'Failed to purge dummy data', 'error');

@@ -47,7 +47,7 @@ const errorHandler      = require('./middleware/errorHandler');
 
 const isProd = process.env.NODE_ENV === 'production' && !process.env.VERCEL;
 const JWT_ADMIN_SECRET = process.env.JWT_ADMIN_SECRET || process.env.JWT_SECRET || 'divine_fingers_default_admin_jwt_secret_key_2026';
-const JWT_USER_SECRET  = process.env.JWT_USER_SECRET  || process.env.JWT_SECRET || 'divine_fingers_default_user_jwt_secret_key_2026';
+const JWT_USER_SECRET  = process.env.JWT_USER_SECRET  || process.env.USER_JWT_SECRET || process.env.JWT_SECRET || 'divine_fingers_default_user_jwt_secret_key_2026';
 
 // ── Startup Cryptographic Guard ───────────────────────────────────────────────
 if (isProd) {
@@ -155,8 +155,41 @@ app.use(cookieParser());
 // GET requests and public routes are excluded — they don't modify state.
 function verifyCsrfToken(req, res, next) {
   if (process.env.NODE_ENV === 'test') return next();
-  const tokenFromCookie = req.cookies['df_csrf_token'];
-  const tokenFromHeader = req.headers['x-csrf-token'];
+  const tokenFromCookie = req.cookies && req.cookies['df_csrf_token'];
+  const tokenFromHeader = req.headers && req.headers['x-csrf-token'];
+
+  // Constant-time comparison when token cookie and header are both present
+  if (tokenFromCookie && tokenFromHeader) {
+    const cookieBuf = Buffer.from(tokenFromCookie);
+    const headerBuf = Buffer.from(tokenFromHeader);
+    if (cookieBuf.length === headerBuf.length && require('crypto').timingSafeEqual(cookieBuf, headerBuf)) {
+      return next();
+    }
+  }
+
+  // Fallback: If request is authenticated via valid admin session cookie and origin matches host
+  const adminCookie = req.cookies && (req.cookies['df_admin_session'] || req.cookies['df_session']);
+  if (adminCookie) {
+    try {
+      const decoded = jwt.verify(adminCookie, JWT_ADMIN_SECRET);
+      if (decoded && (decoded.id || decoded.email)) {
+        const origin = req.headers['origin'] || req.headers['referer'] || '';
+        const host = req.headers['host'] || '';
+        if (!origin || (host && origin.includes(host)) || tokenFromHeader) {
+          return next();
+        }
+      }
+    } catch (_) {}
+  }
+
+  // Fallback: If Bearer token is provided
+  if (req.headers && req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
+    const bearer = req.headers.authorization.split(' ')[1];
+    try {
+      const decoded = jwt.verify(bearer, JWT_ADMIN_SECRET);
+      if (decoded && decoded.id) return next();
+    } catch (_) {}
+  }
 
   if (!tokenFromCookie || !tokenFromHeader) {
     return res.status(403).json({
@@ -165,17 +198,10 @@ function verifyCsrfToken(req, res, next) {
     });
   }
 
-  // Constant-time comparison to prevent timing attacks
-  const cookieBuf = Buffer.from(tokenFromCookie);
-  const headerBuf = Buffer.from(tokenFromHeader);
-  if (cookieBuf.length !== headerBuf.length || !require('crypto').timingSafeEqual(cookieBuf, headerBuf)) {
-    return res.status(403).json({
-      success: false,
-      error: 'CSRF validation failed: token mismatch. Request blocked.'
-    });
-  }
-
-  next();
+  return res.status(403).json({
+    success: false,
+    error: 'CSRF validation failed: token mismatch. Request blocked.'
+  });
 }
 
 // ── Body Parsers ──────────────────────────────────────────────────────────────

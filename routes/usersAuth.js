@@ -23,7 +23,7 @@ const { enqueueMail } = require('../utils/mailOutbox');
 const { generateSecureToken, maskEmail } = require('../utils/cryptoUtils');
 const { sendRawMail, buildUserVerificationOtpEmail } = require('../utils/mailer');
 
-const USER_JWT_SECRET = process.env.USER_JWT_SECRET || process.env.JWT_SECRET || 'divine_fingers_default_secure_jwt_secret_key_2026_production_fallback';
+const USER_JWT_SECRET = process.env.JWT_USER_SECRET || process.env.USER_JWT_SECRET || process.env.JWT_SECRET || 'divine_fingers_default_user_jwt_secret_key_2026';
 const JWT_SECRET = USER_JWT_SECRET;
 const USER_COOKIE_NAME = 'df_user_session';
 

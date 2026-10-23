@@ -12177,7 +12177,17 @@ async function loadStaffDocuments() {
   if (!tbody) return;
 
   try {
-    const res = await fetch(`${API_BASE}/shifts/my-documents`, { credentials: 'include' });
+    const activeStaff = currentUser || JSON.parse(localStorage.getItem('df_portal_user') || 'null') || {};
+    const qParams = new URLSearchParams();
+    if (activeStaff.id) qParams.set('staff_id', activeStaff.id);
+    if (activeStaff.email) qParams.set('staff_email', activeStaff.email);
+    const qStr = qParams.toString() ? `?${qParams.toString()}` : '';
+
+    const headers = {};
+    if (activeStaff.id) headers['X-Staff-Id'] = activeStaff.id;
+    if (activeStaff.email) headers['X-Staff-Email'] = activeStaff.email;
+
+    const res = await fetch(`${API_BASE}/shifts/my-documents${qStr}`, { credentials: 'include', headers });
     let docs = [];
     if (res.ok) {
       const data = await res.json();
@@ -12323,6 +12333,8 @@ async function handleUploadCredential(e) {
   const expiryVal = expiryInput ? expiryInput.value : '';
   const numVal = numInput ? numInput.value.trim() : '';
 
+  const activeStaff = currentUser || JSON.parse(localStorage.getItem('df_portal_user') || 'null') || {};
+
   const formData = new FormData();
   formData.append('document', fileInput.files[0]);
   formData.append('document_type', docTypeVal);
@@ -12332,6 +12344,9 @@ async function handleUploadCredential(e) {
   formData.append('expiry_date', expiryVal);
   formData.append('credential_number', numVal);
   formData.append('credential_value', numVal);
+  if (activeStaff.id) formData.append('staff_id', activeStaff.id);
+  if (activeStaff.email) formData.append('staff_email', activeStaff.email);
+  if (activeStaff.full_name) formData.append('staff_name', activeStaff.full_name);
 
   const btn = document.getElementById('btn-upload-credential-submit');
   if (btn) {
@@ -12340,18 +12355,24 @@ async function handleUploadCredential(e) {
   }
 
   try {
+    const uploadHeaders = {};
+    if (activeStaff.id) uploadHeaders['X-Staff-Id'] = activeStaff.id;
+    if (activeStaff.email) uploadHeaders['X-Staff-Email'] = activeStaff.email;
+    if (activeStaff.full_name) uploadHeaders['X-Staff-Name'] = activeStaff.full_name;
+
     const res = await fetch(`${API_BASE}/shifts/my-documents/upload`, {
       method: 'POST',
       credentials: 'include',
+      headers: uploadHeaders,
       body: formData
     });
 
-    const data = await res.json();
+    const data = await res.json().catch(() => ({}));
     if (!res.ok || !data.success) {
-      throw new Error(data.message || 'Upload failed.');
+      throw new Error(data.error || data.message || `Upload failed with status ${res.status}.`);
     }
 
-    alert('Document uploaded and registered into your verified clinical vault successfully!');
+    alert(data.message || 'Document uploaded and registered into your verified clinical vault successfully!');
     if (document.getElementById('staff-credential-upload-form')) {
       document.getElementById('staff-credential-upload-form').reset();
     }
@@ -12374,19 +12395,26 @@ async function deleteStaffDocument(docId) {
   if (!confirm('Are you sure you want to remove this document from your credential vault?')) return;
 
   try {
+    const activeStaff = currentUser || JSON.parse(localStorage.getItem('df_portal_user') || 'null') || {};
+    const headers = {};
+    if (activeStaff.id) headers['X-Staff-Id'] = activeStaff.id;
+    if (activeStaff.email) headers['X-Staff-Email'] = activeStaff.email;
+
     const res = await fetch(`${API_BASE}/shifts/documents/${docId}`, {
       method: 'DELETE',
-      credentials: 'include'
+      credentials: 'include',
+      headers
     });
 
-    const data = await res.json();
+    const data = await res.json().catch(() => ({}));
     if (res.ok && data.success) {
-      alert('Document removed from vault.');
-      await loadStaffDocuments();
+      alert(data.message || 'Document removed from vault.');
     } else {
-      await loadStaffDocuments();
+      alert(`Removal failed: ${data.error || data.message || 'Unable to delete'}`);
     }
+    await loadStaffDocuments();
   } catch (err) {
+    alert(`Error: ${err.message}`);
     await loadStaffDocuments();
   }
 }

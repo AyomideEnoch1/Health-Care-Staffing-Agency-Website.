@@ -18,7 +18,7 @@ const jwt = require('jsonwebtoken');
 const pool = require('../db');
 
 const JWT_ADMIN_SECRET = process.env.JWT_ADMIN_SECRET || process.env.JWT_SECRET || 'divine_fingers_default_admin_jwt_secret_key_2026';
-const JWT_USER_SECRET = process.env.JWT_USER_SECRET || process.env.JWT_SECRET || 'divine_fingers_default_secure_jwt_secret_key_2026_production_fallback';
+const JWT_USER_SECRET = process.env.JWT_USER_SECRET || process.env.USER_JWT_SECRET || process.env.JWT_SECRET || 'divine_fingers_default_user_jwt_secret_key_2026';
 
 const RESUME_DIR = process.env.UPLOAD_DIR || path.join(__dirname, '../uploads/resumes');
 const CREDENTIAL_DIR = process.env.CREDENTIALS_UPLOAD_DIR || path.join(__dirname, '../uploads/credentials');
