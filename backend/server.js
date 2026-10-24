@@ -126,6 +126,22 @@ app.use(cors({
       return callback(null, true);
     }
 
+    // Auto-allow application's own origin (PUBLIC_BASE_URL)
+    const publicBase = (process.env.PUBLIC_BASE_URL || '').replace(/\/+$/, '');
+    if (publicBase && origin === publicBase) {
+      return callback(null, true);
+    }
+
+    // Auto-allow Render deployment domains and primary brand domain
+    const renderHost = (process.env.RENDER_EXTERNAL_HOSTNAME || '').trim();
+    if (
+      (renderHost && origin.includes(renderHost)) ||
+      origin.endsWith('.onrender.com') ||
+      origin.includes('divinefingershealthcare.ca')
+    ) {
+      return callback(null, true);
+    }
+
     if (allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
