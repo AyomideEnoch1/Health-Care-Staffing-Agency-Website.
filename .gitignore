@@ -9,8 +9,17 @@ backend/.env.production
 backend/.env.test
 !.env.example
 !.env.local.example
+!.env.production.example
 !backend/.env.example
 !backend/.env.local.example
+!backend/.env.production.example
+
+# Secrets & Certificates
+ca.pem
+*.pem
+
+# SQL dumps
+*.sql
 
 # Dependencies
 node_modules/

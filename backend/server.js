@@ -45,7 +45,7 @@ const mailService       = require('./services/mail/MailService');
 const { startShiftLifecycleDaemon } = require('./utils/shiftLifecycle');
 const errorHandler      = require('./middleware/errorHandler');
 
-const isProd = process.env.NODE_ENV === 'production' && !process.env.VERCEL;
+const isProd = process.env.NODE_ENV === 'production';
 const JWT_ADMIN_SECRET = process.env.JWT_ADMIN_SECRET || process.env.JWT_SECRET || 'divine_fingers_default_admin_jwt_secret_key_2026';
 const JWT_USER_SECRET  = process.env.JWT_USER_SECRET  || process.env.USER_JWT_SECRET || process.env.JWT_SECRET || 'divine_fingers_default_user_jwt_secret_key_2026';
 
@@ -343,7 +343,7 @@ initMailListener();
 // ── Health Check ──────────────────────────────────────────────────────────────
 // Checks both API liveness AND active DB connection.
 // Dashboard polls this endpoint and surfaces a "system degraded" state if it fails.
-app.get('/api/health', async (req, res) => {
+app.get(['/health', '/api/health'], async (req, res) => {
   let dbOk = false;
   let dbLatencyMs = null;
   try {
@@ -380,6 +380,10 @@ if (require.main === module) {
       console.log(`✅ [Database] Connected to MySQL (${process.env.DB_HOST || '127.0.0.1'}:${process.env.DB_PORT || 3306}/${process.env.DB_NAME || 'divine_fingers_dev'})`);
     } catch (err) {
       console.error(`❌ [Database] Connection failed: ${err.message}`);
+      if (isProd) {
+        console.error('❌ [FATAL DATABASE ERROR] Failed to connect to MySQL in production. Exiting process.');
+        process.exit(1);
+      }
     }
 
     // Verify SMTP (non-blocking warning only)

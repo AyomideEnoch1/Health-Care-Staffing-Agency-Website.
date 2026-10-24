@@ -1,0 +1,42 @@
+services:
+  - type: web
+    name: divine-fingers-healthcare
+    runtime: node
+    plan: free
+    region: oregon
+    buildCommand: npm install
+    startCommand: node backend/server.js
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: DB_HOST
+        value: mysql-126c0c8b-divine-finger-staffing-agency.e.aivencloud.com
+      - key: DB_PORT
+        value: "26376"
+      - key: DB_USER
+        value: avnadmin
+      - key: DB_NAME
+        value: defaultdb
+      - key: DB_CONNECTION_LIMIT
+        value: "5"
+      - key: DB_PASSWORD
+        sync: false
+      - key: DB_CA_CERT
+        sync: false
+      - key: JWT_ADMIN_SECRET
+        generateValue: true
+      - key: JWT_USER_SECRET
+        generateValue: true
+      - key: OUTBOX_ENC_KEY
+        generateValue: true
+      - key: ENCRYPTION_KEY
+        generateValue: true
+      - key: PUBLIC_BASE_URL
+        fromService:
+          type: web
+          name: divine-fingers-healthcare
+          property: host

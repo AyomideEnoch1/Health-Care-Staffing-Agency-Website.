@@ -20,9 +20,15 @@ let isMySqlAvailable = false;
 let realPool = null;
 
 try {
-  const sslConfig = (process.env.DB_SSL === 'true' || host.includes('tidbcloud.com') || host.includes('aivencloud.com'))
-    ? { minVersion: 'TLSv1.2', rejectUnauthorized: true }
-    : undefined;
+  let sslConfig = undefined;
+  if (process.env.DB_CA_CERT) {
+    sslConfig = {
+      ca: process.env.DB_CA_CERT.replace(/\\n/g, '\n'),
+      rejectUnauthorized: true
+    };
+  } else if (process.env.DB_SSL === 'true' || host.includes('tidbcloud.com') || host.includes('aivencloud.com')) {
+    sslConfig = { minVersion: 'TLSv1.2', rejectUnauthorized: true };
+  }
 
   realPool = mysql.createPool({
     host,
@@ -32,7 +38,7 @@ try {
     database,
     ssl: sslConfig,
     waitForConnections: true,
-    connectionLimit: parseInt(process.env.DB_CONNECTION_LIMIT || '10', 10),
+    connectionLimit: parseInt(process.env.DB_CONNECTION_LIMIT || '5', 10),
     queueLimit: 0,
     enableKeepAlive: true,
     keepAliveInitialDelay: 10000,
@@ -193,7 +199,7 @@ try {
     })
     .catch(err => {
       isMySqlAvailable = false;
-      if (process.env.NODE_ENV === 'production' && !process.env.VERCEL) {
+      if (process.env.NODE_ENV === 'production') {
         console.error(`❌ [FATAL DATABASE ERROR] Production MySQL unreachable: ${err.message}. Failing closed.`);
         process.exit(1);
       }
@@ -203,7 +209,7 @@ try {
     });
 } catch (e) {
   isMySqlAvailable = false;
-  if (process.env.NODE_ENV === 'production' && !process.env.VERCEL) {
+  if (process.env.NODE_ENV === 'production') {
     console.error(`❌ [FATAL DATABASE ERROR] Failed to initialize database pool: ${e.message}`);
     process.exit(1);
   }
@@ -498,6 +504,9 @@ const _adminEmailSet = new Set(
 
 // ── In-Memory Query Router ────────────────────────────────────────────────────
 function handleInMemoryQuery(sql, params = []) {
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('[FATAL DATABASE ERROR] In-memory mock database fallback is strictly disabled in production (NODE_ENV=production). Primary MySQL pool is unreachable.');
+  }
   const normalized = sql.trim().toLowerCase();
 
   // ── SPECIAL HANDLER: /api/admin/registered-clients ──────────────────────
@@ -1620,7 +1629,7 @@ function handleInMemoryQuery(sql, params = []) {
 }
 
 // ── Unified Database Pool Export ──────────────────────────────────────────────
-const isProd = process.env.NODE_ENV === 'production' && !process.env.VERCEL;
+const isProd = process.env.NODE_ENV === 'production';
 
 const pool = {
   async query(sql, params = []) {

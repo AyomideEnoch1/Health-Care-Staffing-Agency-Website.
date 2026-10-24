@@ -20,6 +20,8 @@ const requestSchema = z.object({
   contact_phone: z.string().min(10).max(30),
   role_requested: z.enum(['RN', 'RPN', 'PSW', 'Companion', 'Travel Nurse', 'Multiple']),
   shift_type: z.string().min(2).max(60),
+  shift_date: z.string().optional().nullable(),
+  start_date: z.string().optional().nullable(),
   urgency_level: z.enum(['routine', 'urgent', 'emergency_surge']).optional().default('routine'),
   special_instructions: z.string().max(2000).optional()
 });
@@ -43,10 +45,11 @@ router.post('/', publicFormLimiter, async (req, res, next) => {
       } catch (_) {}
     }
 
+    const targetDate = validated.shift_date || validated.start_date || req.body.shift_date || req.body.start_date || null;
     const query = `
       INSERT INTO staffing_requests 
-        (id, request_code, facility_id, facility_name, unit_department, contact_name, contact_email, contact_phone, role_requested, shift_type, urgency_level, status, special_instructions, ip_address)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?)
+        (id, request_code, facility_id, facility_name, unit_department, contact_name, contact_email, contact_phone, role_requested, shift_type, start_date, urgency_level, status, special_instructions, ip_address)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?)
     `;
 
     await pool.query(query, [
@@ -60,6 +63,7 @@ router.post('/', publicFormLimiter, async (req, res, next) => {
       validated.contact_phone,
       validated.role_requested,
       validated.shift_type,
+      targetDate,
       validated.urgency_level,
       validated.special_instructions || null,
       req.ip
@@ -295,6 +299,7 @@ router.get('/', async (req, res, next) => {
         sr.shift_type,
         sr.urgency_level,
         sr.start_date,
+        COALESCE(sr.start_date, DATE(sr.created_at)) AS shift_date,
         sr.status,
         sr.is_recurring,
         sr.recurrence_pattern,

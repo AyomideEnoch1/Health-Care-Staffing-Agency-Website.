@@ -344,7 +344,31 @@ router.get('/clock-status', async (req, res, next) => {
       [user.id, user.email || '']
     );
 
-    const activePunch = (activeRows && activeRows.length > 0) ? activeRows[0] : null;
+    let activePunch = (activeRows && activeRows.length > 0) ? activeRows[0] : null;
+
+    // Overtime Defense: Auto-close abandoned active punches exceeding 14 hours
+    if (activePunch && activePunch.clock_in_time) {
+      const elapsedHours = (Date.now() - new Date(activePunch.clock_in_time).getTime()) / 3600000;
+      if (elapsedHours > 14) {
+        await pool.query(
+          `UPDATE shift_punches 
+           SET clock_out_time = DATE_ADD(clock_in_time, INTERVAL 8 HOUR),
+               total_hours = 8.00,
+               status = 'completed',
+               notes = CONCAT(COALESCE(notes, ''), ' [SYSTEM AUTO-CONCLUDED: Exceeded 14-hour active limit without clock-out. Capped to standard 8h.]'),
+               updated_at = NOW()
+           WHERE id = ?`,
+          [activePunch.id]
+        ).catch(() => {});
+        if (activePunch.shift_id) {
+          await pool.query(
+            `UPDATE staffing_requests SET status = 'completed', clock_out_time = NOW() WHERE id = ?`,
+            [activePunch.shift_id]
+          ).catch(() => {});
+        }
+        activePunch = null;
+      }
+    }
 
     // 2. Fetch shifts allocated/dispatched by Admin to this staff member
     let allocatedShifts = [];
@@ -499,23 +523,25 @@ router.post('/clock-in', async (req, res, next) => {
       notes = null
     } = req.body || {};
 
+    let shiftRecord = null;
+
     // If shift_id was passed, look up the shift details directly from staffing_requests
     if (shift_id) {
       const [shiftRows] = await pool.query(
-        `SELECT id, request_code, facility_name, unit_department, role_requested, shift_type, status
+        `SELECT id, request_code, facility_name, unit_department, role_requested, shift_type, start_date, status
          FROM staffing_requests WHERE id = ?`,
         [shift_id]
       );
       if (shiftRows && shiftRows.length > 0) {
-        const s = shiftRows[0];
-        facility_name = s.facility_name || facility_name;
-        unit_department = s.unit_department || unit_department;
-        role = s.role_requested || role;
+        shiftRecord = shiftRows[0];
+        facility_name = shiftRecord.facility_name || facility_name;
+        unit_department = shiftRecord.unit_department || unit_department;
+        role = shiftRecord.role_requested || role;
       }
     } else {
       // If no shift_id was passed, automatically find the latest allocated shift for this user!
       const [allocated] = await pool.query(
-        `SELECT id, request_code, facility_name, unit_department, role_requested, shift_type, status
+        `SELECT id, request_code, facility_name, unit_department, role_requested, shift_type, start_date, status
          FROM staffing_requests
          WHERE (assigned_staff_id = ? OR assigned_staff_id IN (SELECT id FROM staff_roster WHERE email = ?))
            AND status IN ('dispatched', 'confirmed')
@@ -524,11 +550,31 @@ router.post('/clock-in', async (req, res, next) => {
         [user.id, user.email || '']
       );
       if (allocated && allocated.length > 0) {
-        const s = allocated[0];
-        shift_id = s.id;
-        facility_name = s.facility_name;
-        unit_department = s.unit_department;
-        role = s.role_requested;
+        shiftRecord = allocated[0];
+        shift_id = shiftRecord.id;
+        facility_name = shiftRecord.facility_name;
+        unit_department = shiftRecord.unit_department;
+        role = shiftRecord.role_requested;
+      }
+    }
+
+    // ── GUARD: PREVENT PREMATURE CLOCK-IN IF SHIFT DISPATCH DATE HAS NOT BEEN REACHED ──
+    if (shiftRecord && shiftRecord.start_date) {
+      const rawDate = shiftRecord.start_date;
+      let shiftDateStr = '';
+      if (typeof rawDate === 'string' && rawDate.length >= 10) {
+        shiftDateStr = rawDate.slice(0, 10);
+      } else if (rawDate instanceof Date) {
+        shiftDateStr = rawDate.toISOString().slice(0, 10);
+      }
+      const now = new Date();
+      const localNowStr = new Date(now.getTime() - (now.getTimezoneOffset() * 60000)).toISOString().slice(0, 10);
+
+      if (shiftDateStr && shiftDateStr > localNowStr) {
+        return res.status(400).json({
+          success: false,
+          error: `Cannot clock in early. This shift is scheduled for ${shiftDateStr}. You may only clock in on the scheduled shift dispatch date.`
+        });
       }
     }
 
@@ -633,26 +679,39 @@ router.post('/clock-out', async (req, res, next) => {
     const paidMinutes = Math.max(1, elapsedMinutes - (parseInt(break_minutes, 10) || 0));
     let totalHours = Number((paidMinutes / 60).toFixed(2));
 
+    // Determine baseline scheduled shift duration
+    let scheduledHours = 8.00;
+    if (punch.shift_id) {
+      const [linkedShift] = await pool.query('SELECT shift_type FROM staffing_requests WHERE id = ?', [punch.shift_id]);
+      if (linkedShift && linkedShift.length > 0) {
+        const st = (linkedShift[0].shift_type || '').toLowerCase();
+        scheduledHours = st.includes('12') ? 12.00 : 8.00;
+      }
+    }
+
     // For test punches (< 30 minutes) or immediate checkout, preserve scheduled shift duration
     if (totalHours < 0.5) {
-      if (punch.shift_id) {
-        const [linkedShift] = await pool.query('SELECT shift_type FROM staffing_requests WHERE id = ?', [punch.shift_id]);
-        if (linkedShift && linkedShift.length > 0) {
-          const st = (linkedShift[0].shift_type || '').toLowerCase();
-          totalHours = st.includes('12') ? 12.00 : 8.00;
-        } else {
-          totalHours = 8.00;
-        }
-      } else {
-        totalHours = 8.00;
-      }
+      totalHours = scheduledHours;
+    }
+
+    // ── OVERTIME AUDIT GUARD & EXCESSIVE HOURS DEFENSE ──
+    // If worker fails or deliberately delays clocking out to inflate income,
+    // hours exceeding scheduled duration + 1.0 hour grace period are capped to scheduled length,
+    // and flagged for supervisor & administrator audit.
+    let finalNotes = notes;
+    const maxAllowableHours = scheduledHours + 1.00;
+    if (totalHours > maxAllowableHours) {
+      const loggedHours = totalHours;
+      totalHours = scheduledHours; // Cap paid hours to prevent unauthorized inflation
+      const auditMsg = `[OVERTIME AUDIT: Clock-out delayed (${loggedHours}h elapsed). Hours capped to scheduled ${scheduledHours}h pending supervisor review.]`;
+      finalNotes = finalNotes ? `${finalNotes} | ${auditMsg}` : auditMsg;
     }
 
     await pool.query(
       `UPDATE shift_punches
        SET clock_out_time = NOW(), total_hours = ?, notes = COALESCE(?, notes), status = 'completed', updated_at = NOW()
        WHERE id = ?`,
-      [totalHours, notes, punch.id]
+      [totalHours, finalNotes, punch.id]
     );
 
     if (punch.shift_id) {
@@ -765,13 +824,29 @@ router.post('/:id/clock-in', async (req, res, next) => {
   try {
     const { id } = req.params;
     const [rows] = await pool.query(
-      'SELECT id, request_code, facility_name, status, assigned_staff_id FROM staffing_requests WHERE id = ?',
+      'SELECT id, request_code, facility_name, start_date, status, assigned_staff_id FROM staffing_requests WHERE id = ?',
       [id]
     );
     if (!rows || rows.length === 0) {
       return res.status(404).json({ success: false, error: 'Shift order not found.' });
     }
     const shift = rows[0];
+
+    // Guard: Prevent clock-in if shift date has not arrived
+    if (shift.start_date) {
+      const rawDate = shift.start_date;
+      const shiftDateStr = typeof rawDate === 'string' ? rawDate.slice(0, 10) : new Date(rawDate).toISOString().slice(0, 10);
+      const now = new Date();
+      const localNowStr = new Date(now.getTime() - (now.getTimezoneOffset() * 60000)).toISOString().slice(0, 10);
+
+      if (shiftDateStr && shiftDateStr > localNowStr) {
+        return res.status(400).json({
+          success: false,
+          error: `Cannot clock in early. This shift is scheduled for ${shiftDateStr}. Clock-in is only permitted on the scheduled shift date.`
+        });
+      }
+    }
+
     await pool.query(`UPDATE staffing_requests SET status = 'in_session', clock_in_time = NOW() WHERE id = ?`, [id]);
     res.json({ success: true, message: `✅ Clocked In for ${shift.facility_name}.`, status: 'in_session' });
   } catch (err) { next(err); }
@@ -1463,7 +1538,8 @@ router.get('/pay-summary', async (req, res, next) => {
       if (!outDate && p.status === 'active') {
         inProgress = true;
         const elapsedSec = Math.max(0, Math.floor((Date.now() - inDate.getTime()) / 1000));
-        hours = Number((elapsedSec / 3600).toFixed(2));
+        // Overtime guard: Cap in-progress display hours so abandoned punches never inflate endlessly
+        hours = Math.min(12.0, Number((elapsedSec / 3600).toFixed(2)));
       }
 
       const total = Number((hours * hourlyRate).toFixed(2));

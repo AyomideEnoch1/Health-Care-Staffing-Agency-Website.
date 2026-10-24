@@ -530,6 +530,33 @@
       color: #2e8b6d;
     }
 
+    .portal-choice-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 0.7rem 0.75rem;
+      font-size: 0.84rem;
+      font-weight: 700;
+      border-radius: 8px;
+      border: 1.5px solid var(--border-color, #E2E8F0);
+      background: #F8FAFC;
+      color: #64748B;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .portal-choice-btn:hover {
+      background: #F1F5F9;
+      border-color: #CBD5E1;
+      color: var(--navy, #0F172A);
+    }
+    .portal-choice-btn.active {
+      border-color: #0284C7;
+      background: #EFF6FF;
+      color: #0369A1;
+      box-shadow: 0 2px 6px rgba(2, 132, 199, 0.15);
+    }
+
     /* Admin link */
     .admin-redirect-hint {
       margin-top: 1.25rem;
@@ -700,10 +727,29 @@
 
               <!-- Organization Name (Shown for Client) -->
               <div class="form-group" id="group-org-name">
-                <label class="form-label" for="reg-orgname">Facility or Hospital Name</label>
+                <label class="form-label" for="reg-orgname">Facility or Hospital Name *</label>
                 <div class="input-wrapper">
                   <i data-lucide="building" class="field-icon"></i>
-                  <input type="text" id="reg-orgname" class="auth-input" placeholder="e.g. Toronto Central Hospital" autocomplete="organization">
+                  <input type="text" id="reg-orgname" class="auth-input" placeholder="e.g. Toronto Central Hospital" autocomplete="organization" required>
+                </div>
+              </div>
+
+              <!-- Facility Operating Region -->
+              <div class="form-group" id="group-reg-region">
+                <label class="form-label" for="reg-region">Operating Region / Zone *</label>
+                <div class="input-wrapper">
+                  <i data-lucide="map-pin" class="field-icon"></i>
+                  <select id="reg-region" class="auth-input" required style="padding-left: 2.75rem; appearance: auto;">
+                    <option value="" disabled selected>Select facility region / GTA zone...</option>
+                    <option value="Toronto Central">Toronto Central (Downtown / Midtown)</option>
+                    <option value="Scarborough & East GTA">Scarborough &amp; East GTA</option>
+                    <option value="North York & York Region">North York &amp; York Region</option>
+                    <option value="Etobicoke & West Toronto">Etobicoke &amp; West Toronto</option>
+                    <option value="Peel Region (Mississauga / Brampton)">Peel Region (Mississauga / Brampton)</option>
+                    <option value="Halton Region (Oakville / Burlington)">Halton Region (Oakville / Burlington)</option>
+                    <option value="Durham Region (Pickering / Oshawa)">Durham Region (Pickering / Oshawa)</option>
+                    <option value="Greater Toronto Area">Greater Toronto Area (General)</option>
+                  </select>
                 </div>
               </div>
 
@@ -755,7 +801,7 @@
 
               <div class="form-extras">
                 <label class="checkbox-container">
-                  <input type="checkbox" id="reg-terms">
+                  <input type="checkbox" id="reg-terms" required>
                   <span>I agree to the Terms of Service &amp; Privacy Policy</span>
                 </label>
               </div>
@@ -996,6 +1042,7 @@
       }
       if (window.lucide) lucide.createIcons();
     }
+    window.switchAuthTab = switchAuthTab;
 
     function openForgotView() {
       clearAlerts();
@@ -1042,8 +1089,7 @@
       }
       if (window.lucide) lucide.createIcons();
     }
-      if (window.lucide) lucide.createIcons();
-    }
+    window.switchAuthTab = switchAuthTab;
     window.openVerifyView = openVerifyView;
 
     function openResetView(token, email) {
@@ -1067,6 +1113,7 @@
       if (newPwdInput) newPwdInput.focus();
       if (window.lucide) lucide.createIcons();
     }
+    window.switchAuthTab = switchAuthTab;
     window.openResetView = openResetView;
 
 
@@ -1208,6 +1255,7 @@
         : '<i data-lucide="eye" style="width: 18px; height: 18px;"></i>';
       if (window.lucide) lucide.createIcons();
     }
+    window.togglePwdVisibility = togglePwdVisibility;
 
     // Check URL parameters for tab selection (e.g. ?tab=register)
     const urlParams = new URLSearchParams(window.location.search);
@@ -1232,11 +1280,13 @@
       }
       if (window.lucide) lucide.createIcons();
     }
+    window.showAlert = showAlert;
 
     function clearAlerts() {
       document.getElementById('auth-error-alert').style.display = 'none';
       document.getElementById('auth-success-alert').style.display = 'none';
     }
+    window.clearAlerts = clearAlerts;
 
     // Handle Login
     async function handleLogin(e) {
@@ -1299,6 +1349,7 @@
         if (window.lucide) lucide.createIcons();
       }
     }
+    window.handleLogin = handleLogin;
 
     // Handle Register
     async function handleRegister(e) {
@@ -1318,6 +1369,18 @@
       const organization_name = document.getElementById('reg-orgname') ? document.getElementById('reg-orgname').value.trim() : null;
       const clinical_role = null;
       const submitBtn = document.getElementById('btn-register-submit');
+
+      const termsChecked = document.getElementById('reg-terms') && document.getElementById('reg-terms').checked;
+      if (!termsChecked) {
+        showAlert('error', 'You must agree to the Terms of Service & Privacy Policy before submitting registration.');
+        return;
+      }
+
+      const region = document.getElementById('reg-region') ? document.getElementById('reg-region').value.trim() : '';
+      if (!region) {
+        showAlert('error', 'Please select your facility operating region / zone.');
+        return;
+      }
 
       if (!full_name || !email || !password) {
         showAlert('error', 'Please fill out all required fields.');
@@ -1344,6 +1407,8 @@
             phone,
             password,
             organization_name,
+            region,
+            agree_terms: true,
             clinical_role
           })
         });
@@ -1384,6 +1449,7 @@
         if (window.lucide) lucide.createIcons();
       }
     }
+    window.handleRegister = handleRegister;
 
     // Auto-focus email field or check action param
     document.addEventListener('DOMContentLoaded', () => {

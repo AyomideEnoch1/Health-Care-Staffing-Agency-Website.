@@ -46,12 +46,15 @@ const registerSchema = z.object({
   role: z.enum(['client', 'healthcare_worker'], { message: 'Please select an account type.' }),
   clinical_role: z.enum(['RN', 'RPN', 'PSW', 'Companion', 'Travel Nurse']).optional().nullable(),
   organization_name: z.string().optional().nullable(),
+  region: z.string().max(100).optional().nullable(),
+  agree_terms: z.boolean().optional(),
   phone: z.string().optional().nullable()
 });
 
 const loginSchema = z.object({
   email: z.string().email({ message: 'Please enter a valid email address.' }),
-  password: z.string().min(1, { message: 'Password is required.' })
+  password: z.string().min(1, { message: 'Password is required.' }),
+  target_portal: z.enum(['client', 'staff', 'healthcare_worker']).optional().default('client')
 });
 
 // ── POST /api/users/register ────────────────────────────────────────────────
@@ -120,7 +123,7 @@ router.post('/register', async (req, res, next) => {
               orgName,
               facilityCode,
               'GTA / Client Self-Registered',
-              'Greater Toronto Area',
+              data.region ? data.region.trim() : 'Greater Toronto Area',
               data.full_name.trim(),
               emailClean,
               data.phone ? data.phone.trim() : null
@@ -274,8 +277,9 @@ router.post('/register', async (req, res, next) => {
 // ── POST /api/users/login ───────────────────────────────────────────────────
 router.post('/login', authLoginLimiter, async (req, res, next) => {
   try {
-    const { email, password } = loginSchema.parse(req.body);
+    const { email, password, target_portal } = loginSchema.parse(req.body);
     const emailClean = email.toLowerCase().trim();
+    const isStaffPortal = target_portal === 'staff' || target_portal === 'healthcare_worker';
     console.log(`[AUTH LOGIN] Attempt for: ${emailClean}`);
 
     // 1. SECURITY: Reject administrator accounts FIRST, before touching the users table.
@@ -397,6 +401,7 @@ router.post('/login', authLoginLimiter, async (req, res, next) => {
           email: authenticatedUser.email,
           full_name: authenticatedUser.full_name,
           role: authenticatedUser.role,
+          target_portal: authenticatedUser.role === 'healthcare_worker' ? 'staff' : (isStaffPortal ? 'staff' : 'client'),
           organization_name: authenticatedUser.organization_name,
           facility_id: authenticatedUser.facility_id,
           phone: authenticatedUser.phone,
@@ -532,17 +537,22 @@ router.get('/me', async (req, res) => {
       }
     }
 
+    const isStaffSession = Boolean(decoded && (decoded.target_portal === 'staff' || decoded.role === 'healthcare_worker'));
+    const effectiveRole = isStaffSession ? 'healthcare_worker' : (user ? user.role : 'client');
+
     let credentialStatus = 'verified';
     let staffStatus = 'available';
     let clinicalRole = 'RN';
     let staffCode = null;
+    let rosterAvatar = null;
+    let rosterRegion = null;
 
     if (user.role === 'healthcare_worker') {
       credentialStatus = 'pending';
       staffStatus = 'available';
       try {
         const [rosterRows] = await pool.query(
-          'SELECT id, staff_code, role, status, credential_status FROM staff_roster WHERE id = ? OR email = ? LIMIT 1',
+          'SELECT id, staff_code, role, status, credential_status, avatar_url, region FROM staff_roster WHERE id = ? OR email = ? LIMIT 1',
           [user.id, user.email]
         );
         if (rosterRows && rosterRows.length > 0) {
@@ -550,6 +560,8 @@ router.get('/me', async (req, res) => {
           staffStatus = rosterRows[0].status || 'available';
           clinicalRole = rosterRows[0].role || 'RN';
           staffCode = rosterRows[0].staff_code;
+          rosterAvatar = rosterRows[0].avatar_url || null;
+          rosterRegion = rosterRows[0].region || null;
         } else {
           // Auto-sync into staff_roster if missing
           const [countRes] = await pool.query('SELECT COUNT(*) AS total FROM staff_roster');
@@ -570,7 +582,8 @@ router.get('/me', async (req, res) => {
         id: user.id,
         email: user.email,
         full_name: user.full_name,
-        role: user.role,
+        role: effectiveRole,
+        target_portal: isStaffSession ? 'staff' : 'client',
         organization_name: user.organization_name || null,
         facility_id: user.facility_id || null,
         client_role: user.client_role || 'requester',
@@ -580,7 +593,8 @@ router.get('/me', async (req, res) => {
         staff_status: staffStatus,
         clinical_role: clinicalRole,
         staff_code: staffCode,
-        avatar_url: user.avatar_url || null,
+        avatar_url: user.avatar_url || rosterAvatar || null,
+        region: rosterRegion || user.region || 'Greater Toronto Area',
         is_verified: credentialStatus === 'verified'
       }
     });
@@ -826,7 +840,7 @@ router.post('/forgot-password', passwordResetLimiter, async (req, res, next) => 
       const reqHost = req.get('host') || 'health-care-staffing-agency-website.vercel.app';
       const reqProto = req.get('x-forwarded-proto') || req.protocol || 'https';
       const autoOrigin = `${reqProto}://${reqHost}`;
-      const appBaseUrl = (process.env.APP_BASE_URL || process.env.APP_URL || autoOrigin).replace(/\/$/, '');
+      const appBaseUrl = (process.env.PUBLIC_BASE_URL || process.env.APP_BASE_URL || process.env.APP_URL || autoOrigin).replace(/\/$/, '');
       resetUrl = `${appBaseUrl}/login.html?action=reset&token=${token}&email=${encodeURIComponent(emailClean)}`;
 
       // Immediate delivery via sendRawMail
@@ -1174,11 +1188,14 @@ router.post('/verify-otp', authLoginLimiter, async (req, res, next) => {
       } catch (e) {}
     }
 
+    const isStaffSession = (decoded.target_portal === 'staff' || decoded.role === 'healthcare_worker' || req.body.target_portal === 'staff');
+    const effectiveRole = isStaffSession ? 'healthcare_worker' : user.role;
     const tokenPayload = {
       id: user.id,
       email: user.email,
       full_name: user.full_name,
-      role: user.role,
+      role: effectiveRole,
+      target_portal: isStaffSession ? 'staff' : 'client',
       organization_name: user.organization_name,
       facility_id: user.facility_id,
       phone: user.phone || null,
@@ -1198,7 +1215,8 @@ router.post('/verify-otp', authLoginLimiter, async (req, res, next) => {
         id: user.id,
         email: user.email,
         full_name: user.full_name,
-        role: user.role,
+        role: effectiveRole,
+        target_portal: isStaffSession ? 'staff' : 'client',
         organization_name: user.organization_name,
         facility_id: user.facility_id,
         phone: user.phone,

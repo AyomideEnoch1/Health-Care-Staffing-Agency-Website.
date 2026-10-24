@@ -3895,6 +3895,7 @@ html, body {
 
 .sidebar-avatar-initials {
   width: 36px;
+  overflow: hidden;
   height: 36px;
   min-width: 36px;
   border-radius: 50%;
@@ -5834,6 +5835,10 @@ html, body {
         </div>
 
         <div class="topbar-right">
+          <a href="portal.html?role=staff" class="view-site-link-btn" title="Switch to Healthcare Staff Workspace" style="background:#F0FDF4;border-color:#BBF7D0;color:#15803D;">
+            <i data-lucide="stethoscope" style="width:14px;height:14px;"></i>
+            <span>Staff Portal</span>
+          </a>
           <div class="live-pulse-chip">
             <span class="pulse-dot"></span>
             <span>24/7 Operations Desk</span>
@@ -6780,6 +6785,10 @@ html, body {
         </div>
 
         <div class="topbar-right">
+          <a href="portal.html?role=client" class="view-site-link-btn" title="Switch to Healthcare Facility Workspace" style="background:#EFF6FF;border-color:#BFDBFE;color:#1D4ED8;">
+            <i data-lucide="building-2" style="width:14px;height:14px;"></i>
+            <span>Facility Portal</span>
+          </a>
           <div class="live-pulse-chip">
             <span class="pulse-dot"></span>
             <span>Live GTA Dispatch</span>
@@ -8065,7 +8074,7 @@ html, body {
           facility_name: currentUser.facility_name || 'Scarborough Health Network',
           unit_department: currentUser.unit_department || 'Emergency & Acute Care'
         };
-      } else if (requestedRole === 'staff' || requestedRole === 'worker') {
+      } else if (requestedRole === 'staff' || requestedRole === 'worker' || currentUser.target_portal === 'staff' || currentUser.role === 'healthcare_worker') {
         currentUser = {
           ...currentUser,
           role: 'healthcare_worker'
@@ -8803,7 +8812,11 @@ html, body {
             const status = req.status || 'pending';
             const isOnSite = Boolean(req.clock_in_time && !req.clock_out_time);
             const isCompleted = Boolean(req.clock_out_time || status === 'completed');
-            const isDispatched = Boolean(req.staff_name && !isOnSite && !isCompleted && status !== 'cancelled');
+            const shiftDateVal = req.shift_date || req.start_date || '';
+            const todayIsoVal = new Date().toISOString().slice(0, 10);
+            const isFutureShift = Boolean(shiftDateVal && shiftDateVal > todayIsoVal);
+            const isDispatched = Boolean(req.staff_name && !isOnSite && !isCompleted && status !== 'cancelled' && !isFutureShift);
+            const isScheduledFuture = Boolean(req.staff_name && !isOnSite && !isCompleted && status !== 'cancelled' && isFutureShift);
             const isCancelled = status === 'cancelled';
 
             // 5-step stepper index: 1: Requested, 2: Matched, 3: Dispatched, 4: On-site, 5: Completed
@@ -8858,6 +8871,8 @@ html, body {
             let badgeHtml = '<span class="badge badge-routine">Pending</span>';
             if (isOnSite) {
               badgeHtml = '<span class="badge badge-active"><span class="live-dot" style="display:inline-block;margin-right:4px;vertical-align:middle;"></span> Active on-site</span>';
+            } else if (isScheduledFuture) {
+              badgeHtml = '<span class="badge" style="background:#E0F2FE;color:#0369A1;font-weight:700;">Scheduled &bull; ' + escapeHTML(shiftDateVal) + '</span>';
             } else if (isDispatched) {
               badgeHtml = '<span class="badge badge-active">Dispatched</span>';
             } else if (isCompleted) {
@@ -11274,6 +11289,24 @@ async function checkClockStatus() {
           instrEl.textContent = currentAssignedShift.special_instructions || 'Report to unit charge nurse on arrival. Wear standard clinical scrubs & valid facility identification badge.';
         }
 
+        const btnAlloc = document.getElementById('btn-clock-in-allocated');
+        if (btnAlloc && currentAssignedShift && currentAssignedShift.start_date) {
+          const rawD = currentAssignedShift.start_date;
+          const sDateStr = typeof rawD === 'string' ? rawD.slice(0, 10) : new Date(rawD).toISOString().slice(0, 10);
+          const lNowStr = new Date(Date.now() - (new Date().getTimezoneOffset() * 60000)).toISOString().slice(0, 10);
+          if (sDateStr > lNowStr) {
+            btnAlloc.disabled = true;
+            btnAlloc.style.opacity = '0.65';
+            btnAlloc.style.cursor = 'not-allowed';
+            btnAlloc.innerHTML = '<i data-lucide="calendar-clock" style="width:20px;height:20px;"></i> <span>Scheduled for ' + sDateStr + ' (Clock-in unlocks on shift day)</span>';
+          } else {
+            btnAlloc.disabled = false;
+            btnAlloc.style.opacity = '1';
+            btnAlloc.style.cursor = 'pointer';
+            btnAlloc.innerHTML = '<i data-lucide="play-circle" style="width:22px;height:22px;"></i> <span>Clock In to Assigned Shift (1-Tap EVV Verification)</span>';
+          }
+        }
+
         if (ovAssignedFac) ovAssignedFac.textContent = fac;
         if (ovAssignedUnit) ovAssignedUnit.textContent = unit;
         if (ovBadge) {
@@ -11309,6 +11342,15 @@ async function checkClockStatus() {
 // ------------------------------------------------------------------------
 async function handleStaffClockAction(action) {
   if (action === 'clock_in') {
+    if (currentAssignedShift && currentAssignedShift.start_date) {
+      const rawD = currentAssignedShift.start_date;
+      const sDateStr = typeof rawD === 'string' ? rawD.slice(0, 10) : new Date(rawD).toISOString().slice(0, 10);
+      const lNowStr = new Date(Date.now() - (new Date().getTimezoneOffset() * 60000)).toISOString().slice(0, 10);
+      if (sDateStr > lNowStr) {
+        alert('Premature Clock-In Prohibited:\n\nThis shift is scheduled for ' + sDateStr + '. You may only clock in on the scheduled shift dispatch date.');
+        return;
+      }
+    }
     const shiftId = currentAssignedShift ? currentAssignedShift.id : null;
     const reqCode = currentAssignedShift ? currentAssignedShift.request_code : '';
     const facName = currentAssignedShift ? currentAssignedShift.facility_name : 'Partner Facility';

@@ -12,7 +12,7 @@
 
 const { escapeHtml, sanitizeHeader } = require('./cryptoUtils');
 
-const APP_URL = () => (process.env.APP_BASE_URL || process.env.APP_URL || 'https://www.divinefingershealthcare.ca').replace(/\/$/, '');
+const APP_URL = () => (process.env.PUBLIC_BASE_URL || process.env.APP_BASE_URL || process.env.APP_URL || 'https://www.divinefingershealthcare.ca').replace(/\/$/, '');
 
 function wrapTemplate(title, bodyContent) {
   return `<!DOCTYPE html>

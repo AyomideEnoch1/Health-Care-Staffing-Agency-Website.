@@ -10,6 +10,7 @@
     "backend:dev": "npm --prefix backend run dev",
     "frontend:start": "npm --prefix frontend start",
     "frontend:dev": "npm --prefix frontend run dev",
+    "create:admin": "node scripts/create-admin.js",
     "test": "npm --prefix backend test"
   },
   "dependencies": {

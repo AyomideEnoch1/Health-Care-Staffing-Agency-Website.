@@ -149,7 +149,7 @@ function buildStaffingRequestAlertEmail(requestData) {
   const safeRole = escapeHtml(sanitizeHeader(requestData.role_requested || 'Staffing'));
   const safeCode = escapeHtml(sanitizeHeader(requestData.request_code || 'REF'));
   const safeUrgency = escapeHtml(sanitizeHeader(requestData.urgency_level || 'routine'));
-  const safeAppUrl = sanitizeHeader(process.env.APP_URL || 'https://www.divinefingershealthcare.ca');
+  const safeAppUrl = sanitizeHeader(process.env.PUBLIC_BASE_URL || process.env.APP_URL || 'https://www.divinefingershealthcare.ca');
 
   const subject = `[STAFF REQUEST ALERT] ${requestData.urgency_level === 'emergency_surge' ? '🚨 EMERGENCY: ' : ''}${requestData.facility_name || 'Facility'} - ${requestData.role_requested || 'Clinician'}`;
   

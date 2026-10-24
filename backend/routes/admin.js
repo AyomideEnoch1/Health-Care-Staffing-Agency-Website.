@@ -730,7 +730,7 @@ router.post('/roster', requirePermission('roster:manage'), async (req, res, next
         [activationHash, emailClean]
       );
       const reqOrigin = req.get('host') ? `${req.protocol || 'http'}://${req.get('host')}` : 'http://localhost:3000';
-    const appBaseUrl = (process.env.APP_BASE_URL || process.env.APP_URL || reqOrigin).replace(/\/$/, '');
+    const appBaseUrl = (process.env.PUBLIC_BASE_URL || process.env.APP_BASE_URL || process.env.APP_URL || reqOrigin).replace(/\/$/, '');
       const activationUrl = `${appBaseUrl}/portal.html?action=activate&token=${activationToken}&email=${encodeURIComponent(emailClean)}`;
 
       await enqueueMail({
@@ -792,7 +792,7 @@ router.post('/staff/:id/reset-password', requirePermission('roster:manage'), asy
     );
 
     const reqOrigin = req.get('host') ? `${req.protocol || 'http'}://${req.get('host')}` : 'http://localhost:3000';
-    const appBaseUrl = (process.env.APP_BASE_URL || process.env.APP_URL || reqOrigin).replace(/\/$/, '');
+    const appBaseUrl = (process.env.PUBLIC_BASE_URL || process.env.APP_BASE_URL || process.env.APP_URL || reqOrigin).replace(/\/$/, '');
     const resetUrl = `${appBaseUrl}/login.html?action=reset&token=${resetToken}&email=${encodeURIComponent(staff.email)}`;
 
     // Dispatch secure reset link via enterprise MailService
@@ -841,6 +841,27 @@ router.patch('/roster/:id', requirePermission('roster:manage'), async (req, res,
       return res.status(404).json({ success: false, error: 'Staff member not found.' });
     }
 
+    // Guard: Admin cannot approve or activate staff member if primary credentials (CPR/BLS) expiry date is missing or expired
+    const nextStatus = status ?? cur.status;
+    const nextCredStatus = credential_status ?? cur.credential_status;
+    const effectiveCprExpiry = cpr_expiry_date ?? cur.cpr_expiry_date;
+
+    if ((nextStatus === 'available' || nextCredStatus === 'verified') && (cur.status !== 'available' || cur.credential_status !== 'verified')) {
+      if (!effectiveCprExpiry) {
+        return res.status(400).json({
+          success: false,
+          error: 'Cannot approve staff member: Primary credential (CPR/BLS certification) expiry date has not been provided. Please provide a valid future expiry date before activating dispatch.'
+        });
+      }
+      const expDate = new Date(effectiveCprExpiry);
+      if (isNaN(expDate.getTime()) || expDate < new Date()) {
+        return res.status(400).json({
+          success: false,
+          error: `Cannot approve staff member: Primary credential (CPR/BLS certification) is expired (${effectiveCprExpiry}). A valid future credential date is required for clinical dispatch.`
+        });
+      }
+    }
+
     await pool.query(
       `UPDATE staff_roster SET
         name = ?, role = ?, specialty = ?, status = ?, credential_status = ?,
@@ -887,6 +908,22 @@ router.post('/roster/:id/approve', requirePermission('roster:manage'), async (re
     const cur = await ensureRosterStaff(id);
     if (!cur) {
       return res.status(404).json({ success: false, error: 'Staff member not found.' });
+    }
+
+    // Guard: Prevent approval if primary credential (CPR/BLS) expiry date is missing or expired
+    const effectiveCprExpiry = cur.cpr_expiry_date;
+    if (!effectiveCprExpiry) {
+      return res.status(400).json({
+        success: false,
+        error: 'Cannot approve staff member: Primary credential (CPR/BLS certification) expiry date has not been provided. Please specify a valid credential expiry date before approving.'
+      });
+    }
+    const expDate = new Date(effectiveCprExpiry);
+    if (isNaN(expDate.getTime()) || expDate < new Date()) {
+      return res.status(400).json({
+        success: false,
+        error: `Cannot approve staff member: Primary credential (CPR/BLS certification) is expired (${effectiveCprExpiry}). A valid future credential date is required before activating for clinical dispatch.`
+      });
     }
 
     await pool.query(
@@ -1690,7 +1727,7 @@ router.post('/admins', requirePermission('admins:manage'), async (req, res, next
         [inviteHash, newId]
       );
       const reqOrigin = req.get('host') ? `${req.protocol || 'http'}://${req.get('host')}` : 'http://localhost:3000';
-    const appBaseUrl = (process.env.APP_BASE_URL || process.env.APP_URL || reqOrigin).replace(/\/$/, '');
+    const appBaseUrl = (process.env.PUBLIC_BASE_URL || process.env.APP_BASE_URL || process.env.APP_URL || reqOrigin).replace(/\/$/, '');
       const inviteUrl = `${appBaseUrl}/admin-login.html?invite=${inviteToken}&email=${encodeURIComponent(emailLower)}`;
 
       await enqueueMail({
@@ -2135,7 +2172,7 @@ router.post('/registered-clients/:id/reset-password', async (req, res, next) => 
     const reqHost = req.get('host') || 'health-care-staffing-agency-website.vercel.app';
     const reqProto = req.get('x-forwarded-proto') || req.protocol || 'https';
     const autoOrigin = `${reqProto}://${reqHost}`;
-    const appBaseUrl = (process.env.APP_BASE_URL || process.env.APP_URL || autoOrigin).replace(/\/$/, '');
+    const appBaseUrl = (process.env.PUBLIC_BASE_URL || process.env.APP_BASE_URL || process.env.APP_URL || autoOrigin).replace(/\/$/, '');
     const resetUrl = `${appBaseUrl}/login.html?action=reset&token=${resetToken}&email=${encodeURIComponent(user.email)}`;
 
     // Dispatch directly with sendRawMail
@@ -3201,6 +3238,9 @@ router.post('/roster/:id/avatar', requirePermission('roster:manage'), uploadAvat
     }
 
     await pool.query('UPDATE staff_roster SET avatar_url = ? WHERE id = ?', [avatarUrl, id]);
+    if (staff.email) {
+      await pool.query('UPDATE users SET avatar_url = ? WHERE LOWER(email) = ? OR id = ?', [avatarUrl, staff.email.toLowerCase().trim(), id]).catch(() => {});
+    }
 
     await pool.query(
       `INSERT INTO audit_logs (id, admin_id, actor_name, action, target_entity, target_id, details, severity, ip_address)
@@ -3246,6 +3286,9 @@ router.delete('/roster/:id/avatar', requirePermission('roster:manage'), async (r
     }
 
     await pool.query('UPDATE staff_roster SET avatar_url = NULL WHERE id = ?', [id]);
+    if (staff.email) {
+      await pool.query('UPDATE users SET avatar_url = NULL WHERE LOWER(email) = ? OR id = ?', [staff.email.toLowerCase().trim(), id]).catch(() => {});
+    }
 
     await pool.query(
       `INSERT INTO audit_logs (id, admin_id, actor_name, action, target_entity, target_id, details, severity, ip_address)
