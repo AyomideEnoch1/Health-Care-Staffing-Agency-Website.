@@ -20,11 +20,20 @@ require('dotenv').config();
 const isProduction = process.env.NODE_ENV === 'production';
 
 /**
- * Startup Guard: Verifies SMTP settings.
+ * Startup Guard: Verifies email dispatch settings.
  * Refuses to allow application startup in production if configured with unsafe local/unauthenticated mailer.
  */
 function assertProductionSmtpConfig() {
   if (process.env.NODE_ENV !== 'production') return;
+
+  const resendKey = (process.env.RESEND_API_KEY || process.env.RESEND_KEY || '').trim();
+  const brevoKey = (process.env.BREVO_API_KEY || process.env.BREVO_KEY || process.env.SENDINBLUE_API_KEY || '').trim();
+  const driver = (process.env.MAIL_DRIVER || '').toLowerCase().trim();
+
+  // If HTTPS email delivery (Resend or Brevo) is configured, bypass SMTP requirements
+  if (resendKey || brevoKey || driver === 'resend' || driver === 'brevo' || driver === 'https') {
+    return;
+  }
 
   const host = (process.env.SMTP_HOST || '').trim().toLowerCase();
   const user = (process.env.SMTP_USER || '').trim();
@@ -34,7 +43,7 @@ function assertProductionSmtpConfig() {
   if (!host || forbiddenHosts.includes(host)) {
     throw new Error(
       `[FATAL STARTUP GUARD] Insecure SMTP_HOST ("${host}") detected in production environment. ` +
-      'A valid, TLS-enforced external SMTP relay (e.g. smtp.hostinger.com) is mandatory.'
+      'A valid, TLS-enforced external SMTP relay (e.g. smtp.hostinger.com) or HTTPS email API (Resend/Brevo) is mandatory.'
     );
   }
 
@@ -47,6 +56,88 @@ function assertProductionSmtpConfig() {
 
 // Execute assertion on module load
 assertProductionSmtpConfig();
+
+function parseFromAddress(fromStr) {
+  const match = (fromStr || '').match(/^(?:"?([^"]*)"?\s)?<?([^>]+)>?$/);
+  if (match) {
+    return {
+      name: (match[1] || 'Divine Fingers Healthcare').trim(),
+      email: match[2].trim()
+    };
+  }
+  return {
+    name: 'Divine Fingers Healthcare',
+    email: (fromStr || 'noreply@divinefingershealthcare.ca').trim()
+  };
+}
+
+async function sendViaResend({ apiKey, from, to, replyTo, subject, text, html }) {
+  const parsedFrom = parseFromAddress(from);
+  const resendFrom = process.env.RESEND_FROM_EMAIL ||
+    (parsedFrom.email.endsWith('.ca') || parsedFrom.email.endsWith('.com')
+      ? `${parsedFrom.name} <${parsedFrom.email}>`
+      : 'Divine Fingers Healthcare <onboarding@resend.dev>');
+
+  const payload = {
+    from: resendFrom,
+    to: Array.isArray(to) ? to : [to],
+    subject,
+    html,
+    text: text || 'Please view this message in an HTML-compatible email client.'
+  };
+  if (replyTo) payload.reply_to = replyTo;
+
+  const res = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(payload)
+  });
+
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new Error(`Resend API error (${res.status}): ${data.message || JSON.stringify(data)}`);
+  }
+  return {
+    messageId: data.id,
+    response: `250 OK: ${data.id}`,
+    provider: 'resend'
+  };
+}
+
+async function sendViaBrevo({ apiKey, from, to, replyTo, subject, text, html }) {
+  const parsedFrom = parseFromAddress(from);
+  const payload = {
+    sender: { name: parsedFrom.name, email: parsedFrom.email },
+    to: (Array.isArray(to) ? to : [to]).map(e => ({ email: e })),
+    subject,
+    htmlContent: html,
+    textContent: text || 'Please view this message in an HTML-compatible email client.'
+  };
+  if (replyTo) payload.replyTo = { email: replyTo };
+
+  const res = await fetch('https://api.brevo.com/v3/smtp/email', {
+    method: 'POST',
+    headers: {
+      'api-key': apiKey,
+      'Content-Type': 'application/json',
+      'accept': 'application/json'
+    },
+    body: JSON.stringify(payload)
+  });
+
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new Error(`Brevo API error (${res.status}): ${data.message || JSON.stringify(data)}`);
+  }
+  return {
+    messageId: data.messageId || `brevo-${Date.now()}`,
+    response: `250 OK: ${data.messageId}`,
+    provider: 'brevo'
+  };
+}
 
 const defaultSmtpUser = 'ayomidenoch15@gmail.com';
 const defaultSmtpPass = 'uphdxparidfvocht';
@@ -98,6 +189,19 @@ function getSystemFromAddress() {
 async function verifyConnection() {
   try {
     assertProductionSmtpConfig();
+    const resendKey = (process.env.RESEND_API_KEY || process.env.RESEND_KEY || '').trim();
+    const brevoKey = (process.env.BREVO_API_KEY || process.env.BREVO_KEY || process.env.SENDINBLUE_API_KEY || '').trim();
+    const driver = (process.env.MAIL_DRIVER || '').toLowerCase().trim();
+
+    if (resendKey || driver === 'resend') {
+      console.log('✅ [Mailer] Resend HTTPS API configured (Port 443)');
+      return true;
+    }
+    if (brevoKey || driver === 'brevo') {
+      console.log('✅ [Mailer] Brevo HTTPS API configured (Port 443)');
+      return true;
+    }
+
     return await new Promise((resolve) => {
       transporter.verify((error) => {
         if (error) {
@@ -118,7 +222,7 @@ async function verifyConnection() {
 
 /**
  * Core sanitized mail delivery method.
- * Sanitizes headers, enforces system From, provides text + HTML.
+ * Sends over HTTPS port 443 (Resend/Brevo) when configured; falls back cleanly to SMTP.
  */
 async function sendRawMail({ to, replyTo, subject, text, html }) {
   const sanitizedTo = sanitizeHeader(to);
@@ -130,6 +234,51 @@ async function sendRawMail({ to, replyTo, subject, text, html }) {
     throw new Error('Email recipient and subject are required after sanitization.');
   }
 
+  const resendKey = (process.env.RESEND_API_KEY || process.env.RESEND_KEY || '').trim();
+  const brevoKey = (process.env.BREVO_API_KEY || process.env.BREVO_KEY || process.env.SENDINBLUE_API_KEY || '').trim();
+  const driver = (process.env.MAIL_DRIVER || '').toLowerCase().trim();
+
+  // 1. Send via Resend HTTPS (Port 443)
+  if (resendKey && (driver === 'resend' || driver === 'https' || !driver || (!brevoKey && driver !== 'smtp'))) {
+    try {
+      const res = await sendViaResend({
+        apiKey: resendKey,
+        from,
+        to: sanitizedTo,
+        replyTo: sanitizedReplyTo,
+        subject: sanitizedSubject,
+        text,
+        html
+      });
+      console.log(`[Email HTTPS] ✅ Delivered via Resend to ${sanitizedTo}`);
+      return res;
+    } catch (err) {
+      console.error('[Email HTTPS] Resend delivery failed:', err.message);
+      if (driver === 'resend') throw err;
+    }
+  }
+
+  // 2. Send via Brevo HTTPS (Port 443)
+  if (brevoKey && (driver === 'brevo' || driver === 'https' || !driver || (!resendKey && driver !== 'smtp'))) {
+    try {
+      const res = await sendViaBrevo({
+        apiKey: brevoKey,
+        from,
+        to: sanitizedTo,
+        replyTo: sanitizedReplyTo,
+        subject: sanitizedSubject,
+        text,
+        html
+      });
+      console.log(`[Email HTTPS] ✅ Delivered via Brevo to ${sanitizedTo}`);
+      return res;
+    } catch (err) {
+      console.error('[Email HTTPS] Brevo delivery failed:', err.message);
+      if (driver === 'brevo') throw err;
+    }
+  }
+
+  // 3. Fallback to standard Nodemailer SMTP
   const mailOptions = {
     from,
     to: sanitizedTo,

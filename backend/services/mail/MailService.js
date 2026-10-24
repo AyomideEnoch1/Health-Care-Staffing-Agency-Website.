@@ -4,11 +4,15 @@ const pool = require('../../db');
 const { compileTemplate, interpolate, validateVariables, htmlToPlainText } = require('./templateEngine');
 const ConsoleLogAdapter = require('./adapters/ConsoleLogAdapter');
 const SmtpAdapter = require('./adapters/SmtpAdapter');
+const ResendAdapter = require('./adapters/ResendAdapter');
+const BrevoAdapter = require('./adapters/BrevoAdapter');
 
 class MailService {
   constructor() {
     this.consoleAdapter = new ConsoleLogAdapter();
     this.smtpAdapter = new SmtpAdapter();
+    this.resendAdapter = new ResendAdapter();
+    this.brevoAdapter = new BrevoAdapter();
     this.workerTimer = null;
     this.isDispatching = false;
 
@@ -21,9 +25,25 @@ class MailService {
    * Determine active adapter based on environment or fallback
    */
   getAdapter() {
-    const driver = process.env.MAIL_DRIVER || 'smtp';
+    const driver = (process.env.MAIL_DRIVER || '').toLowerCase().trim();
     if (driver === 'console') {
       return this.consoleAdapter;
+    }
+    if (driver === 'resend' || (process.env.RESEND_API_KEY && !driver)) {
+      return this.resendAdapter;
+    }
+    if (driver === 'brevo' || (process.env.BREVO_API_KEY && !driver)) {
+      return this.brevoAdapter;
+    }
+    if (driver === 'https') {
+      if (process.env.RESEND_API_KEY) return this.resendAdapter;
+      if (process.env.BREVO_API_KEY) return this.brevoAdapter;
+    }
+    if (process.env.RESEND_API_KEY) {
+      return this.resendAdapter;
+    }
+    if (process.env.BREVO_API_KEY) {
+      return this.brevoAdapter;
     }
     return this.smtpAdapter;
   }
