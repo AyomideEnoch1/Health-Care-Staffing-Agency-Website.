@@ -12,7 +12,11 @@ class ResendAdapter extends BaseAdapter {
   async send(options) {
     const to = sanitizeHeader(options.to);
     const subject = sanitizeHeader(options.subject);
-    const from = options.from ? sanitizeHeader(options.from) : this.systemFrom;
+    let from = options.from ? sanitizeHeader(options.from) : this.systemFrom;
+
+    if (!from || from.includes('@gmail.com') || from.includes('@yahoo.com') || from.includes('@hotmail.com')) {
+      from = 'Divine Fingers Healthcare <onboarding@resend.dev>';
+    }
 
     if (!this.apiKey) {
       throw new Error('ResendAdapter: RESEND_API_KEY is not configured.');

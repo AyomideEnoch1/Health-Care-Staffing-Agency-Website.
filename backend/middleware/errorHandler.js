@@ -24,9 +24,15 @@ function errorHandler(err, req, res, next) {
   }
 
   // Consistent sanitized client error
+  const safeErrorMessage = err.status
+    ? err.message
+    : (err.message && !err.message.includes('password') && !err.message.includes('secret')
+        ? err.message
+        : 'An error occurred while processing your request. Please contact support.');
+
   res.status(err.status || 500).json({
     success: false,
-    error: err.status ? err.message : 'An error occurred while processing your request. Please contact support.'
+    error: safeErrorMessage
   });
 }
 

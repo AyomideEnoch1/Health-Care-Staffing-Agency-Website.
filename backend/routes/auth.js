@@ -36,7 +36,8 @@ const loginSchema = z.object({
 });
 
 function extractClientFingerprint(req) {
-  const ip = req.ip || req.connection.remoteAddress || '127.0.0.1';
+  const rawIp = req.ip || (req.socket && req.socket.remoteAddress) || (req.connection && req.connection.remoteAddress) || '127.0.0.1';
+  const ip = String(rawIp).split(',')[0].trim().slice(0, 45);
   let subnet = ip;
   if (ip.includes('.')) {
     subnet = ip.split('.').slice(0, 3).join('.') + '.0/24';
@@ -539,7 +540,7 @@ router.post('/mfa/confirm', requireAdminAuth(), async (req, res, next) => {
     await pool.query(
       `INSERT INTO audit_logs (id, admin_id, actor_name, action, target_entity, details, severity, ip_address)
        VALUES (?, ?, ?, 'MFA_ENABLED', 'admins', 'User enrolled and verified Two-Factor Authentication (TOTP)', 'info', ?)`,
-      [crypto.randomUUID(), req.admin.id, req.admin.full_name, req.ip]
+      [crypto.randomUUID(), req.admin.id, req.admin.full_name, req.ip ? String(req.ip).split(',')[0].trim().slice(0, 45) : '127.0.0.1']
     );
 
     res.json({
