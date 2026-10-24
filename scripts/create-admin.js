@@ -5,6 +5,7 @@
  * Divine Fingers Healthcare Services Inc.
  * 
  * Safely provisions a super-admin account via CLI interactive prompts.
+ * Prompts for target database (Aiven Cloud vs Local WAMP).
  * Prompts for email, full name, and password (masked).
  * Hashes password using bcryptjs with 12 salt rounds.
  * Sets totp_secret to NULL.
@@ -15,15 +16,9 @@ const readline = require('readline');
 const { Writable } = require('stream');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
+const fs = require('fs');
 const path = require('path');
-
-// Resolve database pool
-let pool;
-try {
-  pool = require('../backend/db');
-} catch {
-  pool = require('./backend/db');
-}
+const mysql = require('mysql2/promise');
 
 const ALL_PERMISSIONS = [
   'requests:view',
@@ -91,7 +86,65 @@ async function main() {
   console.log(' Divine Fingers Healthcare - Provision Super-Admin');
   console.log('======================================================\n');
 
+  let activePool = null;
+
   try {
+    console.log('Choose target database:');
+    console.log('  1) Aiven Cloud MySQL (defaultdb) - [Production / Render]');
+    console.log('  2) Local WAMP MySQL (127.0.0.1)  - [Local Development]\n');
+    const dbChoice = await promptInput('Select option [1/2, default 1]: ');
+    const isAiven = dbChoice !== '2';
+
+    if (isAiven) {
+      const caPath = fs.existsSync(path.join(__dirname, 'ca.pem'))
+        ? path.join(__dirname, 'ca.pem')
+        : path.join(__dirname, '../ca.pem');
+
+      if (!fs.existsSync(caPath)) {
+        throw new Error('ca.pem not found. Required for Aiven TLS connection.');
+      }
+      const ca = fs.readFileSync(caPath, 'utf8');
+
+      const aivenHost = process.env.AIVEN_DB_HOST || process.env.DB_HOST || 'mysql-126c0c8b-divine-finger-staffing-agency.e.aivencloud.com';
+      const aivenPort = parseInt(process.env.AIVEN_DB_PORT || process.env.DB_PORT || '26376', 10);
+      const aivenUser = process.env.AIVEN_DB_USER || process.env.DB_USER || 'avnadmin';
+      let aivenPass = process.env.AIVEN_DB_PASSWORD || (process.env.DB_HOST === aivenHost ? process.env.DB_PASSWORD : '');
+
+      if (!aivenPass) {
+        aivenPass = await promptPassword('Enter Aiven DB Password: ');
+      }
+
+      activePool = mysql.createPool({
+        host: aivenHost,
+        port: aivenPort,
+        user: aivenUser,
+        password: aivenPass,
+        database: process.env.AIVEN_DB_NAME || process.env.DB_NAME || 'defaultdb',
+        ssl: { ca, rejectUnauthorized: true },
+        waitForConnections: true,
+        connectionLimit: 3
+      });
+
+      console.log('\n🌐 Connecting to Aiven Remote MySQL (defaultdb)...');
+      await activePool.query('SELECT 1');
+      console.log('✅ Connected to Aiven MySQL with TLS.');
+    } else {
+      activePool = mysql.createPool({
+        host: process.env.DB_HOST || '127.0.0.1',
+        port: parseInt(process.env.DB_PORT || '3306', 10),
+        user: process.env.DB_USER || 'root',
+        password: process.env.DB_PASSWORD || '',
+        database: process.env.DB_NAME || 'divine_fingers_dev',
+        waitForConnections: true,
+        connectionLimit: 3
+      });
+
+      console.log('\n💻 Connecting to Local MySQL (127.0.0.1)...');
+      await activePool.query('SELECT 1');
+      console.log('✅ Connected to Local MySQL.');
+    }
+
+    console.log('');
     const email = await promptInput('Enter Admin Email: ');
     if (!email || !email.includes('@') || !email.includes('.')) {
       console.error('❌ Error: A valid email address is required.');
@@ -146,7 +199,7 @@ async function main() {
         updated_at = NOW();
     `;
 
-    await pool.query(query, [
+    await activePool.query(query, [
       adminId,
       cleanEmail,
       passwordHash,
@@ -154,19 +207,27 @@ async function main() {
       permissionsJson
     ]);
 
-    console.log('\n✅ Super-admin provisioned successfully!');
+    console.log('\n======================================================');
+    console.log('✅ Super-admin account provisioned successfully!');
+    console.log('======================================================');
     console.log(`👤 ID:          ${adminId}`);
     console.log(`📧 Email:       ${cleanEmail}`);
     console.log(`🏷️  Role:        super-admin`);
-    console.log(`🔑 Permissions: ${ALL_PERMISSIONS.length} permissions granted`);
-    console.log(`🛡️  2FA Secret:  NULL (Not enrolled)\n`);
+    console.log(`🔑 Permissions: ${ALL_PERMISSIONS.length} full permissions granted`);
+    console.log(`🛡️  2FA (TOTP):  Unenrolled (OTP challenge will be sent to your email on login)`);
+    console.log(`🌐 Target DB:   ${isAiven ? 'Aiven Cloud (defaultdb)' : 'Local WAMP MySQL'}`);
+    console.log('\nYou can now log in at:');
+    if (isAiven) {
+      console.log('  👉 Production: https://divine-fingers-healthcare.onrender.com/admin');
+    }
+    console.log('  👉 Local:      http://localhost:3000/admin\n');
 
   } catch (err) {
     console.error(`\n❌ Failed to provision admin: ${err.message}`);
     process.exit(1);
   } finally {
-    if (pool && typeof pool.end === 'function') {
-      await pool.end();
+    if (activePool && typeof activePool.end === 'function') {
+      await activePool.end();
     }
     process.exit(0);
   }
