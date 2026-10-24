@@ -2,12 +2,24 @@
 .env
 .env.local
 .env.production
+.env.test
+backend/.env
+backend/.env.local
+backend/.env.production
+backend/.env.test
+!.env.example
+!.env.local.example
+!backend/.env.example
+!backend/.env.local.example
 
 # Dependencies
 node_modules/
+backend/node_modules/
+frontend/node_modules/
 
 # File uploads (Candidate resumes containing PII)
 uploads/
+backend/uploads/
 
 # Deployments & IDE
 .vercel
@@ -17,11 +29,9 @@ uploads/
 *.log
 .DS_Store
 Thumbs.db
+
 # Temporary and scratch
 scratch/
 deploy-bundle/
 *.zip
 *.docx
-
-.vercel
-.env*

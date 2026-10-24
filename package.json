@@ -1,16 +1,16 @@
 {
-  "name": "divine-fingers-backend",
+  "name": "divine-fingers-healthcare",
   "version": "1.0.0",
-  "description": "Secure Node.js and MySQL Backend for Divine Fingers Healthcare Services Inc.",
-  "main": "server.js",
+  "description": "Full-stack Healthcare Staffing Agency Platform - Divine Fingers Healthcare Services Inc.",
+  "private": true,
   "scripts": {
-    "dev": "nodemon server.js",
-    "start": "node server.js",
-    "db:up": "docker compose up -d",
-    "db:down": "docker compose down",
-    "db:reset": "docker compose down -v && docker compose up -d db && node scripts/seedAdmin.js",
-    "seed:admin": "node scripts/seedAdmin.js",
-    "test": "node --test tests/**/*.test.js"
+    "start": "node backend/server.js",
+    "dev": "nodemon backend/server.js",
+    "backend:start": "npm --prefix backend start",
+    "backend:dev": "npm --prefix backend run dev",
+    "frontend:start": "npm --prefix frontend start",
+    "frontend:dev": "npm --prefix frontend run dev",
+    "test": "npm --prefix backend test"
   },
   "dependencies": {
     "adm-zip": "^0.6.0",
