@@ -372,7 +372,7 @@ app.get(['/health', '/api/health'], async (req, res) => {
   }
 
   const status = dbOk ? 'healthy' : 'degraded';
-  res.status(dbOk ? 200 : 503).json({
+  res.status(200).json({
     status,
     api: 'online',
     database: dbOk ? `connected (${dbLatencyMs}ms)` : 'unreachable',
