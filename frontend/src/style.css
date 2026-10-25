@@ -3490,6 +3490,161 @@ body.has-gsap .proto-gradient-callout {
 .proto-content-card .detail-item:nth-child(6),
 .contact-info-card .detail-item:nth-child(6) { transition-delay: 0.86s; }
 
+/* ==========================================================================
+   MOBILE & TABLET SCROLL ENTRANCE ANIMATIONS (< 992px)
+   ========================================================================== */
+@media (max-width: 991px) {
+  /* Initial hidden state before scrolling into view on mobile/tablet */
+  .header-slide-logo,
+  .hero-slide-title,
+  .hero-slide-sub,
+  .hero-slide-btns,
+  .strip-slide-text,
+  .strip-fade-form,
+  .strip-slide-social-text,
+  .strip-slide-icon,
+  .welcome-slide-heading,
+  .welcome-slide-body,
+  .welcome-slide-cta,
+  .workforce-slide-header,
+  .workforce-slide-body,
+  .workforce-slide-link,
+  .workforce-slide-right,
+  .about-slide-header,
+  .about-slide-body,
+  .about-slide-highlights,
+  .about-slide-right,
+  .purpose-slide-left,
+  .purpose-slide-right,
+  .purpose-slide-header,
+  .purpose-slide-body,
+  .purpose-slide-link,
+  .values-slide-header,
+  .values-slide-body,
+  .values-slide-grid,
+  .solutions-slide-left,
+  .solutions-slide-right,
+  .excellence-slide-left,
+  .excellence-slide-right,
+  .showcase-slide-header,
+  .showcase-slide-body,
+  .showcase-slide-grid,
+  .team-slide-header,
+  .team-slide-body,
+  .team-slide-media,
+  .team-slide-link,
+  .team-slide-benefits,
+  .team-slide-grid,
+  .contact-slide-left,
+  .contact-slide-right,
+  .callout-slide-left,
+  .callout-slide-right,
+  .footer-slide-col,
+  .anim-section .slide-left,
+  .ref-service-row .slide-left,
+  .anim-section .slide-right,
+  .ref-service-row .slide-right,
+  .anim-section .slide-up,
+  .ref-service-row .slide-up,
+  .anim-section .slide-top,
+  .ref-service-row .slide-top,
+  .ref-service-row .ref-micro-pill {
+    opacity: 0;
+    transform: translateY(22px);
+    transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.80s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: transform, opacity;
+  }
+
+  /* When parent section becomes .is-revealed on mobile/tablet */
+  .site-header.is-revealed .header-slide-logo,
+  .hero-section.is-revealed .hero-slide-title,
+  .hero-section.is-revealed .hero-slide-sub,
+  .hero-section.is-revealed .hero-slide-btns,
+  .strip-section.is-revealed .strip-slide-text,
+  .strip-section.is-revealed .strip-fade-form,
+  .strip-section.is-revealed .strip-slide-social-text,
+  .strip-section.is-revealed .strip-slide-icon,
+  .welcome-section.is-revealed .welcome-slide-heading,
+  .welcome-section.is-revealed .welcome-slide-body,
+  .welcome-section.is-revealed .welcome-slide-cta,
+  .proto-workforce-section.is-revealed .workforce-slide-header,
+  .proto-workforce-section.is-revealed .workforce-slide-body,
+  .proto-workforce-section.is-revealed .workforce-slide-link,
+  .proto-workforce-section.is-revealed .workforce-slide-right,
+  #executive-overview.is-revealed .workforce-slide-header,
+  #executive-overview.is-revealed .about-slide-header,
+  #executive-overview.is-revealed .about-slide-body,
+  #executive-overview.is-revealed .about-slide-highlights,
+  #executive-overview.is-revealed .about-slide-right,
+  #purpose-section.is-revealed .purpose-slide-left,
+  #purpose-section.is-revealed .purpose-slide-right,
+  #purpose-section.is-revealed .purpose-slide-header,
+  #purpose-section.is-revealed .purpose-slide-body,
+  #purpose-section.is-revealed .purpose-slide-link,
+  .proto-tricard-section.is-revealed .values-slide-header,
+  .proto-tricard-section.is-revealed .values-slide-body,
+  .proto-tricard-section.is-revealed .values-slide-grid,
+  .solutions-story-row.is-revealed .solutions-slide-left,
+  .solutions-story-row.is-revealed .solutions-slide-right,
+  .excellence-block.is-revealed .excellence-slide-left,
+  .excellence-block.is-revealed .excellence-slide-right,
+  .showcase-block.is-revealed .showcase-slide-header,
+  .showcase-block.is-revealed .showcase-slide-body,
+  .showcase-block.is-revealed .showcase-slide-grid,
+  .proto-mission-section.is-revealed .team-slide-header,
+  .proto-mission-section.is-revealed .team-slide-body,
+  .proto-mission-section.is-revealed .team-slide-media,
+  .proto-mission-section.is-revealed .team-slide-link,
+  .proto-mission-section.is-revealed .team-slide-benefits,
+  .proto-mission-section.is-revealed .team-slide-grid,
+  #about-team.is-revealed .team-slide-header,
+  #about-team.is-revealed .team-slide-body,
+  #about-team.is-revealed .team-slide-media,
+  #about-team.is-revealed .team-slide-link,
+  #about-team.is-revealed .team-slide-benefits,
+  .contact-section.is-revealed .contact-slide-left,
+  .contact-section.is-revealed .contact-slide-right,
+  .callout-banner-section.is-revealed .callout-slide-left,
+  .callout-banner-section.is-revealed .callout-slide-right,
+  .site-footer.is-revealed .footer-slide-col,
+  .anim-section.is-revealed .slide-left,
+  .ref-service-row.is-revealed .slide-left,
+  .anim-section.is-revealed .slide-right,
+  .ref-service-row.is-revealed .slide-right,
+  .anim-section.is-revealed .slide-up,
+  .ref-service-row.is-revealed .slide-up,
+  .anim-section.is-revealed .slide-top,
+  .ref-service-row.is-revealed .slide-top,
+  .ref-service-row.is-revealed .ref-micro-pill {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+  }
+
+  /* Stagger delays on mobile for natural reading rhythm */
+  .welcome-slide-body       { transition-delay: 0.10s; }
+  .welcome-slide-cta        { transition-delay: 0.18s; }
+  .workforce-slide-body     { transition-delay: 0.08s; }
+  .workforce-slide-link     { transition-delay: 0.15s; }
+  .workforce-slide-right    { transition-delay: 0.20s; }
+  .about-slide-body         { transition-delay: 0.08s; }
+  .about-slide-highlights   { transition-delay: 0.15s; }
+  .about-slide-right        { transition-delay: 0.20s; }
+  .purpose-slide-body       { transition-delay: 0.08s; }
+  .purpose-slide-link       { transition-delay: 0.15s; }
+  .purpose-slide-right      { transition-delay: 0.20s; }
+  .values-slide-body        { transition-delay: 0.08s; }
+  .values-slide-grid        { transition-delay: 0.18s; }
+  .solutions-slide-right    { transition-delay: 0.15s; }
+  .excellence-slide-right   { transition-delay: 0.15s; }
+  .showcase-slide-body      { transition-delay: 0.08s; }
+  .showcase-slide-grid      { transition-delay: 0.18s; }
+  .team-slide-body          { transition-delay: 0.08s; }
+  .team-slide-benefits      { transition-delay: 0.15s; }
+  .team-slide-grid          { transition-delay: 0.20s; }
+  .contact-slide-right      { transition-delay: 0.15s; }
+  .callout-slide-right      { transition-delay: 0.15s; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .slide-from-left,
   .slide-from-right,
@@ -7455,6 +7610,161 @@ body.light-theme .action-btn:hover {
   }
 }
 
+/* ==========================================================================
+   MOBILE & TABLET SCROLL ENTRANCE ANIMATIONS (< 992px)
+   ========================================================================== */
+@media (max-width: 991px) {
+  /* Initial hidden state before scrolling into view on mobile/tablet */
+  .header-slide-logo,
+  .hero-slide-title,
+  .hero-slide-sub,
+  .hero-slide-btns,
+  .strip-slide-text,
+  .strip-fade-form,
+  .strip-slide-social-text,
+  .strip-slide-icon,
+  .welcome-slide-heading,
+  .welcome-slide-body,
+  .welcome-slide-cta,
+  .workforce-slide-header,
+  .workforce-slide-body,
+  .workforce-slide-link,
+  .workforce-slide-right,
+  .about-slide-header,
+  .about-slide-body,
+  .about-slide-highlights,
+  .about-slide-right,
+  .purpose-slide-left,
+  .purpose-slide-right,
+  .purpose-slide-header,
+  .purpose-slide-body,
+  .purpose-slide-link,
+  .values-slide-header,
+  .values-slide-body,
+  .values-slide-grid,
+  .solutions-slide-left,
+  .solutions-slide-right,
+  .excellence-slide-left,
+  .excellence-slide-right,
+  .showcase-slide-header,
+  .showcase-slide-body,
+  .showcase-slide-grid,
+  .team-slide-header,
+  .team-slide-body,
+  .team-slide-media,
+  .team-slide-link,
+  .team-slide-benefits,
+  .team-slide-grid,
+  .contact-slide-left,
+  .contact-slide-right,
+  .callout-slide-left,
+  .callout-slide-right,
+  .footer-slide-col,
+  .anim-section .slide-left,
+  .ref-service-row .slide-left,
+  .anim-section .slide-right,
+  .ref-service-row .slide-right,
+  .anim-section .slide-up,
+  .ref-service-row .slide-up,
+  .anim-section .slide-top,
+  .ref-service-row .slide-top,
+  .ref-service-row .ref-micro-pill {
+    opacity: 0;
+    transform: translateY(22px);
+    transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.80s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: transform, opacity;
+  }
+
+  /* When parent section becomes .is-revealed on mobile/tablet */
+  .site-header.is-revealed .header-slide-logo,
+  .hero-section.is-revealed .hero-slide-title,
+  .hero-section.is-revealed .hero-slide-sub,
+  .hero-section.is-revealed .hero-slide-btns,
+  .strip-section.is-revealed .strip-slide-text,
+  .strip-section.is-revealed .strip-fade-form,
+  .strip-section.is-revealed .strip-slide-social-text,
+  .strip-section.is-revealed .strip-slide-icon,
+  .welcome-section.is-revealed .welcome-slide-heading,
+  .welcome-section.is-revealed .welcome-slide-body,
+  .welcome-section.is-revealed .welcome-slide-cta,
+  .proto-workforce-section.is-revealed .workforce-slide-header,
+  .proto-workforce-section.is-revealed .workforce-slide-body,
+  .proto-workforce-section.is-revealed .workforce-slide-link,
+  .proto-workforce-section.is-revealed .workforce-slide-right,
+  #executive-overview.is-revealed .workforce-slide-header,
+  #executive-overview.is-revealed .about-slide-header,
+  #executive-overview.is-revealed .about-slide-body,
+  #executive-overview.is-revealed .about-slide-highlights,
+  #executive-overview.is-revealed .about-slide-right,
+  #purpose-section.is-revealed .purpose-slide-left,
+  #purpose-section.is-revealed .purpose-slide-right,
+  #purpose-section.is-revealed .purpose-slide-header,
+  #purpose-section.is-revealed .purpose-slide-body,
+  #purpose-section.is-revealed .purpose-slide-link,
+  .proto-tricard-section.is-revealed .values-slide-header,
+  .proto-tricard-section.is-revealed .values-slide-body,
+  .proto-tricard-section.is-revealed .values-slide-grid,
+  .solutions-story-row.is-revealed .solutions-slide-left,
+  .solutions-story-row.is-revealed .solutions-slide-right,
+  .excellence-block.is-revealed .excellence-slide-left,
+  .excellence-block.is-revealed .excellence-slide-right,
+  .showcase-block.is-revealed .showcase-slide-header,
+  .showcase-block.is-revealed .showcase-slide-body,
+  .showcase-block.is-revealed .showcase-slide-grid,
+  .proto-mission-section.is-revealed .team-slide-header,
+  .proto-mission-section.is-revealed .team-slide-body,
+  .proto-mission-section.is-revealed .team-slide-media,
+  .proto-mission-section.is-revealed .team-slide-link,
+  .proto-mission-section.is-revealed .team-slide-benefits,
+  .proto-mission-section.is-revealed .team-slide-grid,
+  #about-team.is-revealed .team-slide-header,
+  #about-team.is-revealed .team-slide-body,
+  #about-team.is-revealed .team-slide-media,
+  #about-team.is-revealed .team-slide-link,
+  #about-team.is-revealed .team-slide-benefits,
+  .contact-section.is-revealed .contact-slide-left,
+  .contact-section.is-revealed .contact-slide-right,
+  .callout-banner-section.is-revealed .callout-slide-left,
+  .callout-banner-section.is-revealed .callout-slide-right,
+  .site-footer.is-revealed .footer-slide-col,
+  .anim-section.is-revealed .slide-left,
+  .ref-service-row.is-revealed .slide-left,
+  .anim-section.is-revealed .slide-right,
+  .ref-service-row.is-revealed .slide-right,
+  .anim-section.is-revealed .slide-up,
+  .ref-service-row.is-revealed .slide-up,
+  .anim-section.is-revealed .slide-top,
+  .ref-service-row.is-revealed .slide-top,
+  .ref-service-row.is-revealed .ref-micro-pill {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+  }
+
+  /* Stagger delays on mobile for natural reading rhythm */
+  .welcome-slide-body       { transition-delay: 0.10s; }
+  .welcome-slide-cta        { transition-delay: 0.18s; }
+  .workforce-slide-body     { transition-delay: 0.08s; }
+  .workforce-slide-link     { transition-delay: 0.15s; }
+  .workforce-slide-right    { transition-delay: 0.20s; }
+  .about-slide-body         { transition-delay: 0.08s; }
+  .about-slide-highlights   { transition-delay: 0.15s; }
+  .about-slide-right        { transition-delay: 0.20s; }
+  .purpose-slide-body       { transition-delay: 0.08s; }
+  .purpose-slide-link       { transition-delay: 0.15s; }
+  .purpose-slide-right      { transition-delay: 0.20s; }
+  .values-slide-body        { transition-delay: 0.08s; }
+  .values-slide-grid        { transition-delay: 0.18s; }
+  .solutions-slide-right    { transition-delay: 0.15s; }
+  .excellence-slide-right   { transition-delay: 0.15s; }
+  .showcase-slide-body      { transition-delay: 0.08s; }
+  .showcase-slide-grid      { transition-delay: 0.18s; }
+  .team-slide-body          { transition-delay: 0.08s; }
+  .team-slide-benefits      { transition-delay: 0.15s; }
+  .team-slide-grid          { transition-delay: 0.20s; }
+  .contact-slide-right      { transition-delay: 0.15s; }
+  .callout-slide-right      { transition-delay: 0.15s; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .section-ambient-watermark {
     animation: none !important;
@@ -7557,6 +7867,161 @@ body.light-theme .action-btn:hover {
     opacity: 1 !important;
     transform: translate3d(0, 0, 0) !important;
   }
+}
+
+/* ==========================================================================
+   MOBILE & TABLET SCROLL ENTRANCE ANIMATIONS (< 992px)
+   ========================================================================== */
+@media (max-width: 991px) {
+  /* Initial hidden state before scrolling into view on mobile/tablet */
+  .header-slide-logo,
+  .hero-slide-title,
+  .hero-slide-sub,
+  .hero-slide-btns,
+  .strip-slide-text,
+  .strip-fade-form,
+  .strip-slide-social-text,
+  .strip-slide-icon,
+  .welcome-slide-heading,
+  .welcome-slide-body,
+  .welcome-slide-cta,
+  .workforce-slide-header,
+  .workforce-slide-body,
+  .workforce-slide-link,
+  .workforce-slide-right,
+  .about-slide-header,
+  .about-slide-body,
+  .about-slide-highlights,
+  .about-slide-right,
+  .purpose-slide-left,
+  .purpose-slide-right,
+  .purpose-slide-header,
+  .purpose-slide-body,
+  .purpose-slide-link,
+  .values-slide-header,
+  .values-slide-body,
+  .values-slide-grid,
+  .solutions-slide-left,
+  .solutions-slide-right,
+  .excellence-slide-left,
+  .excellence-slide-right,
+  .showcase-slide-header,
+  .showcase-slide-body,
+  .showcase-slide-grid,
+  .team-slide-header,
+  .team-slide-body,
+  .team-slide-media,
+  .team-slide-link,
+  .team-slide-benefits,
+  .team-slide-grid,
+  .contact-slide-left,
+  .contact-slide-right,
+  .callout-slide-left,
+  .callout-slide-right,
+  .footer-slide-col,
+  .anim-section .slide-left,
+  .ref-service-row .slide-left,
+  .anim-section .slide-right,
+  .ref-service-row .slide-right,
+  .anim-section .slide-up,
+  .ref-service-row .slide-up,
+  .anim-section .slide-top,
+  .ref-service-row .slide-top,
+  .ref-service-row .ref-micro-pill {
+    opacity: 0;
+    transform: translateY(22px);
+    transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.80s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: transform, opacity;
+  }
+
+  /* When parent section becomes .is-revealed on mobile/tablet */
+  .site-header.is-revealed .header-slide-logo,
+  .hero-section.is-revealed .hero-slide-title,
+  .hero-section.is-revealed .hero-slide-sub,
+  .hero-section.is-revealed .hero-slide-btns,
+  .strip-section.is-revealed .strip-slide-text,
+  .strip-section.is-revealed .strip-fade-form,
+  .strip-section.is-revealed .strip-slide-social-text,
+  .strip-section.is-revealed .strip-slide-icon,
+  .welcome-section.is-revealed .welcome-slide-heading,
+  .welcome-section.is-revealed .welcome-slide-body,
+  .welcome-section.is-revealed .welcome-slide-cta,
+  .proto-workforce-section.is-revealed .workforce-slide-header,
+  .proto-workforce-section.is-revealed .workforce-slide-body,
+  .proto-workforce-section.is-revealed .workforce-slide-link,
+  .proto-workforce-section.is-revealed .workforce-slide-right,
+  #executive-overview.is-revealed .workforce-slide-header,
+  #executive-overview.is-revealed .about-slide-header,
+  #executive-overview.is-revealed .about-slide-body,
+  #executive-overview.is-revealed .about-slide-highlights,
+  #executive-overview.is-revealed .about-slide-right,
+  #purpose-section.is-revealed .purpose-slide-left,
+  #purpose-section.is-revealed .purpose-slide-right,
+  #purpose-section.is-revealed .purpose-slide-header,
+  #purpose-section.is-revealed .purpose-slide-body,
+  #purpose-section.is-revealed .purpose-slide-link,
+  .proto-tricard-section.is-revealed .values-slide-header,
+  .proto-tricard-section.is-revealed .values-slide-body,
+  .proto-tricard-section.is-revealed .values-slide-grid,
+  .solutions-story-row.is-revealed .solutions-slide-left,
+  .solutions-story-row.is-revealed .solutions-slide-right,
+  .excellence-block.is-revealed .excellence-slide-left,
+  .excellence-block.is-revealed .excellence-slide-right,
+  .showcase-block.is-revealed .showcase-slide-header,
+  .showcase-block.is-revealed .showcase-slide-body,
+  .showcase-block.is-revealed .showcase-slide-grid,
+  .proto-mission-section.is-revealed .team-slide-header,
+  .proto-mission-section.is-revealed .team-slide-body,
+  .proto-mission-section.is-revealed .team-slide-media,
+  .proto-mission-section.is-revealed .team-slide-link,
+  .proto-mission-section.is-revealed .team-slide-benefits,
+  .proto-mission-section.is-revealed .team-slide-grid,
+  #about-team.is-revealed .team-slide-header,
+  #about-team.is-revealed .team-slide-body,
+  #about-team.is-revealed .team-slide-media,
+  #about-team.is-revealed .team-slide-link,
+  #about-team.is-revealed .team-slide-benefits,
+  .contact-section.is-revealed .contact-slide-left,
+  .contact-section.is-revealed .contact-slide-right,
+  .callout-banner-section.is-revealed .callout-slide-left,
+  .callout-banner-section.is-revealed .callout-slide-right,
+  .site-footer.is-revealed .footer-slide-col,
+  .anim-section.is-revealed .slide-left,
+  .ref-service-row.is-revealed .slide-left,
+  .anim-section.is-revealed .slide-right,
+  .ref-service-row.is-revealed .slide-right,
+  .anim-section.is-revealed .slide-up,
+  .ref-service-row.is-revealed .slide-up,
+  .anim-section.is-revealed .slide-top,
+  .ref-service-row.is-revealed .slide-top,
+  .ref-service-row.is-revealed .ref-micro-pill {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+  }
+
+  /* Stagger delays on mobile for natural reading rhythm */
+  .welcome-slide-body       { transition-delay: 0.10s; }
+  .welcome-slide-cta        { transition-delay: 0.18s; }
+  .workforce-slide-body     { transition-delay: 0.08s; }
+  .workforce-slide-link     { transition-delay: 0.15s; }
+  .workforce-slide-right    { transition-delay: 0.20s; }
+  .about-slide-body         { transition-delay: 0.08s; }
+  .about-slide-highlights   { transition-delay: 0.15s; }
+  .about-slide-right        { transition-delay: 0.20s; }
+  .purpose-slide-body       { transition-delay: 0.08s; }
+  .purpose-slide-link       { transition-delay: 0.15s; }
+  .purpose-slide-right      { transition-delay: 0.20s; }
+  .values-slide-body        { transition-delay: 0.08s; }
+  .values-slide-grid        { transition-delay: 0.18s; }
+  .solutions-slide-right    { transition-delay: 0.15s; }
+  .excellence-slide-right   { transition-delay: 0.15s; }
+  .showcase-slide-body      { transition-delay: 0.08s; }
+  .showcase-slide-grid      { transition-delay: 0.18s; }
+  .team-slide-body          { transition-delay: 0.08s; }
+  .team-slide-benefits      { transition-delay: 0.15s; }
+  .team-slide-grid          { transition-delay: 0.20s; }
+  .contact-slide-right      { transition-delay: 0.15s; }
+  .callout-slide-right      { transition-delay: 0.15s; }
 }
 
 @media (prefers-reduced-motion: reduce) {

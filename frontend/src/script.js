@@ -715,8 +715,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // C. Slide In Section Headers (excludes nested children to avoid double-animation)
     const sectionHeaders = document.querySelectorAll('.welcome-header, .products-title-wrapper, .gallery-title, .form-title, .section-title, .page-title');
     sectionHeaders.forEach(header => {
+      const isMobile = window.innerWidth < 768;
       gsap.fromTo(header, 
-        { x: -35, opacity: 0 }, 
+        { x: isMobile ? 0 : -35, y: isMobile ? 20 : 0, opacity: 0 }, 
         { 
           x: 0, 
           opacity: 1, 
@@ -737,9 +738,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const cards = document.querySelectorAll(selector);
       if (cards.length > 0) {
         cards.forEach((card, index) => {
-          const startX = index % 2 === 0 ? -offsetDist : offsetDist;
+          const isMobile = window.innerWidth < 768;
+          const fromState = isMobile ? { y: 24, opacity: 0 } : { x: index % 2 === 0 ? -offsetDist : offsetDist, opacity: 0 };
           gsap.fromTo(card, 
-            { x: startX, opacity: 0 }, 
+            fromState, 
             { 
               x: 0, 
               opacity: 1, 
@@ -920,12 +922,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const heroSliderEl = document.getElementById('hero-slider');
 
   const triggerHeaderAndHero = () => {
-    if (window.innerWidth < 992) {
-      if (siteHeaderEl) siteHeaderEl.classList.add('is-revealed');
-      if (heroSliderEl) heroSliderEl.classList.add('is-revealed');
-      return;
-    }
-
     setTimeout(() => {
       if (siteHeaderEl) siteHeaderEl.classList.add('is-revealed');
       if (heroSliderEl) heroSliderEl.classList.add('is-revealed');
@@ -937,15 +933,17 @@ document.addEventListener('DOMContentLoaded', () => {
   } else {
     window.addEventListener('load', triggerHeaderAndHero);
   }
+
+  if (document.readyState === 'complete') {
+    triggerHeaderAndHero();
+  } else {
+    window.addEventListener('load', triggerHeaderAndHero);
+  }
   document.addEventListener('DOMContentLoaded', triggerHeaderAndHero);
 
   // 5-0b. Hero Reverse Scroll Handler: Re-animates smoothly upon scrolling back to top
   if (heroSliderEl) {
     const checkHeroScroll = () => {
-      if (window.innerWidth < 992) {
-        heroSliderEl.classList.add('is-revealed');
-        return;
-      }
       const scrollY = window.scrollY || window.pageYOffset;
       const rect = heroSliderEl.getBoundingClientRect();
       const vh = window.innerHeight || document.documentElement.clientHeight;
@@ -967,10 +965,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const stripSection = document.getElementById('newsletter-strip') || document.querySelector('.strip-section');
   if (stripSection) {
     const triggerStripReveal = () => {
-      if (window.innerWidth < 992) {
-        stripSection.classList.add('is-revealed');
-        return;
-      }
       const rect = stripSection.getBoundingClientRect();
       const vh = window.innerHeight || document.documentElement.clientHeight;
 
@@ -1011,16 +1005,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const welcomeSection = document.getElementById('welcome-summary') || document.querySelector('.welcome-section');
   if (welcomeSection) {
     const checkWelcomeScroll = () => {
-      if (window.innerWidth < 992) {
-        welcomeSection.classList.add('is-revealed');
-        return;
-      }
       const rect = welcomeSection.getBoundingClientRect();
       const vh = window.innerHeight || document.documentElement.clientHeight;
       const scrollY = window.scrollY || window.pageYOffset;
 
       // When the top of the welcome section scrolls into view (at 75% viewport height)
-      if (rect.top <= vh * 0.78 && rect.bottom >= 0) {
+      if (rect.top <= vh * (window.innerWidth < 992 ? 0.88 : 0.78) && rect.bottom >= 0) {
         welcomeSection.classList.add('is-revealed');
       } else if (rect.top > vh * 1.05 || rect.bottom < -120 || scrollY < 80) {
         // Reset when user scrolls back to the hero section or far off screen so it replays upon reverse scroll
@@ -1043,17 +1033,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (workforceSection) {
     const checkWorkforceScroll = () => {
-      if (window.innerWidth < 992) {
-        workforceSection.classList.add('is-revealed');
-        if (wmWorkforce) wmWorkforce.classList.add('is-revealed');
-        return;
-      }
       const rect = workforceSection.getBoundingClientRect();
       const vh = window.innerHeight || document.documentElement.clientHeight;
       const scrollY = window.scrollY || window.pageYOffset;
 
       // Reveal when the top of the workforce section scrolls up to 78% of viewport
-      if (rect.top <= vh * 0.78 && rect.bottom >= 0) {
+      if (rect.top <= vh * (window.innerWidth < 992 ? 0.88 : 0.78) && rect.bottom >= 0) {
         workforceSection.classList.add('is-revealed');
         if (wmWorkforce) wmWorkforce.classList.add('is-revealed');
       } else if (rect.top > vh * 1.05 || rect.bottom < -120 || scrollY < 80) {
@@ -1072,15 +1057,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const executiveSection = document.getElementById('executive-overview');
   if (executiveSection && executiveSection !== workforceSection) {
     const checkExecutiveScroll = () => {
-      if (window.innerWidth < 992) {
-        executiveSection.classList.add('is-revealed');
-        return;
-      }
       const rect = executiveSection.getBoundingClientRect();
       const vh = window.innerHeight || document.documentElement.clientHeight;
       const scrollY = window.scrollY || window.pageYOffset;
 
-      if (rect.top <= vh * 0.78 && rect.bottom >= 0) {
+      if (rect.top <= vh * (window.innerWidth < 992 ? 0.88 : 0.78) && rect.bottom >= 0) {
         executiveSection.classList.add('is-revealed');
       } else if (rect.top > vh * 1.05 || rect.bottom < -120 || scrollY < 80) {
         executiveSection.classList.remove('is-revealed');
@@ -1096,15 +1077,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const purposeSection = document.getElementById('purpose-section');
   if (purposeSection && purposeSection !== workforceSection) {
     const checkPurposeScroll = () => {
-      if (window.innerWidth < 992) {
-        purposeSection.classList.add('is-revealed');
-        return;
-      }
       const rect = purposeSection.getBoundingClientRect();
       const vh = window.innerHeight || document.documentElement.clientHeight;
       const scrollY = window.scrollY || window.pageYOffset;
 
-      if (rect.top <= vh * 0.78 && rect.bottom >= 0) {
+      if (rect.top <= vh * (window.innerWidth < 992 ? 0.88 : 0.78) && rect.bottom >= 0) {
         purposeSection.classList.add('is-revealed');
       } else if (rect.top > vh * 1.05 || rect.bottom < -120 || scrollY < 80) {
         purposeSection.classList.remove('is-revealed');
@@ -1120,16 +1097,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const coreValuesSection = document.getElementById('core-values-section') || document.querySelector('.proto-tricard-section');
   if (coreValuesSection) {
     const checkCoreValuesScroll = () => {
-      if (window.innerWidth < 992) {
-        coreValuesSection.classList.add('is-revealed');
-        return;
-      }
       const rect = coreValuesSection.getBoundingClientRect();
       const vh = window.innerHeight || document.documentElement.clientHeight;
       const scrollY = window.scrollY || window.pageYOffset;
 
       // Reveal when the top of the section enters 78% of the viewport height
-      if (rect.top <= vh * 0.78 && rect.bottom >= 0) {
+      if (rect.top <= vh * (window.innerWidth < 992 ? 0.88 : 0.78) && rect.bottom >= 0) {
         coreValuesSection.classList.add('is-revealed');
       } else if (rect.top > vh * 1.05 || rect.bottom < -120 || scrollY < 80) {
         // Reset when user scrolls back above this section so it can replay smoothly
@@ -1146,17 +1119,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const solutionsStoryRow = document.getElementById('compassionate-solutions-row') || document.querySelector('.solutions-story-row');
   if (solutionsStoryRow) {
     const checkSolutionsScroll = () => {
-      if (window.innerWidth < 992) {
-        solutionsStoryRow.classList.add('is-revealed');
-        if (wmSolutions) wmSolutions.classList.add('is-revealed');
-        return;
-      }
       const rect = solutionsStoryRow.getBoundingClientRect();
       const vh = window.innerHeight || document.documentElement.clientHeight;
       const scrollY = window.scrollY || window.pageYOffset;
 
       // Reveal when the top of the solutions row enters 78% of the viewport height
-      if (rect.top <= vh * 0.78 && rect.bottom >= 0) {
+      if (rect.top <= vh * (window.innerWidth < 992 ? 0.88 : 0.78) && rect.bottom >= 0) {
         solutionsStoryRow.classList.add('is-revealed');
         if (wmSolutions) wmSolutions.classList.add('is-revealed');
       } else if (rect.top > vh * 1.05 || rect.bottom < -120 || scrollY < 80) {
@@ -1175,16 +1143,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const excellenceSection = document.getElementById('excellence-section') || document.querySelector('.excellence-block');
   if (excellenceSection) {
     const checkExcellenceScroll = () => {
-      if (window.innerWidth < 992) {
-        excellenceSection.classList.add('is-revealed');
-        if (wmExcellence) wmExcellence.classList.add('is-revealed');
-        return;
-      }
       const rect = excellenceSection.getBoundingClientRect();
       const vh = window.innerHeight || document.documentElement.clientHeight;
       const scrollY = window.scrollY || window.pageYOffset;
 
-      if (rect.top <= vh * 0.78 && rect.bottom >= 0) {
+      if (rect.top <= vh * (window.innerWidth < 992 ? 0.88 : 0.78) && rect.bottom >= 0) {
         excellenceSection.classList.add('is-revealed');
         if (wmExcellence) wmExcellence.classList.add('is-revealed');
       } else if (rect.top > vh * 1.05 || rect.bottom < -120 || scrollY < 80) {
@@ -1202,16 +1165,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const showcaseSection = document.getElementById('showcase-box-section') || document.querySelector('.showcase-block');
   if (showcaseSection) {
     const checkShowcaseScroll = () => {
-      if (window.innerWidth < 992) {
-        showcaseSection.classList.add('is-revealed');
-        if (wmDispatch) wmDispatch.classList.add('is-revealed');
-        return;
-      }
       const rect = showcaseSection.getBoundingClientRect();
       const vh = window.innerHeight || document.documentElement.clientHeight;
       const scrollY = window.scrollY || window.pageYOffset;
 
-      if (rect.top <= vh * 0.78 && rect.bottom >= 0) {
+      if (rect.top <= vh * (window.innerWidth < 992 ? 0.88 : 0.78) && rect.bottom >= 0) {
         showcaseSection.classList.add('is-revealed');
         if (wmDispatch) wmDispatch.classList.add('is-revealed');
       } else if (rect.top > vh * 1.05 || rect.bottom < -120 || scrollY < 80) {
@@ -1229,15 +1187,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const teamSection = document.getElementById('team-section') || document.querySelector('.proto-mission-section');
   if (teamSection) {
     const checkTeamScroll = () => {
-      if (window.innerWidth < 992) {
-        teamSection.classList.add('is-revealed');
-        return;
-      }
       const rect = teamSection.getBoundingClientRect();
       const vh = window.innerHeight || document.documentElement.clientHeight;
       const scrollY = window.scrollY || window.pageYOffset;
 
-      if (rect.top <= vh * 0.78 && rect.bottom >= 0) {
+      if (rect.top <= vh * (window.innerWidth < 992 ? 0.88 : 0.78) && rect.bottom >= 0) {
         teamSection.classList.add('is-revealed');
       } else if (rect.top > vh * 1.05 || rect.bottom < -120 || scrollY < 80) {
         teamSection.classList.remove('is-revealed');
@@ -1253,15 +1207,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const aboutTeamSection = document.getElementById('about-team');
   if (aboutTeamSection && aboutTeamSection !== teamSection) {
     const checkAboutTeamScroll = () => {
-      if (window.innerWidth < 992) {
-        aboutTeamSection.classList.add('is-revealed');
-        return;
-      }
       const rect = aboutTeamSection.getBoundingClientRect();
       const vh = window.innerHeight || document.documentElement.clientHeight;
       const scrollY = window.scrollY || window.pageYOffset;
 
-      if (rect.top <= vh * 0.78 && rect.bottom >= 0) {
+      if (rect.top <= vh * (window.innerWidth < 992 ? 0.88 : 0.78) && rect.bottom >= 0) {
         aboutTeamSection.classList.add('is-revealed');
       } else if (rect.top > vh * 1.05 || rect.bottom < -120 || scrollY < 80) {
         aboutTeamSection.classList.remove('is-revealed');
@@ -1279,10 +1229,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const isSubpageContact = !document.getElementById('welcome-summary');
 
     const checkContactScroll = () => {
-      if (window.innerWidth < 992) {
-        contactSection.classList.add('is-revealed');
-        return;
-      }
       const rect = contactSection.getBoundingClientRect();
       const vh = window.innerHeight || document.documentElement.clientHeight;
       const scrollY = window.scrollY || window.pageYOffset;
@@ -1291,14 +1237,14 @@ document.addEventListener('DOMContentLoaded', () => {
         // Standalone Contact Page: reset when returning to hero fold (scroll back up to top)
         if (scrollY < 60) {
           contactSection.classList.remove('is-revealed');
-        } else if (rect.top <= vh * 0.78 && rect.bottom >= -60) {
+        } else if (rect.top <= vh * (window.innerWidth < 992 ? 0.88 : 0.78) && rect.bottom >= -60) {
           contactSection.classList.add('is-revealed');
         } else if (rect.top > vh * 1.05 || rect.bottom < -120) {
           contactSection.classList.remove('is-revealed');
         }
       } else {
         // Homepage Contact Section
-        if (rect.top <= vh * 0.78 && rect.bottom >= -60) {
+        if (rect.top <= vh * (window.innerWidth < 992 ? 0.88 : 0.78) && rect.bottom >= -60) {
           contactSection.classList.add('is-revealed');
         } else if (rect.top > vh * 1.05 || rect.bottom < -120 || scrollY < 80) {
           contactSection.classList.remove('is-revealed');
@@ -1330,15 +1276,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const calloutBanner = document.getElementById('callout-banner') || document.querySelector('.callout-banner-section');
   if (calloutBanner) {
     const checkCalloutScroll = () => {
-      if (window.innerWidth < 992) {
-        calloutBanner.classList.add('is-revealed');
-        return;
-      }
       const rect = calloutBanner.getBoundingClientRect();
       const vh = window.innerHeight || document.documentElement.clientHeight;
       const scrollY = window.scrollY || window.pageYOffset;
 
-      if (rect.top <= vh * 0.85 && rect.bottom >= 0) {
+      if (rect.top <= vh * (window.innerWidth < 992 ? 0.90 : 0.85) && rect.bottom >= 0) {
         calloutBanner.classList.add('is-revealed');
       } else if (rect.top > vh * 1.05 || scrollY < 80) {
         calloutBanner.classList.remove('is-revealed');
@@ -1354,10 +1296,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const siteFooter = document.getElementById('site-footer') || document.querySelector('.site-footer');
   if (siteFooter) {
     const checkFooterScroll = () => {
-      if (window.innerWidth < 992) {
-        siteFooter.classList.add('is-revealed');
-        return;
-      }
       const rect = siteFooter.getBoundingClientRect();
       const vh = window.innerHeight || document.documentElement.clientHeight;
 
@@ -1384,15 +1322,12 @@ document.addEventListener('DOMContentLoaded', () => {
       const scrollY = window.scrollY || window.pageYOffset;
 
       animSections.forEach((section) => {
-        if (isMobile) {
-          section.classList.add('is-revealed');
-          return;
-        }
+        // Mobile animated via responsive threshold
 
         const rect = section.getBoundingClientRect();
 
         // When in viewport (from top or bottom): reveal smoothly
-        if (rect.top <= vh * 0.82 && rect.bottom >= 0) {
+        if (rect.top <= vh * (window.innerWidth < 992 ? 0.88 : 0.82) && rect.bottom >= 0) {
           section.classList.add('is-revealed');
         } else if (rect.top > vh * 1.05 || rect.bottom < -120 || scrollY < 80) {
           // Reset when scrolled far off-screen or returning to hero fold
