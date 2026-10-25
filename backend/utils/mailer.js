@@ -72,10 +72,7 @@ function parseFromAddress(fromStr) {
 }
 
 async function sendViaResend({ apiKey, from, to, replyTo, subject, text, html }) {
-  let resendFrom = process.env.RESEND_FROM_EMAIL;
-  if (!resendFrom || !process.env.RESEND_DOMAIN_VERIFIED) {
-    resendFrom = 'Divine Fingers Healthcare <onboarding@resend.dev>';
-  }
+  let resendFrom = process.env.RESEND_FROM_EMAIL || 'Divine Fingers Healthcare <no-reply@divinefingershealthcareservice.ca>';
 
   const payload = {
     from: resendFrom,
