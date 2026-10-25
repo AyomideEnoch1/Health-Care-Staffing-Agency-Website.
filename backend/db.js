@@ -43,7 +43,7 @@ try {
     enableKeepAlive: true,
     keepAliveInitialDelay: 10000,
     timezone: 'local',
-    connectTimeout: 5000
+    connectTimeout: 20000
   });
 
   realPool.getConnection()
@@ -200,10 +200,8 @@ try {
     .catch(err => {
       isMySqlAvailable = false;
       if (process.env.NODE_ENV === 'production') {
-        console.error(`❌ [FATAL DATABASE ERROR] Production MySQL unreachable: ${err.message}. Failing closed.`);
-        process.exit(1);
-      }
-      if (!err.message.includes('Pool is closed')) {
+        console.error(`⚠️ [Database] Initial connection attempt: ${err.message}. Retrying via pool...`);
+      } else if (!err.message.includes('Pool is closed')) {
         console.warn(`⚠️ [Database] MySQL not reachable (${err.message}). Activating In-Memory Resilient Mode (DEVELOPMENT ONLY).`);
       }
     });

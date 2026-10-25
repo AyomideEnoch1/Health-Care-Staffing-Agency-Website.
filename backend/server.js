@@ -390,16 +390,22 @@ if (require.main === module) {
     console.log(`🚀 Divine Fingers Healthcare API running on http://localhost:${PORT}`);
     console.log(`🔒 Environment: ${process.env.NODE_ENV || 'development'}`);
 
-    // Verify DB connection on startup
-    try {
-      await pool.query('SELECT 1');
-      console.log(`✅ [Database] Connected to MySQL (${process.env.DB_HOST || '127.0.0.1'}:${process.env.DB_PORT || 3306}/${process.env.DB_NAME || 'divine_fingers_dev'})`);
-    } catch (err) {
-      console.error(`❌ [Database] Connection failed: ${err.message}`);
-      if (isProd) {
-        console.error('❌ [FATAL DATABASE ERROR] Failed to connect to MySQL in production. Exiting process.');
-        process.exit(1);
+    // Verify DB connection on startup (with 3 retries over 10s for cloud network latency)
+    let dbConnected = false;
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        await pool.query('SELECT 1');
+        console.log(`✅ [Database] Connected to MySQL (${process.env.DB_HOST || '127.0.0.1'}:${process.env.DB_PORT || 3306}/${process.env.DB_NAME || 'divine_fingers_dev'})`);
+        dbConnected = true;
+        break;
+      } catch (err) {
+        console.warn(`⚠️ [Database] Connection attempt ${attempt}/3 failed: ${err.message}`);
+        if (attempt < 3) await new Promise(r => setTimeout(r, 3000));
       }
+    }
+    if (!dbConnected && isProd) {
+      console.error('❌ [FATAL DATABASE ERROR] Failed to connect to MySQL in production after retries. Exiting process.');
+      process.exit(1);
     }
 
     // Verify SMTP (non-blocking warning only)
