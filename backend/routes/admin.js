@@ -1649,6 +1649,50 @@ router.post('/admins/:id/reset-mfa', requirePermission('admins:manage'), async (
   } catch (err) { next(err); }
 });
 
+// POST /api/admin/admins/:id/reset-password — Super-admin resets password for an operator
+router.post('/admins/:id/reset-password', requirePermission('admins:manage'), async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { new_password } = req.body;
+
+    if (!new_password || new_password.trim().length < 8) {
+      return res.status(400).json({ success: false, error: 'Password must be at least 8 characters long.' });
+    }
+
+    const [rows] = await pool.query('SELECT id, email, full_name, role FROM admins WHERE id = ?', [id]);
+    if (!rows.length) {
+      return res.status(404).json({ success: false, error: 'Administrator account not found.' });
+    }
+
+    const targetAdmin = rows[0];
+    const passwordHash = await bcrypt.hash(new_password.trim(), 12);
+
+    await pool.query(
+      'UPDATE admins SET password_hash = ?, failed_login_attempts = 0, lock_until = NULL WHERE id = ?',
+      [passwordHash, id]
+    );
+
+    // Keep user table synchronized if email exists
+    await pool.query(
+      'UPDATE users SET password_hash = ? WHERE LOWER(email) = ?',
+      [passwordHash, targetAdmin.email.toLowerCase()]
+    ).catch(() => {});
+
+    await pool.query(
+      `INSERT INTO audit_logs (id, admin_id, actor_name, action, target_entity, target_id, details, severity, ip_address)
+       VALUES (?, ?, ?, 'ADMIN_PASSWORD_RESET_BY_SUPERADMIN', 'admins', ?, ?, 'warning', ?)`,
+      [crypto.randomUUID(), req.admin.id, req.admin.full_name, id,
+       `Super-admin ${req.admin.full_name} set a new password for administrator ${targetAdmin.full_name} (${targetAdmin.email})`,
+       req.ip]
+    );
+
+    res.json({
+      success: true,
+      message: `Password updated successfully for ${targetAdmin.full_name}.`
+    });
+  } catch (err) { next(err); }
+});
+
 // POST /api/admin/admins/:id/resend-verification — resend email verification OTP (super-admin only)
 router.post('/admins/:id/resend-verification', requirePermission('admins:manage'), async (req, res, next) => {
   try {

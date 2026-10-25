@@ -1353,6 +1353,24 @@
             </div>
           </div>
 
+          <!-- 1b. Operator Password & Access Credentials -->
+          <div class="table-card" style="padding: 1.5rem; margin-bottom: 1.5rem; background: var(--bg-surface-elevated); border: 1px solid var(--border-subtle); border-radius: 8px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+              <div>
+                <h2 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.5rem; color: #FFFFFF;">
+                  <i data-lucide="key-round" style="width: 20px; height: 20px; color: var(--brand-turquoise);"></i>
+                  Account Password &amp; Credentials
+                </h2>
+                <p style="color: var(--text-muted); font-size: 0.85rem; margin: 0;">
+                  Update your administrator portal password regularly to protect operational and clinical records.
+                </p>
+              </div>
+              <button type="button" class="btn-primary-action" onclick="window.openAdminChangePasswordModal()" style="padding: 0.5rem 1rem; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px;">
+                <i data-lucide="lock" style="width: 14px; height: 14px;"></i> Change Password
+              </button>
+            </div>
+          </div>
+
           <!-- 2. Super-Admin Only: Link to Dedicated Admin Management Tab -->
           <div class="table-card" id="admin-accounts-settings-link-card" style="padding: 1.5rem; margin-bottom: 1.5rem; background: var(--bg-surface-elevated); border: 1px solid var(--border-subtle); border-radius: 8px;">
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
@@ -2201,6 +2219,81 @@
       <div class="modal-actions" style="display: flex; justify-content: flex-end; gap: 0.75rem; padding-top: 1rem; border-top: 1px solid var(--border-color); margin-top: 1rem;">
         <button type="button" class="btn-secondary-action" onclick="window.closeFacilityRateCardsModal()">Close</button>
       </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       ADMIN SELF-SERVICE CHANGE PASSWORD MODAL
+       ========================================================================== -->
+  <div class="admin-modal-overlay" id="modal-admin-change-password" style="display:none;" onclick="if(event.target===this) window.closeAdminChangePasswordModal()">
+    <div class="admin-modal-card" style="max-width: 480px;">
+      <div class="modal-header">
+        <h3 class="modal-title">
+          <i data-lucide="lock" style="width: 20px; height: 20px; color: var(--brand-cyan);"></i> Change Account Password
+        </h3>
+        <button type="button" class="modal-close-btn" onclick="window.closeAdminChangePasswordModal()" aria-label="Close modal"><i data-lucide="x" style="width: 20px; height: 20px;"></i></button>
+      </div>
+      <form id="form-admin-change-password" onsubmit="window.submitAdminChangePassword(event)">
+        <div style="margin-bottom: 1.25rem;">
+          <div style="margin-bottom: 1rem;">
+            <label style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.35rem;">CURRENT PASSWORD *</label>
+            <input type="password" id="admin-current-password" required placeholder="Enter current password" class="modal-input" style="width: 100%;" autocomplete="current-password">
+          </div>
+          <div style="margin-bottom: 1rem;">
+            <label style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.35rem;">NEW PASSWORD * (Min 8 characters)</label>
+            <input type="password" id="admin-new-password" required minlength="8" placeholder="Enter new secure password" class="modal-input" style="width: 100%;" autocomplete="new-password">
+          </div>
+          <div style="margin-bottom: 1rem;">
+            <label style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.35rem;">CONFIRM NEW PASSWORD *</label>
+            <input type="password" id="admin-confirm-password" required minlength="8" placeholder="Confirm new password" class="modal-input" style="width: 100%;" autocomplete="new-password">
+          </div>
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 0.85rem; font-size: 0.78rem; color: var(--text-muted); line-height: 1.5;">
+            <i data-lucide="shield-check" style="width: 14px; height: 14px; color: var(--brand-turquoise); vertical-align: middle; margin-right: 4px;"></i>
+            Passwords must contain at least 8 characters. For enterprise security, include uppercase letters, numbers, and symbols.
+          </div>
+        </div>
+        <div class="modal-actions" style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+          <button type="button" class="btn-secondary-action" onclick="window.closeAdminChangePasswordModal()">Cancel</button>
+          <button type="submit" class="btn-primary-action" id="btn-submit-change-password">
+            <i data-lucide="check" style="width: 15px; height: 15px;"></i> Update Password
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       SUPER-ADMIN OPERATOR PASSWORD RESET MODAL
+       ========================================================================== -->
+  <div class="admin-modal-overlay" id="modal-superadmin-reset-admin-password" style="display:none;" onclick="if(event.target===this) window.closeSuperadminResetAdminPasswordModal()">
+    <div class="admin-modal-card" style="max-width: 480px;">
+      <div class="modal-header">
+        <h3 class="modal-title">
+          <i data-lucide="key-round" style="width: 20px; height: 20px; color: var(--brand-cyan);"></i> Reset Administrator Password
+        </h3>
+        <button type="button" class="modal-close-btn" onclick="window.closeSuperadminResetAdminPasswordModal()" aria-label="Close modal"><i data-lucide="x" style="width: 20px; height: 20px;"></i></button>
+      </div>
+      <form id="form-superadmin-reset-admin-password" onsubmit="window.submitSuperadminResetAdminPassword(event)">
+        <input type="hidden" id="superadmin-reset-target-admin-id" value="">
+        <div style="margin-bottom: 1.25rem;">
+          <div style="font-size: 0.88rem; color: var(--text-primary); margin-bottom: 0.5rem;">
+            Resetting password for: <strong id="superadmin-reset-target-admin-name" style="color: var(--brand-cyan);"></strong>
+          </div>
+          <div style="margin-bottom: 1rem;">
+            <label style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.35rem;">NEW TEMPORARY PASSWORD * (Min 8 characters)</label>
+            <input type="password" id="superadmin-new-admin-password" required minlength="8" placeholder="Enter temporary password" class="modal-input" style="width: 100%;">
+          </div>
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 0.85rem; font-size: 0.78rem; color: var(--text-muted); line-height: 1.5;">
+            The administrator will use this new password to sign into the Operations Portal. Any active lockouts or failed attempts on this account will be reset.
+          </div>
+        </div>
+        <div class="modal-actions" style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+          <button type="button" class="btn-secondary-action" onclick="window.closeSuperadminResetAdminPasswordModal()">Cancel</button>
+          <button type="submit" class="btn-primary-action" id="btn-submit-superadmin-reset-admin-password">
+            <i data-lucide="shield-check" style="width: 15px; height: 15px;"></i> Save New Password
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 

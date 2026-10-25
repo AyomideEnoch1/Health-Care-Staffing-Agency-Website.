@@ -35,6 +35,15 @@ const loginSchema = z.object({
   password: z.string().min(6, { message: 'Password must be at least 6 characters.' })
 });
 
+const changePasswordSchema = z.object({
+  current_password: z.string().min(1, { message: 'Current password is required.' }),
+  new_password: z.string().min(8, { message: 'New password must be at least 8 characters long.' }),
+  confirm_password: z.string().min(8, { message: 'Password confirmation is required.' })
+}).refine((data) => data.new_password === data.confirm_password, {
+  message: 'New password and confirmation do not match.',
+  path: ['confirm_password']
+});
+
 function extractClientFingerprint(req) {
   const rawIp = req.ip || (req.socket && req.socket.remoteAddress) || (req.connection && req.connection.remoteAddress) || '127.0.0.1';
   const ip = String(rawIp).split(',')[0].trim().slice(0, 45);
@@ -577,6 +586,68 @@ router.get('/me', requireAdminAuth(), async (req, res, next) => {
       }
     });
   } catch (err) { next(err); }
+});
+
+// ── POST /api/auth/change-password ──────────────────────────────────────────
+router.post('/change-password', requireAdminAuth(), async (req, res, next) => {
+  try {
+    const validated = changePasswordSchema.parse(req.body);
+
+    const [rows] = await pool.query(
+      'SELECT id, email, password_hash, full_name FROM admins WHERE id = ? LIMIT 1',
+      [req.admin.id]
+    );
+
+    if (!rows.length) {
+      return res.status(404).json({ success: false, error: 'Administrator account not found.' });
+    }
+
+    const admin = rows[0];
+
+    // Verify current password
+    const match = await bcrypt.compare(validated.current_password, admin.password_hash);
+    if (!match) {
+      return res.status(400).json({ success: false, error: 'Current password is incorrect.' });
+    }
+
+    // Ensure new password is not identical to current
+    const isSame = await bcrypt.compare(validated.new_password, admin.password_hash);
+    if (isSame) {
+      return res.status(400).json({ success: false, error: 'New password cannot be identical to current password.' });
+    }
+
+    // Hash new password
+    const newHash = await bcrypt.hash(validated.new_password, 12);
+
+    await pool.query(
+      'UPDATE admins SET password_hash = ?, failed_login_attempts = 0, lock_until = NULL WHERE id = ?',
+      [newHash, admin.id]
+    );
+
+    // Keep user table synchronized if this email exists there
+    await pool.query(
+      'UPDATE users SET password_hash = ? WHERE LOWER(email) = ?',
+      [newHash, admin.email.toLowerCase()]
+    ).catch(() => {});
+
+    // Write audit log
+    const clientFP = extractClientFingerprint(req);
+    await pool.query(
+      `INSERT INTO audit_logs (id, admin_id, actor_name, action, target_entity, target_id, details, severity, ip_address)
+       VALUES (?, ?, ?, 'ADMIN_PASSWORD_CHANGED', 'admins', ?, 'Operator successfully updated their account password.', 'info', ?)`,
+      [crypto.randomUUID(), admin.id, admin.full_name, admin.id, clientFP.ip]
+    ).catch(() => {});
+
+    res.json({
+      success: true,
+      message: 'Account password updated successfully.'
+    });
+  } catch (err) {
+    if (err instanceof z.ZodError) {
+      return res.status(400).json({ success: false, error: err.errors[0]?.message || 'Validation error.' });
+    }
+    next(err);
+  }
 });
 
 // ── POST /api/auth/logout ───────────────────────────────────────────────────

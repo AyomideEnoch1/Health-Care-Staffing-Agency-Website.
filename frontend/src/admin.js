@@ -1905,10 +1905,17 @@
            </button>`
         : '';
 
+      const resetPwdBtn = (!isSelf && (user.role === 'super-admin' || user.permissions?.includes('admins:manage')))
+        ? `<button type="button" class="admin-action-btn btn-reset-admin-pwd" onclick="window.openSuperadminResetAdminPasswordModal('${a.id}', '${a.full_name.replace(/'/g, "\\'")}')" title="Reset temporary password for this administrator">
+             <i data-lucide="key-round" style="width:13px;height:13px;"></i> Password
+           </button>`
+        : '';
+
       const actionBtn = isSelf
         ? `<span class="admin-action-badge-self"><i data-lucide="shield-check" style="width:13px;height:13px;"></i> Active Session</span>`
         : `<div class="admin-action-toolbar">
              ${permBtn}
+             ${resetPwdBtn}
              <button type="button" class="admin-action-btn btn-status-toggle" onclick="window.toggleAdminStatus('${a.id}', '${a.full_name.replace(/'/g, "\\'")}', ${a.is_active})">
                <i data-lucide="${btnIcon}" style="width:13px;height:13px;"></i> ${btnText}
              </button>
@@ -2232,6 +2239,124 @@
       await fetchAndRenderAudit();
     } catch (err) {
       showToast(`Failed to reset MFA: ${err.message}`, 'warning');
+    }
+  };
+
+  // ── Administrator Self-Service Password Change ──
+  window.openAdminChangePasswordModal = function() {
+    const modal = document.getElementById('modal-admin-change-password');
+    if (modal) {
+      document.getElementById('form-admin-change-password')?.reset();
+      modal.style.display = 'flex';
+      setTimeout(() => document.getElementById('admin-current-password')?.focus(), 50);
+      if (window.lucide) lucide.createIcons();
+    }
+  };
+
+  window.closeAdminChangePasswordModal = function() {
+    const modal = document.getElementById('modal-admin-change-password');
+    if (modal) modal.style.display = 'none';
+  };
+
+  window.submitAdminChangePassword = async function(e) {
+    e.preventDefault();
+    const current_password = document.getElementById('admin-current-password')?.value;
+    const new_password = document.getElementById('admin-new-password')?.value;
+    const confirm_password = document.getElementById('admin-confirm-password')?.value;
+    const btn = document.getElementById('btn-submit-change-password');
+
+    if (!current_password || !new_password || !confirm_password) {
+      showToast('Please fill in all password fields.', 'warning');
+      return;
+    }
+
+    if (new_password.length < 8) {
+      showToast('New password must be at least 8 characters long.', 'warning');
+      return;
+    }
+
+    if (new_password !== confirm_password) {
+      showToast('New password and confirmation do not match.', 'warning');
+      return;
+    }
+
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = 'Updating...';
+    }
+
+    try {
+      const res = await apiRequest('/auth/change-password', {
+        method: 'POST',
+        body: JSON.stringify({ current_password, new_password, confirm_password })
+      });
+      showToast(res.message || 'Password updated successfully!', 'success');
+      window.closeAdminChangePasswordModal();
+    } catch (err) {
+      showToast(`Password update failed: ${err.message}`, 'warning');
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = '<i data-lucide="check" style="width: 15px; height: 15px;"></i> Update Password';
+        if (window.lucide) lucide.createIcons();
+      }
+    }
+  };
+
+  // ── Super-Admin Reset Password for Another Operator ──
+  window.openSuperadminResetAdminPasswordModal = function(adminId, adminName) {
+    const modal = document.getElementById('modal-superadmin-reset-admin-password');
+    if (modal) {
+      const idEl = document.getElementById('superadmin-reset-target-admin-id');
+      const nameEl = document.getElementById('superadmin-reset-target-admin-name');
+      const pwdEl = document.getElementById('superadmin-new-admin-password');
+      if (idEl) idEl.value = adminId;
+      if (nameEl) nameEl.textContent = adminName;
+      if (pwdEl) pwdEl.value = '';
+      modal.style.display = 'flex';
+      setTimeout(() => pwdEl?.focus(), 50);
+      if (window.lucide) lucide.createIcons();
+    }
+  };
+
+  window.closeSuperadminResetAdminPasswordModal = function() {
+    const modal = document.getElementById('modal-superadmin-reset-admin-password');
+    if (modal) modal.style.display = 'none';
+  };
+
+  window.submitSuperadminResetAdminPassword = async function(e) {
+    e.preventDefault();
+    const adminId = document.getElementById('superadmin-reset-target-admin-id')?.value;
+    const new_password = document.getElementById('superadmin-new-admin-password')?.value;
+    const btn = document.getElementById('btn-submit-superadmin-reset-admin-password');
+
+    if (!new_password || new_password.length < 8) {
+      showToast('Password must be at least 8 characters long.', 'warning');
+      return;
+    }
+
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = 'Saving...';
+    }
+
+    try {
+      const res = await apiRequest(`/admin/admins/${adminId}/reset-password`, {
+        method: 'POST',
+        body: JSON.stringify({ new_password })
+      });
+      showToast(res.message || 'Password successfully updated.', 'success');
+      window.closeSuperadminResetAdminPasswordModal();
+      await fetchAndRenderAdminAccounts();
+      await fetchAndRenderAudit();
+    } catch (err) {
+      showToast(`Failed to reset password: ${err.message}`, 'warning');
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = '<i data-lucide="shield-check" style="width: 15px; height: 15px;"></i> Save New Password';
+        if (window.lucide) lucide.createIcons();
+      }
     }
   };
 
