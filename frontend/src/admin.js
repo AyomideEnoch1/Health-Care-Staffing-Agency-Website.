@@ -371,6 +371,13 @@
   const sidebarLogoutBtn = document.getElementById('sidebar-logout-btn');
 
   function showAuthGate(message) {
+    stopRealtimeStream();
+    stopFallbackPolling();
+    // Redirect cleanly to the dedicated admin sign-in portal
+    if (typeof window !== 'undefined' && window.location.pathname !== '/admin-login.html') {
+      window.location.href = '/admin';
+      return;
+    }
     if (authOverlay) {
       authOverlay.style.display = 'flex';
       authOverlay.classList.remove('hidden', 'authenticated');
@@ -379,8 +386,6 @@
       authOverlay.style.opacity = '1';
       if (authError) authError.textContent = message || '';
     }
-    stopRealtimeStream();
-    stopFallbackPolling();
   }
 
   function hideAuthGate() {
@@ -772,17 +777,7 @@
       try { await apiRequest('/auth/logout', { method: 'POST' }); } catch { /* Ignore */ }
       sessionStorage.removeItem('df_admin_user');
       sessionStorage.removeItem('df_csrf_token');
-      pendingMfaToken = null;
-      pendingEmailVerifyToken = null;
-      const credsBox = document.getElementById('login-primary-credentials');
-      const emailBox = document.getElementById('email-verify-challenge-container');
-      const mfaBox   = document.getElementById('mfa-challenge-container');
-      if (credsBox) credsBox.style.display = 'block';
-      if (emailBox) emailBox.style.display = 'none';
-      if (mfaBox)   mfaBox.style.display   = 'none';
-      if (passwordInput) passwordInput.value = '';
-      if (authError)     authError.textContent = '';
-      showAuthGate('Session securely locked.');
+      window.location.href = '/admin';
     });
   }
 

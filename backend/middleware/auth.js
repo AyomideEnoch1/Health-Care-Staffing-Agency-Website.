@@ -84,7 +84,7 @@ function requireAdminAuth(allowedRoles = []) {
 
       // Verify active account status in real-time
       let [rows] = await pool.query(
-        'SELECT id, email, role, permissions, full_name, is_active FROM admins WHERE id = ? OR (email = ? AND email IS NOT NULL AND email != "") LIMIT 1',
+        "SELECT id, email, role, permissions, full_name, is_active FROM admins WHERE id = ? OR (email = ? AND email IS NOT NULL AND email != '') LIMIT 1",
         [decoded.id || '', decoded.email || '']
       );
 

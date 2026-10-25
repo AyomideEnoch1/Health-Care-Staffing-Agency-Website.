@@ -105,7 +105,7 @@ router.post('/register', async (req, res, next) => {
           facilityId = facMatch[0].id;
           if (data.phone) {
             try {
-              await pool.query('UPDATE facilities SET contact_phone = COALESCE(NULLIF(contact_phone, ""), ?), updated_at = NOW() WHERE id = ?', [data.phone.trim(), facilityId]);
+              await pool.query("UPDATE facilities SET contact_phone = COALESCE(NULLIF(contact_phone, ''), ?), updated_at = NOW() WHERE id = ?", [data.phone.trim(), facilityId]);
             } catch (_) {}
           }
         } else {
