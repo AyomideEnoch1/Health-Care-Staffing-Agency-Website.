@@ -595,6 +595,196 @@
         grid-template-columns: 1fr;
       }
     }
+
+    /* In-Form Legal Reader Modal */
+    .legal-modal-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(15, 23, 42, 0.72);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.25rem;
+      box-sizing: border-box;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+    .legal-modal-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .legal-modal-dialog {
+      background: #FFFFFF;
+      width: 100%;
+      max-width: 620px;
+      max-height: 85vh;
+      border-radius: 16px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transform: translateY(20px) scale(0.98);
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .legal-modal-backdrop.open .legal-modal-dialog {
+      transform: translateY(0) scale(1);
+    }
+    .legal-modal-header {
+      padding: 0.9rem 1.25rem;
+      border-bottom: 1px solid #E2E8F0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      background: #F8FAFC;
+    }
+    .legal-modal-tabs {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .legal-tab-btn {
+      padding: 0.45rem 0.85rem;
+      font-size: 0.82rem;
+      font-weight: 700;
+      border: 1.5px solid transparent;
+      border-radius: 8px;
+      background: transparent;
+      color: #64748B;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+    .legal-tab-btn.active {
+      background: #FFFFFF;
+      color: var(--navy);
+      border-color: #CBD5E1;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    }
+    .legal-modal-close {
+      background: transparent;
+      border: none;
+      color: #94A3B8;
+      cursor: pointer;
+      padding: 6px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .legal-modal-close:hover {
+      color: var(--navy);
+      background: #E2E8F0;
+    }
+    .legal-modal-body {
+      padding: 1.5rem;
+      overflow-y: auto;
+      flex: 1;
+      font-size: 0.88rem;
+      line-height: 1.65;
+      color: #334155;
+    }
+    .legal-doc-pill {
+      display: inline-block;
+      background: rgba(0, 168, 150, 0.1);
+      color: #00A896;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 0.25rem 0.65rem;
+      border-radius: 9999px;
+      margin-bottom: 0.65rem;
+      letter-spacing: 0.02em;
+    }
+    .legal-doc-title {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: #0F172A;
+      margin: 0 0 0.5rem 0;
+    }
+    .legal-doc-lead {
+      color: #64748B;
+      font-size: 0.84rem;
+      margin-bottom: 1.25rem;
+    }
+    .legal-summary-card {
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      border-left: 3.5px solid #1BAECF;
+      border-radius: 8px;
+      padding: 0.95rem 1.1rem;
+      margin-bottom: 0.9rem;
+    }
+    .legal-summary-card h4 {
+      font-size: 0.88rem;
+      font-weight: 800;
+      color: #0F172A;
+      margin: 0 0 0.25rem 0;
+    }
+    .legal-summary-card p {
+      font-size: 0.82rem;
+      color: #475569;
+      margin: 0;
+      line-height: 1.55;
+    }
+    .legal-modal-footer {
+      padding: 0.95rem 1.25rem;
+      border-top: 1px solid #E2E8F0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      background: #F8FAFC;
+    }
+    .legal-ext-link {
+      font-size: 0.8rem;
+      color: #1BAECF;
+      font-weight: 700;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .legal-ext-link:hover {
+      text-decoration: underline;
+    }
+    .legal-modal-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .btn-cancel-modal {
+      background: transparent;
+      border: 1.5px solid #CBD5E1;
+      color: #64748B;
+      padding: 0.55rem 1rem;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .btn-accept-terms {
+      background: linear-gradient(135deg, #3CAF8A 0%, #1BAECF 100%);
+      color: #FFFFFF;
+      border: none;
+      padding: 0.55rem 1.15rem;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      box-shadow: 0 4px 12px rgba(27, 174, 207, 0.3);
+    }
   </style>
 </head>
 <body>
@@ -815,11 +1005,19 @@
                 </div>
               </div>
 
-              <div class="form-extras">
-                <label class="checkbox-container">
-                  <input type="checkbox" id="reg-terms" required>
-                  <span>I agree to the <a href="terms.html" target="_blank" style="color: #1BAECF; text-decoration: underline; font-weight: 600;">Terms of Service</a> &amp; <a href="privacy.html" target="_blank" style="color: #1BAECF; text-decoration: underline; font-weight: 600;">Privacy Policy</a></span>
+              <div class="form-extras" style="flex-direction: column; align-items: flex-start; gap: 0.35rem; margin-bottom: 1.25rem;">
+                <label class="checkbox-container" style="align-items: flex-start;">
+                  <input type="checkbox" id="reg-terms" required style="margin-top: 3px;">
+                  <span style="font-size: 0.82rem; line-height: 1.45;">
+                    I agree to the 
+                    <a href="terms.html" onclick="openLegalModal('terms', event)" style="color: #1BAECF; text-decoration: underline; font-weight: 700;">Terms of Service</a> 
+                    &amp; 
+                    <a href="privacy.html" onclick="openLegalModal('privacy', event)" style="color: #1BAECF; text-decoration: underline; font-weight: 700;">Privacy Policy</a>
+                  </span>
                 </label>
+                <button type="button" onclick="openLegalModal('terms', event)" style="background: none; border: none; padding: 0 0 0 1.5rem; color: #00A896; font-size: 0.74rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;">
+                  <i data-lucide="book-open" style="width: 12px; height: 12px;"></i> Read Terms &amp; Policy directly
+                </button>
               </div>
 
               <button type="submit" class="btn-submit-auth" id="btn-register-submit">
@@ -945,11 +1143,177 @@
     </div>
   </main>
 
+  <!-- ==========================================================================
+       IN-PAGE LEGAL & PRIVACY VIEWER MODAL
+       Allows user to review terms directly inside the registration flow
+       ========================================================================== -->
+  <div class="legal-modal-backdrop" id="legal-reader-modal" onclick="if(event.target===this) closeLegalModal()">
+    <div class="legal-modal-dialog">
+      <div class="legal-modal-header">
+        <div class="legal-modal-tabs">
+          <button type="button" class="legal-tab-btn active" id="btn-tab-terms" onclick="switchLegalDoc('terms')">
+            <i data-lucide="file-text" style="width: 15px; height: 15px;"></i> Terms of Service
+          </button>
+          <button type="button" class="legal-tab-btn" id="btn-tab-privacy" onclick="switchLegalDoc('privacy')">
+            <i data-lucide="shield-check" style="width: 15px; height: 15px;"></i> Privacy Policy
+          </button>
+        </div>
+        <button type="button" class="legal-modal-close" onclick="closeLegalModal()" aria-label="Close dialog">
+          <i data-lucide="x" style="width: 18px; height: 18px;"></i>
+        </button>
+      </div>
+
+      <div class="legal-modal-body">
+        <!-- DOC 1: TERMS OF SERVICE -->
+        <div id="legal-doc-terms" class="legal-doc-view">
+          <div class="legal-doc-pill">Divine Fingers Health Care Services Inc. (1592082-5) &bull; Ontario, Canada</div>
+          <h3 class="legal-doc-title">Operational Terms &amp; Health Care Staffing Agreement</h3>
+          <p class="legal-doc-lead">
+            Please review these terms before registering your facility account:
+          </p>
+
+          <div class="legal-summary-card">
+            <h4>1. Clinical Staffing &amp; Facility Engagements</h4>
+            <p>Divine Fingers dispatches certified Registered Nurses (RN), Registered Practical Nurses (RPN), and Personal Support Workers (PSW) to hospitals, retirement residences, and healthcare facilities. Dispatched staff operate under the host facility's administrative on-site direction, clinical orientation, and workplace safety policies.</p>
+          </div>
+
+          <div class="legal-summary-card">
+            <h4>2. 2-Hour Rapid Emergency Surge Dispatch</h4>
+            <p>Our on-call coordinators dispatch registered staff for urgent shift vacancies across Ontario. Facilities agree to adhere to advance cancellation windows specified in their facility staffing agreement to maintain continuity of care.</p>
+          </div>
+
+          <div class="legal-summary-card">
+            <h4>3. Professional Regulatory Standards</h4>
+            <p>All nursing personnel maintain active registration in good standing with the College of Nurses of Ontario (CNO), current CPR/BLS certifications, and clean Vulnerable Sector Police Screening (VSS) records.</p>
+          </div>
+
+          <div class="legal-summary-card">
+            <h4>4. Non-Emergency 911 Notice</h4>
+            <p>Divine Fingers is an employment and healthcare staffing agency. We do not provide 911 emergency medical services. In the event of an immediate life-threatening emergency, call 911 immediately.</p>
+          </div>
+
+          <div class="legal-summary-card">
+            <h4>5. Portal Credentials &amp; Account Security</h4>
+            <p>Authorized facility representatives agree to safeguard their portal credentials, prevent unauthorized access, and report any security concerns immediately to our dispatch team.</p>
+          </div>
+
+          <div class="legal-summary-card">
+            <h4>6. Ontario Governing Law</h4>
+            <p>These terms are governed exclusively by the laws of the Province of Ontario and the federal laws of Canada applicable therein.</p>
+          </div>
+        </div>
+
+        <!-- DOC 2: PRIVACY POLICY -->
+        <div id="legal-doc-privacy" class="legal-doc-view" style="display: none;">
+          <div class="legal-doc-pill">Statutory Compliance: PIPEDA (Canada) &bull; PHIPA (Ontario)</div>
+          <h3 class="legal-doc-title">Privacy &amp; Data Protection Statement</h3>
+          <p class="legal-doc-lead">
+            How we protect personal and corporate information across our platform:
+          </p>
+
+          <div class="legal-summary-card">
+            <h4>1. Zero Data Monetization Guarantee</h4>
+            <p>We <strong>never sell, lease, rent, trade, or monetize</strong> your personal details, corporate accounts, or clinician profiles to third-party data brokers or marketing firms.</p>
+          </div>
+
+          <div class="legal-summary-card">
+            <h4>2. Strict PHIPA Health Information Protection</h4>
+            <p>Our caregivers and coordinators operate in strict accordance with Ontario's Personal Health Information Protection Act (PHIPA). No unauthorized resident or patient clinical charts are stored on public web servers.</p>
+          </div>
+
+          <div class="legal-summary-card">
+            <h4>3. Cryptographic Security Standards</h4>
+            <p>All web communications are encrypted with TLS 1.3. User passwords are protected using salted 12-round bcrypt hashing, and database access is governed by strict role-based access control.</p>
+          </div>
+
+          <div class="legal-summary-card">
+            <h4>4. Designated Privacy Officer</h4>
+            <p>For inquiries, contact our Privacy Office at 17-2 Dailing Gate, Scarborough, ON M1B 1Z8, or email info@divinefingershealthcareservice.ca.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="legal-modal-footer">
+        <a href="terms.html" target="_blank" id="legal-full-page-link" class="legal-ext-link">
+          <i data-lucide="external-link" style="width: 14px; height: 14px;"></i> Open Full Page (New Tab)
+        </a>
+        <div class="legal-modal-actions">
+          <button type="button" class="btn-cancel-modal" onclick="closeLegalModal()">Close</button>
+          <button type="button" class="btn-accept-terms" onclick="acceptLegalTerms()">
+            <i data-lucide="check" style="width: 15px; height: 15px;"></i> I Understand &amp; Agree
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
     // Initialize icons
     if (window.lucide) {
       lucide.createIcons();
     }
+
+    // In-Page Legal Document Reader Modal Controller
+    function openLegalModal(type, event) {
+      if (event) event.preventDefault();
+      const modal = document.getElementById('legal-reader-modal');
+      if (!modal) return;
+      switchLegalDoc(type || 'terms');
+      modal.classList.add('open');
+      if (window.lucide) lucide.createIcons();
+    }
+    window.openLegalModal = openLegalModal;
+
+    function closeLegalModal() {
+      const modal = document.getElementById('legal-reader-modal');
+      if (modal) modal.classList.remove('open');
+    }
+    window.closeLegalModal = closeLegalModal;
+
+    function switchLegalDoc(doc) {
+      const btnTerms = document.getElementById('btn-tab-terms');
+      const btnPrivacy = document.getElementById('btn-tab-privacy');
+      const docTerms = document.getElementById('legal-doc-terms');
+      const docPrivacy = document.getElementById('legal-doc-privacy');
+      const fullLink = document.getElementById('legal-full-page-link');
+
+      if (doc === 'privacy') {
+        btnTerms?.classList.remove('active');
+        btnPrivacy?.classList.add('active');
+        if (docTerms) docTerms.style.display = 'none';
+        if (docPrivacy) docPrivacy.style.display = 'block';
+        if (fullLink) {
+          fullLink.href = 'privacy.html';
+          fullLink.innerHTML = '<i data-lucide="external-link" style="width: 14px; height: 14px;"></i> Open Privacy Policy (New Tab)';
+        }
+      } else {
+        btnPrivacy?.classList.remove('active');
+        btnTerms?.classList.add('active');
+        if (docPrivacy) docPrivacy.style.display = 'none';
+        if (docTerms) docTerms.style.display = 'block';
+        if (fullLink) {
+          fullLink.href = 'terms.html';
+          fullLink.innerHTML = '<i data-lucide="external-link" style="width: 14px; height: 14px;"></i> Open Terms of Service (New Tab)';
+        }
+      }
+      if (window.lucide) lucide.createIcons();
+    }
+    window.switchLegalDoc = switchLegalDoc;
+
+    function acceptLegalTerms() {
+      const chk = document.getElementById('reg-terms');
+      if (chk) {
+        chk.checked = true;
+        chk.parentElement?.style.setProperty('outline', '2px solid #10B981');
+        setTimeout(() => chk.parentElement?.style.removeProperty('outline'), 1200);
+      }
+      closeLegalModal();
+    }
+    window.acceptLegalTerms = acceptLegalTerms;
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeLegalModal();
+    });
 
     // Mobile nav toggle
     const mobileToggle = document.getElementById('mobile-toggle');
