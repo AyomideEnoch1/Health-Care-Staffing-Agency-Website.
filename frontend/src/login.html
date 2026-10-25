@@ -10,8 +10,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Montserrat:wght@400;500;600;700;800;900&family=Open+Sans:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="style.css?v=5.7.0">
-  <link rel="stylesheet" href="prototype.css?v=5.7.0">
+  <link rel="stylesheet" href="style.css?v=6.2.1">
+  <link rel="stylesheet" href="prototype.css?v=6.2.1">
   <script src="https://unpkg.com/lucide@latest"></script>
 
   <style>
@@ -218,30 +218,37 @@
     }
 
     .form-label {
-      display: block;
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
       font-size: 0.82rem;
       font-weight: 700;
       color: var(--navy);
       margin-bottom: 0.4rem;
     }
 
+    .form-label .field-icon,
+    .form-label i.field-icon,
+    .form-label svg.field-icon {
+      width: 16px;
+      height: 16px;
+      color: #1BAECF;
+      flex-shrink: 0;
+      display: inline-block;
+      vertical-align: middle;
+    }
+
     .input-wrapper {
       position: relative;
       display: flex;
       align-items: center;
-      gap: 0.75rem;
+      width: 100%;
     }
 
-    .input-wrapper .field-icon,
-    .input-wrapper i.field-icon,
-    .input-wrapper svg.field-icon {
-      flex-shrink: 0;
-      width: 19px;
-      height: 19px;
-      color: #1A3A63;
-      pointer-events: none;
-      transition: color 0.2s ease, transform 0.2s ease;
-      z-index: 2;
+    .input-wrapper > .field-icon,
+    .input-wrapper > i.field-icon,
+    .input-wrapper > svg.field-icon {
+      display: none !important;
     }
 
     .auth-input {
@@ -670,17 +677,19 @@
         <div class="auth-tab-content active" id="tab-content-login">
           <form id="form-login" onsubmit="handleLogin(event)">
             <div class="form-group">
-              <label class="form-label" for="login-email">Email Address</label>
+              <label class="form-label" for="login-email">
+                <i data-lucide="mail" class="field-icon"></i> Email Address
+              </label>
               <div class="input-wrapper">
-                <i data-lucide="mail" class="field-icon"></i>
                 <input type="email" id="login-email" class="auth-input" placeholder="e.g. name@hospital.ca" required autocomplete="email">
               </div>
             </div>
 
             <div class="form-group">
-              <label class="form-label" for="login-password">Password</label>
+              <label class="form-label" for="login-password">
+                <i data-lucide="lock" class="field-icon"></i> Password
+              </label>
               <div class="input-wrapper">
-                <i data-lucide="lock" class="field-icon"></i>
                 <input type="password" id="login-password" class="auth-input" placeholder="Enter your password" required autocomplete="current-password">
                 <button type="button" class="pwd-toggle-btn" onclick="togglePwdVisibility('login-password', this)" aria-label="Toggle password">
                   <i data-lucide="eye" style="width: 18px; height: 18px;"></i>
@@ -718,28 +727,31 @@
             <!-- Client Facility Registration Fields -->
             <div id="client-registration-fields">
               <div class="form-group">
-                <label class="form-label" for="reg-fullname">Primary Contact Person</label>
+                <label class="form-label" for="reg-fullname">
+                  <i data-lucide="user" class="field-icon"></i> Primary Contact Person
+                </label>
                 <div class="input-wrapper">
-                  <i data-lucide="user" class="field-icon"></i>
                   <input type="text" id="reg-fullname" class="auth-input" placeholder="e.g. Dr. Sarah Jenkins" autocomplete="name">
                 </div>
               </div>
 
               <!-- Organization Name (Shown for Client) -->
               <div class="form-group" id="group-org-name">
-                <label class="form-label" for="reg-orgname">Facility or Hospital Name *</label>
+                <label class="form-label" for="reg-orgname">
+                  <i data-lucide="building" class="field-icon"></i> Facility or Hospital Name *
+                </label>
                 <div class="input-wrapper">
-                  <i data-lucide="building" class="field-icon"></i>
                   <input type="text" id="reg-orgname" class="auth-input" placeholder="e.g. Toronto Central Hospital" autocomplete="organization" required>
                 </div>
               </div>
 
               <!-- Facility Operating Region -->
               <div class="form-group" id="group-reg-region">
-                <label class="form-label" for="reg-region">Operating Region / Zone *</label>
+                <label class="form-label" for="reg-region">
+                  <i data-lucide="map-pin" class="field-icon"></i> Operating Region / Zone *
+                </label>
                 <div class="input-wrapper">
-                  <i data-lucide="map-pin" class="field-icon"></i>
-                  <select id="reg-region" class="auth-input" required style="padding-left: 2.75rem; appearance: auto;">
+                  <select id="reg-region" class="auth-input" required style="appearance: auto;">
                     <option value="" disabled selected>Select facility region / GTA zone...</option>
                     <option value="Toronto Central">Toronto Central (Downtown / Midtown)</option>
                     <option value="Scarborough & East GTA">Scarborough &amp; East GTA</option>
@@ -754,15 +766,18 @@
               </div>
 
               <div class="form-group">
-                <label class="form-label" for="reg-email">Work Email Address</label>
+                <label class="form-label" for="reg-email">
+                  <i data-lucide="mail" class="field-icon"></i> Work Email Address
+                </label>
                 <div class="input-wrapper">
-                  <i data-lucide="mail" class="field-icon"></i>
                   <input type="email" id="reg-email" class="auth-input" placeholder="e.g. coordinator@hospital.ca" autocomplete="email">
                 </div>
               </div>
 
               <div class="form-group">
-                <label class="form-label" for="reg-phone">Direct Contact Phone *</label>
+                <label class="form-label" for="reg-phone">
+                  <i data-lucide="phone" class="field-icon"></i> Direct Contact Phone *
+                </label>
                 <div class="input-wrapper phone-composite-wrapper">
                   <div class="phone-country-addon">
                     <select id="reg-country-code" class="phone-country-select" aria-label="Country Dial Code">
@@ -789,9 +804,10 @@
               </div>
 
               <div class="form-group">
-                <label class="form-label" for="reg-password">Password (Min. 6 characters)</label>
+                <label class="form-label" for="reg-password">
+                  <i data-lucide="lock" class="field-icon"></i> Password (Min. 6 characters)
+                </label>
                 <div class="input-wrapper">
-                  <i data-lucide="lock" class="field-icon"></i>
                   <input type="password" id="reg-password" class="auth-input" placeholder="Create a secure password" minlength="6" autocomplete="new-password">
                   <button type="button" class="pwd-toggle-btn" onclick="togglePwdVisibility('reg-password', this)" aria-label="Toggle password">
                     <i data-lucide="eye" style="width: 18px; height: 18px;"></i>
@@ -821,9 +837,10 @@
             </p>
 
             <div class="form-group">
-              <label class="form-label" for="forgot-email">Account Email Address</label>
+              <label class="form-label" for="forgot-email">
+                <i data-lucide="mail" class="field-icon"></i> Account Email Address
+              </label>
               <div class="input-wrapper">
-                <i data-lucide="mail" class="field-icon"></i>
                 <input type="email" id="forgot-email" class="auth-input" placeholder="e.g. name@hospital.ca" required autocomplete="email">
               </div>
             </div>
@@ -884,9 +901,10 @@
             </p>
 
             <div class="form-group">
-              <label class="form-label" for="reset-new-password">New Password (Min. 8 characters)</label>
+              <label class="form-label" for="reset-new-password">
+                <i data-lucide="lock" class="field-icon"></i> New Password (Min. 8 characters)
+              </label>
               <div class="input-wrapper">
-                <i data-lucide="lock" class="field-icon"></i>
                 <input type="password" id="reset-new-password" class="auth-input" placeholder="Enter new password" minlength="8" required autocomplete="new-password">
                 <button type="button" class="pwd-toggle-btn" onclick="togglePwdVisibility('reset-new-password', this)" aria-label="Toggle password">
                   <i data-lucide="eye" style="width: 18px; height: 18px;"></i>
@@ -895,9 +913,10 @@
             </div>
 
             <div class="form-group">
-              <label class="form-label" for="reset-confirm-password">Confirm New Password</label>
+              <label class="form-label" for="reset-confirm-password">
+                <i data-lucide="lock" class="field-icon"></i> Confirm New Password
+              </label>
               <div class="input-wrapper">
-                <i data-lucide="lock" class="field-icon"></i>
                 <input type="password" id="reset-confirm-password" class="auth-input" placeholder="Re-enter new password" minlength="8" required autocomplete="new-password">
                 <button type="button" class="pwd-toggle-btn" onclick="togglePwdVisibility('reset-confirm-password', this)" aria-label="Toggle password">
                   <i data-lucide="eye" style="width: 18px; height: 18px;"></i>

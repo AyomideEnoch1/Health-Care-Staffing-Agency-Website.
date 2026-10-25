@@ -8195,6 +8195,46 @@ body.light-theme .action-btn:hover {
   text-decoration: underline;
 }
 
+/* ==========================================================================
+   MOBILE & UNIVERSAL FORM ICONS & LABELS ALIGNMENT
+   Icons placed beside labels; input fields take full width without left squish
+   ========================================================================== */
+.form-label,
+.custom-form .form-label,
+.auth-style-form .form-label {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.45rem !important;
+  font-size: 0.82rem !important;
+  font-weight: 700 !important;
+  color: var(--navy, #1A3A63) !important;
+  margin-bottom: 0.4rem !important;
+}
+
+.form-label .field-icon,
+.form-label i.field-icon,
+.form-label svg.field-icon,
+.form-label svg {
+  width: 16px !important;
+  height: 16px !important;
+  color: var(--cyan-turquoise, #1BAECF) !important;
+  flex-shrink: 0 !important;
+  display: inline-block !important;
+  vertical-align: middle !important;
+}
+
+@media (max-width: 991px) {
+  .input-wrapper > .field-icon,
+  .input-wrapper > i.field-icon,
+  .input-wrapper > svg.field-icon {
+    display: none !important;
+  }
+  .input-wrapper {
+    gap: 0 !important;
+  }
+}
+
+
 
 
 

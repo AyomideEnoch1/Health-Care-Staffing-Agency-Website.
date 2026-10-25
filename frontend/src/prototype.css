@@ -4078,31 +4078,44 @@ img, video, canvas, svg {
   width: 100% !important;
 }
 
+.style1-glass-card .form-label,
+.custom-form .form-label {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.45rem !important;
+  font-size: 0.82rem !important;
+  font-weight: 700 !important;
+  color: var(--navy, #1A3A63) !important;
+  margin-bottom: 0.4rem !important;
+}
+
+.style1-glass-card .form-label .field-icon,
+.style1-glass-card .form-label svg.field-icon,
+.custom-form .form-label .field-icon,
+.custom-form .form-label svg.field-icon {
+  width: 16px !important;
+  height: 16px !important;
+  color: var(--cyan-turquoise, #1BAECF) !important;
+  flex-shrink: 0 !important;
+  display: inline-block !important;
+  vertical-align: middle !important;
+}
+
 .style1-glass-card .input-wrapper .field-icon,
 .style1-glass-card .input-wrapper svg.field-icon {
-  position: absolute !important;
-  left: 14px !important;
-  top: 50% !important;
-  transform: translateY(-50%) !important;
-  color: #94A3B8 !important;
-  pointer-events: none !important;
-  width: 18px !important;
-  height: 18px !important;
-  transition: color 0.2s ease !important;
-  z-index: 2 !important;
+  display: none !important;
 }
 
 .style1-glass-card .input-wrapper.textarea-wrapper .field-icon,
 .style1-glass-card .input-wrapper.textarea-wrapper svg.field-icon {
-  top: 14px !important;
-  transform: none !important;
+  display: none !important;
 }
 
 .style1-glass-card .auth-input,
 .style1-glass-card .form-field {
   width: 100% !important;
   max-width: 100% !important;
-  padding: 0.82rem 1.1rem 0.82rem 2.8rem !important;
+  padding: 0.82rem 1.1rem !important;
   border: 1.5px solid #CBD5E1 !important;
   border-radius: 12px !important;
   font-size: 0.86rem !important;
@@ -4204,7 +4217,7 @@ img, video, canvas, svg {
   }
   .style1-glass-card .auth-input,
   .style1-glass-card .form-field {
-    padding: 0.72rem 0.9rem 0.72rem 2.6rem !important;
+    padding: 0.72rem 0.9rem !important;
     font-size: 0.82rem !important;
     border-radius: 10px !important;
   }
@@ -4213,9 +4226,7 @@ img, video, canvas, svg {
   }
   .style1-glass-card .input-wrapper .field-icon,
   .style1-glass-card .input-wrapper svg.field-icon {
-    left: 12px !important;
-    width: 16px !important;
-    height: 16px !important;
+    display: none !important;
   }
   .style1-glass-card .textarea-field {
     min-height: 90px !important;
@@ -4245,7 +4256,7 @@ img, video, canvas, svg {
   }
   .style1-glass-card .auth-input,
   .style1-glass-card .form-field {
-    padding: 0.68rem 0.85rem 0.68rem 2.45rem !important;
+    padding: 0.68rem 0.85rem !important;
     font-size: 0.8rem !important;
   }
   .style1-glass-card textarea.textarea-field {
@@ -4253,9 +4264,7 @@ img, video, canvas, svg {
   }
   .style1-glass-card .input-wrapper .field-icon,
   .style1-glass-card .input-wrapper svg.field-icon {
-    left: 10px !important;
-    width: 15px !important;
-    height: 15px !important;
+    display: none !important;
   }
   .style1-glass-card .btn-submit-auth {
     padding: 0.78rem 1.2rem !important;
