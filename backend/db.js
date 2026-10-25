@@ -51,8 +51,9 @@ try {
       isMySqlAvailable = true;
       console.log(`✅ [Database] Connected to MySQL (${host}:${port}/${database})`);
 
-      // Auto-heal / verify schema integrity across all deployment targets
-      try {
+      // Auto-heal / verify schema integrity across all deployment targets (dev/test only; in production schema is already provisioned)
+      if (process.env.NODE_ENV !== 'production') {
+        try {
         await conn.query(`
           CREATE TABLE IF NOT EXISTS shift_punches (
             id VARCHAR(64) NOT NULL,
@@ -191,11 +192,11 @@ try {
           console.warn('⚠️ [Rate Cards Seed Notice]:', seedErr.message);
         }
 
-      } catch (schemaNotice) {
-        console.warn('⚠️ [Database Schema Verification Notice]:', schemaNotice.message);
-      } finally {
-        conn.release();
+        } catch (schemaNotice) {
+          console.warn('⚠️ [Database Schema Verification Notice]:', schemaNotice.message);
+        }
       }
+      conn.release();
     })
     .catch(err => {
       isMySqlAvailable = false;

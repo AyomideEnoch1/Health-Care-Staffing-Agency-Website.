@@ -1,0 +1,40 @@
+# ==============================================================================
+# Hostinger Apache / LiteSpeed Frontend Rewrite Configuration
+# Divine Fingers Healthcare Services Inc. (divinefingershealthcareservice.ca)
+# ==============================================================================
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # 1. Force HTTPS
+  RewriteCond %{HTTPS} off
+  RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+  # 2. Direct Root to frontend/src/index.html
+  RewriteRule ^$ frontend/src/index.html [L]
+
+  # 3. If file exists in frontend/src, rewrite directly
+  RewriteCond %{REQUEST_URI} !^/frontend/src/
+  RewriteCond %{DOCUMENT_ROOT}/frontend/src/%{REQUEST_URI} -f [OR]
+  RewriteCond %{DOCUMENT_ROOT}/frontend/src/%{REQUEST_URI} -d
+  RewriteRule ^(.*)$ frontend/src/$1 [L]
+
+  # 4. Clean URLs (e.g. /about -> /frontend/src/about.html)
+  RewriteCond %{REQUEST_URI} !^/frontend/src/
+  RewriteCond %{DOCUMENT_ROOT}/frontend/src/$1.html -f
+  RewriteRule ^([^/]+)/?$ frontend/src/$1.html [L]
+
+  # 5. Direct file extensions in root (e.g. /index.html -> /frontend/src/index.html)
+  RewriteCond %{REQUEST_URI} !^/frontend/src/
+  RewriteCond %{DOCUMENT_ROOT}/frontend/src/$1 -f
+  RewriteRule ^(.*)$ frontend/src/$1 [L]
+</IfModule>
+
+# Security Headers
+<IfModule mod_headers.c>
+  Header set X-Content-Type-Options "nosniff"
+  Header set X-Frame-Options "SAMEORIGIN"
+  Header set X-XSS-Protection "1; mode=block"
+  Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>

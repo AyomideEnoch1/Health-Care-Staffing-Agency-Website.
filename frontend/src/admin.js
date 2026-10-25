@@ -17,7 +17,10 @@
     if (isFile || (isLocalHost && window.location.port !== '3000')) {
       return 'http://localhost:3000/api';
     }
-    return '/api';
+    if (window.location.hostname.includes('onrender.com')) {
+      return '/api';
+    }
+    return 'https://divine-fingers-healthcare.onrender.com/api';
   })();
 
   // ── 2. Live In-Memory Data Store ────────────────────────────────────────────
