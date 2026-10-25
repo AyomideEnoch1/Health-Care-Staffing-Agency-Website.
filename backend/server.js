@@ -403,9 +403,8 @@ if (require.main === module) {
         if (attempt < 3) await new Promise(r => setTimeout(r, 3000));
       }
     }
-    if (!dbConnected && isProd) {
-      console.error('❌ [FATAL DATABASE ERROR] Failed to connect to MySQL in production after retries. Exiting process.');
-      process.exit(1);
+    if (!dbConnected) {
+      console.warn('⚠️ [Database Notice] MySQL connection pending or unreachable on startup. Background pool will reconnect automatically once available.');
     }
 
     // Verify SMTP (non-blocking warning only)
