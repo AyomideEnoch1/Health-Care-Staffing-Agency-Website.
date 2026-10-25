@@ -17,7 +17,7 @@
     if (isFile || (isLocalHost && window.location.port !== '3000')) {
       return 'http://localhost:3000/api';
     }
-    if (window.location.hostname.includes('onrender.com')) {
+    if (window.location.hostname.includes('onrender.com') || window.location.hostname.startsWith('admin.')) {
       return '/api';
     }
     return 'https://divine-fingers-healthcare.onrender.com/api';
@@ -376,11 +376,6 @@
   function showAuthGate(message) {
     stopRealtimeStream();
     stopFallbackPolling();
-    // Redirect cleanly to the dedicated admin sign-in portal
-    if (typeof window !== 'undefined' && window.location.pathname !== '/admin-login.html') {
-      window.location.href = '/admin';
-      return;
-    }
     if (authOverlay) {
       authOverlay.style.display = 'flex';
       authOverlay.classList.remove('hidden', 'authenticated');
