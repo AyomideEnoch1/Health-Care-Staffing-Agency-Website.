@@ -237,6 +237,15 @@ const jwt = require('jsonwebtoken');
 const FRONTEND_SRC = path.join(__dirname, '../frontend/src');
 const FRONTEND_PUBLIC = path.join(__dirname, '../frontend/public');
 
+// Subdomain router: if accessing via admin subdomain, direct root / directly to /admin
+app.use((req, res, next) => {
+  const host = (req.hostname || req.headers.host || '').toLowerCase();
+  if (host.startsWith('admin.') && (req.path === '/' || req.path === '/index.html')) {
+    return res.redirect('/admin');
+  }
+  next();
+});
+
 app.get(['/admin', '/admin.html'], (req, res) => {
   const sessionCookie = req.cookies ? req.cookies['df_admin_session'] : null;
   const loginPath = path.join(FRONTEND_SRC, 'admin-login.html');
