@@ -1,11 +1,9 @@
 // GSAP & DOM Interactive Scripts for Divine Fingers Healthcare Services Inc.
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Register GSAP ScrollTrigger if available and mark document
+  // Register GSAP ScrollTrigger if available
   if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
     gsap.registerPlugin(ScrollTrigger);
-    if (document.documentElement) document.documentElement.classList.add('has-gsap');
-    if (document.body) document.body.classList.add('has-gsap');
   }
 
   // 1. Mobile Menu Drawer Toggle
@@ -692,14 +690,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ==========================================================================
   // ==========================================================================
-  // GSAP SCROLLTRIGGER ANIMATION ENGINE (BIDIRECTIONAL FORWARD & REVERSE SCROLL)
+  // GSAP SCROLLTRIGGER ANIMATION ENGINE (100% STABLE, PERMANENT POSITIONING)
   // ==========================================================================
   if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
-    document.documentElement.classList.add('has-gsap');
-    document.body.classList.add('has-gsap');
-    gsap.registerPlugin(ScrollTrigger);
-
-    const isMobile = window.innerWidth <= 768;
 
     // A. Site Header Entrance
     gsap.fromTo('.site-header', 
@@ -725,7 +718,7 @@ document.addEventListener('DOMContentLoaded', () => {
       );
     }
 
-    // C. Slide In Section Headers on Scroll (Forward & Reverse Scroll Animation across all screens)
+    // C. Slide In Section Headers on Scroll (Smoothly slides from the left across all screens)
     const sectionHeaders = document.querySelectorAll(
       '.welcome-header, .welcome-slide-heading, .workforce-slide-header, .about-slide-header, ' +
       '.purpose-slide-header, .values-slide-header, .solutions-slide-header, .excellence-slide-header, ' +
@@ -734,17 +727,13 @@ document.addEventListener('DOMContentLoaded', () => {
       '.callout-slide-text h2'
     );
     sectionHeaders.forEach(header => {
-      const fromX = isMobile ? 0 : -35;
-      const fromY = isMobile ? 20 : 0;
       gsap.fromTo(header, 
-        { x: fromX, y: fromY, opacity: 0 }, 
+        { x: -38, opacity: 0 }, 
         { 
           x: 0, 
-          y: 0, 
           opacity: 1, 
-          duration: 0.75, 
+          duration: 0.85, 
           ease: 'power2.out',
-          clearProps: 'transform,opacity',
           scrollTrigger: {
             trigger: header,
             start: 'top 92%',
@@ -759,25 +748,21 @@ document.addEventListener('DOMContentLoaded', () => {
       );
     });
 
-    // C-2. Section Paragraphs: Slide from left with difference in entrance time (staggered delay, bidirectional)
+    // C-2. Section Paragraphs: Slide from left with difference in entrance time (staggered delay)
     const sectionParagraphs = document.querySelectorAll(
       '.welcome-slide-body, .workforce-slide-body, .about-slide-body, .purpose-slide-body, ' +
       '.solutions-slide-body, .excellence-slide-body, .showcase-slide-body, .team-slide-body, ' +
       '.contact-card-anim-body, .contact-slide-sub, .callout-slide-text p, .strip-slide-text'
     );
     sectionParagraphs.forEach(para => {
-      const fromX = isMobile ? 0 : -28;
-      const fromY = isMobile ? 18 : 0;
       gsap.fromTo(para, 
-        { x: fromX, y: fromY, opacity: 0 }, 
+        { x: -30, opacity: 0 }, 
         { 
           x: 0, 
-          y: 0, 
           opacity: 1, 
-          duration: 0.75, 
-          delay: isMobile ? 0.05 : 0.16, 
-          ease: 'power2.out', 
-          clearProps: 'transform,opacity',
+          duration: 0.85, 
+          delay: 0.18, 
+          ease: 'power2.out',
           scrollTrigger: {
             trigger: para,
             start: 'top 92%',
@@ -788,25 +773,21 @@ document.addEventListener('DOMContentLoaded', () => {
       );
     });
 
-    // C-3. Section Links: Slide from left with further difference in entrance time (bidirectional)
+    // C-3. Section Links: Slide from left with further difference in entrance time (delay: 0.34s)
     const sectionLinks = document.querySelectorAll(
       '.welcome-slide-cta, .workforce-slide-link, .about-slide-highlights, .purpose-slide-link, ' +
       '.solutions-slide-link, .excellence-slide-link, .team-slide-link, .team-slide-benefits, ' +
       '.callout-slide-actions'
     );
     sectionLinks.forEach(link => {
-      const fromX = isMobile ? 0 : -22;
-      const fromY = isMobile ? 16 : 0;
       gsap.fromTo(link, 
-        { x: fromX, y: fromY, opacity: 0 }, 
+        { x: -24, opacity: 0 }, 
         { 
           x: 0, 
-          y: 0, 
           opacity: 1, 
-          duration: 0.72, 
-          delay: isMobile ? 0.08 : 0.28, 
-          ease: 'power2.out', 
-          clearProps: 'transform,opacity',
+          duration: 0.82, 
+          delay: 0.34, 
+          ease: 'power2.out',
           scrollTrigger: {
             trigger: link,
             start: 'top 92%',
@@ -817,45 +798,61 @@ document.addEventListener('DOMContentLoaded', () => {
       );
     });
 
-    // D. Our Values Section Cards: Bidirectional forward & reverse scroll animations on mobile & desktop
+    // D. Our Values Section Cards: Slide in from bottom and fade in on scroll smoothly with sequential stagger
     const valuesCards = document.querySelectorAll('.values-slide-card, .proto-pillar-card, .card-respect, .card-accountability, .card-partnership, .proto-value-card-2x2');
     if (valuesCards.length > 0) {
+      // Individual intersection observer for robust slide up on mobile
+      if ('IntersectionObserver' in window) {
+        const valuesCardObserver = new IntersectionObserver((entries, obs) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('card-revealed', 'is-in-view');
+              obs.unobserve(entry.target);
+            }
+          });
+        }, {
+          threshold: 0.12,
+          rootMargin: '0px 0px -40px 0px'
+        });
+        valuesCards.forEach(c => valuesCardObserver.observe(c));
+      }
+
       valuesCards.forEach((card, index) => {
-        const cardY = isMobile ? 28 : 42;
-        const staggerDelay = isMobile ? 0 : (index % 3) * 0.14;
+        const isMobile = window.innerWidth <= 768;
+        const staggerDelay = isMobile ? 0 : (index % 3) * 0.16;
         gsap.fromTo(card, 
-          { y: cardY, opacity: 0 }, 
+          { y: 48, opacity: 0 }, 
           { 
             y: 0, 
             opacity: 1, 
-            duration: 0.78, 
+            duration: 0.85, 
             delay: staggerDelay, 
-            ease: 'power2.out', 
-            clearProps: 'transform,opacity',
+            ease: 'power2.out',
             scrollTrigger: {
-            trigger: card,
-            start: isMobile ? 'top 92%' : 'top 88%',
-            toggleActions: 'play none none none',
-            once: true
-          }
+              trigger: card,
+              start: isMobile ? 'top 90%' : 'top 86%',
+              toggleActions: 'play none none none',
+              once: true,
+              onEnter: () => {
+                card.classList.add('card-revealed', 'is-in-view');
+              }
+            }
           }
         );
       });
     }
 
-    // E. Sections with Multiple Images: Slide in from left and right smoothly (Forward & Reverse)
+    // E. Sections with Multiple Images: Slide in from left and right smoothly
     const archMainPhotos = document.querySelectorAll('.arch-main-photo, .monograph-bg-plate img, .collage-item-main, .showcase-slide-photo');
     archMainPhotos.forEach(img => {
-      const imgX = isMobile ? -20 : -38;
       gsap.fromTo(img, 
-        { x: imgX, opacity: 0 }, 
+        { x: -40, opacity: 0 }, 
         { 
           x: 0, 
           opacity: 1, 
-          duration: 0.82, 
-          delay: isMobile ? 0.05 : 0.12, 
-          ease: 'power2.out', 
-          clearProps: 'transform,opacity',
+          duration: 0.90, 
+          delay: 0.12, 
+          ease: 'power2.out',
           scrollTrigger: {
             trigger: img,
             start: 'top 90%',
@@ -866,18 +863,16 @@ document.addEventListener('DOMContentLoaded', () => {
       );
     });
 
-    const archSubPhotos = document.querySelectorAll('.arch-vertical-photo, .monograph-caption-card, .monograph-fg-plate img, .collage-row-sub .collage-item-sub, .solutions-slide-right');
+    const archSubPhotos = document.querySelectorAll('.arch-vertical-photo, .monograph-caption-card, .collage-row-sub .collage-item-sub, .solutions-slide-right');
     archSubPhotos.forEach(el => {
-      const subX = isMobile ? 20 : 38;
       gsap.fromTo(el, 
-        { x: subX, opacity: 0 }, 
+        { x: 40, opacity: 0 }, 
         { 
           x: 0, 
           opacity: 1, 
-          duration: 0.82, 
-          delay: isMobile ? 0.10 : 0.22, 
-          ease: 'power2.out', 
-          clearProps: 'transform,opacity',
+          duration: 0.90, 
+          delay: 0.24, 
+          ease: 'power2.out',
           scrollTrigger: {
             trigger: el,
             start: 'top 90%',
@@ -888,24 +883,23 @@ document.addEventListener('DOMContentLoaded', () => {
       );
     });
 
-    // Multi-Image Trio (Excellence block & Clinical Care Masonry Columns)
-    const trioImages = document.querySelectorAll('.masonry-columns-wrapper .masonry-col, .excellence-slide-media .masonry-col, .proto-trio-photo-grid img');
-    trioImages.forEach((col, idx) => {
-      const fromX = isMobile ? 0 : (idx === 0 ? -36 : (idx === 2 ? 36 : 0));
-      const fromY = isMobile ? 28 : (idx === 1 ? 36 : 0);
-      gsap.fromTo(col,
+    // Multi-Image Trio (Excellence block)
+    const trioImages = document.querySelectorAll('.proto-trio-photo-grid img');
+    trioImages.forEach((img, idx) => {
+      const fromX = idx === 0 ? -36 : (idx === 2 ? 36 : 0);
+      const fromY = idx === 1 ? 36 : 0;
+      gsap.fromTo(img,
         { x: fromX, y: fromY, opacity: 0 },
         {
           x: 0,
           y: 0,
           opacity: 1,
-          duration: 0.80,
-          delay: isMobile ? 0 : idx * 0.14,
+          duration: 0.88,
+          delay: idx * 0.14,
           ease: 'power2.out',
-          clearProps: 'transform,opacity',
           scrollTrigger: {
-            trigger: col,
-            start: isMobile ? 'top 92%' : 'top 88%',
+            trigger: img,
+            start: 'top 90%',
             toggleActions: 'play none none none',
             once: true
           }
@@ -913,24 +907,20 @@ document.addEventListener('DOMContentLoaded', () => {
       );
     });
 
-    // Showcase Action Cards (Hospitals & Facilities, Staff Shift Portal) & Hotline Bar
-    const showcaseCards = document.querySelectorAll('.proto-showcase-action-card, .card-facilities, .card-staff, .showcase-slide-actions .card-action');
+    // Showcase Action Cards & Hotline
+    const showcaseCards = document.querySelectorAll('.proto-showcase-action-card, .showcase-slide-actions .card-action');
     showcaseCards.forEach((c, idx) => {
-      const cardY = isMobile ? 32 : 38;
-      const staggerDelay = isMobile ? (idx * 0.12) : (0.16 + (idx * 0.14));
       gsap.fromTo(c,
-        { y: cardY, opacity: 0 },
+        { x: 35, opacity: 0 },
         {
           x: 0,
-          y: 0,
           opacity: 1,
-          duration: 0.80,
-          delay: staggerDelay,
+          duration: 0.82,
+          delay: 0.20 + (idx * 0.12),
           ease: 'power2.out',
-          clearProps: 'transform,opacity',
           scrollTrigger: {
             trigger: c,
-            start: isMobile ? 'top 92%' : 'top 88%',
+            start: 'top 90%',
             toggleActions: 'play none none none',
             once: true
           }
@@ -938,22 +928,19 @@ document.addEventListener('DOMContentLoaded', () => {
       );
     });
 
-    const showcaseHotline = document.querySelector('.proto-showcase-hotline-bar, .showcase-slide-hotline');
+    const showcaseHotline = document.querySelector('.showcase-slide-hotline');
     if (showcaseHotline) {
-      const hotY = isMobile ? 24 : 30;
       gsap.fromTo(showcaseHotline,
-        { y: hotY, opacity: 0 },
+        { y: 25, opacity: 0 },
         {
-          x: 0,
           y: 0,
           opacity: 1,
-          duration: 0.78,
-          delay: isMobile ? 0.10 : 0.32,
+          duration: 0.80,
+          delay: 0.42,
           ease: 'power2.out',
-          clearProps: 'transform,opacity',
           scrollTrigger: {
             trigger: showcaseHotline,
-            start: isMobile ? 'top 94%' : 'top 92%',
+            start: 'top 92%',
             toggleActions: 'play none none none',
             once: true
           }
@@ -964,16 +951,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // Contact Section: Left card from left, right form from right
     const contactLeftCard = document.querySelector('.contact-slide-card');
     if (contactLeftCard) {
-      const clX = isMobile ? -20 : -36;
       gsap.fromTo(contactLeftCard,
-        { x: clX, opacity: 0 },
+        { x: -38, opacity: 0 },
         {
           x: 0,
           opacity: 1,
-          duration: 0.82,
-          delay: 0.08,
+          duration: 0.85,
+          delay: 0.12,
           ease: 'power2.out',
-          clearProps: 'transform,opacity',
           scrollTrigger: {
             trigger: contactLeftCard,
             start: 'top 90%',
@@ -986,16 +971,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const contactRightForm = document.querySelector('.contact-slide-form');
     if (contactRightForm) {
-      const crX = isMobile ? 20 : 36;
       gsap.fromTo(contactRightForm,
-        { x: crX, opacity: 0 },
+        { x: 38, opacity: 0 },
         {
           x: 0,
           opacity: 1,
-          duration: 0.82,
-          delay: isMobile ? 0.08 : 0.18,
+          duration: 0.85,
+          delay: 0.22,
           ease: 'power2.out',
-          clearProps: 'transform,opacity',
           scrollTrigger: {
             trigger: contactRightForm,
             start: 'top 90%',
@@ -1009,16 +992,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // Footer Columns: Slide from bottom with stagger
     const footerCols = document.querySelectorAll('.footer-slide-col');
     footerCols.forEach((col, idx) => {
-      const ftY = isMobile ? 20 : 28;
       gsap.fromTo(col,
-        { y: ftY, opacity: 0 },
+        { y: 28, opacity: 0 },
         {
           y: 0,
           opacity: 1,
-          duration: 0.75,
-          delay: isMobile ? 0 : idx * 0.08,
+          duration: 0.78,
+          delay: idx * 0.10,
           ease: 'power2.out',
-          clearProps: 'transform,opacity',
           scrollTrigger: {
             trigger: col,
             start: 'top 94%',
@@ -1029,33 +1010,31 @@ document.addEventListener('DOMContentLoaded', () => {
       );
     });
 
-    // F. Alternating Slide-In for General Service / Step / Sector Cards (Bidirectional)
-    const animateAlternatingCards = (selector, offsetDist = 32) => {
+    // F. Alternating Slide-In for General Service / Step / Sector Cards
+    const animateAlternatingCards = (selector, offsetDist = 35) => {
       const cards = document.querySelectorAll(selector);
       if (cards.length > 0) {
         cards.forEach((card, index) => {
-          const actualOffset = isMobile ? 18 : offsetDist;
           gsap.fromTo(card, 
-            { x: index % 2 === 0 ? -actualOffset : actualOffset, opacity: 0 }, 
+            { x: index % 2 === 0 ? -offsetDist : offsetDist, opacity: 0 }, 
             { 
               x: 0, 
               opacity: 1, 
-              duration: 0.80, 
-              delay: isMobile ? 0 : (index % 2) * 0.08,
+              duration: 0.88, 
+              delay: (index % 2) * 0.1,
               ease: 'power2.out',
-              clearProps: 'transform,opacity',
               scrollTrigger: {
-            trigger: card,
-            start: 'top 88%',
-            toggleActions: 'play none none none',
-            once: true
-          }
+                trigger: card,
+                start: 'top 88%',
+                toggleActions: 'play none none none',
+                once: true
+              }
             }
           );
         });
       }
     };
-    animateAlternatingCards('.step-card, .sector-card, .product-card, .why-item, .team-card, .service-card, .advantage-card, .perk-card, .proto-team-narrative-card', 32);
+    animateAlternatingCards('.step-card, .sector-card, .product-card, .why-item, .team-card, .service-card, .advantage-card, .perk-card, .proto-team-narrative-card', 35);
   }
 
   // 5. Scroll-Triggered Slide-In Animations (Left, Right, Top & Bottom)
@@ -1115,7 +1094,7 @@ document.addEventListener('DOMContentLoaded', () => {
           cardDelay = 0.18;
         }
 
-        // Silky smooth, natural bidirectional entrance animation
+        // Silky smooth, natural entrance animation
         gsap.fromTo(
           el,
           fromState,
@@ -1123,16 +1102,17 @@ document.addEventListener('DOMContentLoaded', () => {
             x: 0,
             y: 0,
             opacity: 1,
-            duration: 0.80,
-            delay: (window.innerWidth <= 768) ? 0 : cardDelay,
+            duration: 0.85,
+            delay: cardDelay,
             ease: 'power2.out',
             force3D: true,
+            clearProps: 'transform,opacity',
             scrollTrigger: {
-            trigger: el,
-            start: 'top 88%',
-            toggleActions: 'play none none none',
-            once: true
-          }
+              trigger: el,
+              start: 'top 88%',
+              toggleActions: 'play none none none',
+              once: true
+            }
           }
         );
 
@@ -1141,21 +1121,22 @@ document.addEventListener('DOMContentLoaded', () => {
         if (innerTablets.length > 0) {
           gsap.fromTo(
             innerTablets,
-            { y: 12, opacity: 0 },
+            { y: 14, opacity: 0 },
             {
               y: 0,
               opacity: 1,
-              duration: 0.60,
-              stagger: 0.06,
-              delay: (window.innerWidth <= 768) ? 0.08 : (cardDelay + 0.12),
+              duration: 0.65,
+              stagger: 0.08,
+              delay: cardDelay + 0.15,
               ease: 'power2.out',
               force3D: true,
+              clearProps: 'all',
               scrollTrigger: {
-            trigger: el,
-            start: 'top 88%',
-            toggleActions: 'play none none none',
-            once: true
-          }
+                trigger: el,
+                start: 'top 88%',
+                toggleActions: 'play none none none',
+                once: true
+              }
             }
           );
         }
@@ -1167,6 +1148,9 @@ document.addEventListener('DOMContentLoaded', () => {
               if (entry.isIntersecting) {
                 el.classList.remove('slide-hidden');
                 el.classList.add('active-slide');
+              } else if (entry.boundingClientRect.top > (window.innerHeight || document.documentElement.clientHeight) || (window.scrollY || window.pageYOffset) < 80) {
+                el.classList.remove('active-slide');
+                el.classList.add('slide-hidden');
               }
             });
           },
@@ -1620,7 +1604,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }, 400);
 
 
-  // 6. Roles Stagger — queues list items one-by-one on scroll (Bidirectional Forward & Reverse)
+  // 6. Roles Stagger — queues list items one-by-one on scroll (10% threshold trigger)
   const staggerLists = document.querySelectorAll('.roles-stagger-list');
   if (staggerLists.length > 0) {
     const staggerObserver = new IntersectionObserver(
@@ -1628,6 +1612,7 @@ document.addEventListener('DOMContentLoaded', () => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             entry.target.classList.add('stagger-revealed');
+            staggerObserver.unobserve(entry.target);
           }
         });
       },
@@ -2194,12 +2179,7 @@ window.toggleTeamContent = function(btn) {
   if (window.lucide) lucide.createIcons();
 };
 
-
-
-
-
-
-  // ── Interactive Hiring Section Layout Switcher ───────────────────────────
+// ── Interactive Hiring Section Layout Switcher ───────────────────────────
   window.setHiringLayout = function(layout) {
     const grid = document.getElementById('hiring-roles-grid');
     const spotlightNav = document.getElementById('spotlight-role-nav');
