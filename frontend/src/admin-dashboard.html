@@ -1,0 +1,2332 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Operations & Analytics Dashboard | Divine Fingers Healthcare Services Inc.</title>
+  <meta name="description" content="Futuristic clinical operations and dispatch intelligence platform for Divine Fingers Healthcare Services Inc.">
+
+  <!-- Google Fonts: Inter & Montserrat -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Core Dashboard Design System -->
+  <link rel="stylesheet" href="admin.css?v=6.2.2">
+
+  <!-- Chart.js CDN for Gradient Visualizations -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+  <!-- ==========================================================================
+       1. SECURITY & ACCESS AUTHENTICATION OVERLAY GATE
+       ========================================================================== -->
+  <div class="admin-auth-overlay hidden authenticated" id="admin-auth-overlay" style="display: none;">
+    <div class="admin-auth-card">
+      <img src="assets/images/brand_emblem.png" alt="Divine Fingers Healthcare Logo" class="admin-auth-logo">
+      <h2 class="admin-auth-title">DIVINE FINGERS ADMIN</h2>
+      <p class="admin-auth-subtitle">Health Care Coordination &amp; Operations Portal</p>
+      
+      <form class="admin-auth-form" id="admin-login-form">
+        <div id="login-primary-credentials">
+          <input type="email" class="search-input" id="admin-email-input" value="" placeholder="ADMIN EMAIL (e.g. admin@divinefingershealthcare.ca)" style="padding-left: 1.25rem; height: 42px; margin-bottom: 0.75rem;" required autofocus autocomplete="email">
+          <input type="password" class="search-input" id="admin-password-input" value="" placeholder="ACCOUNT PASSWORD" style="padding-left: 1.25rem; height: 42px; margin-bottom: 0.75rem;" required autocomplete="current-password">
+          <button type="submit" class="btn-primary-action" id="login-submit-btn" style="width: 100%; justify-content: center; height: 44px; font-size: 0.95rem;">
+            <i data-lucide="shield-check"></i> UNLOCK DASHBOARD
+          </button>
+          
+        </div>
+
+        <!-- 1. Email Verification Step (if corporate email is unverified) -->
+        <div id="email-verify-challenge-container" style="display: none;">
+          <div style="background: rgba(0, 168, 150, 0.1); border: 1px solid rgba(0, 168, 150, 0.3); border-radius: 6px; padding: 0.75rem; margin-bottom: 1rem; text-align: center;">
+            <i data-lucide="mail-check" style="width: 24px; height: 24px; color: var(--brand-turquoise); margin-bottom: 0.25rem;"></i>
+            <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-primary);">Email Verification Required</div>
+            <div id="email-verify-recipient-text" style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">Enter the 6-digit code sent to your corporate email.</div>
+          </div>
+          <input type="text" class="search-input" id="admin-email-code-input" placeholder="000000" maxlength="6" pattern="[0-9]{6}" inputmode="numeric" style="padding-left: 1.25rem; height: 44px; margin-bottom: 0.75rem; text-align: center; font-size: 1.25rem; letter-spacing: 6px; font-weight: 800;">
+          <button type="button" class="btn-primary-action" id="email-verify-btn" style="width: 100%; justify-content: center; height: 44px; font-size: 0.95rem;">
+            <i data-lucide="check-circle"></i> VERIFY EMAIL &amp; CONTINUE
+          </button>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.75rem;">
+            <button type="button" id="email-resend-btn" style="background: transparent; border: none; color: var(--brand-turquoise); font-size: 0.8rem; cursor: pointer; padding: 0.2rem;">
+              Resend Code
+            </button>
+            <button type="button" id="email-verify-back-btn" style="background: transparent; border: none; color: var(--text-muted); font-size: 0.8rem; cursor: pointer; padding: 0.2rem;">
+              ← Back to Login
+            </button>
+          </div>
+        </div>
+
+        <!-- 2. Two-Factor Authentication Step -->
+        <div id="mfa-challenge-container" style="display: none;">
+          <div style="background: rgba(0, 168, 150, 0.1); border: 1px solid rgba(0, 168, 150, 0.3); border-radius: 6px; padding: 0.75rem; margin-bottom: 1rem; text-align: center;">
+            <i data-lucide="shield-alert" style="width: 24px; height: 24px; color: var(--brand-turquoise); margin-bottom: 0.25rem;"></i>
+            <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-primary);">Two-Factor Authentication</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted);">Enter the 6-digit code from your Authenticator app.</div>
+          </div>
+          <input type="text" class="search-input" id="admin-mfa-code-input" placeholder="000000" maxlength="6" pattern="[0-9]{6}" inputmode="numeric" style="padding-left: 1.25rem; height: 44px; margin-bottom: 0.75rem; text-align: center; font-size: 1.25rem; letter-spacing: 6px; font-weight: 800;">
+          <button type="button" class="btn-primary-action" id="mfa-verify-btn" style="width: 100%; justify-content: center; height: 44px; font-size: 0.95rem;">
+            <i data-lucide="key-round"></i> VERIFY 2FA CODE
+          </button>
+          <button type="button" id="mfa-back-btn" style="width: 100%; background: transparent; border: none; color: var(--text-muted); font-size: 0.8rem; margin-top: 0.75rem; cursor: pointer; padding: 0.4rem;">
+            ← Back to Login
+          </button>
+        </div>
+
+        <div class="admin-auth-error" id="auth-error-msg" style="color: var(--status-danger); font-size: 0.82rem; margin-top: 0.5rem; text-align: center;"></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       2. MAIN APP SHELL WITH COLLAPSIBLE SIDEBAR
+       ========================================================================== -->
+  <div class="admin-shell" id="admin-app">
+
+    <!-- SIDEBAR NAVIGATION -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a href="#overview" class="brand-link" id="brand-home-link">
+          <img src="assets/images/logo.png" alt="Divine Fingers Logo" class="brand-logo-img">
+          <div class="brand-info">
+            <span class="brand-name">Divine Fingers</span>
+            <span class="brand-tag">Health Care Admin</span>
+          </div>
+        </a>
+        <button class="sidebar-collapse-btn" id="sidebar-collapse-btn" aria-label="Toggle Sidebar Navigation" title="Toggle Collapse">
+          <i data-lucide="chevron-left" style="width: 16px; height: 16px;"></i>
+        </button>
+      </div>
+
+      <!-- Nav Menu Items -->
+      <nav class="sidebar-nav">
+        <div class="nav-section-title">Core Operations</div>
+        
+        <button type="button" class="nav-item-btn active" data-tab="overview-tab" data-title="Dashboard Overview" onclick="window.switchAdminTab('overview-tab', 'Dashboard Overview')">
+          <span class="nav-icon"><i data-lucide="layout-dashboard"></i></span>
+          <span class="nav-label">Dashboard Overview</span>
+        </button>
+
+        <button type="button" class="nav-item-btn" data-tab="roster-tab" data-title="Staff Roster" onclick="window.switchAdminTab('roster-tab', 'Staff Roster')">
+          <span class="nav-icon"><i data-lucide="users"></i></span>
+          <span class="nav-label">Staff Roster</span>
+          <span class="nav-badge" id="badge-roster-count" style="display:none;">0</span>
+        </button>
+
+        <button type="button" class="nav-item-btn" data-tab="requests-tab" data-title="Client Requests" onclick="window.switchAdminTab('requests-tab', 'Client Requests')">
+          <span class="nav-icon"><i data-lucide="building-2"></i></span>
+          <span class="nav-label">Client Requests</span>
+          <span class="nav-badge danger" id="badge-requests-count" style="display:none;">0</span>
+        </button>
+
+        <button type="button" class="nav-item-btn" data-tab="facilities-tab" data-title="Facilities &amp; MSA Contracts" onclick="window.switchAdminTab('facilities-tab', 'Facilities &amp; MSA Contracts')">
+          <span class="nav-icon"><i data-lucide="file-badge"></i></span>
+          <span class="nav-label">Facilities &amp; Rates</span>
+          <span class="nav-badge" id="badge-facilities-count" style="display:none;">0</span>
+        </button>
+
+        <button type="button" class="nav-item-btn" data-tab="applicants-tab" data-title="Job Applications (ATS)" onclick="window.switchAdminTab('applicants-tab', 'Job Applications (ATS)')">
+          <span class="nav-icon"><i data-lucide="file-text"></i></span>
+          <span class="nav-label">Job Applications</span>
+          <span class="nav-badge" id="badge-applicants-count" style="display:none;">0</span>
+        </button>
+
+        <button type="button" class="nav-item-btn" data-tab="scheduler-tab" data-title="Shift &amp; Dispatch Scheduler" onclick="window.switchAdminTab('scheduler-tab', 'Shift & Dispatch Scheduler')">
+          <span class="nav-icon"><i data-lucide="calendar"></i></span>
+          <span class="nav-label">Shift Scheduler</span>
+        </button>
+
+        <div class="nav-section-title">Management &amp; Compliance</div>
+
+        <button type="button" class="nav-item-btn" data-tab="compliance-tab" data-title="Compliance &amp; Credentials" onclick="window.switchAdminTab('compliance-tab', 'Compliance & Credentials')">
+          <span class="nav-icon"><i data-lucide="shield-alert"></i></span>
+          <span class="nav-label">Compliance &amp; Docs</span>
+        </button>
+
+        <button type="button" class="nav-item-btn" data-tab="reports-tab" data-title="Reports &amp; Analytics Export" onclick="window.switchAdminTab('reports-tab', 'Reports & Analytics Export')">
+          <span class="nav-icon"><i data-lucide="bar-chart-3"></i></span>
+          <span class="nav-label">Reports &amp; Export</span>
+        </button>
+
+        <button type="button" class="nav-item-btn" data-tab="admin-users-tab" data-title="Administrator Users &amp; Security Roster" id="nav-admin-users" onclick="window.switchAdminTab('admin-users-tab', 'Admin Operators')">
+          <span class="nav-icon"><i data-lucide="shield-check"></i></span>
+          <span class="nav-label">Admin Operators</span>
+          <span class="nav-badge" id="badge-admins-count" style="display:none;">0</span>
+        </button>
+
+        <button type="button" class="nav-item-btn" data-tab="archive-tab" data-title="Archive Vault &amp; Deleted Records" id="nav-archive-vault" onclick="window.switchAdminTab('archive-tab', 'Archive Vault')">
+          <span class="nav-icon"><i data-lucide="archive"></i></span>
+          <span class="nav-label">Archive Vault</span>
+          <span class="nav-badge" id="badge-archive-count" style="display:none;">0</span>
+        </button>
+
+        <button type="button" class="nav-item-btn" data-tab="settings-tab" data-title="Portal Settings &amp; Audit Log" onclick="window.switchAdminTab('settings-tab', 'Portal Settings & Audit Log')">
+          <span class="nav-icon"><i data-lucide="settings"></i></span>
+          <span class="nav-label">Settings &amp; Audit</span>
+        </button>
+      </nav>
+
+      <!-- Sidebar User Profile Footer -->
+      <div class="sidebar-footer">
+        <div class="sidebar-user-pill" id="user-profile-trigger" title="View Administrator Credentials">
+          <div class="user-avatar-initials" id="sidebar-avatar-initials">SA</div>
+          <div class="user-meta">
+            <span class="user-display-name" id="sidebar-user-name">Super Admin</span>
+            <span class="user-clearance-tag" id="sidebar-user-clearance">Security Level 5</span>
+          </div>
+        </div>
+        <button class="topbar-action-btn" id="sidebar-logout-btn" style="width: 32px; height: 32px;" title="Lock Session">
+          <i data-lucide="log-out" style="width: 15px; height: 15px;"></i>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Mobile Sidebar Backdrop Overlay -->
+    <div class="sidebar-backdrop" id="sidebar-backdrop" aria-hidden="true"></div>
+
+    <!-- ==========================================================================
+         3. MAIN VIEW CONTENT AREA
+         ========================================================================== -->
+    <div class="main-wrapper">
+      
+      <!-- TOP NAVIGATION BAR -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Open Mobile Menu">
+            <i data-lucide="menu" style="width: 20px; height: 20px;"></i>
+          </button>
+
+          <!-- Global Instant Search -->
+          <div class="global-search-box">
+            <i data-lucide="search" class="search-icon-svg" style="width: 16px; height: 16px;"></i>
+            <input type="text" class="search-input" id="global-search-input" placeholder="Search nurses, facilities, shifts, or applications...">
+            <span class="search-kbd-hint">/</span>
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <!-- Live Telemetry Status -->
+          <div class="live-pulse-chip">
+            <span class="pulse-dot"></span>
+            <span class="pulse-text">Live GTA Dispatch</span>
+          </div>
+
+          <!-- Live Device Clock & Timezone Indicator -->
+          <div class="live-clock-chip" id="topbar-live-clock" title="Synced with your local device time • Click to toggle Dual-Time Zone">
+            <i data-lucide="clock" style="width: 13px; height: 13px; color: var(--brand-cyan);"></i>
+            <span id="live-clock-display">--:--:--</span>
+            <span class="live-tz-badge" id="live-tz-display">LOCAL</span>
+          </div>
+
+          <!-- Light/Dark Mode Switcher -->
+          <button class="topbar-action-btn" id="theme-toggle-btn" title="Toggle Light / Dark Mode">
+            <i data-lucide="sun" id="theme-icon" style="width: 18px; height: 18px;"></i>
+          </button>
+
+          <!-- Notification Bell -->
+          <div style="position: relative;">
+            <button class="topbar-action-btn" id="notif-btn" title="Operational Alerts">
+              <i data-lucide="bell" style="width: 18px; height: 18px;"></i>
+              <span class="notif-badge-count" id="notif-badge" style="display:none;">0</span>
+            </button>
+            <div class="notif-dropdown" id="notif-dropdown">
+              <div class="notif-header">
+                <span>Operational Alerts</span>
+                <span style="font-size: 0.7rem; color: var(--brand-cyan);" id="notif-count-text">0 Alerts</span>
+              </div>
+              <div class="notif-list" id="notif-list-container">
+                <div style="padding: 1.5rem; text-align: center; color: var(--text-muted); font-size: 0.8rem;">No critical alerts</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Jump to Public Website -->
+          <a href="index.html" target="_blank" class="view-site-link-btn" title="Open Public Website">
+            <i data-lucide="external-link" style="width: 14px; height: 14px;"></i>
+            <span class="view-site-text">Public Site</span>
+          </a>
+        </div>
+      </header>
+
+      <!-- BREADCRUMBS & SECTION HEADER -->
+      <div class="view-header">
+        <div class="breadcrumbs">
+          <a href="#overview" class="breadcrumb-link">Admin</a>
+          <span>/</span>
+          <span class="breadcrumb-current" id="breadcrumb-title">Dashboard Overview</span>
+        </div>
+        <div class="page-title-row">
+          <h1 class="page-title" id="view-heading-text">Dashboard Overview</h1>
+          
+          <div class="page-actions-group" id="dynamic-page-actions">
+            <button class="btn-secondary-action" id="btn-refresh-data" title="Refresh Live Feeds">
+              <i data-lucide="rotate-cw" style="width: 14px; height: 14px;"></i> Refresh
+            </button>
+            <button class="btn-primary-action" id="btn-quick-dispatch">
+              <i data-lucide="plus-circle" style="width: 16px; height: 16px;"></i> Dispatch Shift
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==========================================================================
+           4. TABBED CONTENT PANELS
+           ========================================================================== -->
+      <main class="admin-content-body">
+
+        <!-- TAB 1: DASHBOARD OVERVIEW -->
+        <div class="admin-view-tab active-tab" id="overview-tab">
+          
+
+
+          <!-- 6 Top Row KPI Metric Cards — values populated from /api/admin/kpis (Clickable Tab Shortcuts) -->
+          <div class="kpi-grid">
+            
+            <!-- KPI 1: Active / Dispatched Shifts -> Requests Tab -->
+            <div class="kpi-card" data-tab="requests-tab" data-title="Client Requests &amp; Shift Dispatching" title="Click to view Client Requests &amp; Shift Orders" style="cursor: pointer;">
+              <div class="kpi-top">
+                <span class="kpi-title">Dispatched Shifts</span>
+                <div class="kpi-icon-box"><i data-lucide="activity" style="width: 18px; height: 18px;"></i></div>
+              </div>
+              <div class="kpi-value-row">
+                <span class="kpi-number tabular-nums" id="kpi-active-shifts"><span class="skeleton-shimmer" style="width: 38px; height: 26px;"></span></span>
+                <span class="kpi-trend neutral" id="kpi-active-shifts-trend"></span>
+              </div>
+            </div>
+
+            <!-- KPI 2: Open / Pending Client Requests -> Requests Tab -->
+            <div class="kpi-card" data-tab="requests-tab" data-title="Client Requests &amp; Shift Dispatching" title="Click to view Open Client Requests" style="cursor: pointer;">
+              <div class="kpi-top">
+                <span class="kpi-title">Pending Requests</span>
+                <div class="kpi-icon-box" style="color: var(--status-warning); background: var(--status-warning-bg);">
+                  <i data-lucide="building" style="width: 18px; height: 18px;"></i>
+                </div>
+              </div>
+              <div class="kpi-value-row">
+                <span class="kpi-number tabular-nums" id="kpi-open-requests"><span class="skeleton-shimmer" style="width: 38px; height: 26px;"></span></span>
+                <span class="kpi-trend neutral" id="kpi-open-requests-trend" style="color: var(--status-warning); background: var(--status-warning-bg);"></span>
+              </div>
+            </div>
+
+            <!-- KPI 3: New Applications -> Applicants ATS Tab -->
+            <div class="kpi-card" data-tab="applicants-tab" data-title="Applicant Pipeline &amp; ATS" title="Click to view Healthcare Candidate Applications" style="cursor: pointer;">
+              <div class="kpi-top">
+                <span class="kpi-title">New Applications</span>
+                <div class="kpi-icon-box" style="color: var(--status-info); background: var(--status-info-bg);">
+                  <i data-lucide="file-check" style="width: 18px; height: 18px;"></i>
+                </div>
+              </div>
+              <div class="kpi-value-row">
+                <span class="kpi-number tabular-nums" id="kpi-pending-apps"><span class="skeleton-shimmer" style="width: 38px; height: 26px;"></span></span>
+                <span class="kpi-trend neutral" id="kpi-pending-apps-trend"></span>
+              </div>
+            </div>
+
+            <!-- KPI 4: Staff Available -> Roster Tab -->
+            <div class="kpi-card" data-tab="roster-tab" data-title="Staff Directory &amp; Healthcare Roster" title="Click to view Active Healthcare Staff Roster" style="cursor: pointer;">
+              <div class="kpi-top">
+                <span class="kpi-title">Staff Available</span>
+                <div class="kpi-icon-box" style="color: var(--status-success); background: var(--status-success-bg);">
+                  <i data-lucide="user-check" style="width: 18px; height: 18px;"></i>
+                </div>
+              </div>
+              <div class="kpi-value-row">
+                <span class="kpi-number tabular-nums" id="kpi-staff-available"><span class="skeleton-shimmer" style="width: 38px; height: 26px;"></span></span>
+                <span class="kpi-trend neutral" id="kpi-staff-available-trend"></span>
+              </div>
+            </div>
+
+            <!-- KPI 5: Credentials Expiring -> Compliance Tab -->
+            <div class="kpi-card" data-tab="compliance-tab" data-title="Compliance &amp; Credential Tracking" title="Click to view CNO, BLS/CPR, VSS &amp; N95 Compliance" style="cursor: pointer;">
+              <div class="kpi-top">
+                <span class="kpi-title">Credentials Expiring</span>
+                <div class="kpi-icon-box" style="color: var(--status-danger); background: var(--status-danger-bg);">
+                  <i data-lucide="alert-triangle" style="width: 18px; height: 18px;"></i>
+                </div>
+              </div>
+              <div class="kpi-value-row">
+                <span class="kpi-number tabular-nums" id="kpi-creds-expiring"><span class="skeleton-shimmer" style="width: 38px; height: 26px;"></span></span>
+                <span class="kpi-trend neutral" id="kpi-creds-expiring-trend"></span>
+              </div>
+            </div>
+
+            <!-- KPI 6: Shift Fill Rate -> Scheduler Tab -->
+            <div class="kpi-card" data-tab="scheduler-tab" data-title="Interactive Shift Scheduler &amp; Rota" title="Click to view Interactive Shift Scheduler" style="cursor: pointer;">
+              <div class="kpi-top">
+                <span class="kpi-title">Shift Fill Rate</span>
+                <div class="kpi-icon-box"><i data-lucide="calendar" style="width: 18px; height: 18px;"></i></div>
+              </div>
+              <div class="kpi-value-row">
+                <span class="kpi-number tabular-nums" id="kpi-fill-rate"><span class="skeleton-shimmer" style="width: 48px; height: 26px;"></span></span>
+                <span class="kpi-trend neutral" id="kpi-fill-rate-trend"></span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Main Visualizations (Futuristic Telemetry Area Chart + Holographic Role Donut Chart) -->
+          <div class="charts-grid-main">
+            
+            <div class="chart-card glass-cyber-card">
+              <div class="chart-header-row">
+                <div class="chart-title-group">
+                  <div style="display:flex;align-items:center;gap:8px;">
+                    <span class="live-chart-pulse"></span>
+                    <span class="chart-title">Real-Time Shift Fulfillment Telemetry</span>
+                  </div>
+                  <span class="chart-subtitle">Demand velocity vs. active hospital &amp; LTC dispatches across Ontario</span>
+                </div>
+                <div class="chart-segmented-control" id="fulfillment-toggle">
+                  <button class="segmented-btn active" data-period="7">7 Days</button>
+                  <button class="segmented-btn" data-period="30">30 Days</button>
+                  <button class="segmented-btn" data-period="90">90 Days</button>
+                </div>
+              </div>
+              <div class="chart-container-box">
+                <canvas id="chart-fulfillment"></canvas>
+              </div>
+            </div>
+
+            <div class="chart-card glass-cyber-card">
+              <div class="chart-header-row">
+                <div class="chart-title-group">
+                  <div style="display:flex;align-items:center;gap:8px;">
+                    <span class="live-chart-pulse" style="background:var(--brand-cyan);"></span>
+                    <span class="chart-title">Clinical Workforce Distribution</span>
+                  </div>
+                  <span class="chart-subtitle">Real-time breakdown of registered healthcare staff by credential</span>
+                </div>
+              </div>
+              <div class="chart-container-box" style="height: 220px; position: relative;">
+                <canvas id="chart-roles-donut"></canvas>
+              </div>
+              <div class="donut-stat-summary" id="donut-stat-summary"></div>
+            </div>
+
+          </div>
+
+          <!-- Secondary Grid (Regional Density & Live Compliance HUD) -->
+          <div class="charts-grid-secondary">
+            
+            <div class="chart-card glass-cyber-card">
+              <div class="chart-header-row">
+                <div class="chart-title-group">
+                  <div style="display:flex;align-items:center;gap:8px;">
+                    <span class="live-chart-pulse" style="background:#38bdf8;"></span>
+                    <span class="chart-title">Regional Shift Demand Matrix</span>
+                  </div>
+                  <span class="chart-subtitle" id="regional-demand-subtitle">Hospital surge, LTC facilities, and Home Care allocations by GTA sector &bull; <strong id="regional-demand-total-badge" style="color:var(--brand-cyan);font-weight:700;">0 Active Shifts</strong></span>
+                </div>
+              </div>
+              <div class="chart-container-box">
+                <canvas id="chart-regional-demand"></canvas>
+              </div>
+            </div>
+
+            <div class="chart-card glass-cyber-card">
+              <div class="chart-header-row">
+                <div class="chart-title-group">
+                  <div style="display:flex;align-items:center;gap:8px;">
+                    <span class="live-chart-pulse" style="background:#10b981;"></span>
+                    <span class="chart-title">Credential Verification &amp; Live Audit Feed</span>
+                  </div>
+                  <span class="chart-subtitle">Real-time status of CNO licenses, Vulnerable Sector checks, and BLS/CPR</span>
+                </div>
+              </div>
+
+              <div class="compliance-bars-list" id="overview-compliance-bars"></div>
+
+              <div class="activity-feed-list" id="overview-activity-feed" style="margin-top: 1.25rem;"></div>
+            </div>
+          </div>
+
+          <!-- Super-Admin: Active Administrators Card directly on Dashboard Overview -->
+          <div class="table-card" id="overview-admin-accounts-card" style="padding: 1.5rem; margin-top: 1.75rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem;">
+              <div>
+                <h3 style="font-size: 1.15rem; font-weight: 800; margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+                  <i data-lucide="shield-check" style="width: 20px; height: 20px; color: var(--brand-turquoise);"></i>
+                  Registered System Administrators &amp; Operators
+                </h3>
+                <p style="color: var(--text-muted); font-size: 0.82rem; margin: 0.25rem 0 0 0;">
+                  Live operator roster, clearance levels, 2FA status, and administrative actions.
+                </p>
+              </div>
+              <button class="btn-secondary-action" onclick="window.switchAdminTab('admin-users-tab', 'Administrator Users &amp; Security Roster')">
+                <i data-lucide="user-plus" style="width: 14px; height: 14px;"></i> Provision New Admin
+              </button>
+            </div>
+            
+            <div class="table-responsive-container">
+              <table class="data-table mobile-stacked-table">
+                <thead>
+                  <tr>
+                    <th>Administrator</th>
+                    <th>Email Address</th>
+                    <th>Role</th>
+                    <th>Email Verification</th>
+                    <th>2FA Security</th>
+                    <th>Last Login</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="overview-admin-accounts-table-body"></tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- TAB 2: STAFF ROSTER -->
+        <div class="admin-view-tab" id="roster-tab">
+          <div class="table-card">
+            <div class="table-toolbar">
+              <div class="table-filter-group">
+                <input type="text" class="search-input filter-search-box" id="roster-search-input" placeholder="Search nurse name, ID, or license...">
+                
+                <select class="filter-select" id="roster-role-filter">
+                  <option value="">All Roles (RN, RPN, PSW)</option>
+                  <option value="RN">RN (Registered Nurse)</option>
+                  <option value="RPN">RPN (Registered Practical Nurse)</option>
+                  <option value="PSW">PSW (Personal Support Worker)</option>
+                  <option value="Companion">Care Companion</option>
+                </select>
+
+                <select class="filter-select" id="roster-status-filter">
+                  <option value="">All Statuses</option>
+                  <option value="pending_verification">⏳ Pending Verification</option>
+                  <option value="available">Available Now</option>
+                  <option value="on-shift">On Shift</option>
+                  <option value="off-duty">Off Duty</option>
+                </select>
+
+                <select class="filter-select" id="roster-region-filter">
+                  <option value="">All Ontario Regions</option>
+                  <option value="Scarborough">Scarborough / East GTA</option>
+                  <option value="North York">North York</option>
+                  <option value="Mississauga">Mississauga / Peel</option>
+                  <option value="Brampton">Brampton</option>
+                  <option value="Markham">Markham / York Region</option>
+                </select>
+              </div>
+
+              <div class="page-actions-group">
+                <button class="btn-secondary-action" id="btn-export-roster-csv">
+                  <i data-lucide="download" style="width: 14px; height: 14px;"></i> Export CSV
+                </button>
+                <button class="btn-primary-action" id="btn-add-staff-modal">
+                  <i data-lucide="user-plus" style="width: 14px; height: 14px;"></i> Add Caregiver
+                </button>
+              </div>
+            </div>
+
+            <div class="table-responsive-container">
+              <table class="data-table mobile-stacked-table" id="roster-table">
+                <thead>
+                  <tr>
+                    <th style="width: 40px;"><input type="checkbox" id="roster-select-all" title="Select All"></th>
+                    <th>Caregiver Name</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Credentials</th>
+                    <th>Rating</th>
+                    <th>Assigned Region</th>
+                    <th style="text-align: right;">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="roster-table-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 3: CLIENT REQUESTS -->
+        <div class="admin-view-tab" id="requests-tab">
+          <div class="table-toolbar" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); margin-bottom: 1.25rem;">
+            <div class="table-filter-group">
+              <div class="chart-segmented-control" id="requests-view-toggle">
+                <button type="button" class="segmented-btn active" data-view="kanban" onclick="window.switchRequestsView('kanban')"><i data-lucide="kanban" style="width: 14px; height: 14px; vertical-align: middle;"></i> Kanban Board</button>
+                <button type="button" class="segmented-btn" data-view="table" onclick="window.switchRequestsView('table')"><i data-lucide="table" style="width: 14px; height: 14px; vertical-align: middle;"></i> Data Table</button>
+              </div>
+              <input type="text" class="search-input filter-search-box" id="requests-search-input" placeholder="Search facility, unit, or shift...">
+            </div>
+
+            <div class="page-actions-group">
+              <button class="btn-primary-action" id="btn-new-request-modal">
+                <i data-lucide="plus" style="width: 14px; height: 14px;"></i> Create Staffing Request
+              </button>
+            </div>
+          </div>
+
+          <!-- Mobile Kanban Stage Switcher Pill Bar (Option 1) -->
+          <div class="mobile-kanban-stage-bar" id="requests-mobile-stage-bar"></div>
+
+          <div class="pipeline-board" id="requests-kanban-board">
+            <div class="pipeline-col" data-stage="new">
+              <div class="pipeline-col-header">
+                <span class="pipeline-col-title"><span class="donut-color-dot" style="background: var(--status-info);"></span> New Inbound</span>
+                <span class="pipeline-col-count" id="count-req-new">0</span>
+              </div>
+              <div class="pipeline-cards-list" id="col-req-new"></div>
+            </div>
+
+            <div class="pipeline-col" data-stage="reviewing">
+              <div class="pipeline-col-header">
+                <span class="pipeline-col-title"><span class="donut-color-dot" style="background: var(--status-warning);"></span> Reviewing &amp; Matching</span>
+                <span class="pipeline-col-count" id="count-req-reviewing">0</span>
+              </div>
+              <div class="pipeline-cards-list" id="col-req-reviewing"></div>
+            </div>
+
+            <div class="pipeline-col" data-stage="matched">
+              <div class="pipeline-col-header">
+                <span class="pipeline-col-title"><span class="donut-color-dot" style="background: var(--brand-cyan);"></span> Caregiver Matched</span>
+                <span class="pipeline-col-count" id="count-req-matched">0</span>
+              </div>
+              <div class="pipeline-cards-list" id="col-req-matched"></div>
+            </div>
+
+            <div class="pipeline-col" data-stage="confirmed">
+              <div class="pipeline-col-header">
+                <span class="pipeline-col-title"><span class="donut-color-dot" style="background: var(--status-success);"></span> Dispatched &amp; Confirmed</span>
+                <span class="pipeline-col-count" id="count-req-confirmed">0</span>
+              </div>
+              <div class="pipeline-cards-list" id="col-req-confirmed"></div>
+            </div>
+
+            <div class="pipeline-col" data-stage="closed">
+              <div class="pipeline-col-header">
+                <span class="pipeline-col-title"><span class="donut-color-dot" style="background: var(--text-muted);"></span> Shift Completed</span>
+                <span class="pipeline-col-count" id="count-req-closed">0</span>
+              </div>
+              <div class="pipeline-cards-list" id="col-req-closed"></div>
+            </div>
+          </div>
+
+          <div class="table-card" id="requests-table-view" style="display: none;">
+            <div class="table-responsive-container">
+              <table class="data-table mobile-stacked-table">
+                <thead>
+                  <tr>
+                    <th>Req ID</th>
+                    <th>Facility / Client</th>
+                    <th>Role Needed</th>
+                    <th>Shift &amp; Date</th>
+                    <th>Urgency</th>
+                    <th>Assigned Staff</th>
+                    <th>Order Status</th>
+                    <th style="text-align: right;">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="requests-table-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB: HEALTHCARE FACILITIES & MSA CONTRACT RATE CARDS -->
+        <div class="admin-view-tab" id="facilities-tab" style="display: none;">
+          <!-- Top KPI Metrics -->
+          <div class="kpi-grid">
+            <div class="kpi-card">
+              <div class="kpi-top">
+                <span class="kpi-title">Contracted Facilities</span>
+                <div class="kpi-icon-box"><i data-lucide="building-2" style="width: 18px; height: 18px;"></i></div>
+              </div>
+              <div class="kpi-value-row">
+                <span class="kpi-number tabular-nums" id="stat-active-facilities">0</span>
+                <span class="kpi-trend positive"><i data-lucide="shield-check" style="width: 12px; height: 12px;"></i> Active</span>
+              </div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-top">
+                <span class="kpi-title">Active MSA Terms</span>
+                <div class="kpi-icon-box" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;"><i data-lucide="file-check" style="width: 18px; height: 18px;"></i></div>
+              </div>
+              <div class="kpi-value-row">
+                <span class="kpi-number tabular-nums" id="stat-active-rate-cards">0</span>
+                <span class="kpi-trend positive">Terms Live</span>
+              </div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-top">
+                <span class="kpi-title">Expiring Soon (&lt;30d)</span>
+                <div class="kpi-icon-box" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;"><i data-lucide="alert-triangle" style="width: 18px; height: 18px;"></i></div>
+              </div>
+              <div class="kpi-value-row">
+                <span class="kpi-number tabular-nums" id="stat-expiring-facilities" style="color: var(--status-warning, #f59e0b);">0</span>
+                <span class="kpi-trend neutral" style="color: var(--status-warning); background: var(--status-warning-bg);">Notice</span>
+              </div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-top">
+                <span class="kpi-title">Pending Onboarding</span>
+                <div class="kpi-icon-box" style="background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%) !important;"><i data-lucide="clock" style="width: 18px; height: 18px;"></i></div>
+              </div>
+              <div class="kpi-value-row">
+                <span class="kpi-number tabular-nums" id="stat-pending-facilities">0</span>
+                <span class="kpi-trend neutral">Agency Default</span>
+              </div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-top">
+                <span class="kpi-title">Registered Clients</span>
+                <div class="kpi-icon-box" style="background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%) !important;"><i data-lucide="users" style="width: 18px; height: 18px;"></i></div>
+              </div>
+              <div class="kpi-value-row">
+                <span class="kpi-number tabular-nums" id="stat-registered-clients">0</span>
+                <span class="kpi-trend positive" style="color: #06b6d4; background: rgba(6, 182, 212, 0.12);"><i data-lucide="user-check" style="width: 12px; height: 12px;"></i> Portal Active</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Governance Info Banner -->
+          <div style="background: rgba(0, 168, 150, 0.08); border: 1px solid rgba(0, 168, 150, 0.25); border-radius: 8px; padding: 0.9rem 1.1rem; margin-bottom: 1.25rem; display: flex; align-items: flex-start; gap: 0.85rem;">
+            <i data-lucide="shield-check" style="width: 22px; height: 22px; color: var(--brand-turquoise, #00a896); flex-shrink: 0; margin-top: 2px;"></i>
+            <div style="font-size: 0.82rem; line-height: 1.45; color: var(--text-secondary, #94a3b8);">
+              <strong style="color: var(--text-primary, #f8fafc);">Internal Rate Card Governance &amp; Portal Accounts:</strong> Healthcare facilities registering online via the client portal are automatically synced here in <span style="color: #f59e0b; font-weight: 700;">Pending Onboarding</span> status until their MSA contracts and rate cards are finalized. Agency admins can review accounts, set customized shift rates, or toggle portal access.
+            </div>
+          </div>
+
+          <div class="table-card">
+            <div class="table-toolbar facilities-table-toolbar">
+              <!-- Sub-View Toggle -->
+              <div class="segmented-control facilities-segmented-control">
+                <button type="button" class="segmented-btn active" id="btn-show-facilities-table" onclick="window.switchFacilitiesSubView('facilities')">
+                  <i data-lucide="building-2" style="width: 14px; height: 14px;"></i> Facilities &amp; Rates
+                </button>
+                <button type="button" class="segmented-btn" id="btn-show-clients-table" onclick="window.switchFacilitiesSubView('clients')">
+                  <i data-lucide="users" style="width: 14px; height: 14px;"></i> Registered Clients <span class="badge" id="badge-client-users-count">0</span>
+                </button>
+              </div>
+
+              <div class="table-filter-group facilities-filter-group">
+                <div class="results-count-pill" id="facilities-view-results-count">
+                  <i data-lucide="layers" style="width: 13px; height: 13px;"></i>
+                  <span id="facilities-view-results-text">Loading records...</span>
+                </div>
+                <input type="text" class="search-input filter-search-box" id="facilities-search-input" placeholder="Search facility name, code, contact or email...">
+                <select class="filter-select" id="facilities-status-filter">
+                  <option value="">All Statuses</option>
+                  <option value="active">Active MSA Contract</option>
+                  <option value="pending">Pending Onboarding</option>
+                  <option value="expired">Expired MSA</option>
+                  <option value="portal_active">Has Portal Account</option>
+                  <option value="no_portal">No Portal Account</option>
+                </select>
+                <button type="button" class="btn-primary-action" onclick="window.openFacilityModal()">
+                  <i data-lucide="plus-circle" style="width: 16px; height: 16px;"></i> Register Facility
+                </button>
+              </div>
+            </div>
+
+            <!-- VIEW 1: Facilities & Rate Cards Table -->
+            <div class="table-responsive-container" id="facilities-table-container">
+              <table class="data-table mobile-stacked-table" id="facilities-table">
+                <thead>
+                  <tr>
+                    <th>Facility Name &amp; Code</th>
+                    <th>Location / Region</th>
+                    <th>Primary Contact &amp; Portal Account</th>
+                    <th>Contract Status</th>
+                    <th>MSA Expiry Date</th>
+                    <th>Contracted Terms</th>
+                    <th style="text-align: right;">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="facilities-table-body">
+                  <tr>
+                    <td colspan="7" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">
+                      <i data-lucide="loader-2" class="spin" style="width: 24px; height: 24px; margin-bottom: 0.5rem;"></i>
+                      <div>Loading healthcare facilities &amp; contracted rate cards...</div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- VIEW 2: Registered Client Portal Users Ledger -->
+            <div class="table-responsive-container" id="client-accounts-container" style="display: none;">
+              <table class="data-table mobile-stacked-table" id="client-accounts-table">
+                <thead>
+                  <tr>
+                    <th>Client Facility / Organization</th>
+                    <th>Primary Contact Person</th>
+                    <th>Login Email &amp; Phone</th>
+                    <th>Account Status</th>
+                    <th>Registered Date</th>
+                    <th>Total Requests</th>
+                    <th style="text-align: right;">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="client-accounts-table-body">
+                  <tr>
+                    <td colspan="7" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">
+                      <i data-lucide="loader-2" class="spin" style="width: 24px; height: 24px; margin-bottom: 0.5rem;"></i>
+                      <div>Loading registered client portal accounts...</div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 4: JOB APPLICANTS (ATS) -->
+        <div class="admin-view-tab" id="applicants-tab">
+          <div class="table-card">
+            <div class="table-toolbar">
+              <div class="table-filter-group">
+                <input type="text" class="search-input filter-search-box" id="applicants-search-input" placeholder="Search applicant name, role, email...">
+                <select class="filter-select" id="applicants-stage-filter">
+                  <option value="">All Application Stages</option>
+                  <option value="new">New Inbound</option>
+                  <option value="review">Under Review</option>
+                  <option value="interview">Interview Scheduled</option>
+                  <option value="credential_check">Credential / CNO Check</option>
+                  <option value="hired">Hired &amp; Onboarded</option>
+                  <option value="rejected">Archived / Rejected</option>
+                </select>
+              </div>
+
+              <div class="page-actions-group">
+                <button class="btn-secondary-action" id="btn-export-applicants-csv">
+                  <i data-lucide="download" style="width: 14px; height: 14px;"></i> Export ATS Data
+                </button>
+              </div>
+            </div>
+
+            <div class="table-responsive-container">
+              <table class="data-table mobile-stacked-table">
+                <thead>
+                  <tr>
+                    <th>Candidate Name</th>
+                    <th>Applied Role</th>
+                    <th>License / CNO</th>
+                    <th>Applied Date</th>
+                    <th>Resume Document</th>
+                    <th>Pipeline Stage</th>
+                    <th>Stage Update</th>
+                    <th style="text-align: right;">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="applicants-table-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="admin-view-tab" id="scheduler-tab">
+          <div class="table-card" id="scheduler-card" style="padding: 1.75rem;">
+            
+            <!-- Modern Responsive Scheduler Date Navigator Toolbar -->
+            <div class="scheduler-top-toolbar">
+              <div class="scheduler-title-group">
+                <h3 class="chart-title" style="display: flex; align-items: center; gap: 0.5rem; margin: 0;">
+                  <i data-lucide="calendar" style="width: 20px; height: 20px; color: var(--brand-turquoise);"></i>
+                  Ontario Healthcare Dispatch Schedule
+                </h3>
+                <span class="chart-subtitle">Weekly facility roster and live shift coverage across the GTA</span>
+              </div>
+
+              <div class="scheduler-controls-wrapper">
+                <!-- Segmented Stepper Bar -->
+                <div class="scheduler-date-stepper">
+                  <button type="button" class="btn-secondary-action stepper-btn" id="btn-prev-week" title="Previous Week">
+                    <i data-lucide="chevron-left" style="width: 14px; height: 14px;"></i>
+                    <span class="stepper-text">Prev</span>
+                  </button>
+                  <button type="button" class="btn-secondary-action stepper-today-btn" id="btn-today-week" title="Jump to Current Week">
+                    Today
+                  </button>
+                  <button type="button" class="btn-secondary-action stepper-btn" id="btn-next-week" title="Next Week">
+                    <span class="stepper-text">Next</span>
+                    <i data-lucide="chevron-right" style="width: 14px; height: 14px;"></i>
+                  </button>
+                </div>
+
+                <!-- Highlighted Date Pill Banner -->
+                <div class="scheduler-week-banner" id="calendar-current-week-label">
+                  Week of Aug 31 – Sep 6, 2026
+                </div>
+
+                <!-- Create Shift Action Button -->
+                <button type="button" class="btn-primary-action scheduler-create-btn" onclick="window.openNewRequestModal()">
+                  <i data-lucide="calendar-plus" style="width: 14px; height: 14px;"></i>
+                  <span>+ Create Shift</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Scheduler Live Search & Filter Bar -->
+            <div class="table-filter-group" style="margin-bottom: 1.25rem;">
+              <input type="text" class="search-input filter-search-box" id="scheduler-search-input" placeholder="Search facility, unit, nurse name, or shift code...">
+              
+              <select class="filter-select" id="scheduler-role-filter">
+                <option value="">All Roles (RN, RPN, PSW, Travel)</option>
+                <option value="RN">RN (Registered Nurse)</option>
+                <option value="RPN">RPN (Registered Practical Nurse)</option>
+                <option value="PSW">PSW (Personal Support Worker)</option>
+                <option value="Travel Nurse">Travel Nurse</option>
+                <option value="Companion">Care Companion</option>
+              </select>
+
+              <select class="filter-select" id="scheduler-status-filter">
+                <option value="">All Statuses</option>
+                <option value="pending">Pending Dispatch</option>
+                <option value="dispatched">Dispatched</option>
+                <option value="in_session">In Session</option>
+                <option value="completed">Completed</option>
+              </select>
+            </div>
+
+            <div class="table-responsive-container" style="margin-top: 1rem;">
+              <table class="scheduler-table">
+                <thead id="schedule-calendar-head">
+                  <tr>
+                    <th>Facility &amp; Unit</th>
+                    <th>Mon</th>
+                    <th>Tue</th>
+                    <th>Wed</th>
+                    <th>Thu</th>
+                    <th>Fri</th>
+                    <th>Sat</th>
+                    <th>Sun</th>
+                  </tr>
+                </thead>
+                <tbody id="schedule-calendar-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+
+
+        <!-- TAB 7: COMPLIANCE & CREDENTIALS AUDITOR -->
+        <div class="admin-view-tab" id="compliance-tab">
+          <div class="table-card">
+            <div class="table-toolbar">
+              <div class="chart-title-group">
+                <span class="chart-title">Ontario Healthcare Regulatory Compliance</span>
+                <span class="chart-subtitle">Tracking CNO registration, Police Record Checks (VSS), N95 Mask Fit, TB Skin Tests, CPR/BLS</span>
+              </div>
+              <button class="btn-secondary-action" id="btn-run-compliance-audit">
+                <i data-lucide="shield-check" style="width: 14px; height: 14px;"></i> Run Automated Audit
+              </button>
+            </div>
+
+            <div class="table-responsive-container">
+              <table class="data-table mobile-stacked-table">
+                <thead>
+                  <tr>
+                    <th>Staff Name</th>
+                    <th>Role</th>
+                    <th>CNO Reg #</th>
+                    <th>CPR/BLS Expiry</th>
+                    <th>Vulnerable Sector Check</th>
+                    <th>N95 Mask Fit</th>
+                    <th>Compliance Status</th>
+                    <th style="text-align: right;">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="compliance-table-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 8: REPORTS & ANALYTICS EXPORT -->
+        <div class="admin-view-tab" id="reports-tab">
+          <!-- Report Selector Cards (Spacious Modern Grid) -->
+          <div class="table-card" id="reports-hub-card" style="padding: 1.75rem; margin-bottom: 1.75rem;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem;">
+              <div>
+                <h2 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.5rem;">
+                  <i data-lucide="bar-chart-3" style="width: 20px; height: 20px; color: var(--brand-cyan);"></i>
+                  <span>Agency Analytics &amp; Operational Reports</span>
+                </h2>
+                <p style="color: var(--text-muted); font-size: 0.85rem; line-height: 1.45; margin: 0;">
+                  Generate and inspect live standardized Ontario healthcare staffing reports on-screen or download compliance-ready CSV spreadsheets.
+                </p>
+              </div>
+            </div>
+
+            <div class="report-selector-grid">
+              <!-- Report Card 1: Shift Fill Rate -->
+              <div class="report-meta-card">
+                <div>
+                  <div class="report-card-top">
+                    <div class="report-icon-box icon-shifts">
+                      <i data-lucide="calendar-check" style="width: 22px; height: 22px;"></i>
+                    </div>
+                    <span class="status-pill verified" style="font-size: 0.68rem;">Live Matrix</span>
+                  </div>
+                  <h4 class="report-card-title">Shift Fill Rate Audit</h4>
+                  <p class="report-card-desc">Comprehensive breakdown of shifts requested, dispatched, and completed across Ontario acute care, LTC, and retirement facilities.</p>
+                </div>
+                <div class="report-card-actions">
+                  <button type="button" class="btn-primary-action" onclick="window.switchReportViewer('shifts')">
+                    <i data-lucide="eye" style="width: 14px; height: 14px;"></i> View Report
+                  </button>
+                  <button type="button" class="btn-secondary-action" onclick="window.exportActiveReportCSV('shifts')" title="Download CSV">
+                    <i data-lucide="download" style="width: 14px; height: 14px;"></i> CSV
+                  </button>
+                </div>
+              </div>
+
+              <!-- Report Card 2: Caregiver Roster -->
+              <div class="report-meta-card">
+                <div>
+                  <div class="report-card-top">
+                    <div class="report-icon-box icon-roster">
+                      <i data-lucide="users" style="width: 22px; height: 22px;"></i>
+                    </div>
+                    <span class="status-pill verified" style="font-size: 0.68rem;">Live Roster</span>
+                  </div>
+                  <h4 class="report-card-title">Caregiver &amp; CNO Registry</h4>
+                  <p class="report-card-desc">Active registry covering professional licensure status, assigned GTA region, performance ratings, and verified contact records.</p>
+                </div>
+                <div class="report-card-actions">
+                  <button type="button" class="btn-primary-action" onclick="window.switchReportViewer('roster')">
+                    <i data-lucide="eye" style="width: 14px; height: 14px;"></i> View Report
+                  </button>
+                  <button type="button" class="btn-secondary-action" onclick="window.exportActiveReportCSV('roster')" title="Download CSV">
+                    <i data-lucide="download" style="width: 14px; height: 14px;"></i> CSV
+                  </button>
+                </div>
+              </div>
+
+              <!-- Report Card 3: ATS Candidate Pipeline -->
+              <div class="report-meta-card">
+                <div>
+                  <div class="report-card-top">
+                    <div class="report-icon-box icon-ats">
+                      <i data-lucide="briefcase" style="width: 22px; height: 22px;"></i>
+                    </div>
+                    <span class="status-pill verified" style="font-size: 0.68rem;">Live ATS</span>
+                  </div>
+                  <h4 class="report-card-title">ATS Candidate Pipeline</h4>
+                  <p class="report-card-desc">Complete candidate tracking report including pipeline stages, applied healthcare roles, resume attachments, and interview statuses.</p>
+                </div>
+                <div class="report-card-actions">
+                  <button type="button" class="btn-primary-action" onclick="window.switchReportViewer('applicants')">
+                    <i data-lucide="eye" style="width: 14px; height: 14px;"></i> View Report
+                  </button>
+                  <button type="button" class="btn-secondary-action" onclick="window.exportActiveReportCSV('applicants')" title="Download CSV">
+                    <i data-lucide="download" style="width: 14px; height: 14px;"></i> CSV
+                  </button>
+                </div>
+              </div>
+
+              <!-- Report Card 4: Newsletter Subscribers -->
+              <div class="report-meta-card">
+                <div>
+                  <div class="report-card-top">
+                    <div class="report-icon-box icon-leads">
+                      <i data-lucide="mail" style="width: 22px; height: 22px;"></i>
+                    </div>
+                    <span class="status-pill verified" style="font-size: 0.68rem;">Live Leads</span>
+                  </div>
+                  <h4 class="report-card-title">Newsletter Subscribers</h4>
+                  <p class="report-card-desc">Verified email subscribers captured from website quick-alert strips, clinical update forms, and job seeker notification feeds.</p>
+                </div>
+                <div class="report-card-actions">
+                  <button type="button" class="btn-primary-action" onclick="window.switchReportViewer('subscribers')">
+                    <i data-lucide="eye" style="width: 14px; height: 14px;"></i> View Report
+                  </button>
+                  <button type="button" class="btn-secondary-action" onclick="window.exportActiveReportCSV('subscribers')" title="Download CSV">
+                    <i data-lucide="download" style="width: 14px; height: 14px;"></i> CSV
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Live Interactive Report Studio Viewer -->
+          <div class="table-card" style="padding: 1.75rem;" id="report-viewer-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem;">
+              <div>
+                <h3 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.5rem;" id="report-viewer-title">
+                  <i data-lucide="file-text" style="width: 18px; height: 18px; color: var(--brand-cyan);"></i>
+                  <span>Live Report: Monthly Shift Fill Rate &amp; Dispatch Audit</span>
+                </h3>
+                <p style="color: var(--text-muted); font-size: 0.8rem; margin: 0;" id="report-viewer-subtitle">
+                  Showing real-time records from the operational database.
+                </p>
+              </div>
+
+              <div class="page-actions-group" style="align-items: center;">
+                <span class="status-pill verified" style="font-size: 0.75rem; font-weight: 700; padding: 0.3rem 0.7rem;" id="report-viewer-counter">
+                  0 Records
+                </span>
+                <button type="button" class="btn-secondary-action" onclick="window.printActiveReport()" style="font-size: 0.8rem; padding: 0.35rem 0.75rem;">
+                  <i data-lucide="printer" style="width: 14px; height: 14px;"></i> Print
+                </button>
+                <button type="button" class="btn-primary-action" id="report-viewer-export-btn" onclick="window.exportActiveReportCSV()" style="font-size: 0.8rem; padding: 0.35rem 0.75rem;">
+                  <i data-lucide="download" style="width: 14px; height: 14px;"></i> Export CSV
+                </button>
+              </div>
+            </div>
+
+            <!-- Report Filter & Search Toolbar with Clean Segmented Switcher -->
+            <div class="table-filter-group" style="margin-bottom: 1.25rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.85rem;">
+              <input type="text" class="search-input filter-search-box" id="report-viewer-search-input" placeholder="Search within this live report...">
+              
+              <!-- Quick Switcher Segmented Control -->
+              <div class="report-segmented-nav">
+                <button type="button" class="report-tab-btn active" id="btn-report-tab-shifts" onclick="window.switchReportViewer('shifts')">
+                  <i data-lucide="calendar" style="width: 13px; height: 13px;"></i> Shift Fill Rate
+                </button>
+                <button type="button" class="report-tab-btn" id="btn-report-tab-roster" onclick="window.switchReportViewer('roster')">
+                  <i data-lucide="users" style="width: 13px; height: 13px;"></i> Caregiver Roster
+                </button>
+                <button type="button" class="report-tab-btn" id="btn-report-tab-applicants" onclick="window.switchReportViewer('applicants')">
+                  <i data-lucide="file-text" style="width: 13px; height: 13px;"></i> ATS Pipeline
+                </button>
+                <button type="button" class="report-tab-btn" id="btn-report-tab-subscribers" onclick="window.switchReportViewer('subscribers')">
+                  <i data-lucide="mail" style="width: 13px; height: 13px;"></i> Subscribers
+                </button>
+              </div>
+            </div>
+
+            <div class="table-responsive-container">
+              <table class="data-table mobile-stacked-table" id="report-viewer-table">
+                <thead id="report-viewer-thead"></thead>
+                <tbody id="report-viewer-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB: ADMINISTRATOR USERS & OPERATOR ROSTER -->
+        <div class="admin-view-tab" id="admin-users-tab">
+          <div class="table-card" style="padding: 1.75rem; margin-bottom: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem;">
+              <div>
+                <h2 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.5rem;">
+                  <i data-lucide="shield-check" style="width: 22px; height: 22px; color: var(--brand-turquoise);"></i>
+                  Administrator Account Management &amp; Security Roster
+                </h2>
+                <p style="color: var(--text-muted); font-size: 0.85rem; margin: 0;">
+                  Active portal operators, role-based access levels, email verification status, and Two-Factor Authentication telemetry.
+                </p>
+              </div>
+            </div>
+
+            <!-- Create Admin Form -->
+            <form id="create-admin-form-dedicated" onsubmit="window.handleCreateAdminSubmit(event)" style="background: var(--bg-surface-elevated); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 1.25rem; margin-bottom: 1.5rem;">
+              <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 1rem; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
+                <i data-lucide="user-plus" style="width: 16px; height: 16px; color: var(--brand-turquoise);"></i> Provision New Administrator
+              </h3>
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+                <div>
+                  <label style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.35rem;">FULL LEGAL NAME *</label>
+                  <input type="text" id="dedicated-new-admin-name" required placeholder="e.g. Adeyemi Hezekiah" style="width: 100%; padding: 0.6rem 0.8rem; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-surface); color: var(--text-primary); font-size: 0.85rem;">
+                </div>
+                <div>
+                  <label style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.35rem;">CORPORATE EMAIL *</label>
+                  <input type="email" id="dedicated-new-admin-email" required placeholder="name@divinefingershealthcare.ca" style="width: 100%; padding: 0.6rem 0.8rem; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-surface); color: var(--text-primary); font-size: 0.85rem;">
+                </div>
+                <div>
+                  <label style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.35rem;">ASSIGNED ROLE *</label>
+                  <select id="dedicated-new-admin-role" class="filter-select" required style="width: 100%; height: 38px;">
+                    <option value="care-coordinator">Care Coordinator (Read & Shift View)</option>
+                    <option value="dispatch">Dispatch Officer (Roster & Shifts)</option>
+                    <option value="recruiter">Recruitment Specialist / HR (Job ATS & Roster)</option>
+                    <option value="auditor">Compliance Auditor (Audit Trail & Reports)</option>
+                    <option value="super-admin">Super Admin (Full RBAC Privileges)</option>
+                  </select>
+                </div>
+                <div>
+                  <label style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.35rem;">TEMPORARY PASSWORD *</label>
+                  <input type="password" id="dedicated-new-admin-password" required minlength="8" placeholder="Min 8 characters" style="width: 100%; padding: 0.6rem 0.8rem; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-surface); color: var(--text-primary); font-size: 0.85rem;">
+                </div>
+              </div>
+              <div style="display: flex; justify-content: flex-end;">
+                <button type="submit" id="dedicated-create-admin-submit-btn" class="btn-primary-action" style="padding: 0.6rem 1.25rem; font-size: 0.85rem;">
+                  <i data-lucide="user-plus" style="width: 15px; height: 15px;"></i> Create Administrator
+                </button>
+              </div>
+            </form>
+
+            <!-- Admin Operators Search & Filter Toolbar -->
+            <div class="table-toolbar" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1.25rem;">
+              <div style="position: relative; flex: 1; min-width: 240px; max-width: 380px;">
+                <i data-lucide="search" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: var(--text-muted); pointer-events: none;"></i>
+                <input type="text" id="admin-users-search-input" placeholder="Search administrators by name or email..." class="search-input" style="width: 100%; box-sizing: border-box; padding: 0.5rem 0.85rem 0.5rem 2.2rem; font-size: 0.82rem; border-radius: var(--radius-sm);">
+              </div>
+              <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                <select id="admin-users-role-filter" class="filter-select" style="padding: 0.45rem 0.75rem; font-size: 0.82rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary);">
+                  <option value="">All Access Roles</option>
+                  <option value="super-admin">Super Admin</option>
+                  <option value="admin">Operations Admin</option>
+                  <option value="dispatch">Dispatch Officer</option>
+                  <option value="recruiter">Recruiter / HR</option>
+                  <option value="auditor">Compliance Auditor</option>
+                </select>
+                <select id="admin-users-status-filter" class="filter-select" style="padding: 0.45rem 0.75rem; font-size: 0.82rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary);">
+                  <option value="">All Statuses</option>
+                  <option value="active">Active Operators</option>
+                  <option value="inactive">Deactivated</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Admin Accounts Table -->
+            <div class="table-responsive-container">
+              <table class="data-table mobile-stacked-table">
+                <thead>
+                  <tr>
+                    <th>Administrator</th>
+                    <th>Email Address</th>
+                    <th>Role</th>
+                    <th>Email Verification</th>
+                    <th>2FA Security</th>
+                    <th>Last Login</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="dedicated-admin-accounts-table-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+
+        <!-- TAB: ARCHIVE RETENTION VAULT -->
+        <div class="admin-view-tab" id="archive-tab">
+          
+          <!-- Archive Vault Header Banner -->
+          <div class="table-card archive-vault-hero-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+              <div>
+                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.35rem;">
+                  <div class="archive-vault-hero-icon">
+                    <i data-lucide="archive" style="width: 20px; height: 20px;"></i>
+                  </div>
+                  <h2 class="archive-vault-hero-title">Archive Vault &amp; Retention System</h2>
+                </div>
+                <p class="archive-vault-hero-desc">
+                  Comprehensive soft-delete archive preserving deleted clients, facilities, staff members, user accounts, and administrative records. View full audit snapshots and instantly restore any deleted entity.
+                </p>
+              </div>
+              <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <button type="button" class="btn-secondary-action" onclick="window.loadArchiveRecords()">
+                  <i data-lucide="refresh-cw" style="width: 14px; height: 14px;"></i> Refresh Vault
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Archive KPI Metric Cubes -->
+          <div class="kpi-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+            <div class="archive-metric-cube">
+              <div style="font-size: 0.76rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.4rem;">Total Preserved</div>
+              <div class="archive-metric-number" id="archive-stat-total">0</div>
+              <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.25rem;">Safely preserved in vault</div>
+            </div>
+            <div class="archive-metric-cube">
+              <div style="font-size: 0.76rem; font-weight: 700; color: #0284c7; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.4rem;">Clients &amp; Facilities</div>
+              <div class="archive-metric-number" style="color: #0284c7;" id="archive-stat-clients">0</div>
+              <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.25rem;">Facilities and accounts</div>
+            </div>
+            <div class="archive-metric-cube">
+              <div style="font-size: 0.76rem; font-weight: 700; color: #059669; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.4rem;">Staff &amp; Caregivers</div>
+              <div class="archive-metric-number" style="color: #059669;" id="archive-stat-staff">0</div>
+              <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.25rem;">Clinical roster profiles</div>
+            </div>
+            <div class="archive-metric-cube">
+              <div style="font-size: 0.76rem; font-weight: 700; color: #7c3aed; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.4rem;">Users &amp; Admins</div>
+              <div class="archive-metric-number" style="color: #7c3aed;" id="archive-stat-users">0</div>
+              <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.25rem;">Portal &amp; operator users</div>
+            </div>
+          </div>
+
+          <!-- Archive Table Card with Search & Filters -->
+          <div class="table-card" style="padding: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem;">
+              <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                <button type="button" class="archive-filter-pill active" onclick="window.filterArchiveType('all', this)">All Records</button>
+                <button type="button" class="archive-filter-pill" onclick="window.filterArchiveType('client', this)">Clients &amp; Facilities</button>
+                <button type="button" class="archive-filter-pill" onclick="window.filterArchiveType('staff', this)">Staff Caregivers</button>
+                <button type="button" class="archive-filter-pill" onclick="window.filterArchiveType('admin', this)">Admin Operators</button>
+                <button type="button" class="archive-filter-pill" onclick="window.filterArchiveType('user', this)">Portal Users</button>
+              </div>
+
+              <div style="position: relative; width: 280px; max-width: 100%;">
+                <input type="text" id="archive-search-input" class="search-input" oninput="window.debounceArchiveSearch()" placeholder="Search archived name, email..." style="width: 100%; box-sizing: border-box; padding: 0.5rem 0.85rem 0.5rem 2.2rem; font-size: 0.82rem; border-radius: var(--radius-sm);">
+                <i data-lucide="search" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: var(--text-muted);"></i>
+              </div>
+            </div>
+
+            <!-- Table of Archived Items -->
+            <div class="table-responsive" style="overflow-x: auto;">
+              <table class="admin-data-table" style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+                <thead>
+                  <tr style="border-bottom: 1px solid var(--border-color); text-align: left; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px;">
+                    <th style="padding: 0.75rem 1rem;">Entity Type</th>
+                    <th style="padding: 0.75rem 1rem;">Display Name</th>
+                    <th style="padding: 0.75rem 1rem;">Identifier</th>
+                    <th style="padding: 0.75rem 1rem;">Archived Date</th>
+                    <th style="padding: 0.75rem 1rem;">Deleted By</th>
+                    <th style="padding: 0.75rem 1rem;">Reason</th>
+                    <th style="padding: 0.75rem 1rem; text-align: right;">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="archive-records-table-body">
+                  <tr>
+                    <td colspan="7" style="text-align: center; color: #64748B; padding: 2.5rem 1rem;">
+                      Loading archived records...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+
+
+        <!-- TAB 9: PORTAL SETTINGS & AUDIT LOG -->
+        <div class="admin-view-tab" id="settings-tab">
+          
+          <!-- 0. Operator Profile & Avatar Settings -->
+          <div class="table-card" style="padding: 1.5rem; margin-bottom: 1.5rem; background: var(--bg-surface-elevated); border: 1px solid var(--border-subtle); border-radius: 8px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.25rem;">
+              <div style="display: flex; align-items: center; gap: 1.25rem;">
+                <div style="position: relative; width: 68px; height: 68px; flex-shrink: 0;">
+                  <div id="settings-admin-avatar-preview" style="width: 68px; height: 68px; border-radius: 50%; overflow: hidden; background: linear-gradient(135deg, #0284C7, #0F766E); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 800; color: #FFFFFF; border: 2.5px solid var(--brand-turquoise); box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
+                    SA
+                  </div>
+                  <label for="admin-avatar-file-input" style="position: absolute; bottom: -2px; right: -2px; width: 26px; height: 26px; border-radius: 50%; background: var(--brand-turquoise); color: #0F172A; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.4);" title="Upload Profile Picture">
+                    <i data-lucide="camera" style="width: 14px; height: 14px;"></i>
+                  </label>
+                  <input type="file" id="admin-avatar-file-input" accept="image/jpeg,image/png,image/webp" style="display: none;" onchange="window.handleAdminAvatarSelected(this)">
+                </div>
+                <div>
+                  <h2 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.5rem; color: #FFFFFF;">
+                    <span id="settings-admin-name">Administrator</span>
+                    <span class="status-pill verified" id="settings-admin-role-badge" style="font-size: 0.72rem; padding: 2px 8px;">Super-Admin</span>
+                  </h2>
+                  <p style="color: var(--text-muted); font-size: 0.82rem; margin: 0;" id="settings-admin-email">admin@divinefingers.ca</p>
+                  <div style="font-size: 0.74rem; color: #64748B; margin-top: 4px;">PNG, JPG, or WebP. Max 2MB. Square 1:1 ratio recommended.</div>
+                </div>
+              </div>
+              <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+                <button type="button" class="btn-primary-action" onclick="document.getElementById('admin-avatar-file-input').click()" style="padding: 0.5rem 1rem; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px;">
+                  <i data-lucide="upload" style="width: 14px; height: 14px;"></i> Change Picture
+                </button>
+                <button type="button" class="btn-secondary-action" id="btn-remove-admin-avatar" onclick="window.removeAdminAvatar()" style="display: none; padding: 0.5rem 0.85rem; font-size: 0.85rem; align-items: center; gap: 6px; color: #f87171; border-color: rgba(239,68,68,0.3);">
+                  <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i> Remove
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 1. Operator Password & Access Credentials -->
+          <div class="table-card" style="padding: 1.5rem; margin-bottom: 1.5rem; background: var(--bg-surface-elevated); border: 1px solid var(--border-subtle); border-radius: 8px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+              <div>
+                <h2 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.5rem; color: var(--text-primary);">
+                  <i data-lucide="key-round" style="width: 20px; height: 20px; color: var(--brand-turquoise);"></i>
+                  Account Password &amp; Credentials
+                </h2>
+                <p style="color: var(--text-muted); font-size: 0.85rem; margin: 0;">
+                  Update your administrator portal password regularly to protect operational and clinical records.
+                </p>
+              </div>
+              <button type="button" class="btn-primary-action" id="btn-open-admin-change-password" onclick="window.openAdminChangePasswordModal()" style="padding: 0.5rem 1rem; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; cursor: pointer;">
+                <i data-lucide="lock" style="width: 14px; height: 14px;"></i> Change Password
+              </button>
+            </div>
+          </div>
+
+          <!-- 2. Super-Admin Only: Link to Dedicated Admin Management Tab -->
+          <div class="table-card" id="admin-accounts-settings-link-card" style="padding: 1.5rem; margin-bottom: 1.5rem; background: var(--bg-surface-elevated); border: 1px solid var(--border-subtle); border-radius: 8px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+              <div>
+                <h3 style="font-size: 1.05rem; font-weight: 800; margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.5rem;">
+                  <i data-lucide="users" style="width: 18px; height: 18px; color: var(--brand-turquoise);"></i>
+                  Administrator Access &amp; Operator Roster
+                </h3>
+                <p style="color: var(--text-muted); font-size: 0.82rem; margin: 0;">
+                  Provision new administrators, configure granular RBAC permissions, and manage operator security in the dedicated Administrators Roster.
+                </p>
+              </div>
+              <button type="button" class="btn-primary-action" id="btn-open-admin-roster" style="padding: 0.5rem 1rem; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; cursor: pointer;" onclick="window.switchAdminTab('admin-users-tab', 'Admin Operators')">
+                <i data-lucide="shield-check" style="width: 15px; height: 15px;"></i> Open Administrator Roster
+              </button>
+            </div>
+          </div>
+
+          <div class="table-card" id="audit-log-card" style="padding: 1.75rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem;">
+              <div>
+                <h2 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.5rem;">
+                  <i data-lucide="shield-check" style="width: 22px; height: 22px; color: var(--brand-turquoise);"></i>
+                  Security &amp; System Audit Log
+                </h2>
+                <p style="color: var(--text-muted); font-size: 0.85rem; margin: 0;">
+                  Immutable audit tracking for regulatory Canadian healthcare dispatch security &bull; Click any entry to inspect full metadata.
+                </p>
+              </div>
+              <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                <span class="badge" id="audit-count-badge" style="background: rgba(2, 132, 199, 0.08); color: #0369A1; border: 1px solid rgba(2, 132, 199, 0.25); font-weight: 700; padding: 4px 10px; border-radius: 8px;">
+                  0 Recorded Events
+                </span>
+              </div>
+            </div>
+
+            <!-- Toolbar: Search & Filter -->
+            <div class="audit-search-toolbar">
+              <div class="audit-search-wrapper">
+                <i data-lucide="search" class="audit-search-icon"></i>
+                <input type="text" id="audit-search-input" class="audit-search-input" placeholder="Search by actor, action, target, IP or details...">
+              </div>
+              <div class="audit-filter-wrapper">
+                <select id="audit-severity-filter" class="audit-severity-select">
+                  <option value="">All Severities</option>
+                  <option value="info">Info / Normal</option>
+                  <option value="warning">Warnings</option>
+                  <option value="critical">Critical / Danger</option>
+                </select>
+                <i data-lucide="chevron-down" class="audit-filter-arrow"></i>
+              </div>
+            </div>
+
+            <!-- Full Interactive Audit Feed -->
+            <div class="audit-feed-list" id="audit-logs-feed"></div>
+          </div>
+        </div>
+
+      </main>
+
+    </div>
+
+    <!-- 5. SLIDE-IN SIDE PANEL -->
+    <div class="side-drawer-backdrop" id="detail-drawer-backdrop">
+      <div class="side-drawer-panel">
+        <div class="drawer-header">
+          <h3 class="drawer-title" id="drawer-headline">Caregiver Profile</h3>
+          <button class="drawer-close-btn" id="drawer-close-btn" aria-label="Close Side Drawer">
+            <i data-lucide="x" style="width: 18px; height: 18px;"></i>
+          </button>
+        </div>
+
+        <div class="drawer-tabs-nav">
+          <button class="drawer-tab-btn active" data-drawertab="tab-profile-overview">Overview</button>
+          <button class="drawer-tab-btn" data-drawertab="tab-profile-docs">Credentials</button>
+          <button class="drawer-tab-btn" data-drawertab="tab-profile-shifts">Shift History</button>
+          <button class="drawer-tab-btn" data-drawertab="tab-profile-avail">Availability</button>
+        </div>
+
+        <div class="drawer-body" id="drawer-content-container"></div>
+      </div>
+    </div>
+
+    <!-- 6. FLOATING BULK ACTIONS TOOLBAR -->
+    <div class="bulk-toolbar-floating" id="bulk-toolbar">
+      <span class="bulk-selected-count" id="bulk-counter-text">0 items selected</span>
+      <div class="page-actions-group">
+        <button class="btn-secondary-action" id="bulk-btn-assign"><i data-lucide="calendar-plus" style="width: 14px; height: 14px;"></i> Assign Shift</button>
+        <button class="btn-secondary-action" id="bulk-btn-message"><i data-lucide="mail" style="width: 14px; height: 14px;"></i> Send Message</button>
+        <button class="btn-secondary-action" id="bulk-btn-export"><i data-lucide="download" style="width: 14px; height: 14px;"></i> Export</button>
+        <button class="btn-secondary-action" id="bulk-btn-clear" style="color: var(--status-danger);">Cancel</button>
+      </div>
+    </div>
+
+    <!-- 7. MOBILE BOTTOM NAVIGATION (<768px) -->
+    <nav class="bottom-nav">
+      <button type="button" class="bottom-nav-item active" data-tab="overview-tab" onclick="window.switchAdminTab('overview-tab', 'Dashboard Overview')">
+        <i data-lucide="layout-dashboard" style="width: 18px; height: 18px;"></i>
+        <span>Overview</span>
+      </button>
+      <button type="button" class="bottom-nav-item" data-tab="roster-tab" onclick="window.switchAdminTab('roster-tab', 'Staff Roster')">
+        <i data-lucide="users" style="width: 18px; height: 18px;"></i>
+        <span>Roster</span>
+        <span class="bottom-nav-badge" id="bottom-badge-roster-count" style="display:none;">0</span>
+      </button>
+      <button type="button" class="bottom-nav-item" data-tab="requests-tab" onclick="window.switchAdminTab('requests-tab', 'Client Requests')">
+        <i data-lucide="building-2" style="width: 18px; height: 18px;"></i>
+        <span>Requests</span>
+        <span class="bottom-nav-badge danger" id="bottom-badge-requests-count" style="display:none;">0</span>
+      </button>
+      <button type="button" class="bottom-nav-item" data-tab="applicants-tab" onclick="window.switchAdminTab('applicants-tab', 'Job Applications (ATS)')">
+        <i data-lucide="file-text" style="width: 18px; height: 18px;"></i>
+        <span>ATS</span>
+        <span class="bottom-nav-badge" id="bottom-badge-applicants-count" style="display:none;">0</span>
+      </button>
+      <button type="button" class="bottom-nav-item" data-tab="admin-users-tab" onclick="window.switchAdminTab('admin-users-tab', 'Admin Operators')">
+        <i data-lucide="shield-check" style="width: 18px; height: 18px;"></i>
+        <span>Admins</span>
+      </button>
+    </nav>
+
+  </div>
+
+  <!-- MODAL 1: ADD NEW STAFF MEMBER -->
+  <div class="admin-modal-overlay" id="modal-add-staff">
+    <div class="admin-modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title"><i data-lucide="user-plus" style="width: 20px; height: 20px; color: var(--brand-cyan);"></i> Add Healthcare Staff Member</h3>
+        <button class="modal-close-btn" id="modal-add-staff-close" aria-label="Close modal"><i data-lucide="x" style="width: 20px; height: 20px;"></i></button>
+      </div>
+      <form id="form-add-staff">
+        <div class="modal-form-grid">
+          <div class="modal-form-group">
+            <label for="new-staff-name">Full Legal Name *</label>
+            <input type="text" class="modal-input" id="new-staff-name" placeholder="e.g. Sarah Jenkins" required>
+          </div>
+          <div class="modal-form-group">
+            <label for="new-staff-role">Role / Credential *</label>
+            <select class="modal-input" id="new-staff-role" required>
+              <option value="RN">Registered Nurse (RN)</option>
+              <option value="RPN">Registered Practical Nurse (RPN)</option>
+              <option value="PSW">Personal Support Worker (PSW)</option>
+              <option value="Travel Nurse">Travel Nurse</option>
+              <option value="Companion">Support &amp; Companion</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-form-grid">
+          <div class="modal-form-group">
+            <label for="new-staff-email">Work Email *</label>
+            <input type="email" class="modal-input" id="new-staff-email" placeholder="nurse@divinefingershealthcare.ca" required>
+          </div>
+          <div class="modal-form-group">
+            <label for="new-staff-phone">Direct Phone *</label>
+            <input type="tel" class="modal-input" id="new-staff-phone" placeholder="+1 (647) 000-0000" required>
+          </div>
+        </div>
+        <div class="modal-form-grid">
+          <div class="modal-form-group">
+            <label for="new-staff-specialty">Clinical Specialty</label>
+            <input type="text" class="modal-input" id="new-staff-specialty" placeholder="e.g. ICU &amp; Critical Care">
+          </div>
+          <div class="modal-form-group">
+            <label for="new-staff-region">Assigned Region</label>
+            <select class="modal-input" id="new-staff-region">
+              <option value="Scarborough">Scarborough</option>
+              <option value="Toronto Central">Toronto Central</option>
+              <option value="North York">North York</option>
+              <option value="Etobicoke">Etobicoke</option>
+              <option value="Peel Region (Mississauga/Brampton)">Peel Region</option>
+              <option value="York Region (Markham/Richmond Hill)">York Region</option>
+              <option value="Durham Region (Ajax/Pickering/Oshawa)">Durham Region</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-form-grid">
+          <div class="modal-form-group">
+            <label for="new-staff-cno">CNO / Reg Number</label>
+            <input type="text" class="modal-input" id="new-staff-cno" placeholder="e.g. CNO-892144">
+          </div>
+          <div class="modal-form-group">
+            <label for="new-staff-rate">Hourly Rate ($ CAD)</label>
+            <input type="number" class="modal-input" id="new-staff-rate" placeholder="48.00" step="0.50" value="45.00">
+          </div>
+        </div>
+        <div class="modal-form-grid">
+          <div class="modal-form-group">
+            <label for="new-staff-cpr">CPR/BLS Expiry Date</label>
+            <input type="date" class="modal-input" id="new-staff-cpr">
+          </div>
+          <div class="modal-form-group">
+            <label for="new-staff-status">Initial Status</label>
+            <select class="modal-input" id="new-staff-status">
+              <option value="available">Available (On-Call)</option>
+              <option value="on-shift">On-Shift</option>
+              <option value="off-duty">Off-Duty</option>
+            </select>
+          </div>
+        </div>
+        <div style="background: var(--status-info-bg); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 10px; padding: 1rem 1.15rem; margin-top: 0.85rem;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.45rem;">
+            <label for="new-staff-password" style="margin: 0; font-size: 0.78rem; font-weight: 800; color: var(--status-info); display: flex; align-items: center; gap: 0.45rem;">
+              <i data-lucide="key-round" style="width: 15px; height: 15px;"></i> Staff Portal Initial Password
+            </label>
+            <span style="font-size: 0.7rem; font-weight: 800; background: rgba(56, 189, 248, 0.2); color: var(--status-info); padding: 0.15rem 0.5rem; border-radius: 4px;">Auto-Provisioned</span>
+          </div>
+          <input type="text" class="modal-input" id="new-staff-password" value="DivineFingers2026!" placeholder="Default: DivineFingers2026!" style="font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace; font-weight: 700; background: var(--bg-input); border-color: rgba(56, 189, 248, 0.4);">
+          <span style="font-size: 0.73rem; color: var(--text-muted); margin-top: 6px; display: block; line-height: 1.4;">
+            Creates an active login account in the database. The caregiver can log into their Staff Portal (<span style="font-family: monospace;">portal.html</span>) immediately using their work email and this password.
+          </span>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary-action" id="modal-add-staff-cancel">Cancel</button>
+          <button type="submit" class="btn-primary-action" id="modal-add-staff-submit"><i data-lucide="user-plus"></i> Save to Roster</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 2: CREATE / DISPATCH NEW SHIFT REQUEST -->
+  <div class="admin-modal-overlay" id="modal-new-request">
+    <div class="admin-modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title"><i data-lucide="calendar-plus" style="width: 20px; height: 20px; color: var(--brand-cyan);"></i> Create &amp; Dispatch Shift Request</h3>
+        <button class="modal-close-btn" id="modal-new-request-close" aria-label="Close modal"><i data-lucide="x" style="width: 20px; height: 20px;"></i></button>
+      </div>
+      <form id="form-new-request">
+        <div class="modal-form-grid">
+          <div class="modal-form-group">
+            <label for="req-facility-name">Healthcare Facility *</label>
+            <input type="text" class="modal-input" id="req-facility-name" placeholder="e.g. Sunnybrook Health Sciences" required>
+          </div>
+          <div class="modal-form-group">
+            <label for="req-unit-department">Unit / Ward / Department</label>
+            <input type="text" class="modal-input" id="req-unit-department" placeholder="e.g. ICU, ER, 4th Floor Palliative, LTC">
+          </div>
+        </div>
+        <div class="modal-form-grid">
+          <div class="modal-form-group">
+            <label for="req-contact-name">Contact Person / Charge Nurse *</label>
+            <input type="text" class="modal-input" id="req-contact-name" placeholder="e.g. Jane Okafor, RN" required>
+          </div>
+          <div class="modal-form-group">
+            <label for="req-contact-email">Facility Email *</label>
+            <input type="email" class="modal-input" id="req-contact-email" placeholder="staffing@hospital.ca" required>
+          </div>
+        </div>
+        <div class="modal-form-group" style="margin-bottom: 0.85rem;">
+          <label for="req-contact-phone">Dispatch Phone *</label>
+          <input type="tel" class="modal-input" id="req-contact-phone" placeholder="+1 (416) 000-0000" required>
+        </div>
+        <div class="modal-form-grid">
+          <div class="modal-form-group">
+            <label for="req-role-needed">Role Requested *</label>
+            <select class="modal-input" id="req-role-needed" required>
+              <option value="RN">Registered Nurse (RN)</option>
+              <option value="RPN">Registered Practical Nurse (RPN)</option>
+              <option value="PSW">Personal Support Worker (PSW)</option>
+              <option value="Travel Nurse">Travel Nurse</option>
+              <option value="Companion">Support Staff</option>
+            </select>
+          </div>
+          <div class="modal-form-group">
+            <label for="req-urgency">Urgency Level</label>
+            <select class="modal-input" id="req-urgency">
+              <option value="routine">Routine (Next 48H)</option>
+              <option value="urgent">Urgent (&lt;24H)</option>
+              <option value="emergency_surge">Emergency Surge (Immediate)</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-form-grid">
+          <div class="modal-form-group">
+            <label for="req-start-date">Shift Date *</label>
+            <input type="date" class="modal-input" id="req-start-date" required>
+          </div>
+          <div class="modal-form-group">
+            <label for="req-shift-type">Shift / Coverage *</label>
+            <select class="modal-input" id="req-shift-type">
+              <option value="Day Shift (07:00 - 15:00)">Day Shift (07:00 - 15:00)</option>
+              <option value="Evening Shift (15:00 - 23:00)">Evening Shift (15:00 - 23:00)</option>
+              <option value="Night Shift (23:00 - 07:00)">Night Shift (23:00 - 07:00)</option>
+              <option value="12-Hour Day (07:00 - 19:00)">12-Hour Day (07:00 - 19:00)</option>
+              <option value="12-Hour Night (19:00 - 07:00)">12-Hour Night (19:00 - 07:00)</option>
+              <option value="Weekend 24H Surge">Weekend 24H Surge</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-form-group" style="margin-bottom: 0.85rem;">
+          <label for="req-assign-staff">Assign Staff Member (Direct Dispatch)</label>
+          <select class="modal-input" id="req-assign-staff">
+            <option value="">— Unassigned (Pending Dispatch) —</option>
+          </select>
+        </div>
+        <div class="modal-form-group" style="margin-bottom: 1rem;">
+          <label for="req-instructions">Special Instructions / Patient Acuity</label>
+          <textarea class="modal-input" id="req-instructions" rows="2" placeholder="e.g. Ventilator competency required; report to 4th floor East Wing."></textarea>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary-action" id="modal-new-request-cancel">Cancel</button>
+          <button type="submit" class="btn-primary-action" id="modal-new-request-submit"><i data-lucide="send"></i> Dispatch Shift Order</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 10. TWO-FACTOR AUTHENTICATION (TOTP) SETUP MODAL -->
+  <div class="admin-modal-overlay" id="mfa-setup-modal">
+    <div class="admin-modal-card" style="max-width: 460px; text-align: center;">
+      <div class="modal-header" style="margin-bottom: 1rem;">
+        <h3 class="modal-title" style="display: flex; align-items: center; gap: 0.5rem;">
+          <i data-lucide="shield-check" style="width: 20px; height: 20px; color: var(--brand-cyan);"></i>
+          Set Up Two-Factor Authentication
+        </h3>
+        <button type="button" class="modal-close-btn" onclick="window.closeMfaSetupModal()" aria-label="Close modal">
+          <i data-lucide="x" style="width: 20px; height: 20px;"></i>
+        </button>
+      </div>
+
+      <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.25rem; line-height: 1.5;">
+        Scan this QR code with <strong>Google Authenticator</strong>, <strong>Microsoft Authenticator</strong>, or <strong>1Password</strong>.
+      </p>
+
+      <div style="background: #ffffff; padding: 0.85rem; border-radius: 12px; display: inline-block; margin-bottom: 1.25rem; border: 2px solid var(--brand-cyan); box-shadow: 0 4px 15px rgba(0, 245, 212, 0.2);">
+        <img id="mfa-qr-code-img" src="" alt="MFA QR Code" style="width: 180px; height: 180px; display: block; margin: 0 auto;">
+      </div>
+
+      <div style="margin-bottom: 1.25rem;">
+        <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.35rem;">Or enter this secret key manually:</div>
+        <code id="mfa-secret-text" style="background: var(--bg-surface-elevated); padding: 0.4rem 0.75rem; border-radius: 6px; font-size: 0.88rem; letter-spacing: 1.5px; color: var(--brand-cyan); font-weight: 800; user-select: all; border: 1px solid var(--border-subtle); display: inline-block;">—</code>
+      </div>
+
+      <form id="mfa-confirm-form" onsubmit="window.submitMfaConfirm(event)">
+        <div class="modal-form-group" style="margin-bottom: 1.25rem; text-align: left;">
+          <label for="mfa-confirm-code-input" style="display: block; font-size: 0.78rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.4rem; text-align: center;">6-DIGIT AUTHENTICATOR CODE</label>
+          <input type="text" id="mfa-confirm-code-input" placeholder="000000" maxlength="6" pattern="[0-9]{6}" inputmode="numeric" required class="modal-input" style="text-align: center; font-size: 1.4rem; letter-spacing: 6px; font-weight: 900; height: 48px;">
+        </div>
+        <div class="modal-actions" style="justify-content: flex-end; gap: 0.75rem;">
+          <button type="button" class="btn-secondary-action" onclick="window.closeMfaSetupModal()">Cancel</button>
+          <button type="submit" class="btn-primary-action" id="mfa-confirm-submit-btn">
+            <i data-lucide="check-circle" style="width: 16px; height: 16px;"></i> Enable 2FA
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 11. RBAC PERMISSIONS & ROLE CONFIGURATION MODAL -->
+  <div class="admin-modal-overlay" id="admin-permissions-modal">
+    <div class="admin-modal-card" style="max-width: 620px;">
+      <div class="modal-header" style="margin-bottom: 1rem;">
+        <div>
+          <h3 class="modal-title" style="display: flex; align-items: center; gap: 0.5rem;">
+            <i data-lucide="shield-check" style="width: 20px; height: 20px; color: var(--brand-cyan);"></i>
+            Configure Operator Access &amp; Permissions
+          </h3>
+          <p id="perm-modal-subtitle" style="font-size: 0.8rem; color: var(--text-muted); margin: 0.25rem 0 0 0;">Managing role privileges for operator</p>
+        </div>
+        <button type="button" class="modal-close-btn" onclick="window.closeAdminPermissionsModal()" aria-label="Close modal">
+          <i data-lucide="x" style="width: 20px; height: 20px;"></i>
+        </button>
+      </div>
+
+      <form id="admin-permissions-form" onsubmit="window.saveAdminPermissions(event)">
+        <input type="hidden" id="perm-modal-admin-id">
+
+        <!-- Role Template Selector -->
+        <div class="modal-form-group" style="margin-bottom: 1.25rem;">
+          <label for="perm-modal-role-select" style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 0.4rem;">PRIMARY OPERATIONAL ROLE PRESET</label>
+          <select id="perm-modal-role-select" class="modal-input" onchange="window.handleRolePresetChange(this.value)" style="width: 100%; font-weight: 600;">
+            <option value="super-admin">Super-Admin (Full Unrestricted Access)</option>
+            <option value="dispatch">Dispatch Officer (Shift Orders &amp; Roster)</option>
+            <option value="care-coordinator">Care Coordinator (Shift View &amp; Staffing)</option>
+            <option value="recruiter">Recruitment Specialist / HR (Job ATS &amp; Roster)</option>
+            <option value="auditor">Compliance Auditor (Audit Trail &amp; Reports)</option>
+            <option value="custom">Custom Granular Access</option>
+          </select>
+        </div>
+
+        <!-- Granular Permissions Grid -->
+        <div style="margin-bottom: 1.25rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
+            <label style="font-size: 0.78rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted);">GRANULAR MODULE PRIVILEGES</label>
+            <div class="perm-toolbar-actions">
+              <button type="button" class="btn-perm-toggle perm-select-all" onclick="window.toggleAllPermissions(true)" title="Grant all module permissions">
+                <i data-lucide="check-check" style="width: 13px; height: 13px;"></i> Select All
+              </button>
+              <button type="button" class="btn-perm-toggle perm-clear-all" onclick="window.toggleAllPermissions(false)" title="Revoke all module permissions">
+                <i data-lucide="rotate-ccw" style="width: 12px; height: 12px;"></i> Clear All
+              </button>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 0.65rem;">
+            <!-- Shift Requests -->
+            <label class="perm-checkbox-item">
+              <input type="checkbox" name="perm-checkbox" value="requests:view" class="perm-chk" onchange="window.onIndividualPermChange()">
+              <div>
+                <strong style="color: var(--text-primary); font-size: 0.85rem;">View Shift Requests</strong>
+                <div style="font-size: 0.73rem; color: var(--text-muted); margin-top: 2px;">Access live shift board &amp; calendar</div>
+              </div>
+            </label>
+
+            <label class="perm-checkbox-item">
+              <input type="checkbox" name="perm-checkbox" value="requests:dispatch" class="perm-chk" onchange="window.onIndividualPermChange()">
+              <div>
+                <strong style="color: var(--text-primary); font-size: 0.85rem;">Dispatch &amp; Fulfill Shifts</strong>
+                <div style="font-size: 0.73rem; color: var(--text-muted); margin-top: 2px;">Assign caregivers &amp; update status</div>
+              </div>
+            </label>
+
+            <!-- Staff Roster -->
+            <label class="perm-checkbox-item">
+              <input type="checkbox" name="perm-checkbox" value="roster:view" class="perm-chk" onchange="window.onIndividualPermChange()">
+              <div>
+                <strong style="color: var(--text-primary); font-size: 0.85rem;">View Staff Roster</strong>
+                <div style="font-size: 0.73rem; color: var(--text-muted); margin-top: 2px;">Browse clinician profiles &amp; ratings</div>
+              </div>
+            </label>
+
+            <label class="perm-checkbox-item">
+              <input type="checkbox" name="perm-checkbox" value="roster:manage" class="perm-chk" onchange="window.onIndividualPermChange()">
+              <div>
+                <strong style="color: var(--text-primary); font-size: 0.85rem;">Manage Staff &amp; Credentials</strong>
+                <div style="font-size: 0.73rem; color: var(--text-muted); margin-top: 2px;">Add/edit staff, CNO, CPR &amp; N95 docs</div>
+              </div>
+            </label>
+
+            <!-- Recruitment ATS -->
+            <label class="perm-checkbox-item">
+              <input type="checkbox" name="perm-checkbox" value="applications:view" class="perm-chk" onchange="window.onIndividualPermChange()">
+              <div>
+                <strong style="color: var(--text-primary); font-size: 0.85rem;">View Job Applicants</strong>
+                <div style="font-size: 0.73rem; color: var(--text-muted); margin-top: 2px;">Access ATS candidates &amp; resumes</div>
+              </div>
+            </label>
+
+            <label class="perm-checkbox-item">
+              <input type="checkbox" name="perm-checkbox" value="applications:manage" class="perm-chk" onchange="window.onIndividualPermChange()">
+              <div>
+                <strong style="color: var(--text-primary); font-size: 0.85rem;">Manage Candidate ATS</strong>
+                <div style="font-size: 0.73rem; color: var(--text-muted); margin-top: 2px;">Change hiring stages &amp; enroll staff</div>
+              </div>
+            </label>
+
+            <!-- Inquiries -->
+            <label class="perm-checkbox-item">
+              <input type="checkbox" name="perm-checkbox" value="inquiries:manage" class="perm-chk" onchange="window.onIndividualPermChange()">
+              <div>
+                <strong style="color: var(--text-primary); font-size: 0.85rem;">Manage Client Inquiries</strong>
+                <div style="font-size: 0.73rem; color: var(--text-muted); margin-top: 2px;">Read inquiries &amp; dispatch replies</div>
+              </div>
+            </label>
+
+            <!-- Reports -->
+            <label class="perm-checkbox-item">
+              <input type="checkbox" name="perm-checkbox" value="reports:view" class="perm-chk" onchange="window.onIndividualPermChange()">
+              <div>
+                <strong style="color: var(--text-primary); font-size: 0.85rem;">View Report Studio</strong>
+                <div style="font-size: 0.73rem; color: var(--text-muted); margin-top: 2px;">Operational, roster &amp; shift analytics</div>
+              </div>
+            </label>
+
+            <label class="perm-checkbox-item">
+              <input type="checkbox" name="perm-checkbox" value="reports:export" class="perm-chk" onchange="window.onIndividualPermChange()">
+              <div>
+                <strong style="color: var(--text-primary); font-size: 0.85rem;">Export &amp; Print Reports</strong>
+                <div style="font-size: 0.73rem; color: var(--text-muted); margin-top: 2px;">Download CSV &amp; print dossiers</div>
+              </div>
+            </label>
+
+            <!-- Newsletter -->
+            <label class="perm-checkbox-item">
+              <input type="checkbox" name="perm-checkbox" value="newsletter:manage" class="perm-chk" onchange="window.onIndividualPermChange()">
+              <div>
+                <strong style="color: var(--text-primary); font-size: 0.85rem;">Manage Subscribers</strong>
+                <div style="font-size: 0.73rem; color: var(--text-muted); margin-top: 2px;">Shift alert newsletter subscribers</div>
+              </div>
+            </label>
+
+            <!-- Audit Logs -->
+            <label class="perm-checkbox-item">
+              <input type="checkbox" name="perm-checkbox" value="audit:view" class="perm-chk" onchange="window.onIndividualPermChange()">
+              <div>
+                <strong style="color: var(--text-primary); font-size: 0.85rem;">View Audit Logs</strong>
+                <div style="font-size: 0.73rem; color: var(--text-muted); margin-top: 2px;">Security ledger &amp; compliance trail</div>
+              </div>
+            </label>
+
+            <!-- Admin Operators -->
+            <label class="perm-checkbox-item">
+              <input type="checkbox" name="perm-checkbox" value="admins:manage" class="perm-chk" onchange="window.onIndividualPermChange()">
+              <div>
+                <strong style="color: var(--text-primary); font-size: 0.85rem;">Manage Administrators</strong>
+                <div style="font-size: 0.73rem; color: var(--text-muted); margin-top: 2px;">Provision admins &amp; configure RBAC</div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <div class="modal-actions" style="display: flex; justify-content: flex-end; gap: 0.85rem; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+          <button type="button" class="btn-secondary-action perm-cancel-btn" onclick="window.closeAdminPermissionsModal()">
+            <i data-lucide="x" style="width: 14px; height: 14px;"></i> Cancel
+          </button>
+          <button type="submit" class="btn-primary-action perm-save-btn" id="perm-save-submit-btn">
+            <i data-lucide="shield-check" style="width: 16px; height: 16px;"></i> Save Access Configuration
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       FACILITY REGISTRATION / EDIT MODAL
+       ========================================================================== -->
+  <div class="admin-modal-overlay" id="modal-facility">
+    <div class="admin-modal-card" style="max-width: 580px;">
+      <div class="modal-header">
+        <h3 class="modal-title" id="facility-modal-title">
+          <i data-lucide="building-2" style="width: 20px; height: 20px; color: var(--brand-cyan);"></i> Register Healthcare Facility
+        </h3>
+        <button type="button" class="modal-close-btn" onclick="window.closeFacilityModal()" aria-label="Close modal"><i data-lucide="x" style="width: 20px; height: 20px;"></i></button>
+      </div>
+      <form id="form-facility" onsubmit="window.saveFacilityForm(event)">
+        <input type="hidden" id="facility-id" value="">
+        <div class="modal-form-grid">
+          <div class="modal-form-group">
+            <label for="facility-name">Facility Legal Name *</label>
+            <input type="text" class="modal-input" id="facility-name" placeholder="e.g. Scarborough Health Network" required>
+          </div>
+          <div class="modal-form-group">
+            <label for="facility-code">Facility Code (Optional)</label>
+            <input type="text" class="modal-input" id="facility-code" placeholder="Auto-generated if blank (e.g. FAC-SHN-01)">
+          </div>
+        </div>
+
+        <div class="modal-form-grid">
+          <div class="modal-form-group">
+            <label for="facility-address">Physical Address</label>
+            <input type="text" class="modal-input" id="facility-address" placeholder="e.g. 3050 Lawrence Ave E, Scarborough">
+          </div>
+          <div class="modal-form-group">
+            <label for="facility-region">Region / Territory</label>
+            <select class="modal-input" id="facility-region">
+              <option value="Greater Toronto Area">Greater Toronto Area (GTA)</option>
+              <option value="Toronto Central">Toronto Central</option>
+              <option value="Scarborough / GTA">Scarborough / GTA</option>
+              <option value="North York / GTA">North York / GTA</option>
+              <option value="Mississauga / Peel">Mississauga / Peel</option>
+              <option value="York Region">York Region</option>
+              <option value="Durham Region">Durham Region</option>
+              <option value="Halton Region">Halton Region</option>
+              <option value="Simcoe County">Simcoe County</option>
+              <option value="Hamilton Niagara">Hamilton Niagara</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="modal-form-grid">
+          <div class="modal-form-group">
+            <label for="facility-contact-name">Primary Contact Person</label>
+            <input type="text" class="modal-input" id="facility-contact-name" placeholder="e.g. Sarah Jenkins (Staffing Coord.)">
+          </div>
+          <div class="modal-form-group">
+            <label for="facility-contact-email">Contact / Billing Email</label>
+            <input type="email" class="modal-input" id="facility-contact-email" placeholder="e.g. staffing@hospital.ca">
+          </div>
+        </div>
+
+        <div class="modal-form-grid">
+          <div class="modal-form-group">
+            <label for="facility-contact-phone">Contact Phone</label>
+            <input type="tel" class="modal-input" id="facility-contact-phone" placeholder="e.g. +1 (416) 438-2911">
+          </div>
+          <div class="modal-form-group">
+            <label for="facility-status">MSA Contract Status *</label>
+            <select class="modal-input" id="facility-status" required>
+              <option value="active">Active MSA Contract</option>
+              <option value="pending" selected>Pending Onboarding (Global Fallback)</option>
+              <option value="expired">Expired MSA</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="modal-form-grid">
+          <div class="modal-form-group">
+            <label for="facility-msa-signed">MSA Execution / Signed Date</label>
+            <input type="date" class="modal-input" id="facility-msa-signed">
+          </div>
+          <div class="modal-form-group">
+            <label for="facility-msa-expiry">MSA Expiration Date</label>
+            <input type="date" class="modal-input" id="facility-msa-expiry">
+          </div>
+        </div>
+
+        <div class="modal-form-group" style="margin-bottom: 1.25rem;">
+          <label style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+            <span>Executed Master Services Agreement (MSA Document)</span>
+            <span style="font-size: 0.72rem; color: var(--text-muted); font-weight: normal;">PDF, DOC, DOCX up to 25MB</span>
+          </label>
+
+          <!-- Direct File Upload Dropzone -->
+          <div class="admin-file-upload-box" id="facility-msa-dropzone">
+            <input type="file" id="facility-msa-file" class="admin-hidden-file-input" accept=".pdf,.doc,.docx" onchange="window.handleFacilityMsaFileChange(this)">
+            <label for="facility-msa-file" class="admin-file-upload-label" id="facility-msa-file-label">
+              <div class="admin-file-upload-icon-circle">
+                <i data-lucide="file-up" id="facility-msa-file-icon" style="width: 18px; height: 18px;"></i>
+              </div>
+              <div class="admin-file-upload-text-group">
+                <span class="admin-file-upload-title" id="facility-msa-title">Upload Signed Contract Document</span>
+                <span class="admin-file-upload-subtitle" id="facility-msa-subtitle">Drag &amp; drop or click to choose MSA contract (.pdf, .docx)</span>
+              </div>
+              <span class="admin-file-upload-btn-chip" id="facility-msa-browse-btn">Browse File</span>
+            </label>
+            <div id="facility-msa-preview-bar" style="display: none; align-items: center; justify-content: space-between; margin-top: 0.5rem; padding: 0.5rem 0.75rem; background: rgba(2, 132, 199, 0.1); border: 1px solid rgba(2, 132, 199, 0.3); border-radius: 6px; font-size: 0.75rem;">
+              <div style="display: flex; align-items: center; gap: 0.5rem; overflow: hidden; min-width: 0;">
+                <i data-lucide="file-check-2" style="width: 16px; height: 16px; color: #10B981; flex-shrink: 0;"></i>
+                <a id="facility-msa-active-link" href="#" target="_blank" rel="noopener noreferrer" style="color: var(--brand-turquoise); font-weight: 600; text-decoration: underline; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"></a>
+              </div>
+              <button type="button" onclick="window.clearFacilityMsaFile()" style="background: none; border: none; color: #EF4444; font-size: 0.72rem; cursor: pointer; display: flex; align-items: center; gap: 2px; flex-shrink: 0; padding: 2px 6px; border-radius: 4px;">
+                <i data-lucide="x" style="width: 13px; height: 13px;"></i> Remove
+              </button>
+            </div>
+          </div>
+
+          <!-- Stored file path / URL hidden input -->
+          <input type="hidden" id="facility-msa-url">
+
+          <!-- Optional manual URL fallback -->
+          <div style="margin-top: 0.45rem;">
+            <a href="javascript:void(0)" onclick="window.toggleMsaUrlInput()" id="facility-msa-url-toggle" style="font-size: 0.72rem; color: var(--text-muted); text-decoration: underline;">
+              Or link to an external document URL instead
+            </a>
+            <div id="facility-msa-url-wrapper" style="display: none; margin-top: 0.45rem;">
+              <input type="text" class="modal-input" id="facility-msa-url-manual" placeholder="https://external-storage.ca/contracts/msa-shn-2026.pdf" oninput="document.getElementById('facility-msa-url').value = this.value.trim();">
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-actions" style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+          <button type="button" class="btn-secondary-action" onclick="window.closeFacilityModal()">Cancel</button>
+          <button type="submit" class="btn-primary-action" id="facility-submit-btn">
+            <i data-lucide="check"></i> Save Facility Profile
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       CONTRACTED RATE CARD TERM MODAL
+       ========================================================================== -->
+  <div class="admin-modal-overlay" id="modal-rate-card-term" onclick="if(event.target===this) window.closeRateCardModal()">
+    <div class="admin-modal-card" style="max-width: 540px;">
+      <div class="modal-header">
+        <h3 class="modal-title">
+          <i data-lucide="badge-dollar-sign" style="width: 20px; height: 20px; color: var(--brand-turquoise);"></i> Add Contracted MSA Rate Term
+        </h3>
+        <button type="button" class="modal-close-btn" onclick="window.closeRateCardModal()" aria-label="Close modal"><i data-lucide="x" style="width: 20px; height: 20px;"></i></button>
+      </div>
+      <form id="form-rate-card-term" onsubmit="window.saveRateCardTermForm(event)">
+        <input type="hidden" id="rate-card-facility-id" value="">
+
+        <div style="background: rgba(0, 168, 150, 0.08); border: 1px solid rgba(0, 168, 150, 0.25); border-radius: 6px; padding: 0.75rem 0.9rem; margin-bottom: 1rem; font-size: 0.8rem; color: var(--text-secondary);">
+          <strong style="color: var(--text-primary);" id="rate-card-modal-facility-title">Facility: Scarborough Health Network</strong>
+          <div style="margin-top: 3px; font-size: 0.74rem;">Note: Saving this term will automatically archive the previous active term for this clinical role and shift type.</div>
+        </div>
+
+        <div class="modal-form-grid">
+          <div class="modal-form-group">
+            <label for="rate-term-role">Clinical Role *</label>
+            <select class="modal-input" id="rate-term-role" required onchange="window.updateRateTermPayFloorHint()">
+              <option value="RN">RN (Registered Nurse)</option>
+              <option value="RPN">RPN (Registered Practical Nurse)</option>
+              <option value="PSW">PSW (Personal Support Worker)</option>
+              <option value="Companion">Companion Caregiver</option>
+              <option value="Travel Nurse">Travel Nurse</option>
+              <option value="Multiple">Multiple Roles</option>
+            </select>
+          </div>
+          <div class="modal-form-group">
+            <label for="rate-term-shift-type">Shift Type Category *</label>
+            <select class="modal-input" id="rate-term-shift-type" required>
+              <option value="standard" selected>Standard (Day / Evening / General)</option>
+              <option value="night">Night Shift (Premium)</option>
+              <option value="weekend">Weekend Shift</option>
+              <option value="statutory_holiday">Statutory Holiday</option>
+              <option value="critical_surge">Critical Surge</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="modal-form-grid">
+          <div class="modal-form-group">
+            <label for="rate-term-bill-rate">Contracted Bill Rate ($/hr) *</label>
+            <input type="number" class="modal-input" id="rate-term-bill-rate" step="0.50" min="1" placeholder="92.00" required>
+            <div id="rate-term-floor-hint" style="font-size: 0.73rem; color: var(--text-muted); margin-top: 3px;">Agency baseline: $85.00/hr</div>
+          </div>
+          <div class="modal-form-group">
+            <label for="rate-term-pay-rate">Target Clinician Pay ($/hr)</label>
+            <input type="number" class="modal-input" id="rate-term-pay-rate" step="0.50" min="1" placeholder="52.00">
+            <div style="font-size: 0.73rem; color: var(--text-muted); margin-top: 3px;">Default caregiver wage for this term</div>
+          </div>
+        </div>
+
+        <div class="modal-form-grid">
+          <div class="modal-form-group">
+            <label for="rate-term-overtime">Overtime Multiplier</label>
+            <input type="number" class="modal-input" id="rate-term-overtime" step="0.05" min="1.00" max="3.00" value="1.50" required>
+          </div>
+          <div class="modal-form-group">
+            <label for="rate-term-effective-date">Effective Date *</label>
+            <input type="date" class="modal-input" id="rate-term-effective-date" required>
+          </div>
+        </div>
+
+        <div class="modal-form-group" style="margin-bottom: 1.25rem;">
+          <label for="rate-term-notes">Contract / Schedule Amendment Reference</label>
+          <input type="text" class="modal-input" id="rate-term-notes" placeholder="e.g. Schedule B 2026 Annual Rate Revision">
+        </div>
+
+        <div class="modal-actions" style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+          <button type="button" class="btn-secondary-action" onclick="window.closeRateCardModal()">Cancel</button>
+          <button type="submit" class="btn-primary-action" id="rate-term-submit-btn">
+            <i data-lucide="check-circle"></i> Establish Term
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       ONE-OFF SHIFT RATE EXCEPTION MODAL (ADMIN ONLY)
+       ========================================================================== -->
+  <div class="admin-modal-overlay" id="modal-rate-exception">
+    <div class="admin-modal-card" style="max-width: 480px;">
+      <div class="modal-header">
+        <h3 class="modal-title">
+          <i data-lucide="sparkles" style="width: 20px; height: 20px; color: var(--brand-amber, #f59e0b);"></i> One-Off Shift Rate Exception
+        </h3>
+        <button type="button" class="modal-close-btn" onclick="window.closeRateExceptionModal()" aria-label="Close modal"><i data-lucide="x" style="width: 20px; height: 20px;"></i></button>
+      </div>
+      <form id="form-rate-exception" onsubmit="window.saveRateExceptionForm(event)">
+        <input type="hidden" id="rate-exception-request-id" value="">
+        <div style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 1rem;" id="rate-exception-summary-text">
+          Applying a one-off rate exception on shift request.
+        </div>
+        <div class="modal-form-group" style="margin-bottom: 1rem;">
+          <label for="rate-exception-amount">Exception Bill Rate ($/hr) — Leave blank to reset to contract</label>
+          <input type="number" class="modal-input" id="rate-exception-amount" step="0.50" min="1" placeholder="e.g. 98.00">
+        </div>
+        <div class="modal-form-group" style="margin-bottom: 1.25rem;">
+          <label for="rate-exception-reason">Internal Operational Reason *</label>
+          <input type="text" class="modal-input" id="rate-exception-reason" placeholder="e.g. Critical weekend surge approved by director" required>
+        </div>
+        <div class="modal-actions" style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+          <button type="button" class="btn-secondary-action" onclick="window.closeRateExceptionModal()">Cancel</button>
+          <button type="submit" class="btn-primary-action">
+            <i data-lucide="check"></i> Apply Rate Exception
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       FACILITY RATE CARDS & MSA CONTRACT TERMS MANAGEMENT MODAL
+       ========================================================================== -->
+  <div class="admin-modal-overlay" id="modal-manage-rate-cards">
+    <div class="admin-modal-card" style="max-width: 900px; width: 95%;">
+      <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem;">
+        <div>
+          <h3 class="modal-title" id="manage-rate-cards-title" style="display: flex; align-items: center; gap: 0.5rem; margin: 0; font-size: 1.15rem;">
+            <i data-lucide="badge-dollar-sign" style="width: 22px; height: 22px; color: var(--brand-cyan);"></i> Contracted MSA Rate Cards
+          </h3>
+          <div id="manage-rate-cards-subtitle" style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 3px;">
+            Facility: Scarborough Health Network
+          </div>
+        </div>
+        <button type="button" class="modal-close-btn" onclick="window.closeFacilityRateCardsModal()" aria-label="Close modal">
+          <i data-lucide="x" style="width: 20px; height: 20px;"></i>
+        </button>
+      </div>
+
+      <div style="padding: 1.25rem 0 0.5rem;">
+        <!-- Facility Info Bar -->
+        <div id="manage-rate-cards-facility-summary" style="background: rgba(0, 168, 150, 0.08); border: 1px solid rgba(0, 168, 150, 0.25); border-radius: 8px; padding: 0.85rem 1rem; margin-bottom: 1.25rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+          <!-- Dynamically filled -->
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem; flex-wrap: wrap; gap: 0.5rem;">
+          <div>
+            <h4 style="margin: 0; font-size: 0.95rem; font-weight: 700; color: var(--text-primary);">Contracted Rate Card Terms Ledger</h4>
+            <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">Active terms resolve for shift billing; historical terms remain archived for audit reconciliation.</div>
+          </div>
+          <button type="button" class="btn-primary-action" id="btn-add-rate-term-from-modal" style="font-size: 0.8rem; padding: 0.4rem 0.85rem; display: flex; align-items: center; gap: 0.4rem;">
+            <i data-lucide="plus" style="width: 14px; height: 14px;"></i> Add Rate Term
+          </button>
+        </div>
+
+        <div class="table-responsive-container" style="max-height: 420px; overflow-y: auto; overflow-x: auto; -webkit-overflow-scrolling: touch; border: 1px solid var(--border-color); border-radius: 8px; width: 100%;">
+          <table class="data-table" style="font-size: 0.82rem; margin: 0; min-width: 680px; width: 100%;">
+            <thead>
+              <tr>
+                <th>Role &amp; Shift Type</th>
+                <th>Contracted Bill Rate</th>
+                <th>Target Clinician Pay</th>
+                <th>Target Margin</th>
+                <th>Effective Date</th>
+                <th>Expiry Date</th>
+                <th>Status</th>
+                <th>Reference / Auditor</th>
+                <th style="text-align: right;">Action</th>
+              </tr>
+            </thead>
+            <tbody id="facility-modal-rate-cards-body">
+              <tr>
+                <td colspan="9" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                  <i data-lucide="loader-2" class="spin" style="width: 20px; height: 20px; margin-bottom: 4px;"></i>
+                  <div>Loading rate terms...</div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="modal-actions" style="display: flex; justify-content: flex-end; gap: 0.75rem; padding-top: 1rem; border-top: 1px solid var(--border-color); margin-top: 1rem;">
+        <button type="button" class="btn-secondary-action" onclick="window.closeFacilityRateCardsModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       ADMIN SELF-SERVICE CHANGE PASSWORD MODAL
+       ========================================================================== -->
+  <div class="admin-modal-overlay" id="modal-admin-change-password" style="display:none;" onclick="if(event.target===this) window.closeAdminChangePasswordModal()">
+    <div class="admin-modal-card" style="max-width: 480px;">
+      <div class="modal-header">
+        <h3 class="modal-title">
+          <i data-lucide="lock" style="width: 20px; height: 20px; color: var(--brand-cyan);"></i> Change Account Password
+        </h3>
+        <button type="button" class="modal-close-btn" onclick="window.closeAdminChangePasswordModal()" aria-label="Close modal"><i data-lucide="x" style="width: 20px; height: 20px;"></i></button>
+      </div>
+      <form id="form-admin-change-password" onsubmit="window.submitAdminChangePassword(event)">
+        <div style="margin-bottom: 1.25rem;">
+          <div style="margin-bottom: 1rem;">
+            <label style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.35rem;">CURRENT PASSWORD *</label>
+            <input type="password" id="admin-current-password" required placeholder="Enter current password" class="modal-input" style="width: 100%;" autocomplete="current-password">
+          </div>
+          <div style="margin-bottom: 1rem;">
+            <label style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.35rem;">NEW PASSWORD * (Min 8 characters)</label>
+            <input type="password" id="admin-new-password" required minlength="8" placeholder="Enter new secure password" class="modal-input" style="width: 100%;" autocomplete="new-password">
+          </div>
+          <div style="margin-bottom: 1rem;">
+            <label style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.35rem;">CONFIRM NEW PASSWORD *</label>
+            <input type="password" id="admin-confirm-password" required minlength="8" placeholder="Confirm new password" class="modal-input" style="width: 100%;" autocomplete="new-password">
+          </div>
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 0.85rem; font-size: 0.78rem; color: var(--text-muted); line-height: 1.5;">
+            <i data-lucide="shield-check" style="width: 14px; height: 14px; color: var(--brand-turquoise); vertical-align: middle; margin-right: 4px;"></i>
+            Passwords must contain at least 8 characters. For enterprise security, include uppercase letters, numbers, and symbols.
+          </div>
+        </div>
+        <div class="modal-actions" style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+          <button type="button" class="btn-secondary-action" onclick="window.closeAdminChangePasswordModal()">Cancel</button>
+          <button type="submit" class="btn-primary-action" id="btn-submit-change-password">
+            <i data-lucide="check" style="width: 15px; height: 15px;"></i> Update Password
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       SUPER-ADMIN OPERATOR PASSWORD RESET MODAL
+       ========================================================================== -->
+  <div class="admin-modal-overlay" id="modal-superadmin-reset-admin-password" style="display:none;" onclick="if(event.target===this) window.closeSuperadminResetAdminPasswordModal()">
+    <div class="admin-modal-card" style="max-width: 480px;">
+      <div class="modal-header">
+        <h3 class="modal-title">
+          <i data-lucide="key-round" style="width: 20px; height: 20px; color: var(--brand-cyan);"></i> Reset Administrator Password
+        </h3>
+        <button type="button" class="modal-close-btn" onclick="window.closeSuperadminResetAdminPasswordModal()" aria-label="Close modal"><i data-lucide="x" style="width: 20px; height: 20px;"></i></button>
+      </div>
+      <form id="form-superadmin-reset-admin-password" onsubmit="window.submitSuperadminResetAdminPassword(event)">
+        <input type="hidden" id="superadmin-reset-target-admin-id" value="">
+        <div style="margin-bottom: 1.25rem;">
+          <div style="font-size: 0.88rem; color: var(--text-primary); margin-bottom: 0.5rem;">
+            Resetting password for: <strong id="superadmin-reset-target-admin-name" style="color: var(--brand-cyan);"></strong>
+          </div>
+          <div style="margin-bottom: 1rem;">
+            <label style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.35rem;">NEW TEMPORARY PASSWORD * (Min 8 characters)</label>
+            <input type="password" id="superadmin-new-admin-password" required minlength="8" placeholder="Enter temporary password" class="modal-input" style="width: 100%;">
+          </div>
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 0.85rem; font-size: 0.78rem; color: var(--text-muted); line-height: 1.5;">
+            The administrator will use this new password to sign into the Operations Portal. Any active lockouts or failed attempts on this account will be reset.
+          </div>
+        </div>
+        <div class="modal-actions" style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+          <button type="button" class="btn-secondary-action" onclick="window.closeSuperadminResetAdminPasswordModal()">Cancel</button>
+          <button type="submit" class="btn-primary-action" id="btn-submit-superadmin-reset-admin-password">
+            <i data-lucide="shield-check" style="width: 15px; height: 15px;"></i> Save New Password
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       CLIENT PORTAL PASSWORD RESET MODAL
+       ========================================================================== -->
+  <div class="admin-modal-overlay" id="modal-client-reset-password">
+    <div class="admin-modal-card" style="max-width: 480px;">
+      <div class="modal-header">
+        <h3 class="modal-title" id="client-reset-modal-title">
+          <i data-lucide="mail" style="width: 20px; height: 20px; color: var(--brand-cyan);"></i> Dispatch Password Reset Link
+        </h3>
+        <button type="button" class="modal-close-btn" onclick="window.closeClientResetModal()" aria-label="Close modal"><i data-lucide="x" style="width: 20px; height: 20px;"></i></button>
+      </div>
+      <form id="form-client-reset-password" onsubmit="window.saveClientResetPassword(event)">
+        <input type="hidden" id="client-reset-user-id" value="">
+        <div style="margin-bottom: 1.25rem;">
+          <div style="font-size: 0.88rem; color: var(--text-primary); margin-bottom: 0.5rem;">
+            Recipient: <strong id="client-reset-user-email" style="color: var(--brand-cyan);"></strong>
+          </div>
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 0.85rem; font-size: 0.78rem; color: var(--text-muted); line-height: 1.5;">
+            Clicking below will invalidate any active sessions for this client and dispatch a cryptographically secure, single-use 30-minute password reset link directly to their inbox.
+            <div style="margin-top: 0.4rem; color: var(--text-secondary); font-weight: 600;">
+              Admins never set or view user passwords.
+            </div>
+          </div>
+        </div>
+        <div class="modal-actions" style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+          <button type="button" class="btn-secondary-action" onclick="window.closeClientResetModal()">Cancel</button>
+          <button type="submit" class="btn-primary-action" id="btn-submit-client-reset">
+            <i data-lucide="send" style="width: 15px; height: 15px;"></i> Dispatch Reset Link
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+    <!-- ==========================================================================
+       AVATAR / PROFILE PICTURE FULL PREVIEW LIGHTBOX MODAL
+       ========================================================================== -->
+  <div class="admin-modal-overlay" id="modal-avatar-preview" style="display:none;" onclick="if(event.target===this) window.closeAvatarPreviewModal()">
+    <div class="admin-modal-card avatar-preview-card" style="max-width: 440px; text-align: center; overflow: hidden; padding: 1.75rem; border-radius: 16px;">
+      <div class="modal-header" style="justify-content: space-between; align-items: center; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.85rem;">
+        <h3 class="modal-title" style="font-size: 1.05rem; display: flex; align-items: center; gap: 8px;">
+          <i data-lucide="image" style="width: 18px; height: 18px; color: var(--brand-cyan);"></i> Profile Picture Preview
+        </h3>
+        <button type="button" class="modal-close-btn" onclick="window.closeAvatarPreviewModal()" aria-label="Close modal">
+          <i data-lucide="x" style="width: 18px; height: 18px;"></i>
+        </button>
+      </div>
+
+      <div class="avatar-preview-lightbox-body" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.15rem; padding: 0.5rem 0;">
+        <div class="avatar-preview-large-frame" style="width: 220px; height: 220px; border-radius: 50%; overflow: hidden; border: 3.5px solid var(--brand-cyan); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25), 0 0 20px rgba(0, 168, 150, 0.2); background: #0F172A; display: flex; align-items: center; justify-content: center; position: relative;">
+          <img id="avatar-preview-img" src="" alt="Profile Picture" style="width: 100%; height: 100%; object-fit: cover; object-position: center; display: block;" onerror="this.src='assets/images/default_avatar.svg'">
+        </div>
+
+        <div style="text-align: center; width: 100%;">
+          <h4 id="avatar-preview-name" style="margin: 0; font-size: 1.2rem; font-weight: 800; color: var(--text-primary); letter-spacing: -0.01em;"></h4>
+          <div id="avatar-preview-role-badge" style="margin-top: 0.4rem; display: inline-flex;"></div>
+          <div id="avatar-preview-meta" style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.35rem; font-weight: 500;"></div>
+        </div>
+      </div>
+
+      <div class="modal-actions" style="margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid var(--border-color); display: flex; justify-content: center; gap: 0.75rem;">
+        <a id="avatar-preview-open-btn" href="#" target="_blank" rel="noopener noreferrer" class="btn-primary-action" style="padding: 0.5rem 1.25rem; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; text-decoration: none;">
+          <i data-lucide="external-link" style="width: 14px; height: 14px;"></i> View Full Size
+        </a>
+        <button type="button" class="btn-secondary-action" onclick="window.closeAvatarPreviewModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+<!-- Core Dashboard Application Script -->
+  <script src="admin.js?v=6.2.2"></script>
+
+</body>
+</html>
