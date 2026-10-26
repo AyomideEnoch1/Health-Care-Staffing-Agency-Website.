@@ -734,11 +734,13 @@ document.addEventListener('DOMContentLoaded', () => {
       '.callout-slide-text h2'
     );
     sectionHeaders.forEach(header => {
-      const hOffset = isMobile ? -18 : -35;
+      const fromX = isMobile ? 0 : -35;
+      const fromY = isMobile ? 20 : 0;
       gsap.fromTo(header, 
-        { x: hOffset, opacity: 0 }, 
+        { x: fromX, y: fromY, opacity: 0 }, 
         { 
           x: 0, 
+          y: 0, 
           opacity: 1, 
           duration: 0.75, 
           ease: 'power2.out',
@@ -750,10 +752,6 @@ document.addEventListener('DOMContentLoaded', () => {
             onEnter: () => {
               const sec = header.closest('section, .anim-section, footer');
               if (sec) sec.classList.add('is-revealed');
-            },
-            onLeave: () => {
-              const sec = header.closest('section, .anim-section, footer');
-              if (sec) sec.classList.remove('is-revealed');
             },
             onEnterBack: () => {
               const sec = header.closest('section, .anim-section, footer');
@@ -775,14 +773,16 @@ document.addEventListener('DOMContentLoaded', () => {
       '.contact-card-anim-body, .contact-slide-sub, .callout-slide-text p, .strip-slide-text'
     );
     sectionParagraphs.forEach(para => {
-      const pOffset = isMobile ? -14 : -28;
+      const fromX = isMobile ? 0 : -28;
+      const fromY = isMobile ? 18 : 0;
       gsap.fromTo(para, 
-        { x: pOffset, opacity: 0 }, 
+        { x: fromX, y: fromY, opacity: 0 }, 
         { 
           x: 0, 
+          y: 0, 
           opacity: 1, 
           duration: 0.75, 
-          delay: isMobile ? 0.08 : 0.16, 
+          delay: isMobile ? 0.05 : 0.16, 
           ease: 'power2.out',
           scrollTrigger: {
             trigger: para,
@@ -801,14 +801,16 @@ document.addEventListener('DOMContentLoaded', () => {
       '.callout-slide-actions'
     );
     sectionLinks.forEach(link => {
-      const lOffset = isMobile ? -12 : -22;
+      const fromX = isMobile ? 0 : -22;
+      const fromY = isMobile ? 16 : 0;
       gsap.fromTo(link, 
-        { x: lOffset, opacity: 0 }, 
+        { x: fromX, y: fromY, opacity: 0 }, 
         { 
           x: 0, 
+          y: 0, 
           opacity: 1, 
           duration: 0.72, 
-          delay: isMobile ? 0.12 : 0.28, 
+          delay: isMobile ? 0.08 : 0.28, 
           ease: 'power2.out',
           scrollTrigger: {
             trigger: link,

@@ -3554,57 +3554,57 @@ body.has-gsap .proto-gradient-callout {
    5. Multi-image sections slide in from left & right smoothly
    ========================================================================== */
 @media (max-width: 991px) {
-  /* 1. SECTION HEADERS: Slide in from the left on scroll */
-  .welcome-slide-heading,
-  .workforce-slide-header,
-  .about-slide-header,
-  .purpose-slide-header,
-  .values-slide-header,
-  .solutions-slide-header,
-  .excellence-slide-header,
-  .showcase-slide-header,
-  .team-slide-header,
-  .team-slide-top-header,
-  .contact-slide-top,
-  .contact-slide-left,
-  .section-title,
-  .anim-section .slide-left,
-  .ref-service-row .slide-left {
+  /* 1. SECTION HEADERS: Slide in from the left on scroll (Non-GSAP fallback) */
+  body:not(.has-gsap) .welcome-slide-heading,
+  body:not(.has-gsap) .workforce-slide-header,
+  body:not(.has-gsap) .about-slide-header,
+  body:not(.has-gsap) .purpose-slide-header,
+  body:not(.has-gsap) .values-slide-header,
+  body:not(.has-gsap) .solutions-slide-header,
+  body:not(.has-gsap) .excellence-slide-header,
+  body:not(.has-gsap) .showcase-slide-header,
+  body:not(.has-gsap) .team-slide-header,
+  body:not(.has-gsap) .team-slide-top-header,
+  body:not(.has-gsap) .contact-slide-top,
+  body:not(.has-gsap) .contact-slide-left,
+  body:not(.has-gsap) .section-title,
+  body:not(.has-gsap) .anim-section .slide-left,
+  body:not(.has-gsap) .ref-service-row .slide-left {
     opacity: 0;
     transform: translate3d(-38px, 0, 0);
     transition: transform 0.82s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.78s cubic-bezier(0.22, 1, 0.36, 1);
     will-change: transform, opacity;
   }
 
-  /* 2. SECTION PARAGRAPHS: Slide from left with difference in entrance time (delay: 0.18s) */
-  .welcome-slide-body,
-  .workforce-slide-body,
-  .about-slide-body,
-  .purpose-slide-body,
-  .values-slide-body,
-  .solutions-slide-body,
-  .excellence-slide-body,
-  .showcase-slide-body,
-  .team-slide-body,
-  .contact-card-anim-body,
-    .strip-slide-text {
+  /* 2. SECTION PARAGRAPHS (Non-GSAP fallback) */
+  body:not(.has-gsap) .welcome-slide-body,
+  body:not(.has-gsap) .workforce-slide-body,
+  body:not(.has-gsap) .about-slide-body,
+  body:not(.has-gsap) .purpose-slide-body,
+  body:not(.has-gsap) .values-slide-body,
+  body:not(.has-gsap) .solutions-slide-body,
+  body:not(.has-gsap) .excellence-slide-body,
+  body:not(.has-gsap) .showcase-slide-body,
+  body:not(.has-gsap) .team-slide-body,
+  body:not(.has-gsap) .contact-card-anim-body,
+  body:not(.has-gsap) .strip-slide-text {
     opacity: 0;
     transform: translate3d(-32px, 0, 0);
     transition: transform 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.18s, opacity 0.80s cubic-bezier(0.22, 1, 0.36, 1) 0.18s;
     will-change: transform, opacity;
   }
 
-  /* 3. SECTION LINKS & CTAs: Slide from left with further difference in entrance time (delay: 0.34s) */
-  .welcome-slide-cta,
-  .workforce-slide-link,
-  .about-slide-highlights,
-  .purpose-slide-link,
-  .solutions-slide-link,
-  .excellence-slide-link,
-  .team-slide-link,
-  .team-slide-benefits,
-      .btn-see-more-toggle,
-  .strip-fade-form {
+  /* 3. SECTION LINKS & CTAs (Non-GSAP fallback) */
+  body:not(.has-gsap) .welcome-slide-cta,
+  body:not(.has-gsap) .workforce-slide-link,
+  body:not(.has-gsap) .about-slide-highlights,
+  body:not(.has-gsap) .purpose-slide-link,
+  body:not(.has-gsap) .solutions-slide-link,
+  body:not(.has-gsap) .excellence-slide-link,
+  body:not(.has-gsap) .team-slide-link,
+  body:not(.has-gsap) .team-slide-benefits,
+  body:not(.has-gsap) .btn-see-more-toggle,
+  body:not(.has-gsap) .strip-fade-form {
     opacity: 0;
     transform: translate3d(-26px, 0, 0);
     transition: transform 0.82s cubic-bezier(0.22, 1, 0.36, 1) 0.34s, opacity 0.78s cubic-bezier(0.22, 1, 0.36, 1) 0.34s;
@@ -8822,6 +8822,36 @@ body.has-gsap .proto-team-narrative-card {
     transform: none !important;
     display: inline-block !important;
   }
+
+  /* Team slide header & content column on mobile: guaranteed zero negative offset and complete visibility */
+  .team-content-col,
+  .team-slide-header,
+  .team-slide-body,
+  .team-slide-link,
+  .team-text-wrapper {
+    margin-left: 0 !important;
+    padding-left: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  .team-slide-header .proto-heading-lg {
+    opacity: 1 !important;
+    transform: none !important;
+    margin-left: 0 !important;
+    padding-left: 0 !important;
+    font-size: clamp(1.4rem, 4.8vw, 1.85rem) !important;
+    line-height: 1.28 !important;
+    overflow-wrap: break-word !important;
+    word-break: normal !important;
+  }
+
+  .team-slide-header .proto-section-eyebrow {
+    opacity: 1 !important;
+    transform: none !important;
+    display: inline-block !important;
+    margin-bottom: 0.5rem !important;
+  }
+
 }
 
 
