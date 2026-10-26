@@ -3994,19 +3994,74 @@ img, video, canvas, svg {
 .style1-glass-card .form-brand-header {
   display: flex !important;
   align-items: center !important;
-  gap: 0.9rem !important;
-  padding-bottom: 1.1rem !important;
+  gap: 0.75rem !important;
+  padding-bottom: 0.95rem !important;
   margin-bottom: 1.25rem !important;
   border-bottom: 1.5px solid #F1F5F9 !important;
   position: relative !important;
   z-index: 1 !important;
+  overflow: hidden !important;
 }
 
 .style1-glass-card .form-brand-header img {
-  width: 44px !important;
-  height: 44px !important;
+  width: 40px !important;
+  height: 40px !important;
   object-fit: contain !important;
   flex-shrink: 0 !important;
+}
+
+.style1-glass-card .form-brand-header-text {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.1rem !important;
+  min-width: 0 !important;
+  flex: 1 1 auto !important;
+  overflow: hidden !important;
+}
+
+.style1-glass-card .form-brand-header-name,
+.form-brand-header-name {
+  font-family: var(--font-heading) !important;
+  font-size: clamp(0.72rem, 3.2vw, 0.95rem) !important;
+  font-weight: 800 !important;
+  color: var(--navy, #1A3A63) !important;
+  line-height: 1.2 !important;
+  letter-spacing: -0.015em !important;
+  white-space: nowrap !important;
+}
+
+.style1-glass-card .form-brand-header-tagline,
+.form-brand-header-tagline {
+  font-family: var(--font-heading) !important;
+  font-size: 0.62rem !important;
+  font-weight: 700 !important;
+  color: var(--teal-green, #00A896) !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  white-space: nowrap !important;
+}
+
+@media (max-width: 480px) {
+  .style1-glass-card .form-brand-header,
+  .form-brand-header {
+    gap: 0.55rem !important;
+    padding-bottom: 0.8rem !important;
+    margin-bottom: 1rem !important;
+  }
+  .style1-glass-card .form-brand-header img,
+  .form-brand-header img {
+    width: 32px !important;
+    height: 32px !important;
+  }
+  .style1-glass-card .form-brand-header-name,
+  .form-brand-header-name {
+    font-size: clamp(0.64rem, 2.8vw, 0.76rem) !important;
+    white-space: nowrap !important;
+  }
+  .style1-glass-card .form-brand-header-tagline,
+  .form-brand-header-tagline {
+    font-size: 0.54rem !important;
+  }
 }
 
 .style1-glass-card .auth-card-header-styled {
@@ -4080,25 +4135,29 @@ img, video, canvas, svg {
 
 .style1-glass-card .form-label,
 .custom-form .form-label {
-  display: flex !important;
+  display: inline-flex !important;
   align-items: center !important;
-  gap: 0.45rem !important;
+  gap: 6px !important;
   font-size: 0.82rem !important;
   font-weight: 700 !important;
   color: var(--navy, #1A3A63) !important;
   margin-bottom: 0.4rem !important;
+  line-height: 1.2 !important;
 }
 
 .style1-glass-card .form-label .field-icon,
 .style1-glass-card .form-label svg.field-icon,
+.style1-glass-card .form-label svg,
 .custom-form .form-label .field-icon,
-.custom-form .form-label svg.field-icon {
-  width: 16px !important;
-  height: 16px !important;
+.custom-form .form-label svg.field-icon,
+.custom-form .form-label svg {
+  width: 14px !important;
+  height: 14px !important;
   color: var(--cyan-turquoise, #1BAECF) !important;
   flex-shrink: 0 !important;
   display: inline-block !important;
   vertical-align: middle !important;
+  margin-left: 2px !important;
 }
 
 .style1-glass-card .input-wrapper .field-icon,
@@ -4331,11 +4390,11 @@ img, video, canvas, svg {
 
 .preview-style-info-card .info-company-title {
   font-family: var(--font-heading) !important;
-  font-size: 1.3rem !important;
+  font-size: clamp(1rem, 3.8vw, 1.3rem) !important;
   font-weight: 800 !important;
   color: var(--navy, #1A3A63) !important;
   margin-bottom: 0.35rem !important;
-  line-height: 1.35 !important;
+  line-height: 1.25 !important;
 }
 
 .preview-style-info-card .info-company-sub {
@@ -4442,7 +4501,7 @@ img, video, canvas, svg {
     align-self: stretch !important;
   }
   .preview-style-info-card .info-company-title {
-    font-size: 1.2rem !important;
+    font-size: clamp(0.92rem, 3.6vw, 1.15rem) !important;
   }
   .preview-style-info-card .info-company-sub {
     font-size: 0.82rem !important;
@@ -4469,7 +4528,7 @@ img, video, canvas, svg {
     border-radius: 14px !important;
   }
   .preview-style-info-card .info-company-title {
-    font-size: 1.1rem !important;
+    font-size: clamp(0.85rem, 3.4vw, 1.02rem) !important;
   }
   .preview-style-info-card .info-item {
     gap: 0.75rem !important;

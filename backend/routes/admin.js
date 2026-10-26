@@ -33,7 +33,7 @@ const { z } = require('zod');
 const { uploadCredential } = require('../middleware/uploadCredentials');
 const { uploadAvatar, validateAvatarContent } = require('../middleware/avatarUpload');
 const { uploadContract, validateContractMime } = require('../middleware/contractUpload');
-const { requireAdminAuth, requirePermission, normalizePermissions, ALL_PERMISSIONS } = require('../middleware/auth');
+const { requireAdminAuth, requirePermission, requireSuperAdmin, normalizePermissions, ALL_PERMISSIONS } = require('../middleware/auth');
 const adminEvents = require('../utils/events');
 const { enqueueMail } = require('../utils/mailOutbox');
 const mailService = require('../services/mail/MailService');
@@ -1401,7 +1401,7 @@ router.post('/requests', async (req, res, next) => {
 // AUDIT LOGS LEDGER
 // GET /api/admin/audit-logs & GET /api/admin/audit
 // ============================================================================
-router.get(['/audit-logs', '/audit'], requirePermission('audit:view'), async (req, res, next) => {
+router.get(['/audit-logs', '/audit'], requireSuperAdmin(), async (req, res, next) => {
   try {
     const [logs] = await pool.query(`
       SELECT id, admin_id, actor_name, action, target_entity, target_id, details, severity, ip_address, created_at
@@ -2650,7 +2650,7 @@ async function recordArchive(connOrPool, {
 }
 
 // GET /api/admin/archives — List archived items with counts and filtering
-router.get('/archives', requirePermission('settings:view'), async (req, res, next) => {
+router.get('/archives', requireSuperAdmin(), async (req, res, next) => {
   try {
     const { type = 'all', q = '' } = req.query;
     let query = 'SELECT * FROM archived_records';
@@ -2707,7 +2707,7 @@ router.get('/archives', requirePermission('settings:view'), async (req, res, nex
 });
 
 // GET /api/admin/archives/:id — Inspect single archived record with parsed payload
-router.get('/archives/:id', requirePermission('settings:view'), async (req, res, next) => {
+router.get('/archives/:id', requireSuperAdmin(), async (req, res, next) => {
   try {
     const { id } = req.params;
     const [rows] = await pool.query('SELECT * FROM archived_records WHERE id = ?', [id]);
@@ -2734,7 +2734,7 @@ router.get('/archives/:id', requirePermission('settings:view'), async (req, res,
 });
 
 // POST /api/admin/archives/:id/restore — Recover an archived client, staff, user, or record
-router.post('/archives/:id/restore', requirePermission('settings:edit'), async (req, res, next) => {
+router.post('/archives/:id/restore', requireSuperAdmin(), async (req, res, next) => {
   const conn = await pool.getConnection();
   try {
     await conn.beginTransaction();
@@ -2908,7 +2908,7 @@ router.post('/archives/:id/restore', requirePermission('settings:edit'), async (
 });
 
 // DELETE /api/admin/archives/:id — Permanently purge an archived record (super-admin only)
-router.delete('/archives/:id', requirePermission('admins:manage'), async (req, res, next) => {
+router.delete('/archives/:id', requireSuperAdmin(), async (req, res, next) => {
   try {
     const { id } = req.params;
     const [rows] = await pool.query('SELECT * FROM archived_records WHERE id = ?', [id]);

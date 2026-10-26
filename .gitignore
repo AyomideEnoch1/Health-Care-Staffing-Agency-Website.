@@ -41,6 +41,7 @@ Thumbs.db
 
 # Temporary and scratch
 scratch/
+preview-server.js
 deploy-bundle/
 *.zip
 *.docx

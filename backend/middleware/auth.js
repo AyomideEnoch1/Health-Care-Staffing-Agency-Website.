@@ -180,9 +180,40 @@ function requirePermission(permission) {
   };
 }
 
+/**
+ * requireSuperAdmin — validates that the authenticated operator has Super Admin privileges.
+ */
+function requireSuperAdmin() {
+  return async (req, res, next) => {
+    const isSuper = (admin) => (admin && (admin.role === 'super-admin' || admin.role === 'super_admin'));
+    if (!req.admin) {
+      return requireAdminAuth()(req, res, () => {
+        if (!req.admin) return;
+        if (isSuper(req.admin)) {
+          return next();
+        }
+        return res.status(403).json({
+          success: false,
+          error: 'Forbidden: Super Administrator clearance required.'
+        });
+      });
+    }
+
+    if (isSuper(req.admin)) {
+      return next();
+    }
+
+    return res.status(403).json({
+      success: false,
+      error: 'Forbidden: Super Administrator clearance required.'
+    });
+  };
+}
+
 module.exports = {
   requireAdminAuth,
   requirePermission,
+  requireSuperAdmin,
   normalizePermissions,
   ALL_PERMISSIONS
 };

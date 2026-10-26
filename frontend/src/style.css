@@ -479,7 +479,7 @@ ul {
 }
 
 .subpage-hero {
-  min-height: clamp(380px, 45vh, 520px);
+  min-height: clamp(280px, 32vh, 380px);
 }
 
 .hero-bg-container {
@@ -654,17 +654,18 @@ ul {
 }
 
 .subpage-hero .hero-content {
-  padding-top: clamp(5.5rem, 10vw, 8rem);
-  padding-bottom: clamp(3.5rem, 7vw, 6rem);
+  padding-top: clamp(3.5rem, 6vh, 5rem);
+  padding-bottom: clamp(2rem, 3.5vh, 3rem);
   padding-left: 1.5rem;
   padding-right: 1.5rem;
 }
 
 .hero-text-block {
-  max-width: min(620px, 52vw);
+  max-width: min(1000px, 64vw);
   width: 100%;
   margin-left: 0;
   margin-right: auto;
+  margin-top: clamp(1rem, 2.5vh, 2rem);
   background: transparent;
   padding: 0;
   color: var(--white);
@@ -681,12 +682,12 @@ ul {
 
 .hero-title {
   font-family: var(--font-heading);
-  font-size: clamp(2.75rem, 4.6vw, 3.85rem);
+  font-size: clamp(2.1rem, 3.2vw, 3.25rem);
   font-weight: 800;
-  line-height: 1.15;
-  letter-spacing: -0.02em;
+  line-height: 1.18;
+  letter-spacing: -0.015em;
   margin-top: 0;
-  margin-bottom: clamp(1rem, 2vw, 1.4rem);
+  margin-bottom: clamp(0.9rem, 1.5vw, 1.25rem);
   text-shadow: 0 4px 20px rgba(0, 0, 0, 0.45);
   transition: opacity 0.6s ease, transform 0.6s ease;
   text-align: left;
@@ -698,12 +699,13 @@ ul {
 .hero-subtitle {
   font-family: var(--font-body);
   color: rgba(255, 255, 255, 0.95);
-  font-size: clamp(1.1rem, 1.4vw, 1.25rem);
+  font-size: clamp(0.96rem, 1.15vw, 1.15rem);
   font-weight: 400;
-  line-height: 1.65;
+  line-height: 1.62;
   margin-top: 0;
-  margin-bottom: clamp(1.2rem, 2.4vw, 1.8rem);
-  max-width: 600px;
+  margin-bottom: clamp(1.2rem, 2vw, 1.8rem);
+  max-width: min(880px, 58vw);
+  width: 100%;
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
   word-wrap: break-word;
   overflow-wrap: break-word;
@@ -720,30 +722,37 @@ ul {
   }
 
   .hero-diagonal-shape {
-    width: 62% !important;
-    clip-path: polygon(0 0, 100% 0, 78% 100%, 0 100%) !important;
+    width: 65% !important;
+    clip-path: polygon(0 0, 100% 0, 80% 100%, 0 100%) !important;
   }
 
   .hero-image-wrapper {
-    width: 58% !important;
+    width: 55% !important;
   }
 
   #home .hero-content,
-  .hero-section .hero-content {
+  .hero-section:not(.subpage-hero) .hero-content {
     max-width: 100% !important;
     width: 100% !important;
     margin-left: 0 !important;
     margin-right: auto !important;
-    padding-top: clamp(6.2rem, 12vh, 9.5rem);
-    padding-bottom: clamp(4.2rem, 8vh, 6.5rem);
-    padding-left: clamp(2.5rem, 3.8vw, 4.2rem) !important;
-    padding-right: clamp(1.5rem, 3vw, 3rem) !important;
+    height: 100% !important;
+    min-height: clamp(632px, 71vh, 762px) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: flex-start !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    padding-left: clamp(3rem, 6.2vw, 7.5rem) !important;
+    padding-right: 1.5rem !important;
+    box-sizing: border-box !important;
   }
 
   .subpage-hero {
     display: flex !important;
     align-items: center !important; /* Perfect vertical centering in polygon */
-    min-height: clamp(500px, 62vh, 640px) !important; /* Retain full original hero height */
+    min-height: clamp(320px, 36vh, 420px) !important; /* Compact subpage hero height */
     position: relative !important;
   }
 
@@ -765,17 +774,20 @@ ul {
   .hero-section:not(.subpage-hero) .hero-text-block {
     width: 100% !important;
     max-width: min(850px, 48vw) !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
     margin-left: 0 !important;
     margin-right: auto !important;
     text-align: left !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: flex-start !important;
+    justify-content: center !important;
   }
 
   .subpage-hero .hero-text-block {
     width: 100% !important;
-    max-width: min(820px, 48vw) !important; /* Spread out naturally inside the widened polygon */
+    max-width: min(880px, 52vw) !important; /* Spread out naturally inside the widened polygon */
     margin-left: 0 !important;
     margin-right: auto !important;
     text-align: left !important;
@@ -790,9 +802,9 @@ ul {
     width: 100% !important;
     max-width: 100% !important;
     font-size: clamp(2.35rem, 3.4vw, 3.5rem) !important;
-    line-height: 1.18 !important;
-    letter-spacing: -0.012em !important;
-    margin-bottom: clamp(0.9rem, 1.5vw, 1.25rem) !important;
+    line-height: 1.15 !important;
+    letter-spacing: -0.015em !important;
+    margin-bottom: clamp(1rem, 1.8vw, 1.4rem) !important;
     text-shadow: 0 4px 20px rgba(0, 0, 0, 0.45) !important;
     text-align: left !important;
     word-break: normal !important;
@@ -802,7 +814,7 @@ ul {
   .subpage-hero .hero-title {
     width: 100% !important;
     max-width: 100% !important;
-    font-size: clamp(2.2rem, 3.2vw, 3.25rem) !important;
+    font-size: clamp(2.1rem, 3.1vw, 3.15rem) !important;
     line-height: 1.2 !important;
     letter-spacing: -0.012em !important;
     margin-bottom: clamp(0.75rem, 1.3vw, 1.05rem) !important;
@@ -815,10 +827,10 @@ ul {
   #home .hero-subtitle,
   .hero-section:not(.subpage-hero) .hero-subtitle {
     width: 100% !important;
-    max-width: min(650px, 42vw) !important;
+    max-width: min(700px, 44vw) !important;
     font-size: clamp(1.04rem, 1.25vw, 1.2rem) !important;
-    line-height: 1.65 !important;
-    margin-bottom: clamp(1.5rem, 2.4vw, 2.2rem) !important;
+    line-height: 1.62 !important;
+    margin-bottom: clamp(1.4rem, 2.2vw, 2rem) !important;
   }
 
   .subpage-hero .hero-subtitle {
@@ -831,7 +843,8 @@ ul {
 
   /* Side-by-side horizontal button alignment on larger screens */
   #home .hero-btn-row,
-  .hero-section:not(.subpage-hero) .hero-btn-row {
+  .hero-section:not(.subpage-hero) .hero-btn-row,
+  #hero-slider .hero-btn-row {
     display: flex !important;
     flex-direction: row !important;
     flex-wrap: nowrap !important;
@@ -840,33 +853,48 @@ ul {
     gap: clamp(0.75rem, 1.2vw, 1.25rem) !important;
     width: auto !important;
     max-width: 100% !important;
-    margin-top: 0.25rem !important;
+    margin-top: 0.35rem !important;
     margin-bottom: 1.3rem !important;
   }
 
   #home .hero-btn-row .btn,
-  .hero-section:not(.subpage-hero) .hero-btn-row .btn {
+  .hero-section:not(.subpage-hero) .hero-btn-row .btn,
+  #home .hero-btn-row .btn-pill-hero,
+  #home .hero-btn-row .btn-pill-outline,
+  .hero-section:not(.subpage-hero) .hero-btn-row .btn-pill-hero,
+  .hero-section:not(.subpage-hero) .hero-btn-row .btn-pill-outline,
+  #hero-slider .hero-btn-row .btn-pill-hero,
+  #hero-slider .hero-btn-row .btn-pill-outline {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: auto !important;
+    max-width: max-content !important;
+    flex: 0 0 auto !important;
     white-space: nowrap !important;
-    flex-shrink: 0 !important;
-    padding: clamp(0.72rem, 1vw, 0.88rem) clamp(1.2rem, 1.8vw, 2.2rem) !important;
-    font-size: clamp(0.74rem, 0.88vw, 0.84rem) !important;
+    padding: clamp(0.72rem, 0.95vw, 0.86rem) clamp(1.2rem, 1.8vw, 2.1rem) !important;
+    font-size: clamp(0.74rem, 0.86vw, 0.84rem) !important;
+    letter-spacing: 0.4px !important;
+    min-height: auto !important;
   }
 }
 
 @media (min-width: 1200px) {
   #home .hero-content,
   .hero-section:not(.subpage-hero) .hero-content {
-    padding-left: clamp(2.8rem, 4vw, 4.6rem) !important;
+    padding-left: clamp(3.5rem, 6.5vw, 8rem) !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
   }
   .subpage-hero .hero-content {
     padding-left: clamp(3.2rem, 5vw, 6rem) !important;
   }
   .subpage-hero .hero-text-block {
-    max-width: min(880px, 48vw) !important;
+    max-width: min(920px, 52vw) !important;
   }
   #home .hero-text-block,
   .hero-section:not(.subpage-hero) .hero-text-block {
-    max-width: min(920px, 50vw) !important;
+    max-width: min(850px, 48vw) !important;
   }
 }
 
@@ -876,25 +904,27 @@ ul {
     min-height: clamp(710px, 76vh, 850px) !important;
   }
   .hero-diagonal-shape {
-    width: 63% !important;
+    width: 65% !important;
     clip-path: polygon(0 0, 100% 0, 80% 100%, 0 100%) !important;
   }
   .hero-image-wrapper {
-    width: 56% !important;
+    width: 55% !important;
   }
   #home .hero-content,
   .hero-section:not(.subpage-hero) .hero-content {
-    padding-left: clamp(3.2rem, 4.5vw, 5.2rem) !important;
+    padding-left: clamp(4rem, 7.5vw, 9.5rem) !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
   }
   .subpage-hero .hero-content {
     padding-left: clamp(4.5rem, 6.5vw, 8.5rem) !important;
   }
   .subpage-hero .hero-text-block {
-    max-width: min(960px, 46vw) !important;
+    max-width: min(1000px, 50vw) !important;
   }
   #home .hero-text-block,
   .hero-section:not(.subpage-hero) .hero-text-block {
-    max-width: min(1000px, 50vw) !important;
+    max-width: min(920px, 49vw) !important;
   }
 }
 
@@ -1037,15 +1067,16 @@ ul {
 .form-brand-header {
   display: flex;
   align-items: center;
-  gap: 0.9rem;
-  padding-bottom: 1.2rem;
-  margin-bottom: 1.4rem;
+  gap: 0.75rem;
+  padding-bottom: 0.95rem;
+  margin-bottom: 1.25rem;
   border-bottom: 1.5px solid #E2E8F0;
+  overflow: hidden;
 }
 
 .form-brand-header img {
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   object-fit: contain;
   flex-shrink: 0;
 }
@@ -1054,15 +1085,19 @@ ul {
   display: flex;
   flex-direction: column;
   gap: 0.1rem;
+  min-width: 0;
+  flex: 1 1 auto;
+  overflow: hidden;
 }
 
 .form-brand-header-name {
   font-family: var(--font-heading);
-  font-size: 0.95rem;
+  font-size: clamp(0.72rem, 3.2vw, 0.95rem);
   font-weight: 800;
   color: var(--navy);
   line-height: 1.2;
-  letter-spacing: 0.01em;
+  letter-spacing: -0.015em;
+  white-space: nowrap;
 }
 
 .form-brand-header-tagline {
@@ -1072,8 +1107,27 @@ ul {
   color: var(--teal-green);
   letter-spacing: 0.08em;
   text-transform: uppercase;
+  white-space: nowrap;
 }
 
+@media (max-width: 480px) {
+  .form-brand-header {
+    gap: 0.55rem;
+    padding-bottom: 0.8rem;
+    margin-bottom: 1rem;
+  }
+  .form-brand-header img {
+    width: 32px;
+    height: 32px;
+  }
+  .form-brand-header-name {
+    font-size: clamp(0.64rem, 2.8vw, 0.76rem);
+    white-space: nowrap;
+  }
+  .form-brand-header-tagline {
+    font-size: 0.54rem;
+  }
+}
 /* ── Form Watermark Logo (bottom-right ghost logo) ── */
 .custom-form {
   position: relative;
@@ -1673,7 +1727,7 @@ button.btn.btn-subscribe svg {
 .strip-social {
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 1.2rem;
   max-width: 100%;
   box-sizing: border-box;
@@ -3197,9 +3251,9 @@ button.btn.btn-subscribe svg {
 .subpage-hero {
   position: relative;
   background: var(--gradient-hero) !important;
-  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 4.5vw), 0 100%) !important;
-  margin-bottom: -4vw !important;
-  padding-bottom: calc(5.5rem + 4vw) !important;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 3.5vw), 0 100%) !important;
+  margin-bottom: -3vw !important;
+  padding-bottom: calc(2.8rem + 3vw) !important;
   z-index: 1;
 }
 
@@ -3492,78 +3546,148 @@ body.has-gsap .proto-gradient-callout {
 
 /* ==========================================================================
    MOBILE & TABLET SCROLL ENTRANCE ANIMATIONS (< 992px)
+   Choreographed directional scroll animations:
+   1. Headers slide from left
+   2. Paragraphs slide from left with staggered delay
+   3. Links slide from left with further staggered delay
+   4. Values cards slide from bottom and fade in
+   5. Multi-image sections slide in from left & right smoothly
    ========================================================================== */
 @media (max-width: 991px) {
-  /* Initial hidden state before scrolling into view on mobile/tablet */
-  .header-slide-logo,
-  .hero-slide-title,
-  .hero-slide-sub,
-  .hero-slide-btns,
-  .strip-slide-text,
-  .strip-fade-form,
-  .strip-slide-social-text,
-  .strip-slide-icon,
+  /* 1. SECTION HEADERS: Slide in from the left on scroll */
   .welcome-slide-heading,
-  .welcome-slide-body,
-  .welcome-slide-cta,
   .workforce-slide-header,
-  .workforce-slide-body,
-  .workforce-slide-link,
-  .workforce-slide-right,
   .about-slide-header,
-  .about-slide-body,
-  .about-slide-highlights,
-  .about-slide-right,
-  .purpose-slide-left,
-  .purpose-slide-right,
   .purpose-slide-header,
-  .purpose-slide-body,
-  .purpose-slide-link,
   .values-slide-header,
-  .values-slide-body,
-  .values-slide-grid,
-  .solutions-slide-left,
-  .solutions-slide-right,
-  .excellence-slide-left,
-  .excellence-slide-right,
+  .solutions-slide-header,
+  .excellence-slide-header,
   .showcase-slide-header,
-  .showcase-slide-body,
-  .showcase-slide-grid,
   .team-slide-header,
-  .team-slide-body,
-  .team-slide-media,
-  .team-slide-link,
-  .team-slide-benefits,
-  .team-slide-grid,
+  .team-slide-top-header,
+  .contact-slide-top,
   .contact-slide-left,
-  .contact-slide-right,
-  .callout-slide-left,
-  .callout-slide-right,
-  .footer-slide-col,
+  .section-title,
+  .welcome-title,
+  .proto-heading-lg,
   .anim-section .slide-left,
-  .ref-service-row .slide-left,
-  .anim-section .slide-right,
-  .ref-service-row .slide-right,
-  .anim-section .slide-up,
-  .ref-service-row .slide-up,
-  .anim-section .slide-top,
-  .ref-service-row .slide-top,
-  .ref-service-row .ref-micro-pill {
+  .ref-service-row .slide-left {
     opacity: 0;
-    transform: translateY(22px);
-    transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.80s cubic-bezier(0.16, 1, 0.3, 1);
+    transform: translate3d(-38px, 0, 0);
+    transition: transform 0.82s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.78s cubic-bezier(0.22, 1, 0.36, 1);
     will-change: transform, opacity;
   }
 
-  /* When parent section becomes .is-revealed on mobile/tablet */
-  .site-header.is-revealed .header-slide-logo,
-  .hero-section.is-revealed .hero-slide-title,
-  .hero-section.is-revealed .hero-slide-sub,
-  .hero-section.is-revealed .hero-slide-btns,
-  .strip-section.is-revealed .strip-slide-text,
-  .strip-section.is-revealed .strip-fade-form,
-  .strip-section.is-revealed .strip-slide-social-text,
-  .strip-section.is-revealed .strip-slide-icon,
+  /* 2. SECTION PARAGRAPHS: Slide from left with difference in entrance time (delay: 0.18s) */
+  .welcome-slide-body,
+  .workforce-slide-body,
+  .about-slide-body,
+  .purpose-slide-body,
+  .values-slide-body,
+  .solutions-slide-body,
+  .excellence-slide-body,
+  .showcase-slide-body,
+  .team-slide-body,
+  .contact-card-anim-body,
+  .proto-body-text,
+  .strip-slide-text {
+    opacity: 0;
+    transform: translate3d(-32px, 0, 0);
+    transition: transform 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.18s, opacity 0.80s cubic-bezier(0.22, 1, 0.36, 1) 0.18s;
+    will-change: transform, opacity;
+  }
+
+  /* 3. SECTION LINKS & CTAs: Slide from left with further difference in entrance time (delay: 0.34s) */
+  .welcome-slide-cta,
+  .workforce-slide-link,
+  .about-slide-highlights,
+  .purpose-slide-link,
+  .solutions-slide-link,
+  .excellence-slide-link,
+  .team-slide-link,
+  .team-slide-benefits,
+  .proto-arrow-link,
+  .link-more,
+  .btn-see-more-toggle,
+  .strip-fade-form {
+    opacity: 0;
+    transform: translate3d(-26px, 0, 0);
+    transition: transform 0.82s cubic-bezier(0.22, 1, 0.36, 1) 0.34s, opacity 0.78s cubic-bezier(0.22, 1, 0.36, 1) 0.34s;
+    will-change: transform, opacity;
+  }
+
+  /* 4. OUR VALUES SECTION CARDS: Slide in from bottom and fade in on scroll smoothly */
+  .values-slide-card,
+  .proto-pillar-card,
+  .proto-value-card-2x2,
+  .proto-tricard-section article,
+  .card-respect,
+  .card-accountability,
+  .card-partnership {
+    opacity: 0;
+    transform: translate3d(0, 44px, 0);
+    transition: transform 0.88s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.82s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: transform, opacity;
+  }
+
+  .values-slide-card:nth-child(1),
+  .proto-value-card-2x2:nth-child(1),
+  .card-respect {
+    transition-delay: 0.10s !important;
+  }
+  .values-slide-card:nth-child(2),
+  .proto-value-card-2x2:nth-child(2),
+  .card-accountability {
+    transition-delay: 0.22s !important;
+  }
+  .values-slide-card:nth-child(3),
+  .proto-value-card-2x2:nth-child(3),
+  .card-partnership {
+    transition-delay: 0.34s !important;
+  }
+  .values-slide-card:nth-child(4),
+  .proto-value-card-2x2:nth-child(4) {
+    transition-delay: 0.46s !important;
+  }
+
+  /* 5. MULTIPLE IMAGES: Slide in from left and right smoothly */
+  /* Left / Main image slides from left */
+  .arch-collage-wrapper .arch-main-photo,
+  .monograph-bg-plate img,
+  .photo-collage-3 .collage-item-main,
+  .collage-row-sub .collage-item-sub:first-child,
+  .proto-trio-photo-grid img:first-child {
+    opacity: 0;
+    transform: translate3d(-38px, 0, 0);
+    transition: transform 0.90s cubic-bezier(0.22, 1, 0.36, 1) 0.14s, opacity 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.14s;
+    will-change: transform, opacity;
+  }
+
+  /* Right / Secondary image slides from right */
+  .arch-collage-wrapper .arch-vertical-photo,
+  .monograph-fg-plate img,
+  .photo-collage-3 .collage-row-sub .collage-item-sub:last-child,
+  .proto-trio-photo-grid img:last-child,
+  .solutions-slide-right,
+  .workforce-slide-right,
+  .about-slide-right,
+  .purpose-slide-right,
+  .contact-slide-right {
+    opacity: 0;
+    transform: translate3d(38px, 0, 0);
+    transition: transform 0.90s cubic-bezier(0.22, 1, 0.36, 1) 0.24s, opacity 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.24s;
+    will-change: transform, opacity;
+  }
+
+  /* Middle image in trio slides from bottom */
+  .proto-trio-photo-grid img:nth-child(2) {
+    opacity: 0;
+    transform: translate3d(0, 35px, 0);
+    transition: transform 0.90s cubic-bezier(0.22, 1, 0.36, 1) 0.20s, opacity 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.20s;
+    will-change: transform, opacity;
+  }
+
+  /* When parent section becomes .is-revealed on mobile/tablet: smooth return to (0, 0) */
   .welcome-section.is-revealed .welcome-slide-heading,
   .welcome-section.is-revealed .welcome-slide-body,
   .welcome-section.is-revealed .welcome-slide-cta,
@@ -3571,6 +3695,8 @@ body.has-gsap .proto-gradient-callout {
   .proto-workforce-section.is-revealed .workforce-slide-body,
   .proto-workforce-section.is-revealed .workforce-slide-link,
   .proto-workforce-section.is-revealed .workforce-slide-right,
+  .proto-workforce-section.is-revealed .arch-main-photo,
+  .proto-workforce-section.is-revealed .arch-vertical-photo,
   #executive-overview.is-revealed .workforce-slide-header,
   #executive-overview.is-revealed .about-slide-header,
   #executive-overview.is-revealed .about-slide-body,
@@ -3584,29 +3710,46 @@ body.has-gsap .proto-gradient-callout {
   .proto-tricard-section.is-revealed .values-slide-header,
   .proto-tricard-section.is-revealed .values-slide-body,
   .proto-tricard-section.is-revealed .values-slide-grid,
-  .solutions-story-row.is-revealed .solutions-slide-left,
+  .proto-tricard-section.is-revealed .values-slide-card,
+  .proto-tricard-section.is-revealed .proto-pillar-card,
+  .proto-tricard-section.is-revealed .proto-value-card-2x2,
+  .solutions-story-row.is-revealed .solutions-slide-header,
+  .solutions-story-row.is-revealed .solutions-slide-body,
+  .solutions-story-row.is-revealed .solutions-slide-link,
   .solutions-story-row.is-revealed .solutions-slide-right,
-  .excellence-block.is-revealed .excellence-slide-left,
+  .solutions-story-row.is-revealed .monograph-bg-plate img,
+  .solutions-story-row.is-revealed .monograph-fg-plate img,
+  .excellence-block.is-revealed .excellence-slide-header,
+  .excellence-block.is-revealed .excellence-slide-body,
+  .excellence-block.is-revealed .excellence-slide-link,
   .excellence-block.is-revealed .excellence-slide-right,
+  .excellence-block.is-revealed .proto-trio-photo-grid img,
   .showcase-block.is-revealed .showcase-slide-header,
   .showcase-block.is-revealed .showcase-slide-body,
   .showcase-block.is-revealed .showcase-slide-grid,
   .proto-mission-section.is-revealed .team-slide-header,
+  .proto-mission-section.is-revealed .team-slide-top-header,
   .proto-mission-section.is-revealed .team-slide-body,
   .proto-mission-section.is-revealed .team-slide-media,
   .proto-mission-section.is-revealed .team-slide-link,
   .proto-mission-section.is-revealed .team-slide-benefits,
   .proto-mission-section.is-revealed .team-slide-grid,
+  .proto-mission-section.is-revealed .collage-item-main,
+  .proto-mission-section.is-revealed .collage-item-sub,
   #about-team.is-revealed .team-slide-header,
   #about-team.is-revealed .team-slide-body,
   #about-team.is-revealed .team-slide-media,
   #about-team.is-revealed .team-slide-link,
   #about-team.is-revealed .team-slide-benefits,
+  .contact-section.is-revealed .contact-slide-top,
   .contact-section.is-revealed .contact-slide-left,
   .contact-section.is-revealed .contact-slide-right,
   .callout-banner-section.is-revealed .callout-slide-left,
   .callout-banner-section.is-revealed .callout-slide-right,
-  .site-footer.is-revealed .footer-slide-col,
+  .strip-section.is-revealed .strip-slide-text,
+  .strip-section.is-revealed .strip-fade-form,
+  .strip-section.is-revealed .strip-slide-social-text,
+  .strip-section.is-revealed .strip-slide-icon,
   .anim-section.is-revealed .slide-left,
   .ref-service-row.is-revealed .slide-left,
   .anim-section.is-revealed .slide-right,
@@ -3617,32 +3760,8 @@ body.has-gsap .proto-gradient-callout {
   .ref-service-row.is-revealed .slide-top,
   .ref-service-row.is-revealed .ref-micro-pill {
     opacity: 1 !important;
-    transform: translateY(0) !important;
+    transform: translate3d(0, 0, 0) !important;
   }
-
-  /* Stagger delays on mobile for natural reading rhythm */
-  .welcome-slide-body       { transition-delay: 0.10s; }
-  .welcome-slide-cta        { transition-delay: 0.18s; }
-  .workforce-slide-body     { transition-delay: 0.08s; }
-  .workforce-slide-link     { transition-delay: 0.15s; }
-  .workforce-slide-right    { transition-delay: 0.20s; }
-  .about-slide-body         { transition-delay: 0.08s; }
-  .about-slide-highlights   { transition-delay: 0.15s; }
-  .about-slide-right        { transition-delay: 0.20s; }
-  .purpose-slide-body       { transition-delay: 0.08s; }
-  .purpose-slide-link       { transition-delay: 0.15s; }
-  .purpose-slide-right      { transition-delay: 0.20s; }
-  .values-slide-body        { transition-delay: 0.08s; }
-  .values-slide-grid        { transition-delay: 0.18s; }
-  .solutions-slide-right    { transition-delay: 0.15s; }
-  .excellence-slide-right   { transition-delay: 0.15s; }
-  .showcase-slide-body      { transition-delay: 0.08s; }
-  .showcase-slide-grid      { transition-delay: 0.18s; }
-  .team-slide-body          { transition-delay: 0.08s; }
-  .team-slide-benefits      { transition-delay: 0.15s; }
-  .team-slide-grid          { transition-delay: 0.20s; }
-  .contact-slide-right      { transition-delay: 0.15s; }
-  .callout-slide-right      { transition-delay: 0.15s; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -4239,8 +4358,8 @@ body.has-gsap .proto-gradient-callout {
   }
 
   .hero-diagonal-shape {
-    width: 58%;
-    clip-path: polygon(0 0, 100% 0, 72% 100%, 0 100%);
+    width: 65% !important;
+    clip-path: polygon(0 0, 100% 0, 80% 100%, 0 100%) !important;
   }
 
   .hero-image-wrapper {
@@ -4446,10 +4565,11 @@ body.has-gsap .proto-gradient-callout {
 
   .hero-text-block,
   #home .hero-text-block {
-    max-width: clamp(380px, 50vw, 540px) !important;
+    max-width: 100% !important;
     width: 100% !important;
     margin-left: 0 !important;
     margin-right: auto !important;
+    margin-top: clamp(1rem, 2.5vh, 2rem) !important;
     text-align: left !important;
     display: flex !important;
     flex-direction: column !important;
@@ -4458,7 +4578,7 @@ body.has-gsap .proto-gradient-callout {
 
   .hero-title,
   #home .hero-title {
-    font-size: clamp(2.25rem, 3.8vw, 2.85rem) !important;
+    font-size: clamp(2.05rem, 3.4vw, 2.65rem) !important;
     line-height: 1.18 !important;
     margin-bottom: 1rem !important;
     color: #FFFFFF !important;
@@ -4557,12 +4677,12 @@ body.has-gsap .proto-gradient-callout {
   }
 
   .subpage-hero {
-    min-height: clamp(380px, 45vh, 520px) !important;
+    min-height: clamp(290px, 32vh, 370px) !important;
   }
 
   .subpage-hero .hero-content {
-    padding-top: clamp(4.8rem, 9vw, 6.5rem) !important;
-    padding-bottom: clamp(2.8rem, 5vw, 4rem) !important;
+    padding-top: clamp(3.2rem, 5.5vw, 4.5rem) !important;
+    padding-bottom: clamp(1.8rem, 3vw, 2.5rem) !important;
   }
 
   .subpage-hero .hero-title {
@@ -5027,7 +5147,7 @@ body.has-gsap .proto-gradient-callout {
     height: auto !important;
     min-height: 0 !important;
     max-height: none !important;
-    padding-top: clamp(4.5rem, 9vh, 6.5rem) !important;
+    padding-top: clamp(6.2rem, 12vh, 8.5rem) !important;
     padding-bottom: clamp(3.5rem, 6vh, 5rem) !important;
     padding-left: clamp(2rem, 5vw, 4rem) !important;
     padding-right: clamp(1.5rem, 3vw, 2.5rem) !important;
@@ -5045,7 +5165,7 @@ body.has-gsap .proto-gradient-callout {
   .hero-section:not(.subpage-hero) .hero-text-block,
   #hero-slider .hero-text-block,
   #home .hero-text-block {
-    margin-top: 0 !important;
+    margin-top: clamp(14px, 3vh, 24px) !important;
     margin-bottom: 0 !important;
     margin-left: 0 !important;
     margin-right: auto !important;
@@ -5055,7 +5175,7 @@ body.has-gsap .proto-gradient-callout {
     align-items: flex-start !important;
     justify-content: center !important;
     width: 100% !important;
-    max-width: clamp(440px, 55vw, 620px) !important;
+    max-width: 100% !important;
   }
 
   .hero-section:not(.subpage-hero) .hero-eyebrow-tag,
@@ -5144,14 +5264,18 @@ body.has-gsap .proto-gradient-callout {
   }
 
   /* Subpage Hero Left Alignment across all screen sizes */
+  .subpage-hero {
+    min-height: clamp(270px, 30vh, 350px) !important;
+  }
+
   .subpage-hero .hero-content {
     display: flex !important;
     flex-direction: column !important;
     align-items: flex-start !important;
     justify-content: center !important;
     text-align: left !important;
-    padding-top: clamp(5rem, 10vw, 6.5rem) !important;
-    padding-bottom: clamp(2.8rem, 5vw, 4rem) !important;
+    padding-top: clamp(3.2rem, 6vw, 4.2rem) !important;
+    padding-bottom: clamp(1.8rem, 3vw, 2.4rem) !important;
     padding-left: 1.5rem !important;
     padding-right: 1.5rem !important;
   }
@@ -5194,7 +5318,7 @@ body.has-gsap .proto-gradient-callout {
   }
 
   .btn-pill-hero, .btn-pill-outline {
-    width: 100%;
+    width: auto;
     text-align: center;
     justify-content: center;
   }
@@ -5400,10 +5524,42 @@ body.has-gsap .proto-gradient-callout {
   }
 
   .strip-social {
-    flex-direction: column !important;
-    align-items: flex-start !important;
-    gap: 0.8rem !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 0.75rem !important;
     width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .social-label,
+  .strip-section .strip-slide-social-text {
+    font-family: var(--font-heading) !important;
+    font-size: clamp(0.76rem, 3.2vw, 0.9rem) !important;
+    color: var(--navy) !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.2px !important;
+    white-space: nowrap !important;
+    margin: 0 !important;
+  }
+
+  .social-buttons,
+  .strip-social-icons {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    flex-shrink: 0 !important;
+    margin: 0 !important;
+  }
+
+  .social-circle-btn {
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 34px !important;
+    min-height: 34px !important;
+    flex-shrink: 0 !important;
   }
 
   .footer-content {
@@ -5492,8 +5648,8 @@ body.has-gsap .proto-gradient-callout {
     min-height: 0 !important;
     width: 100% !important;
     max-width: 100% !important;
-    padding-top: clamp(3rem, 7.5vh, 4.5rem) !important;
-    padding-bottom: clamp(4.5rem, 9vh, 6rem) !important;
+    padding-top: clamp(4.5rem, 11vh, 6.5rem) !important;
+    padding-bottom: clamp(4rem, 8vh, 5.5rem) !important;
     padding-left: clamp(1.25rem, 4vw, 1.75rem) !important;
     padding-right: clamp(1.25rem, 4vw, 1.75rem) !important;
     margin: 0 !important;
@@ -5513,7 +5669,7 @@ body.has-gsap .proto-gradient-callout {
   #home .hero-text-block {
     width: 100% !important;
     max-width: 100% !important;
-    margin-top: 14px !important;
+    margin-top: clamp(18px, 4vh, 30px) !important;
     margin-bottom: 0 !important;
     margin-left: 0 !important;
     margin-right: 0 !important;
@@ -5530,11 +5686,11 @@ body.has-gsap .proto-gradient-callout {
   #home .hero-title {
     width: 100% !important;
     max-width: 100% !important;
-    font-size: clamp(2.05rem, 7.2vw, 2.65rem) !important;
+    font-size: clamp(1.72rem, 5.8vw, 2.25rem) !important;
     font-weight: 800 !important;
-    line-height: 1.22 !important;
+    line-height: 1.2 !important;
     margin-top: 0 !important;
-    margin-bottom: 1rem !important;
+    margin-bottom: 0.85rem !important;
     margin-left: 0 !important;
     margin-right: 0 !important;
     text-align: left !important;
@@ -5549,11 +5705,10 @@ body.has-gsap .proto-gradient-callout {
   #home .hero-subtitle {
     width: 100% !important;
     max-width: 100% !important;
-    font-size: clamp(1.05rem, 3.6vw, 1.22rem) !important;
-    font-weight: 500 !important;
-    line-height: 1.62 !important;
+    font-size: clamp(0.86rem, 3.5vw, 0.98rem) !important;
+    line-height: 1.55 !important;
     margin-top: 0 !important;
-    margin-bottom: 1.45rem !important;
+    margin-bottom: 1.15rem !important;
     margin-left: 0 !important;
     margin-right: 0 !important;
     text-align: left !important;
@@ -5656,11 +5811,15 @@ body.has-gsap .proto-gradient-callout {
   }
 
   /* Other Webpages (subpages) Hero Text Content Width Expanded on Mobile */
+  .subpage-hero {
+    min-height: clamp(250px, 26vh, 320px) !important;
+  }
+
   .subpage-hero .hero-content {
     width: 100% !important;
     max-width: 100% !important;
-    padding-top: clamp(5.2rem, 11vw, 6.8rem) !important;
-    padding-bottom: clamp(2.5rem, 5vw, 3.8rem) !important;
+    padding-top: clamp(3rem, 6.5vw, 4rem) !important;
+    padding-bottom: clamp(1.5rem, 3vw, 2.2rem) !important;
     padding-left: 1.25rem !important;
     padding-right: 1.25rem !important;
     box-sizing: border-box !important;
@@ -5758,17 +5917,17 @@ body.has-gsap .proto-gradient-callout {
   }
 }
 
-/* ── Standard Smartphones: From 428px by 928px and downward (Occupies Full Viewport) ── */
+/* ── Standard Smartphones: From 428px by 928px and downward (Occupies 90% of Viewport) ── */
 @media (max-width: 428px) {
-  /* Hero occupies full viewport from 428px downward */
+  /* Hero occupies 90% of device viewport on mobile screens */
   .hero-section:not(.subpage-hero),
   #hero-slider {
-    height: calc(100vh - 56px) !important;
-    height: calc(100dvh - 56px) !important;
-    min-height: calc(100vh - 56px) !important;
-    min-height: calc(100dvh - 56px) !important;
-    max-height: calc(100vh - 56px) !important;
-    max-height: calc(100dvh - 56px) !important;
+    height: 90vh !important;
+    height: 90dvh !important;
+    min-height: 90vh !important;
+    min-height: 90dvh !important;
+    max-height: 90vh !important;
+    max-height: 90dvh !important;
   }
 
   .site-header {
@@ -5803,18 +5962,18 @@ body.has-gsap .proto-gradient-callout {
   .hero-section:not(.subpage-hero) .hero-title,
   #hero-slider .hero-title,
   #home .hero-title {
-    font-size: clamp(1.95rem, 6.8vw, 2.35rem) !important;
+    font-size: clamp(1.72rem, 5.8vw, 2.25rem) !important;
     font-weight: 800 !important;
-    line-height: 1.22 !important;
+    line-height: 1.2 !important;
     text-align: left !important;
   }
 
   .hero-section:not(.subpage-hero) .hero-subtitle,
   #hero-slider .hero-subtitle,
   #home .hero-subtitle {
-    font-size: clamp(1rem, 3.4vw, 1.15rem) !important;
+    font-size: clamp(0.86rem, 3.5vw, 0.98rem) !important;
     font-weight: 500 !important;
-    line-height: 1.58 !important;
+    line-height: 1.55 !important;
     text-align: left !important;
   }
 
@@ -5836,12 +5995,16 @@ body.has-gsap .proto-gradient-callout {
     font-size: 0.77rem !important;
   }
 
-  /* Other Webpages (subpages) Full Width Hero Text Content */
+  /* Other Webpages (subpages) Compact Hero */
+  .subpage-hero {
+    min-height: clamp(240px, 25vh, 310px) !important;
+  }
+
   .subpage-hero .hero-content {
     width: 100% !important;
     max-width: 100% !important;
-    padding-top: clamp(5.2rem, 12vw, 6.8rem) !important;
-    padding-bottom: clamp(2.2rem, 5vw, 3.5rem) !important;
+    padding-top: clamp(3rem, 6.5vw, 4rem) !important;
+    padding-bottom: clamp(1.5rem, 3vw, 2.2rem) !important;
     padding-left: 1.25rem !important;
     padding-right: 1.25rem !important;
   }
@@ -7610,160 +7773,7 @@ body.light-theme .action-btn:hover {
   }
 }
 
-/* ==========================================================================
-   MOBILE & TABLET SCROLL ENTRANCE ANIMATIONS (< 992px)
-   ========================================================================== */
-@media (max-width: 991px) {
-  /* Initial hidden state before scrolling into view on mobile/tablet */
-  .header-slide-logo,
-  .hero-slide-title,
-  .hero-slide-sub,
-  .hero-slide-btns,
-  .strip-slide-text,
-  .strip-fade-form,
-  .strip-slide-social-text,
-  .strip-slide-icon,
-  .welcome-slide-heading,
-  .welcome-slide-body,
-  .welcome-slide-cta,
-  .workforce-slide-header,
-  .workforce-slide-body,
-  .workforce-slide-link,
-  .workforce-slide-right,
-  .about-slide-header,
-  .about-slide-body,
-  .about-slide-highlights,
-  .about-slide-right,
-  .purpose-slide-left,
-  .purpose-slide-right,
-  .purpose-slide-header,
-  .purpose-slide-body,
-  .purpose-slide-link,
-  .values-slide-header,
-  .values-slide-body,
-  .values-slide-grid,
-  .solutions-slide-left,
-  .solutions-slide-right,
-  .excellence-slide-left,
-  .excellence-slide-right,
-  .showcase-slide-header,
-  .showcase-slide-body,
-  .showcase-slide-grid,
-  .team-slide-header,
-  .team-slide-body,
-  .team-slide-media,
-  .team-slide-link,
-  .team-slide-benefits,
-  .team-slide-grid,
-  .contact-slide-left,
-  .contact-slide-right,
-  .callout-slide-left,
-  .callout-slide-right,
-  .footer-slide-col,
-  .anim-section .slide-left,
-  .ref-service-row .slide-left,
-  .anim-section .slide-right,
-  .ref-service-row .slide-right,
-  .anim-section .slide-up,
-  .ref-service-row .slide-up,
-  .anim-section .slide-top,
-  .ref-service-row .slide-top,
-  .ref-service-row .ref-micro-pill {
-    opacity: 0;
-    transform: translateY(22px);
-    transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.80s cubic-bezier(0.16, 1, 0.3, 1);
-    will-change: transform, opacity;
-  }
 
-  /* When parent section becomes .is-revealed on mobile/tablet */
-  .site-header.is-revealed .header-slide-logo,
-  .hero-section.is-revealed .hero-slide-title,
-  .hero-section.is-revealed .hero-slide-sub,
-  .hero-section.is-revealed .hero-slide-btns,
-  .strip-section.is-revealed .strip-slide-text,
-  .strip-section.is-revealed .strip-fade-form,
-  .strip-section.is-revealed .strip-slide-social-text,
-  .strip-section.is-revealed .strip-slide-icon,
-  .welcome-section.is-revealed .welcome-slide-heading,
-  .welcome-section.is-revealed .welcome-slide-body,
-  .welcome-section.is-revealed .welcome-slide-cta,
-  .proto-workforce-section.is-revealed .workforce-slide-header,
-  .proto-workforce-section.is-revealed .workforce-slide-body,
-  .proto-workforce-section.is-revealed .workforce-slide-link,
-  .proto-workforce-section.is-revealed .workforce-slide-right,
-  #executive-overview.is-revealed .workforce-slide-header,
-  #executive-overview.is-revealed .about-slide-header,
-  #executive-overview.is-revealed .about-slide-body,
-  #executive-overview.is-revealed .about-slide-highlights,
-  #executive-overview.is-revealed .about-slide-right,
-  #purpose-section.is-revealed .purpose-slide-left,
-  #purpose-section.is-revealed .purpose-slide-right,
-  #purpose-section.is-revealed .purpose-slide-header,
-  #purpose-section.is-revealed .purpose-slide-body,
-  #purpose-section.is-revealed .purpose-slide-link,
-  .proto-tricard-section.is-revealed .values-slide-header,
-  .proto-tricard-section.is-revealed .values-slide-body,
-  .proto-tricard-section.is-revealed .values-slide-grid,
-  .solutions-story-row.is-revealed .solutions-slide-left,
-  .solutions-story-row.is-revealed .solutions-slide-right,
-  .excellence-block.is-revealed .excellence-slide-left,
-  .excellence-block.is-revealed .excellence-slide-right,
-  .showcase-block.is-revealed .showcase-slide-header,
-  .showcase-block.is-revealed .showcase-slide-body,
-  .showcase-block.is-revealed .showcase-slide-grid,
-  .proto-mission-section.is-revealed .team-slide-header,
-  .proto-mission-section.is-revealed .team-slide-body,
-  .proto-mission-section.is-revealed .team-slide-media,
-  .proto-mission-section.is-revealed .team-slide-link,
-  .proto-mission-section.is-revealed .team-slide-benefits,
-  .proto-mission-section.is-revealed .team-slide-grid,
-  #about-team.is-revealed .team-slide-header,
-  #about-team.is-revealed .team-slide-body,
-  #about-team.is-revealed .team-slide-media,
-  #about-team.is-revealed .team-slide-link,
-  #about-team.is-revealed .team-slide-benefits,
-  .contact-section.is-revealed .contact-slide-left,
-  .contact-section.is-revealed .contact-slide-right,
-  .callout-banner-section.is-revealed .callout-slide-left,
-  .callout-banner-section.is-revealed .callout-slide-right,
-  .site-footer.is-revealed .footer-slide-col,
-  .anim-section.is-revealed .slide-left,
-  .ref-service-row.is-revealed .slide-left,
-  .anim-section.is-revealed .slide-right,
-  .ref-service-row.is-revealed .slide-right,
-  .anim-section.is-revealed .slide-up,
-  .ref-service-row.is-revealed .slide-up,
-  .anim-section.is-revealed .slide-top,
-  .ref-service-row.is-revealed .slide-top,
-  .ref-service-row.is-revealed .ref-micro-pill {
-    opacity: 1 !important;
-    transform: translateY(0) !important;
-  }
-
-  /* Stagger delays on mobile for natural reading rhythm */
-  .welcome-slide-body       { transition-delay: 0.10s; }
-  .welcome-slide-cta        { transition-delay: 0.18s; }
-  .workforce-slide-body     { transition-delay: 0.08s; }
-  .workforce-slide-link     { transition-delay: 0.15s; }
-  .workforce-slide-right    { transition-delay: 0.20s; }
-  .about-slide-body         { transition-delay: 0.08s; }
-  .about-slide-highlights   { transition-delay: 0.15s; }
-  .about-slide-right        { transition-delay: 0.20s; }
-  .purpose-slide-body       { transition-delay: 0.08s; }
-  .purpose-slide-link       { transition-delay: 0.15s; }
-  .purpose-slide-right      { transition-delay: 0.20s; }
-  .values-slide-body        { transition-delay: 0.08s; }
-  .values-slide-grid        { transition-delay: 0.18s; }
-  .solutions-slide-right    { transition-delay: 0.15s; }
-  .excellence-slide-right   { transition-delay: 0.15s; }
-  .showcase-slide-body      { transition-delay: 0.08s; }
-  .showcase-slide-grid      { transition-delay: 0.18s; }
-  .team-slide-body          { transition-delay: 0.08s; }
-  .team-slide-benefits      { transition-delay: 0.15s; }
-  .team-slide-grid          { transition-delay: 0.20s; }
-  .contact-slide-right      { transition-delay: 0.15s; }
-  .callout-slide-right      { transition-delay: 0.15s; }
-}
 
 @media (prefers-reduced-motion: reduce) {
   .section-ambient-watermark {
@@ -7869,160 +7879,7 @@ body.light-theme .action-btn:hover {
   }
 }
 
-/* ==========================================================================
-   MOBILE & TABLET SCROLL ENTRANCE ANIMATIONS (< 992px)
-   ========================================================================== */
-@media (max-width: 991px) {
-  /* Initial hidden state before scrolling into view on mobile/tablet */
-  .header-slide-logo,
-  .hero-slide-title,
-  .hero-slide-sub,
-  .hero-slide-btns,
-  .strip-slide-text,
-  .strip-fade-form,
-  .strip-slide-social-text,
-  .strip-slide-icon,
-  .welcome-slide-heading,
-  .welcome-slide-body,
-  .welcome-slide-cta,
-  .workforce-slide-header,
-  .workforce-slide-body,
-  .workforce-slide-link,
-  .workforce-slide-right,
-  .about-slide-header,
-  .about-slide-body,
-  .about-slide-highlights,
-  .about-slide-right,
-  .purpose-slide-left,
-  .purpose-slide-right,
-  .purpose-slide-header,
-  .purpose-slide-body,
-  .purpose-slide-link,
-  .values-slide-header,
-  .values-slide-body,
-  .values-slide-grid,
-  .solutions-slide-left,
-  .solutions-slide-right,
-  .excellence-slide-left,
-  .excellence-slide-right,
-  .showcase-slide-header,
-  .showcase-slide-body,
-  .showcase-slide-grid,
-  .team-slide-header,
-  .team-slide-body,
-  .team-slide-media,
-  .team-slide-link,
-  .team-slide-benefits,
-  .team-slide-grid,
-  .contact-slide-left,
-  .contact-slide-right,
-  .callout-slide-left,
-  .callout-slide-right,
-  .footer-slide-col,
-  .anim-section .slide-left,
-  .ref-service-row .slide-left,
-  .anim-section .slide-right,
-  .ref-service-row .slide-right,
-  .anim-section .slide-up,
-  .ref-service-row .slide-up,
-  .anim-section .slide-top,
-  .ref-service-row .slide-top,
-  .ref-service-row .ref-micro-pill {
-    opacity: 0;
-    transform: translateY(22px);
-    transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.80s cubic-bezier(0.16, 1, 0.3, 1);
-    will-change: transform, opacity;
-  }
 
-  /* When parent section becomes .is-revealed on mobile/tablet */
-  .site-header.is-revealed .header-slide-logo,
-  .hero-section.is-revealed .hero-slide-title,
-  .hero-section.is-revealed .hero-slide-sub,
-  .hero-section.is-revealed .hero-slide-btns,
-  .strip-section.is-revealed .strip-slide-text,
-  .strip-section.is-revealed .strip-fade-form,
-  .strip-section.is-revealed .strip-slide-social-text,
-  .strip-section.is-revealed .strip-slide-icon,
-  .welcome-section.is-revealed .welcome-slide-heading,
-  .welcome-section.is-revealed .welcome-slide-body,
-  .welcome-section.is-revealed .welcome-slide-cta,
-  .proto-workforce-section.is-revealed .workforce-slide-header,
-  .proto-workforce-section.is-revealed .workforce-slide-body,
-  .proto-workforce-section.is-revealed .workforce-slide-link,
-  .proto-workforce-section.is-revealed .workforce-slide-right,
-  #executive-overview.is-revealed .workforce-slide-header,
-  #executive-overview.is-revealed .about-slide-header,
-  #executive-overview.is-revealed .about-slide-body,
-  #executive-overview.is-revealed .about-slide-highlights,
-  #executive-overview.is-revealed .about-slide-right,
-  #purpose-section.is-revealed .purpose-slide-left,
-  #purpose-section.is-revealed .purpose-slide-right,
-  #purpose-section.is-revealed .purpose-slide-header,
-  #purpose-section.is-revealed .purpose-slide-body,
-  #purpose-section.is-revealed .purpose-slide-link,
-  .proto-tricard-section.is-revealed .values-slide-header,
-  .proto-tricard-section.is-revealed .values-slide-body,
-  .proto-tricard-section.is-revealed .values-slide-grid,
-  .solutions-story-row.is-revealed .solutions-slide-left,
-  .solutions-story-row.is-revealed .solutions-slide-right,
-  .excellence-block.is-revealed .excellence-slide-left,
-  .excellence-block.is-revealed .excellence-slide-right,
-  .showcase-block.is-revealed .showcase-slide-header,
-  .showcase-block.is-revealed .showcase-slide-body,
-  .showcase-block.is-revealed .showcase-slide-grid,
-  .proto-mission-section.is-revealed .team-slide-header,
-  .proto-mission-section.is-revealed .team-slide-body,
-  .proto-mission-section.is-revealed .team-slide-media,
-  .proto-mission-section.is-revealed .team-slide-link,
-  .proto-mission-section.is-revealed .team-slide-benefits,
-  .proto-mission-section.is-revealed .team-slide-grid,
-  #about-team.is-revealed .team-slide-header,
-  #about-team.is-revealed .team-slide-body,
-  #about-team.is-revealed .team-slide-media,
-  #about-team.is-revealed .team-slide-link,
-  #about-team.is-revealed .team-slide-benefits,
-  .contact-section.is-revealed .contact-slide-left,
-  .contact-section.is-revealed .contact-slide-right,
-  .callout-banner-section.is-revealed .callout-slide-left,
-  .callout-banner-section.is-revealed .callout-slide-right,
-  .site-footer.is-revealed .footer-slide-col,
-  .anim-section.is-revealed .slide-left,
-  .ref-service-row.is-revealed .slide-left,
-  .anim-section.is-revealed .slide-right,
-  .ref-service-row.is-revealed .slide-right,
-  .anim-section.is-revealed .slide-up,
-  .ref-service-row.is-revealed .slide-up,
-  .anim-section.is-revealed .slide-top,
-  .ref-service-row.is-revealed .slide-top,
-  .ref-service-row.is-revealed .ref-micro-pill {
-    opacity: 1 !important;
-    transform: translateY(0) !important;
-  }
-
-  /* Stagger delays on mobile for natural reading rhythm */
-  .welcome-slide-body       { transition-delay: 0.10s; }
-  .welcome-slide-cta        { transition-delay: 0.18s; }
-  .workforce-slide-body     { transition-delay: 0.08s; }
-  .workforce-slide-link     { transition-delay: 0.15s; }
-  .workforce-slide-right    { transition-delay: 0.20s; }
-  .about-slide-body         { transition-delay: 0.08s; }
-  .about-slide-highlights   { transition-delay: 0.15s; }
-  .about-slide-right        { transition-delay: 0.20s; }
-  .purpose-slide-body       { transition-delay: 0.08s; }
-  .purpose-slide-link       { transition-delay: 0.15s; }
-  .purpose-slide-right      { transition-delay: 0.20s; }
-  .values-slide-body        { transition-delay: 0.08s; }
-  .values-slide-grid        { transition-delay: 0.18s; }
-  .solutions-slide-right    { transition-delay: 0.15s; }
-  .excellence-slide-right   { transition-delay: 0.15s; }
-  .showcase-slide-body      { transition-delay: 0.08s; }
-  .showcase-slide-grid      { transition-delay: 0.18s; }
-  .team-slide-body          { transition-delay: 0.08s; }
-  .team-slide-benefits      { transition-delay: 0.15s; }
-  .team-slide-grid          { transition-delay: 0.20s; }
-  .contact-slide-right      { transition-delay: 0.15s; }
-  .callout-slide-right      { transition-delay: 0.15s; }
-}
 
 @media (prefers-reduced-motion: reduce) {
   .anim-section .slide-left,
@@ -8201,26 +8058,50 @@ body.light-theme .action-btn:hover {
    ========================================================================== */
 .form-label,
 .custom-form .form-label,
-.auth-style-form .form-label {
-  display: flex !important;
+.auth-style-form .form-label,
+.style1-glass-card .form-label {
+  display: inline-flex !important;
   align-items: center !important;
-  gap: 0.45rem !important;
+  gap: 6px !important;
   font-size: 0.82rem !important;
   font-weight: 700 !important;
   color: var(--navy, #1A3A63) !important;
   margin-bottom: 0.4rem !important;
+  line-height: 1.2 !important;
 }
 
 .form-label .field-icon,
 .form-label i.field-icon,
 .form-label svg.field-icon,
-.form-label svg {
-  width: 16px !important;
-  height: 16px !important;
+.form-label svg,
+.custom-form .form-label .field-icon,
+.custom-form .form-label svg.field-icon,
+.auth-style-form .form-label .field-icon,
+.auth-style-form .form-label svg.field-icon,
+.style1-glass-card .form-label .field-icon,
+.style1-glass-card .form-label svg.field-icon {
+  width: 14px !important;
+  height: 14px !important;
   color: var(--cyan-turquoise, #1BAECF) !important;
   flex-shrink: 0 !important;
   display: inline-block !important;
   vertical-align: middle !important;
+  margin-left: 2px !important;
+}
+
+/* Ensure Divine Fingers Health Care Services Inc. never breaks onto a second line */
+.form-brand-header-name,
+.style1-glass-card .form-brand-header-name {
+  white-space: nowrap !important;
+  font-size: clamp(0.7rem, 3.1vw, 0.95rem) !important;
+}
+
+@media (max-width: 480px) {
+  .form-brand-header-name,
+  .style1-glass-card .form-brand-header-name {
+    white-space: nowrap !important;
+    font-size: clamp(0.64rem, 2.8vw, 0.76rem) !important;
+  }
 }
 
 @media (max-width: 991px) {
@@ -8238,3 +8119,608 @@ body.light-theme .action-btn:hover {
 
 
 
+
+
+/* ==========================================================================
+   Active Hiring & Recruitment Showcase Page (blog.html)
+   ========================================================================== */
+.hiring-ribbon-bar {
+  background: linear-gradient(135deg, #1A3A63 0%, #1e497d 100%);
+  color: #FFFFFF;
+  padding: 0.9rem 0;
+  border-bottom: 2px solid rgba(60, 175, 138, 0.3);
+}
+
+.hiring-ribbon-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.hiring-ribbon-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-heading);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: #FFFFFF;
+}
+
+.hiring-pulse-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #7CC242;
+  box-shadow: 0 0 0 0 rgba(124, 194, 66, 0.7);
+  animation: hiringPulse 2s infinite;
+}
+
+@keyframes hiringPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(124, 194, 66, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 8px rgba(124, 194, 66, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(124, 194, 66, 0);
+  }
+}
+
+.hiring-ribbon-tags {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.hiring-tag-chip {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #FFFFFF;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Hiring Cards Grid */
+.hiring-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  margin-top: 2.8rem;
+}
+
+.hiring-card {
+  background: #FFFFFF;
+  border: 1.5px solid #E2E8F0;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px -5px rgba(26, 58, 99, 0.08), 0 4px 12px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+  position: relative;
+}
+
+.hiring-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 40px -10px rgba(26, 58, 99, 0.14), 0 8px 20px rgba(60, 175, 138, 0.12);
+  border-color: #3CAF8A;
+}
+
+.hiring-card-image-wrap {
+  position: relative;
+  width: 100%;
+  height: 220px;
+  overflow: hidden;
+  background: #1A3A63;
+}
+
+.hiring-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.hiring-card:hover .hiring-card-img {
+  transform: scale(1.05);
+}
+
+.hiring-card-pill {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  background: rgba(26, 58, 99, 0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  font-family: var(--font-heading);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  padding: 0.35rem 0.85rem;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  z-index: 2;
+}
+
+.hiring-card-body {
+  padding: 1.8rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+}
+
+.hiring-card-role-title {
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--navy);
+  margin-bottom: 0.5rem;
+  line-height: 1.3;
+}
+
+.hiring-card-desc {
+  font-size: 0.88rem;
+  color: #64748B;
+  line-height: 1.55;
+  margin-bottom: 1.25rem;
+}
+
+/* Specs snapshot box */
+.hiring-specs-box {
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 1.25rem;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.65rem;
+}
+
+.hiring-spec-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 0.82rem;
+}
+
+.hiring-spec-icon {
+  width: 16px;
+  height: 16px;
+  color: var(--teal-green, #3CAF8A);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.hiring-spec-text strong {
+  color: var(--navy);
+  font-weight: 700;
+}
+
+.hiring-spec-text span {
+  color: #475569;
+}
+
+/* Highlights checklist */
+.hiring-perks-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1.5rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  flex-grow: 1;
+}
+
+.hiring-perk-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 0.84rem;
+  color: #334155;
+  line-height: 1.45;
+}
+
+.hiring-perk-item svg,
+.hiring-perk-item i {
+  color: var(--lime-green, #7CC242);
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+
+.hiring-card-action {
+  margin-top: auto;
+  padding-top: 1rem;
+  border-top: 1px solid #EDF2F7;
+}
+
+.btn-hiring-apply {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 0.85rem 1.4rem;
+  border-radius: 999px;
+  font-family: var(--font-heading);
+  font-size: 0.84rem;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  text-decoration: none;
+  background: linear-gradient(135deg, #1BAECF 0%, #3CAF8A 100%);
+  color: #FFFFFF !important;
+  border: 1.5px solid transparent;
+  box-shadow: 0 4px 14px rgba(27, 174, 207, 0.25);
+  transition: all 0.25s ease;
+}
+
+.btn-hiring-apply:hover {
+  background: linear-gradient(135deg, #7CC242 0%, #3CAF8A 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(124, 194, 66, 0.35);
+  color: #FFFFFF !important;
+}
+
+/* Travel Nursing Feature Banner */
+.hiring-travel-banner {
+  background: linear-gradient(135deg, #1A3A63 0%, #0F233D 100%);
+  border-radius: 20px;
+  overflow: hidden;
+  color: #FFFFFF;
+  margin: 3.5rem 0;
+  box-shadow: 0 16px 40px -10px rgba(26, 58, 99, 0.25);
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  position: relative;
+}
+
+.hiring-travel-content {
+  padding: clamp(2rem, 4vw, 3.5rem);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.hiring-travel-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(124, 194, 66, 0.18);
+  border: 1px solid #7CC242;
+  color: #A3E635;
+  font-family: var(--font-heading);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  padding: 0.35rem 0.85rem;
+  border-radius: 999px;
+  margin-bottom: 1rem;
+  width: fit-content;
+}
+
+.hiring-travel-title {
+  font-family: var(--font-heading);
+  font-size: clamp(1.4rem, 2.4vw, 2rem);
+  font-weight: 800;
+  color: #FFFFFF;
+  line-height: 1.25;
+  margin-bottom: 0.9rem;
+}
+
+.hiring-travel-desc {
+  font-size: 0.94rem;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.hiring-travel-perks {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1.8rem;
+}
+
+.hiring-travel-perk {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.84rem;
+  color: #FFFFFF;
+}
+
+.hiring-travel-perk svg {
+  color: #7CC242;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.hiring-travel-img-wrap {
+  position: relative;
+  min-height: 320px;
+}
+
+.hiring-travel-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hiring-travel-floating-card {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  right: 20px;
+  background: rgba(26, 58, 99, 0.88);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 0.9rem 1.1rem;
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.hiring-travel-floating-card strong {
+  display: block;
+  font-size: 0.86rem;
+  color: #FFFFFF;
+}
+
+.hiring-travel-floating-card span {
+  font-size: 0.76rem;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+/* 3-Step Process Section */
+.hiring-process-section {
+  padding: 3.5rem 0;
+  background: #F8FAFC;
+}
+
+.hiring-steps-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.8rem;
+  margin-top: 2.5rem;
+}
+
+.hiring-step-card {
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 14px;
+  padding: 2rem 1.6rem;
+  position: relative;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+  transition: transform 0.25s ease;
+}
+
+.hiring-step-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px rgba(26, 58, 99, 0.08);
+}
+
+.hiring-step-num {
+  font-family: var(--font-heading);
+  font-size: 2.2rem;
+  font-weight: 900;
+  color: rgba(27, 174, 207, 0.25);
+  line-height: 1;
+  margin-bottom: 0.6rem;
+}
+
+.hiring-step-title {
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--navy);
+  margin-bottom: 0.5rem;
+}
+
+.hiring-step-desc {
+  font-size: 0.86rem;
+  color: #64748B;
+  line-height: 1.55;
+}
+
+/* Callout Bar */
+.hiring-cta-bar {
+  background: linear-gradient(135deg, #1A3A63 0%, #3CAF8A 100%);
+  border-radius: 16px;
+  padding: clamp(2rem, 3.5vw, 3rem);
+  color: #FFFFFF;
+  text-align: center;
+  margin-top: 3.5rem;
+}
+
+.hiring-cta-bar h3 {
+  font-family: var(--font-heading);
+  font-size: clamp(1.4rem, 2.2vw, 1.95rem);
+  font-weight: 800;
+  color: #FFFFFF;
+  margin-bottom: 0.6rem;
+}
+
+.hiring-cta-bar p {
+  font-size: 0.94rem;
+  color: rgba(255, 255, 255, 0.9);
+  max-width: 620px;
+  margin: 0 auto 1.5rem auto;
+  line-height: 1.6;
+}
+
+.hiring-cta-btn-group {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 991px) {
+  .hiring-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+  .hiring-travel-banner {
+    grid-template-columns: 1fr;
+  }
+  .hiring-travel-img-wrap {
+    min-height: 240px;
+  }
+  .hiring-steps-grid {
+    grid-template-columns: 1fr;
+    gap: 1.2rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .hiring-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  .hiring-travel-perks {
+    grid-template-columns: 1fr;
+  }
+  .hiring-ribbon-inner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .hiring-cta-btn-group {
+    flex-direction: column;
+    width: 100%;
+  }
+  .hiring-cta-btn-group .btn {
+    width: 100%;
+  }
+}
+
+
+/* ==========================================================================
+   Smooth & Stable Scroll Animation Engine (Guaranteed Return to Position)
+   ========================================================================== */
+.is-revealed .welcome-slide-heading,
+.is-revealed .welcome-slide-cta,
+.is-revealed .workforce-slide-header,
+.is-revealed .workforce-slide-body,
+.is-revealed .workforce-slide-link,
+.is-revealed .workforce-slide-right,
+.is-revealed .arch-main-photo,
+.is-revealed .arch-vertical-photo,
+.is-revealed .stat-badge-pill,
+.is-revealed .values-slide-header,
+.is-revealed .values-slide-card,
+.is-revealed .proto-pillar-card,
+.values-slide-card.is-in-view,
+.proto-pillar-card.is-in-view,
+.is-revealed .solutions-slide-header,
+.is-revealed .solutions-slide-body,
+.is-revealed .solutions-slide-link,
+.is-revealed .solutions-slide-right,
+.is-revealed .monograph-bg-plate img,
+.is-revealed .monograph-caption-card,
+.is-revealed .excellence-slide-header,
+.is-revealed .excellence-slide-body,
+.is-revealed .excellence-slide-link,
+.is-revealed .proto-trio-photo-grid img,
+.is-revealed .showcase-slide-photo,
+.is-revealed .showcase-slide-header,
+.is-revealed .showcase-slide-body,
+.is-revealed .showcase-slide-actions,
+.is-revealed .proto-showcase-action-card,
+.is-revealed .showcase-slide-hotline,
+.is-revealed .team-slide-top-header,
+.is-revealed .team-slide-media,
+.is-revealed .team-slide-header,
+.is-revealed .team-slide-body,
+.is-revealed .team-slide-link,
+.is-revealed .collage-item-main,
+.is-revealed .collage-item-sub,
+.is-revealed .contact-slide-top,
+.is-revealed .contact-slide-sub,
+.is-revealed .contact-slide-card,
+.is-revealed .contact-slide-form,
+.is-revealed .callout-slide-text,
+.is-revealed .callout-slide-actions,
+.is-revealed .footer-slide-col,
+.is-revealed .footer-slide-bottom,
+.is-revealed .strip-slide-text,
+.is-revealed .strip-fade-form,
+.is-revealed .strip-slide-social-text,
+.is-revealed .strip-slide-icon {
+  opacity: 1 !important;
+  transform: translate(0, 0) !important;
+}
+
+.is-revealed .welcome-slide-body {
+  opacity: 0.78 !important;
+  transform: translate(0, 0) !important;
+}
+
+/* Our Core Values Section: Smooth slide in from bottom + sequential stagger */
+.values-slide-card,
+.proto-pillar-card.values-slide-card,
+.card-respect,
+.card-accountability,
+.card-partnership {
+  opacity: 0;
+  transform: translate3d(0, 48px, 0);
+  transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.80s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, opacity;
+}
+
+.proto-tricard-section.is-revealed .values-slide-card,
+.proto-tricard-section.is-revealed .proto-pillar-card,
+.values-slide-card.is-in-view,
+.proto-pillar-card.is-in-view {
+  opacity: 1 !important;
+  transform: translate3d(0, 0, 0) !important;
+}
+
+.values-slide-card:nth-child(1),
+.proto-pillar-card:nth-child(1),
+.card-respect {
+  transition-delay: 0.05s !important;
+}
+
+.values-slide-card:nth-child(2),
+.proto-pillar-card:nth-child(2),
+.card-accountability {
+  transition-delay: 0.22s !important;
+}
+
+.values-slide-card:nth-child(3),
+.proto-pillar-card:nth-child(3),
+.card-partnership {
+  transition-delay: 0.38s !important;
+}
+
+/* Preserve card hover lift interaction smoothly */
+.values-slide-card.is-in-view:hover,
+.proto-tricard-section.is-revealed .values-slide-card:hover,
+.proto-pillar-card.is-in-view:hover {
+  transform: translate3d(0, -8px, 0) !important;
+}

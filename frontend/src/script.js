@@ -145,19 +145,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const heroSlidesData = [
     {
-      text: "Where Innovation Meets <br>Compassionate Care.",
+      text: "Where Innovation Meets Compassionate Care.",
       img: "assets/images/hero_divine.jpg"
     },
     {
-      text: "Travelling Nursing &amp; On-Demand <br>Clinical Care Across Canada.",
+      text: "Travelling Nursing &amp; On-Demand Clinical Care Across Canada.",
       img: "assets/images/service_nurse.jpg"
     },
     {
-      text: "Personal Care Support <br>&amp; Assistive Daily Living.",
+      text: "Personal Care Support &amp; Assistive Daily Living.",
       img: "assets/images/service_homecare.jpg"
     },
     {
-      text: "Dedicated Clinical Staffing <br>&amp; Facility Partnerships.",
+      text: "Dedicated Clinical Staffing &amp; Facility Partnerships.",
       img: "assets/images/team_divine.jpg"
     }
   ];
@@ -185,7 +185,12 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => {
       if (heroTitle) {
         heroTitle.innerHTML = slide.text;
-        heroTitle.style.fontSize = ''; // Uses full CSS clamp font size
+        const plainTextLen = slide.text.replace(/<[^>]*>/g, '').length;
+        if (plainTextLen > 45) {
+          heroTitle.style.fontSize = 'clamp(1.75rem, 2.7vw, 2.65rem)';
+        } else {
+          heroTitle.style.fontSize = '';
+        } // Uses full CSS clamp font size
         heroTitle.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
         heroTitle.style.opacity = '1';
         heroTitle.style.transform = 'translateY(0)';
@@ -684,7 +689,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
   // ==========================================================================
-  // GSAP SCROLLTRIGGER ANIMATION ENGINE (100% GUARANTEED VISIBILITY & REVEALS)
+  // ==========================================================================
+  // GSAP SCROLLTRIGGER ANIMATION ENGINE (100% STABLE, PERMANENT POSITIONING)
   // ==========================================================================
   if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
 
@@ -712,80 +718,308 @@ document.addEventListener('DOMContentLoaded', () => {
       );
     }
 
-    // C. Slide In Section Headers (excludes nested children to avoid double-animation)
-    const sectionHeaders = document.querySelectorAll('.welcome-header, .products-title-wrapper, .gallery-title, .form-title, .section-title, .page-title');
+    // C. Slide In Section Headers on Scroll (Smoothly slides from the left across all screens)
+    const sectionHeaders = document.querySelectorAll(
+      '.welcome-header, .welcome-slide-heading, .workforce-slide-header, .about-slide-header, ' +
+      '.purpose-slide-header, .values-slide-header, .solutions-slide-header, .excellence-slide-header, ' +
+      '.showcase-slide-header, .team-slide-header, .team-slide-top-header, .contact-slide-top, ' +
+      '.contact-slide-left, .products-title-wrapper, .gallery-title, .form-title, .section-title, .page-title, ' +
+      '.callout-slide-text h2'
+    );
     sectionHeaders.forEach(header => {
-      const isMobile = window.innerWidth < 768;
       gsap.fromTo(header, 
-        { x: isMobile ? 0 : -35, y: isMobile ? 20 : 0, opacity: 0 }, 
+        { x: -38, opacity: 0 }, 
         { 
           x: 0, 
           opacity: 1, 
-          duration: 0.9, 
+          duration: 0.85, 
           ease: 'power2.out',
-          clearProps: 'transform',
           scrollTrigger: {
             trigger: header,
-            start: 'top 90%',
-            toggleActions: 'play none none reverse'
+            start: 'top 92%',
+            toggleActions: 'play none none none',
+            once: true,
+            onEnter: () => {
+              const sec = header.closest('section, .anim-section, footer');
+              if (sec) sec.classList.add('is-revealed');
+            }
           }
         }
       );
     });
 
-    // D. Alternating Slide-In for Cards
-    const animateAlternatingCards = (selector, offsetDist = 40) => {
+    // C-2. Section Paragraphs: Slide from left with difference in entrance time (staggered delay)
+    const sectionParagraphs = document.querySelectorAll(
+      '.welcome-slide-body, .workforce-slide-body, .about-slide-body, .purpose-slide-body, ' +
+      '.solutions-slide-body, .excellence-slide-body, .showcase-slide-body, .team-slide-body, ' +
+      '.contact-card-anim-body, .contact-slide-sub, .callout-slide-text p, .strip-slide-text'
+    );
+    sectionParagraphs.forEach(para => {
+      gsap.fromTo(para, 
+        { x: -30, opacity: 0 }, 
+        { 
+          x: 0, 
+          opacity: 1, 
+          duration: 0.85, 
+          delay: 0.18, 
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: para,
+            start: 'top 92%',
+            toggleActions: 'play none none none',
+            once: true
+          }
+        }
+      );
+    });
+
+    // C-3. Section Links: Slide from left with further difference in entrance time (delay: 0.34s)
+    const sectionLinks = document.querySelectorAll(
+      '.welcome-slide-cta, .workforce-slide-link, .about-slide-highlights, .purpose-slide-link, ' +
+      '.solutions-slide-link, .excellence-slide-link, .team-slide-link, .team-slide-benefits, ' +
+      '.callout-slide-actions'
+    );
+    sectionLinks.forEach(link => {
+      gsap.fromTo(link, 
+        { x: -24, opacity: 0 }, 
+        { 
+          x: 0, 
+          opacity: 1, 
+          duration: 0.82, 
+          delay: 0.34, 
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: link,
+            start: 'top 92%',
+            toggleActions: 'play none none none',
+            once: true
+          }
+        }
+      );
+    });
+
+    // D. Our Values Section Cards: Slide in from bottom and fade in on scroll smoothly with sequential stagger
+    const valuesCards = document.querySelectorAll('.values-slide-card, .proto-pillar-card, .card-respect, .card-accountability, .card-partnership, .proto-value-card-2x2');
+    if (valuesCards.length > 0) {
+      valuesCards.forEach((card, index) => {
+        const staggerDelay = (index % 3) * 0.18;
+        gsap.fromTo(card, 
+          { y: 48, opacity: 0 }, 
+          { 
+            y: 0, 
+            opacity: 1, 
+            duration: 0.85, 
+            delay: staggerDelay, 
+            ease: 'power2.out',
+            scrollTrigger: {
+              trigger: card,
+              start: 'top 92%',
+              toggleActions: 'play none none none',
+              once: true,
+              onEnter: () => {
+                card.classList.add('is-in-view');
+                const sec = card.closest('#core-values-section, .proto-tricard-section');
+                if (sec) sec.classList.add('is-revealed');
+              }
+            }
+          }
+        );
+      });
+    }
+
+    // E. Sections with Multiple Images: Slide in from left and right smoothly
+    const archMainPhotos = document.querySelectorAll('.arch-main-photo, .monograph-bg-plate img, .collage-item-main, .showcase-slide-photo');
+    archMainPhotos.forEach(img => {
+      gsap.fromTo(img, 
+        { x: -40, opacity: 0 }, 
+        { 
+          x: 0, 
+          opacity: 1, 
+          duration: 0.90, 
+          delay: 0.12, 
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: img,
+            start: 'top 90%',
+            toggleActions: 'play none none none',
+            once: true
+          }
+        }
+      );
+    });
+
+    const archSubPhotos = document.querySelectorAll('.arch-vertical-photo, .monograph-caption-card, .collage-row-sub .collage-item-sub, .solutions-slide-right');
+    archSubPhotos.forEach(el => {
+      gsap.fromTo(el, 
+        { x: 40, opacity: 0 }, 
+        { 
+          x: 0, 
+          opacity: 1, 
+          duration: 0.90, 
+          delay: 0.24, 
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: el,
+            start: 'top 90%',
+            toggleActions: 'play none none none',
+            once: true
+          }
+        }
+      );
+    });
+
+    // Multi-Image Trio (Excellence block)
+    const trioImages = document.querySelectorAll('.proto-trio-photo-grid img');
+    trioImages.forEach((img, idx) => {
+      const fromX = idx === 0 ? -36 : (idx === 2 ? 36 : 0);
+      const fromY = idx === 1 ? 36 : 0;
+      gsap.fromTo(img,
+        { x: fromX, y: fromY, opacity: 0 },
+        {
+          x: 0,
+          y: 0,
+          opacity: 1,
+          duration: 0.88,
+          delay: idx * 0.14,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: img,
+            start: 'top 90%',
+            toggleActions: 'play none none none',
+            once: true
+          }
+        }
+      );
+    });
+
+    // Showcase Action Cards & Hotline
+    const showcaseCards = document.querySelectorAll('.proto-showcase-action-card, .showcase-slide-actions .card-action');
+    showcaseCards.forEach((c, idx) => {
+      gsap.fromTo(c,
+        { x: 35, opacity: 0 },
+        {
+          x: 0,
+          opacity: 1,
+          duration: 0.82,
+          delay: 0.20 + (idx * 0.12),
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: c,
+            start: 'top 90%',
+            toggleActions: 'play none none none',
+            once: true
+          }
+        }
+      );
+    });
+
+    const showcaseHotline = document.querySelector('.showcase-slide-hotline');
+    if (showcaseHotline) {
+      gsap.fromTo(showcaseHotline,
+        { y: 25, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.80,
+          delay: 0.42,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: showcaseHotline,
+            start: 'top 92%',
+            toggleActions: 'play none none none',
+            once: true
+          }
+        }
+      );
+    }
+
+    // Contact Section: Left card from left, right form from right
+    const contactLeftCard = document.querySelector('.contact-slide-card');
+    if (contactLeftCard) {
+      gsap.fromTo(contactLeftCard,
+        { x: -38, opacity: 0 },
+        {
+          x: 0,
+          opacity: 1,
+          duration: 0.85,
+          delay: 0.12,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: contactLeftCard,
+            start: 'top 90%',
+            toggleActions: 'play none none none',
+            once: true
+          }
+        }
+      );
+    }
+
+    const contactRightForm = document.querySelector('.contact-slide-form');
+    if (contactRightForm) {
+      gsap.fromTo(contactRightForm,
+        { x: 38, opacity: 0 },
+        {
+          x: 0,
+          opacity: 1,
+          duration: 0.85,
+          delay: 0.22,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: contactRightForm,
+            start: 'top 90%',
+            toggleActions: 'play none none none',
+            once: true
+          }
+        }
+      );
+    }
+
+    // Footer Columns: Slide from bottom with stagger
+    const footerCols = document.querySelectorAll('.footer-slide-col');
+    footerCols.forEach((col, idx) => {
+      gsap.fromTo(col,
+        { y: 28, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.78,
+          delay: idx * 0.10,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: col,
+            start: 'top 94%',
+            toggleActions: 'play none none none',
+            once: true
+          }
+        }
+      );
+    });
+
+    // F. Alternating Slide-In for General Service / Step / Sector Cards
+    const animateAlternatingCards = (selector, offsetDist = 35) => {
       const cards = document.querySelectorAll(selector);
       if (cards.length > 0) {
         cards.forEach((card, index) => {
-          const isMobile = window.innerWidth < 768;
-          const fromState = isMobile ? { y: 24, opacity: 0 } : { x: index % 2 === 0 ? -offsetDist : offsetDist, opacity: 0 };
           gsap.fromTo(card, 
-            fromState, 
+            { x: index % 2 === 0 ? -offsetDist : offsetDist, opacity: 0 }, 
             { 
               x: 0, 
               opacity: 1, 
-              duration: 0.95, 
+              duration: 0.88, 
+              delay: (index % 2) * 0.1,
               ease: 'power2.out',
-              clearProps: 'transform',
               scrollTrigger: {
                 trigger: card,
                 start: 'top 88%',
-                toggleActions: 'play none none reverse'
+                toggleActions: 'play none none none',
+                once: true
               }
             }
           );
         });
       }
     };
-
-    // E. Staggered Slide-In from Bottom for Core Values Cards
-    const animateBottomCards = (selector, offsetDist = 45) => {
-      const cards = document.querySelectorAll(selector);
-      if (cards.length > 0) {
-        cards.forEach((card, index) => {
-          gsap.fromTo(card, 
-            { y: offsetDist, opacity: 0 }, 
-            { 
-              y: 0, 
-              opacity: 1, 
-              duration: 0.9, 
-              delay: (index % 3) * 0.12,
-              ease: 'power3.out',
-              clearProps: 'transform,opacity',
-              scrollTrigger: {
-                trigger: card,
-                start: 'top 88%',
-                toggleActions: 'play none none reverse'
-              }
-            }
-          );
-        });
-      }
-    };
-
-    animateAlternatingCards('.step-card, .sector-card, .product-card, .why-item, .team-card, .pillar-card, .service-card, .advantage-card, .perk-card, .proto-team-narrative-card', 40);
-    animateBottomCards('.proto-value-card-2x2', 45);
+    animateAlternatingCards('.step-card, .sector-card, .product-card, .why-item, .team-card, .service-card, .advantage-card, .perk-card, .proto-team-narrative-card', 35);
   }
 
   // 5. Scroll-Triggered Slide-In Animations (Left, Right, Top & Bottom)
@@ -951,7 +1185,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // When back near the top or hero fold re-enters: re-trigger smooth entrance
       if (scrollY <= 140 || rect.bottom >= vh * 0.40) {
         heroSliderEl.classList.add('is-revealed');
-      } else if (rect.bottom < -40 || scrollY > 450) {
+      } else if (scrollY > 450) {
         // Reset when user has scrolled down into subsequent sections so it replays upon reverse scroll back up
         heroSliderEl.classList.remove('is-revealed');
       }
@@ -1012,7 +1246,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // When the top of the welcome section scrolls into view (at 75% viewport height)
       if (rect.top <= vh * (window.innerWidth < 992 ? 0.88 : 0.78) && rect.bottom >= 0) {
         welcomeSection.classList.add('is-revealed');
-      } else if (rect.top > vh * 1.05 || rect.bottom < -120 || scrollY < 80) {
+      } else if (scrollY < 60) {
         // Reset when user scrolls back to the hero section or far off screen so it replays upon reverse scroll
         welcomeSection.classList.remove('is-revealed');
       }
@@ -1041,7 +1275,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (rect.top <= vh * (window.innerWidth < 992 ? 0.88 : 0.78) && rect.bottom >= 0) {
         workforceSection.classList.add('is-revealed');
         if (wmWorkforce) wmWorkforce.classList.add('is-revealed');
-      } else if (rect.top > vh * 1.05 || rect.bottom < -120 || scrollY < 80) {
+      } else if (scrollY < 60) {
         // Reset when user scrolls far above or below, or returns to the hero section
         workforceSection.classList.remove('is-revealed');
         if (wmWorkforce) wmWorkforce.classList.remove('is-revealed');
@@ -1063,7 +1297,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (rect.top <= vh * (window.innerWidth < 992 ? 0.88 : 0.78) && rect.bottom >= 0) {
         executiveSection.classList.add('is-revealed');
-      } else if (rect.top > vh * 1.05 || rect.bottom < -120 || scrollY < 80) {
+      } else if (scrollY < 60) {
         executiveSection.classList.remove('is-revealed');
       }
     };
@@ -1083,7 +1317,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (rect.top <= vh * (window.innerWidth < 992 ? 0.88 : 0.78) && rect.bottom >= 0) {
         purposeSection.classList.add('is-revealed');
-      } else if (rect.top > vh * 1.05 || rect.bottom < -120 || scrollY < 80) {
+      } else if (scrollY < 60) {
         purposeSection.classList.remove('is-revealed');
       }
     };
@@ -1104,7 +1338,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // Reveal when the top of the section enters 78% of the viewport height
       if (rect.top <= vh * (window.innerWidth < 992 ? 0.88 : 0.78) && rect.bottom >= 0) {
         coreValuesSection.classList.add('is-revealed');
-      } else if (rect.top > vh * 1.05 || rect.bottom < -120 || scrollY < 80) {
+      } else if (scrollY < 60) {
         // Reset when user scrolls back above this section so it can replay smoothly
         coreValuesSection.classList.remove('is-revealed');
       }
@@ -1127,7 +1361,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (rect.top <= vh * (window.innerWidth < 992 ? 0.88 : 0.78) && rect.bottom >= 0) {
         solutionsStoryRow.classList.add('is-revealed');
         if (wmSolutions) wmSolutions.classList.add('is-revealed');
-      } else if (rect.top > vh * 1.05 || rect.bottom < -120 || scrollY < 80) {
+      } else if (scrollY < 60) {
         // Reset when user scrolls back above this section so it can replay smoothly
         solutionsStoryRow.classList.remove('is-revealed');
         if (wmSolutions) wmSolutions.classList.remove('is-revealed');
@@ -1150,7 +1384,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (rect.top <= vh * (window.innerWidth < 992 ? 0.88 : 0.78) && rect.bottom >= 0) {
         excellenceSection.classList.add('is-revealed');
         if (wmExcellence) wmExcellence.classList.add('is-revealed');
-      } else if (rect.top > vh * 1.05 || rect.bottom < -120 || scrollY < 80) {
+      } else if (scrollY < 60) {
         excellenceSection.classList.remove('is-revealed');
         if (wmExcellence) wmExcellence.classList.remove('is-revealed');
       }
@@ -1172,7 +1406,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (rect.top <= vh * (window.innerWidth < 992 ? 0.88 : 0.78) && rect.bottom >= 0) {
         showcaseSection.classList.add('is-revealed');
         if (wmDispatch) wmDispatch.classList.add('is-revealed');
-      } else if (rect.top > vh * 1.05 || rect.bottom < -120 || scrollY < 80) {
+      } else if (scrollY < 60) {
         showcaseSection.classList.remove('is-revealed');
         if (wmDispatch) wmDispatch.classList.remove('is-revealed');
       }
@@ -1193,7 +1427,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (rect.top <= vh * (window.innerWidth < 992 ? 0.88 : 0.78) && rect.bottom >= 0) {
         teamSection.classList.add('is-revealed');
-      } else if (rect.top > vh * 1.05 || rect.bottom < -120 || scrollY < 80) {
+      } else if (scrollY < 60) {
         teamSection.classList.remove('is-revealed');
       }
     };
@@ -1213,7 +1447,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (rect.top <= vh * (window.innerWidth < 992 ? 0.88 : 0.78) && rect.bottom >= 0) {
         aboutTeamSection.classList.add('is-revealed');
-      } else if (rect.top > vh * 1.05 || rect.bottom < -120 || scrollY < 80) {
+      } else if (scrollY < 60) {
         aboutTeamSection.classList.remove('is-revealed');
       }
     };
@@ -1239,14 +1473,14 @@ document.addEventListener('DOMContentLoaded', () => {
           contactSection.classList.remove('is-revealed');
         } else if (rect.top <= vh * (window.innerWidth < 992 ? 0.88 : 0.78) && rect.bottom >= -60) {
           contactSection.classList.add('is-revealed');
-        } else if (rect.top > vh * 1.05 || rect.bottom < -120) {
+        } else if (scrollY < 60) {
           contactSection.classList.remove('is-revealed');
         }
       } else {
         // Homepage Contact Section
         if (rect.top <= vh * (window.innerWidth < 992 ? 0.88 : 0.78) && rect.bottom >= -60) {
           contactSection.classList.add('is-revealed');
-        } else if (rect.top > vh * 1.05 || rect.bottom < -120 || scrollY < 80) {
+        } else if (scrollY < 60) {
           contactSection.classList.remove('is-revealed');
         }
       }
@@ -1329,7 +1563,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // When in viewport (from top or bottom): reveal smoothly
         if (rect.top <= vh * (window.innerWidth < 992 ? 0.88 : 0.82) && rect.bottom >= 0) {
           section.classList.add('is-revealed');
-        } else if (rect.top > vh * 1.05 || rect.bottom < -120 || scrollY < 80) {
+        } else if (scrollY < 60) {
           // Reset when scrolled far off-screen or returning to hero fold
           section.classList.remove('is-revealed');
         }

@@ -12,7 +12,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
 
   <!-- Core Dashboard Design System -->
-  <link rel="stylesheet" href="admin.css?v=6.1.3">
+  <link rel="stylesheet" href="admin.css?v=6.2.1">
 
   <!-- Chart.js CDN for Gradient Visualizations -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -1330,34 +1330,11 @@
             </div>
           </div>
 
-          <!-- 1. Operator Self-Security & Two-Factor Authentication -->
-          <div class="table-card mfa-banner-card" style="padding: 1.5rem; margin-bottom: 1.5rem; background: var(--bg-surface-elevated); border: 1px solid var(--border-subtle); border-radius: 8px;">
-            <div class="mfa-banner-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-              <div class="mfa-banner-text">
-                <h2 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.5rem;">
-                  <i data-lucide="shield-check" style="width: 20px; height: 20px; color: var(--brand-turquoise);"></i>
-                  Two-Factor Authentication (TOTP 2FA)
-                </h2>
-                <p style="color: var(--text-muted); font-size: 0.85rem; margin: 0;">
-                  Protect your operator session with Google Authenticator or Microsoft Authenticator (RFC 6238).
-                </p>
-              </div>
-              <div class="mfa-banner-actions" style="display: flex; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
-                <div id="mfa-current-status-badge">
-                  <span class="status-pill expiring"><i data-lucide="shield-alert" style="width:12px;height:12px;vertical-align:middle;margin-right:3px;"></i> 2FA Not Enrolled</span>
-                </div>
-                <button type="button" class="btn-primary-action" id="btn-configure-mfa" style="padding: 0.5rem 1rem; font-size: 0.85rem;" onclick="window.openMfaSetupModal()">
-                  <i data-lucide="qr-code" style="width: 15px; height: 15px;"></i> Configure 2FA
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- 1b. Operator Password & Access Credentials -->
+          <!-- 1. Operator Password & Access Credentials -->
           <div class="table-card" style="padding: 1.5rem; margin-bottom: 1.5rem; background: var(--bg-surface-elevated); border: 1px solid var(--border-subtle); border-radius: 8px;">
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
               <div>
-                <h2 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.5rem; color: #FFFFFF;">
+                <h2 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.5rem; color: var(--text-primary);">
                   <i data-lucide="key-round" style="width: 20px; height: 20px; color: var(--brand-turquoise);"></i>
                   Account Password &amp; Credentials
                 </h2>
@@ -1365,7 +1342,7 @@
                   Update your administrator portal password regularly to protect operational and clinical records.
                 </p>
               </div>
-              <button type="button" class="btn-primary-action" onclick="window.openAdminChangePasswordModal()" style="padding: 0.5rem 1rem; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px;">
+              <button type="button" class="btn-primary-action" id="btn-open-admin-change-password" onclick="window.openAdminChangePasswordModal()" style="padding: 0.5rem 1rem; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; cursor: pointer;">
                 <i data-lucide="lock" style="width: 14px; height: 14px;"></i> Change Password
               </button>
             </div>
@@ -1380,12 +1357,12 @@
                   Administrator Access &amp; Operator Roster
                 </h3>
                 <p style="color: var(--text-muted); font-size: 0.82rem; margin: 0;">
-                  Provision new administrators, configure granular RBAC permissions, and manage 2FA security in the dedicated Administrators Roster.
+                  Provision new administrators, configure granular RBAC permissions, and manage operator security in the dedicated Administrators Roster.
                 </p>
               </div>
-              <a href="#admin-users" class="btn-primary-action" style="padding: 0.5rem 1rem; font-size: 0.85rem; text-decoration: none;" onclick="window.switchTab && window.switchTab('admin-users')">
+              <button type="button" class="btn-primary-action" id="btn-open-admin-roster" style="padding: 0.5rem 1rem; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; cursor: pointer;" onclick="window.switchAdminTab('admin-users-tab', 'Admin Operators')">
                 <i data-lucide="shield-check" style="width: 15px; height: 15px;"></i> Open Administrator Roster
-              </a>
+              </button>
             </div>
           </div>
 
@@ -1407,7 +1384,7 @@
             </div>
           </div>
 
-          <div class="table-card" style="padding: 1.75rem;">
+          <div class="table-card" id="audit-log-card" style="padding: 1.75rem;">
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem;">
               <div>
                 <h2 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.5rem;">
@@ -2367,7 +2344,7 @@
   </div>
 
 <!-- Core Dashboard Application Script -->
-  <script src="admin.js?v=6.2.0"></script>
+  <script src="admin.js?v=6.2.1"></script>
 
 </body>
 </html>

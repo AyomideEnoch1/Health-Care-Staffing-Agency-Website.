@@ -417,25 +417,27 @@
   }
 
   function applyRolePermissionsToUI(permissions = [], role = '') {
-    const isSuper = role === 'super-admin' || role === 'admin';
+    const isSuperAdminOnly = (role === 'super-admin' || role === 'super_admin');
+    const isSuper = isSuperAdminOnly || role === 'admin';
     const perms = Array.isArray(permissions) ? permissions : [];
     const hasPerm = (key) => isSuper || perms.includes(key);
 
     const tabPermMap = [
-      { tab: 'overview-tab',    perm: null },
-      { tab: 'requests-tab',    perm: 'requests:view' },
-      { tab: 'scheduler-tab',   perm: 'requests:view' },
-      { tab: 'roster-tab',      perm: 'roster:view' },
-      { tab: 'compliance-tab',  perm: 'roster:view' },
-      { tab: 'applicants-tab',  perm: 'applications:view' },
-      { tab: 'reports-tab',     perm: 'reports:view' },
-      { tab: 'admin-users-tab', perm: 'admins:manage' },
-      { tab: 'archive-tab',     perm: null },
-      { tab: 'settings-tab',    perm: null }
+      { tab: 'overview-tab',    perm: null, superOnly: false },
+      { tab: 'requests-tab',    perm: 'requests:view', superOnly: false },
+      { tab: 'scheduler-tab',   perm: 'requests:view', superOnly: false },
+      { tab: 'roster-tab',      perm: 'roster:view', superOnly: false },
+      { tab: 'compliance-tab',  perm: 'roster:view', superOnly: false },
+      { tab: 'applicants-tab',  perm: 'applications:view', superOnly: false },
+      { tab: 'reports-tab',     perm: 'reports:view', superOnly: false },
+      { tab: 'admin-users-tab', perm: 'admins:manage', superOnly: false },
+      { tab: 'archive-tab',     perm: null, superOnly: true },
+      { tab: 'settings-tab',    perm: null, superOnly: false }
     ];
 
-    tabPermMap.forEach(({ tab, perm }) => {
-      const allowed = !perm || hasPerm(perm);
+    tabPermMap.forEach(({ tab, perm, superOnly }) => {
+      let allowed = !perm || hasPerm(perm);
+      if (superOnly && !isSuperAdminOnly) allowed = false;
 
       // 1. Sidebar Nav Buttons
       document.querySelectorAll(`.sidebar-nav .nav-item-btn[data-tab="${tab}"]`).forEach(btn => {
@@ -455,12 +457,24 @@
       });
     });
 
+    // Specifically restrict Audit Log card in Settings tab to Super Admin only
+    const auditLogCard = document.getElementById('audit-log-card');
+    if (auditLogCard) {
+      auditLogCard.style.display = isSuperAdminOnly ? 'block' : 'none';
+    }
+
+    // Specifically restrict Archive Vault navigation to Super Admin only
+    const archiveNav = document.getElementById('nav-archive-vault');
+    if (archiveNav) {
+      archiveNav.style.display = isSuperAdminOnly ? '' : 'none';
+    }
+
     // If currently active tab is not allowed, switch back to overview-tab
     const activeTabEl = document.querySelector('.admin-view-tab.active, .admin-view-tab.active-tab');
     if (activeTabEl) {
       const activeTabId = activeTabEl.id;
       const matched = tabPermMap.find(item => item.tab === activeTabId);
-      if (matched && matched.perm && !hasPerm(matched.perm)) {
+      if ((matched && matched.superOnly && !isSuperAdminOnly) || (matched && matched.perm && !hasPerm(matched.perm))) {
         if (window.switchAdminTab) {
           window.switchAdminTab('overview-tab', 'Dashboard Overview');
         }
@@ -1605,6 +1619,14 @@
 
   // F. Audit Logs & Interactive Activity Feed
   async function fetchAndRenderAudit() {
+    const user = JSON.parse(sessionStorage.getItem('df_admin_user') || '{}');
+    const isSuperAdminOnly = (user.role === 'super-admin' || user.role === 'super_admin');
+    if (!isSuperAdminOnly) {
+      const feed = document.getElementById('audit-logs-feed');
+      if (feed) feed.innerHTML = '';
+      return;
+    }
+
     try {
       const res = await apiRequest('/admin/audit-logs');
       if (res && Array.isArray(res.data)) {
@@ -2247,7 +2269,9 @@
     const modal = document.getElementById('modal-admin-change-password');
     if (modal) {
       document.getElementById('form-admin-change-password')?.reset();
+      modal.classList.add('open');
       modal.style.display = 'flex';
+      modal.style.pointerEvents = 'auto';
       setTimeout(() => document.getElementById('admin-current-password')?.focus(), 50);
       if (window.lucide) lucide.createIcons();
     }
@@ -2255,7 +2279,11 @@
 
   window.closeAdminChangePasswordModal = function() {
     const modal = document.getElementById('modal-admin-change-password');
-    if (modal) modal.style.display = 'none';
+    if (modal) {
+      modal.classList.remove('open');
+      modal.style.display = 'none';
+      modal.style.pointerEvents = '';
+    }
   };
 
   window.submitAdminChangePassword = async function(e) {
@@ -2313,7 +2341,9 @@
       if (idEl) idEl.value = adminId;
       if (nameEl) nameEl.textContent = adminName;
       if (pwdEl) pwdEl.value = '';
+      modal.classList.add('open');
       modal.style.display = 'flex';
+      modal.style.pointerEvents = 'auto';
       setTimeout(() => pwdEl?.focus(), 50);
       if (window.lucide) lucide.createIcons();
     }
@@ -2321,7 +2351,11 @@
 
   window.closeSuperadminResetAdminPasswordModal = function() {
     const modal = document.getElementById('modal-superadmin-reset-admin-password');
-    if (modal) modal.style.display = 'none';
+    if (modal) {
+      modal.classList.remove('open');
+      modal.style.display = 'none';
+      modal.style.pointerEvents = '';
+    }
   };
 
   window.submitSuperadminResetAdminPassword = async function(e) {
@@ -6276,9 +6310,26 @@
   function switchTab(targetTab, title) {
     if (!targetTab) return;
 
+    // Normalize targetTab if passed without '-tab' or as shorthand
+    if (!document.getElementById(targetTab)) {
+      if (document.getElementById(targetTab + '-tab')) {
+        targetTab = targetTab + '-tab';
+      } else if (targetTab.endsWith('-tab') && document.getElementById(targetTab.replace('-tab', ''))) {
+        targetTab = targetTab.replace('-tab', '');
+      }
+    }
+
     const user = JSON.parse(sessionStorage.getItem('df_admin_user') || '{}');
+    const isSuperAdminOnly = (user.role === 'super-admin' || user.role === 'super_admin');
+
+    // Archive system is strictly super-admin only
+    if (targetTab === 'archive-tab' && !isSuperAdminOnly) {
+      showToast('Access restricted: Only Super Administrators can access the Archive Vault.', 'warning');
+      return;
+    }
+
     const reqPerm = TAB_PERMISSION_REQUIREMENTS[targetTab];
-    if (reqPerm && user.role !== 'super-admin' && user.role !== 'admin') {
+    if (reqPerm && !isSuperAdminOnly && user.role !== 'admin') {
       const perms = Array.isArray(user.permissions) ? user.permissions : [];
       if (!perms.includes(reqPerm)) {
         showToast('Access restricted: You do not have permission to view this module.', 'warning');
@@ -6322,11 +6373,20 @@
       else if (targetTab === 'scheduler-tab') renderShiftScheduler();
       else if (targetTab === 'compliance-tab') renderCompliance();
       else if (targetTab === 'reports-tab') fetchAndRenderReportViewer();
-      else if (targetTab === 'admin-users-tab' || targetTab === 'settings-tab') {
+      else if (targetTab === 'admin-users-tab') {
         fetchAndRenderAdminAccounts();
-        fetchAndRenderAudit();
       }
-      else if (targetTab === 'archive-tab') loadArchiveRecords();
+      else if (targetTab === 'settings-tab') {
+        fetchAndRenderAdminAccounts();
+        if (isSuperAdminOnly) {
+          fetchAndRenderAudit();
+        }
+      }
+      else if (targetTab === 'archive-tab') {
+        if (isSuperAdminOnly) {
+          loadArchiveRecords();
+        }
+      }
     } catch (e) {
       console.warn('[Tab Activation Error]:', e);
     }
@@ -6503,6 +6563,10 @@
   
   // ── 16B. Archive Retention Vault Controller ────────────────────────────────
   async function loadArchiveRecords() {
+    const user = JSON.parse(sessionStorage.getItem('df_admin_user') || '{}');
+    const isSuperAdminOnly = (user.role === 'super-admin' || user.role === 'super_admin');
+    if (!isSuperAdminOnly) return;
+
     const tableBody = document.getElementById('archive-records-table-body');
     if (!tableBody) return;
 
@@ -7023,6 +7087,23 @@
       window.closeAvatarPreviewModal();
     }
   });
+
+  // ── URL Hash Navigation Synchronization ──
+  function handleHashNavigation() {
+    const raw = (window.location.hash || '').replace(/^#/, '').trim();
+    if (!raw) return;
+    let target = raw;
+    if (!document.getElementById(target)) {
+      if (document.getElementById(target + '-tab')) target = target + '-tab';
+    }
+    if (document.getElementById(target)) {
+      const navBtn = document.querySelector(`[data-tab="${target}"]`);
+      const title = navBtn?.getAttribute('data-title') || navBtn?.querySelector('.nav-label')?.textContent;
+      switchTab(target, title);
+    }
+  }
+  window.addEventListener('hashchange', handleHashNavigation);
+  setTimeout(handleHashNavigation, 250);
 
   // ── 17. Initialization ──────────────────────────────────────────────────────
   initTheme();
