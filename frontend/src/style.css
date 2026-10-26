@@ -3568,8 +3568,6 @@ body.has-gsap .proto-gradient-callout {
   .contact-slide-top,
   .contact-slide-left,
   .section-title,
-  .welcome-title,
-  .proto-heading-lg,
   .anim-section .slide-left,
   .ref-service-row .slide-left {
     opacity: 0;
@@ -3589,8 +3587,7 @@ body.has-gsap .proto-gradient-callout {
   .showcase-slide-body,
   .team-slide-body,
   .contact-card-anim-body,
-  .proto-body-text,
-  .strip-slide-text {
+    .strip-slide-text {
     opacity: 0;
     transform: translate3d(-32px, 0, 0);
     transition: transform 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.18s, opacity 0.80s cubic-bezier(0.22, 1, 0.36, 1) 0.18s;
@@ -3606,9 +3603,7 @@ body.has-gsap .proto-gradient-callout {
   .excellence-slide-link,
   .team-slide-link,
   .team-slide-benefits,
-  .proto-arrow-link,
-  .link-more,
-  .btn-see-more-toggle,
+      .btn-see-more-toggle,
   .strip-fade-form {
     opacity: 0;
     transform: translate3d(-26px, 0, 0);
@@ -8723,4 +8718,73 @@ body.light-theme .action-btn:hover {
 .proto-tricard-section.is-revealed .values-slide-card:hover,
 .proto-pillar-card.is-in-view:hover {
   transform: translate3d(0, -8px, 0) !important;
+}
+
+
+/* ==========================================================================
+   MOBILE SCREEN HEADING VISIBILITY & POSITIONING GUARDS (<= 991px)
+   ========================================================================== */
+@media (max-width: 991px) {
+  /* Welcome title and section headings: Always 100% visible, fully opaque, zero negative offset */
+  .welcome-title,
+  .proto-heading-lg,
+  .accent-heading-wrapper .welcome-title,
+  .workforce-slide-header .proto-heading-lg,
+  .solutions-slide-header .proto-heading-lg,
+  .excellence-slide-header .proto-heading-lg,
+  .showcase-slide-header .proto-heading-lg,
+  .team-slide-header .proto-heading-lg,
+  .about-slide-header .proto-heading-lg,
+  .purpose-slide-header .proto-heading-lg {
+    opacity: 1 !important;
+    transform: none !important;
+    visibility: visible !important;
+    margin-left: 0 !important;
+    padding-left: 0 !important;
+    word-break: normal !important;
+    overflow-wrap: break-word !important;
+  }
+
+  /* Welcome section accent wrapper on mobile: green indicator bar beside clear title */
+  .welcome-section .accent-heading-wrapper,
+  .accent-heading-wrapper {
+    display: flex !important;
+    border-left: 5px solid var(--teal-green, #3CAF8A) !important;
+    padding-left: 1rem !important;
+    margin-bottom: 1.25rem !important;
+  }
+
+  .welcome-section .welcome-title,
+  .accent-heading-wrapper .welcome-title {
+    opacity: 1 !important;
+    transform: none !important;
+    visibility: visible !important;
+    display: block !important;
+    color: var(--navy, #1A3A63) !important;
+    font-size: clamp(1.35rem, 5vw, 1.85rem) !important;
+    line-height: 1.28 !important;
+  }
+
+  /* Workforce slide header & content column on mobile: guaranteed zero negative offset */
+  .workforce-content-col,
+  .workforce-slide-header {
+    margin-left: 0 !important;
+    padding-left: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  .workforce-slide-header .proto-heading-lg {
+    opacity: 1 !important;
+    transform: none !important;
+    margin-left: 0 !important;
+    padding-left: 0 !important;
+    font-size: clamp(1.4rem, 4.8vw, 1.85rem) !important;
+    line-height: 1.28 !important;
+  }
+
+  .workforce-slide-header .proto-section-eyebrow {
+    opacity: 1 !important;
+    transform: none !important;
+    display: inline-block !important;
+  }
 }
