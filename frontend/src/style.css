@@ -3705,9 +3705,10 @@ body.has-gsap .proto-gradient-callout {
   .proto-tricard-section.is-revealed .values-slide-header,
   .proto-tricard-section.is-revealed .values-slide-body,
   .proto-tricard-section.is-revealed .values-slide-grid,
-  .proto-tricard-section.is-revealed .values-slide-card,
-  .proto-tricard-section.is-revealed .proto-pillar-card,
-  .proto-tricard-section.is-revealed .proto-value-card-2x2,
+  .values-slide-card.card-revealed,
+  .values-slide-card.is-in-view,
+  .proto-pillar-card.card-revealed,
+  .proto-pillar-card.is-in-view,
   .solutions-story-row.is-revealed .solutions-slide-header,
   .solutions-story-row.is-revealed .solutions-slide-body,
   .solutions-story-row.is-revealed .solutions-slide-link,
@@ -8687,9 +8688,9 @@ body.light-theme .action-btn:hover {
   will-change: transform, opacity;
 }
 
-.proto-tricard-section.is-revealed .values-slide-card,
-.proto-tricard-section.is-revealed .proto-pillar-card,
+.values-slide-card.card-revealed,
 .values-slide-card.is-in-view,
+.proto-pillar-card.card-revealed,
 .proto-pillar-card.is-in-view {
   opacity: 1 !important;
   transform: translate3d(0, 0, 0) !important;

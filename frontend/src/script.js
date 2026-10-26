@@ -801,8 +801,25 @@ document.addEventListener('DOMContentLoaded', () => {
     // D. Our Values Section Cards: Slide in from bottom and fade in on scroll smoothly with sequential stagger
     const valuesCards = document.querySelectorAll('.values-slide-card, .proto-pillar-card, .card-respect, .card-accountability, .card-partnership, .proto-value-card-2x2');
     if (valuesCards.length > 0) {
+      // Individual intersection observer for robust slide up on mobile
+      if ('IntersectionObserver' in window) {
+        const valuesCardObserver = new IntersectionObserver((entries, obs) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('card-revealed', 'is-in-view');
+              obs.unobserve(entry.target);
+            }
+          });
+        }, {
+          threshold: 0.12,
+          rootMargin: '0px 0px -40px 0px'
+        });
+        valuesCards.forEach(c => valuesCardObserver.observe(c));
+      }
+
       valuesCards.forEach((card, index) => {
-        const staggerDelay = (index % 3) * 0.18;
+        const isMobile = window.innerWidth <= 768;
+        const staggerDelay = isMobile ? 0 : (index % 3) * 0.16;
         gsap.fromTo(card, 
           { y: 48, opacity: 0 }, 
           { 
@@ -813,13 +830,11 @@ document.addEventListener('DOMContentLoaded', () => {
             ease: 'power2.out',
             scrollTrigger: {
               trigger: card,
-              start: 'top 92%',
+              start: isMobile ? 'top 90%' : 'top 86%',
               toggleActions: 'play none none none',
               once: true,
               onEnter: () => {
-                card.classList.add('is-in-view');
-                const sec = card.closest('#core-values-section, .proto-tricard-section');
-                if (sec) sec.classList.add('is-revealed');
+                card.classList.add('card-revealed', 'is-in-view');
               }
             }
           }
