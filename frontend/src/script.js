@@ -867,7 +867,7 @@ document.addEventListener('DOMContentLoaded', () => {
       );
     });
 
-    const archSubPhotos = document.querySelectorAll('.arch-vertical-photo, .monograph-caption-card, .collage-row-sub .collage-item-sub, .solutions-slide-right');
+    const archSubPhotos = document.querySelectorAll('.arch-vertical-photo, .monograph-caption-card, .monograph-fg-plate img, .collage-row-sub .collage-item-sub, .solutions-slide-right');
     archSubPhotos.forEach(el => {
       const subX = isMobile ? 20 : 38;
       gsap.fromTo(el, 
@@ -888,25 +888,23 @@ document.addEventListener('DOMContentLoaded', () => {
       );
     });
 
-    // Multi-Image Trio (Excellence block)
-    const trioImages = document.querySelectorAll('.proto-trio-photo-grid img');
-    trioImages.forEach((img, idx) => {
-      const mX = isMobile ? 18 : 34;
-      const mY = isMobile ? 20 : 34;
-      const fromX = idx === 0 ? -mX : (idx === 2 ? mX : 0);
-      const fromY = idx === 1 ? mY : 0;
-      gsap.fromTo(img,
+    // Multi-Image Trio (Excellence block & Clinical Care Masonry Columns)
+    const trioImages = document.querySelectorAll('.masonry-columns-wrapper .masonry-col, .excellence-slide-media .masonry-col, .proto-trio-photo-grid img');
+    trioImages.forEach((col, idx) => {
+      const fromX = isMobile ? 0 : (idx === 0 ? -36 : (idx === 2 ? 36 : 0));
+      const fromY = isMobile ? 28 : (idx === 1 ? 36 : 0);
+      gsap.fromTo(col,
         { x: fromX, y: fromY, opacity: 0 },
         {
           x: 0,
           y: 0,
           opacity: 1,
           duration: 0.80,
-          delay: isMobile ? 0 : idx * 0.12,
+          delay: isMobile ? 0 : idx * 0.14,
           ease: 'power2.out',
           scrollTrigger: {
-            trigger: img,
-            start: 'top 90%',
+            trigger: col,
+            start: isMobile ? 'top 92%' : 'top 88%',
             end: 'bottom top',
             toggleActions: 'play reverse play reverse'
           }

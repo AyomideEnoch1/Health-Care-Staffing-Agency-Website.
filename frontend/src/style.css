@@ -8723,6 +8723,9 @@ body.has-gsap .card-accountability,
 body.has-gsap .card-partnership,
 body.has-gsap .arch-main-photo,
 body.has-gsap .arch-vertical-photo,
+body.has-gsap .monograph-fg-plate img,
+body.has-gsap .masonry-col,
+body.has-gsap .excellence-slide-media .masonry-col,
 body.has-gsap .proto-trio-photo-grid img,
 body.has-gsap .showcase-slide-photo,
 body.has-gsap .proto-showcase-action-card,
@@ -8741,12 +8744,13 @@ body.has-gsap .proto-team-narrative-card {
   transition: none !important;
 }
 
-/* Preserve card hover lift interaction smoothly */
+/* Preserve card and masonry hover lift interaction smoothly */
 .values-slide-card:hover,
 .proto-pillar-card:hover,
 .card-respect:hover,
 .card-accountability:hover,
-.card-partnership:hover {
+.card-partnership:hover,
+.masonry-col:hover {
   transform: translate3d(0, -8px, 0) !important;
   transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
