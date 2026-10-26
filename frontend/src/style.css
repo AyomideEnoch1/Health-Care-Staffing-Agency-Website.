@@ -8617,108 +8617,138 @@ body.light-theme .action-btn:hover {
 
 /* ==========================================================================
    Smooth & Stable Scroll Animation Engine (Guaranteed Return to Position)
+   Non-GSAP fallback: apply revealed state only when GSAP is not loaded
    ========================================================================== */
-.is-revealed .welcome-slide-heading,
-.is-revealed .welcome-slide-cta,
-.is-revealed .workforce-slide-header,
-.is-revealed .workforce-slide-body,
-.is-revealed .workforce-slide-link,
-.is-revealed .workforce-slide-right,
-.is-revealed .arch-main-photo,
-.is-revealed .arch-vertical-photo,
-.is-revealed .stat-badge-pill,
-.is-revealed .values-slide-header,
-.is-revealed .values-slide-card,
-.is-revealed .proto-pillar-card,
-.values-slide-card.is-in-view,
-.proto-pillar-card.is-in-view,
-.is-revealed .solutions-slide-header,
-.is-revealed .solutions-slide-body,
-.is-revealed .solutions-slide-link,
-.is-revealed .solutions-slide-right,
-.is-revealed .monograph-bg-plate img,
-.is-revealed .monograph-caption-card,
-.is-revealed .excellence-slide-header,
-.is-revealed .excellence-slide-body,
-.is-revealed .excellence-slide-link,
-.is-revealed .proto-trio-photo-grid img,
-.is-revealed .showcase-slide-photo,
-.is-revealed .showcase-slide-header,
-.is-revealed .showcase-slide-body,
-.is-revealed .showcase-slide-actions,
-.is-revealed .proto-showcase-action-card,
-.is-revealed .showcase-slide-hotline,
-.is-revealed .team-slide-top-header,
-.is-revealed .team-slide-media,
-.is-revealed .team-slide-header,
-.is-revealed .team-slide-body,
-.is-revealed .team-slide-link,
-.is-revealed .collage-item-main,
-.is-revealed .collage-item-sub,
-.is-revealed .contact-slide-top,
-.is-revealed .contact-slide-sub,
-.is-revealed .contact-slide-card,
-.is-revealed .contact-slide-form,
-.is-revealed .callout-slide-text,
-.is-revealed .callout-slide-actions,
-.is-revealed .footer-slide-col,
-.is-revealed .footer-slide-bottom,
-.is-revealed .strip-slide-text,
-.is-revealed .strip-fade-form,
-.is-revealed .strip-slide-social-text,
-.is-revealed .strip-slide-icon {
+body:not(.has-gsap) .is-revealed .welcome-slide-heading,
+body:not(.has-gsap) .is-revealed .welcome-slide-cta,
+body:not(.has-gsap) .is-revealed .workforce-slide-header,
+body:not(.has-gsap) .is-revealed .workforce-slide-body,
+body:not(.has-gsap) .is-revealed .workforce-slide-link,
+body:not(.has-gsap) .is-revealed .workforce-slide-right,
+body:not(.has-gsap) .is-revealed .arch-main-photo,
+body:not(.has-gsap) .is-revealed .arch-vertical-photo,
+body:not(.has-gsap) .is-revealed .stat-badge-pill,
+body:not(.has-gsap) .is-revealed .values-slide-header,
+body:not(.has-gsap) .is-revealed .values-slide-card,
+body:not(.has-gsap) .is-revealed .proto-pillar-card,
+body:not(.has-gsap) .values-slide-card.is-in-view,
+body:not(.has-gsap) .proto-pillar-card.is-in-view,
+body:not(.has-gsap) .is-revealed .solutions-slide-header,
+body:not(.has-gsap) .is-revealed .solutions-slide-body,
+body:not(.has-gsap) .is-revealed .solutions-slide-link,
+body:not(.has-gsap) .is-revealed .solutions-slide-right,
+body:not(.has-gsap) .is-revealed .monograph-bg-plate img,
+body:not(.has-gsap) .is-revealed .monograph-caption-card,
+body:not(.has-gsap) .is-revealed .excellence-slide-header,
+body:not(.has-gsap) .is-revealed .excellence-slide-body,
+body:not(.has-gsap) .is-revealed .excellence-slide-link,
+body:not(.has-gsap) .is-revealed .proto-trio-photo-grid img,
+body:not(.has-gsap) .is-revealed .showcase-slide-photo,
+body:not(.has-gsap) .is-revealed .showcase-slide-header,
+body:not(.has-gsap) .is-revealed .showcase-slide-body,
+body:not(.has-gsap) .is-revealed .showcase-slide-actions,
+body:not(.has-gsap) .is-revealed .proto-showcase-action-card,
+body:not(.has-gsap) .is-revealed .showcase-slide-hotline,
+body:not(.has-gsap) .is-revealed .team-slide-top-header,
+body:not(.has-gsap) .is-revealed .team-slide-media,
+body:not(.has-gsap) .is-revealed .team-slide-header,
+body:not(.has-gsap) .is-revealed .team-slide-body,
+body:not(.has-gsap) .is-revealed .team-slide-link,
+body:not(.has-gsap) .is-revealed .collage-item-main,
+body:not(.has-gsap) .is-revealed .collage-item-sub,
+body:not(.has-gsap) .is-revealed .contact-slide-top,
+body:not(.has-gsap) .is-revealed .contact-slide-sub,
+body:not(.has-gsap) .is-revealed .contact-slide-card,
+body:not(.has-gsap) .is-revealed .contact-slide-form,
+body:not(.has-gsap) .is-revealed .callout-slide-text,
+body:not(.has-gsap) .is-revealed .callout-slide-actions,
+body:not(.has-gsap) .is-revealed .footer-slide-col,
+body:not(.has-gsap) .is-revealed .footer-slide-bottom,
+body:not(.has-gsap) .is-revealed .strip-slide-text,
+body:not(.has-gsap) .is-revealed .strip-fade-form,
+body:not(.has-gsap) .is-revealed .strip-slide-social-text,
+body:not(.has-gsap) .is-revealed .strip-slide-icon {
   opacity: 1 !important;
   transform: translate(0, 0) !important;
 }
 
-.is-revealed .welcome-slide-body {
+body:not(.has-gsap) .is-revealed .welcome-slide-body {
   opacity: 0.78 !important;
   transform: translate(0, 0) !important;
 }
 
-/* Our Core Values Section: Smooth slide in from bottom + sequential stagger */
-.values-slide-card,
-.proto-pillar-card.values-slide-card,
-.card-respect,
-.card-accountability,
-.card-partnership {
+/* Fallback CSS transitions for non-GSAP environments */
+body:not(.has-gsap) .values-slide-card,
+body:not(.has-gsap) .proto-pillar-card.values-slide-card,
+body:not(.has-gsap) .card-respect,
+body:not(.has-gsap) .card-accountability,
+body:not(.has-gsap) .card-partnership {
   opacity: 0;
   transform: translate3d(0, 48px, 0);
   transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.80s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: transform, opacity;
 }
 
-.values-slide-card.card-revealed,
-.values-slide-card.is-in-view,
-.proto-pillar-card.card-revealed,
-.proto-pillar-card.is-in-view {
+body:not(.has-gsap) .values-slide-card.card-revealed,
+body:not(.has-gsap) .values-slide-card.is-in-view,
+body:not(.has-gsap) .proto-pillar-card.card-revealed,
+body:not(.has-gsap) .proto-pillar-card.is-in-view {
   opacity: 1 !important;
   transform: translate3d(0, 0, 0) !important;
 }
 
-.values-slide-card:nth-child(1),
-.proto-pillar-card:nth-child(1),
-.card-respect {
+body:not(.has-gsap) .values-slide-card:nth-child(1),
+body:not(.has-gsap) .proto-pillar-card:nth-child(1),
+body:not(.has-gsap) .card-respect {
   transition-delay: 0.05s !important;
 }
 
-.values-slide-card:nth-child(2),
-.proto-pillar-card:nth-child(2),
-.card-accountability {
+body:not(.has-gsap) .values-slide-card:nth-child(2),
+body:not(.has-gsap) .proto-pillar-card:nth-child(2),
+body:not(.has-gsap) .card-accountability {
   transition-delay: 0.22s !important;
 }
 
-.values-slide-card:nth-child(3),
-.proto-pillar-card:nth-child(3),
-.card-partnership {
+body:not(.has-gsap) .values-slide-card:nth-child(3),
+body:not(.has-gsap) .proto-pillar-card:nth-child(3),
+body:not(.has-gsap) .card-partnership {
   transition-delay: 0.38s !important;
 }
 
+/* GSAP Active Engine: disable CSS transitions on animated elements to prevent conflicts with GSAP bidirectional engine */
+body.has-gsap .values-slide-card,
+body.has-gsap .proto-pillar-card,
+body.has-gsap .card-respect,
+body.has-gsap .card-accountability,
+body.has-gsap .card-partnership,
+body.has-gsap .arch-main-photo,
+body.has-gsap .arch-vertical-photo,
+body.has-gsap .proto-trio-photo-grid img,
+body.has-gsap .showcase-slide-photo,
+body.has-gsap .proto-showcase-action-card,
+body.has-gsap .contact-slide-card,
+body.has-gsap .contact-slide-form,
+body.has-gsap .footer-slide-col,
+body.has-gsap .step-card,
+body.has-gsap .sector-card,
+body.has-gsap .product-card,
+body.has-gsap .why-item,
+body.has-gsap .team-card,
+body.has-gsap .service-card,
+body.has-gsap .advantage-card,
+body.has-gsap .perk-card,
+body.has-gsap .proto-team-narrative-card {
+  transition: none !important;
+}
+
 /* Preserve card hover lift interaction smoothly */
-.values-slide-card.is-in-view:hover,
-.proto-tricard-section.is-revealed .values-slide-card:hover,
-.proto-pillar-card.is-in-view:hover {
+.values-slide-card:hover,
+.proto-pillar-card:hover,
+.card-respect:hover,
+.card-accountability:hover,
+.card-partnership:hover {
   transform: translate3d(0, -8px, 0) !important;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 
