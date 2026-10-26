@@ -2165,10 +2165,10 @@ button.btn.btn-subscribe svg {
     backface-visibility: hidden;
   }
 
-  .excellence-block.is-revealed .excellence-slide-header,
-  .excellence-block.is-revealed .excellence-slide-body,
-  .excellence-block.is-revealed .excellence-slide-link,
-  .excellence-block.is-revealed .excellence-slide-media {
+  body:not(.has-gsap) .excellence-block.is-revealed .excellence-slide-header,
+  body:not(.has-gsap) .excellence-block.is-revealed .excellence-slide-body,
+  body:not(.has-gsap) .excellence-block.is-revealed .excellence-slide-link,
+  body:not(.has-gsap) .excellence-block.is-revealed .excellence-slide-media {
     opacity: 1 !important;
     transform: translate(0, 0) !important;
   }
@@ -2225,11 +2225,11 @@ button.btn.btn-subscribe svg {
     backface-visibility: hidden;
   }
 
-  .showcase-block.is-revealed .showcase-slide-photo,
-  .showcase-block.is-revealed .showcase-slide-header,
-  .showcase-block.is-revealed .showcase-slide-body,
-  .showcase-block.is-revealed .showcase-slide-actions,
-  .showcase-block.is-revealed .showcase-slide-hotline {
+  body:not(.has-gsap) .showcase-block.is-revealed .showcase-slide-photo,
+  body:not(.has-gsap) .showcase-block.is-revealed .showcase-slide-header,
+  body:not(.has-gsap) .showcase-block.is-revealed .showcase-slide-body,
+  body:not(.has-gsap) .showcase-block.is-revealed .showcase-slide-actions,
+  body:not(.has-gsap) .showcase-block.is-revealed .showcase-slide-hotline {
     opacity: 1 !important;
     transform: translate(0, 0) !important;
   }
@@ -8821,5 +8821,42 @@ body.has-gsap .proto-team-narrative-card {
     opacity: 1 !important;
     transform: none !important;
     display: inline-block !important;
+  }
+}
+
+
+/* Workforce Dispatch Showcase Eyebrow Badge & Mobile Spacing Guards */
+.showcase-eyebrow-badge,
+.showcase-slide-header .proto-card-badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  font-size: 0.76rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  color: var(--teal-green, #3CAF8A) !important;
+  background: rgba(60, 175, 138, 0.12) !important;
+  padding: 0.35rem 0.8rem !important;
+  border-radius: 4px !important;
+  margin-top: 0.25rem !important;
+  margin-bottom: 0.75rem !important;
+  opacity: 1 !important;
+  transform: none !important;
+  visibility: visible !important;
+  line-height: 1.2 !important;
+}
+
+.proto-showcase-hotline-bar:hover {
+  transform: translateY(-3px) !important;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease !important;
+}
+
+@media (max-width: 991px) {
+  .proto-showcase-content-col,
+  .showcase-content-col {
+    padding-top: 2.25rem !important;
+    padding-bottom: 2.25rem !important;
+    padding-left: 1.35rem !important;
+    padding-right: 1.35rem !important;
   }
 }

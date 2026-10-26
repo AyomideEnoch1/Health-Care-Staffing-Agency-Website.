@@ -912,21 +912,23 @@ document.addEventListener('DOMContentLoaded', () => {
       );
     });
 
-    // Showcase Action Cards & Hotline
-    const showcaseCards = document.querySelectorAll('.proto-showcase-action-card, .showcase-slide-actions .card-action');
+    // Showcase Action Cards (Hospitals & Facilities, Staff Shift Portal) & Hotline Bar
+    const showcaseCards = document.querySelectorAll('.proto-showcase-action-card, .card-facilities, .card-staff, .showcase-slide-actions .card-action');
     showcaseCards.forEach((c, idx) => {
-      const scX = isMobile ? 20 : 35;
+      const cardY = isMobile ? 32 : 38;
+      const staggerDelay = isMobile ? (idx * 0.12) : (0.16 + (idx * 0.14));
       gsap.fromTo(c,
-        { x: scX, opacity: 0 },
+        { y: cardY, opacity: 0 },
         {
           x: 0,
+          y: 0,
           opacity: 1,
-          duration: 0.78,
-          delay: isMobile ? 0.05 : 0.18 + (idx * 0.10),
+          duration: 0.80,
+          delay: staggerDelay,
           ease: 'power2.out',
           scrollTrigger: {
             trigger: c,
-            start: 'top 90%',
+            start: isMobile ? 'top 92%' : 'top 88%',
             end: 'bottom top',
             toggleActions: 'play reverse play reverse'
           }
@@ -934,20 +936,21 @@ document.addEventListener('DOMContentLoaded', () => {
       );
     });
 
-    const showcaseHotline = document.querySelector('.showcase-slide-hotline');
+    const showcaseHotline = document.querySelector('.proto-showcase-hotline-bar, .showcase-slide-hotline');
     if (showcaseHotline) {
-      const hotY = isMobile ? 18 : 25;
+      const hotY = isMobile ? 24 : 30;
       gsap.fromTo(showcaseHotline,
         { y: hotY, opacity: 0 },
         {
+          x: 0,
           y: 0,
           opacity: 1,
-          duration: 0.76,
-          delay: isMobile ? 0.08 : 0.32,
+          duration: 0.78,
+          delay: isMobile ? 0.10 : 0.32,
           ease: 'power2.out',
           scrollTrigger: {
             trigger: showcaseHotline,
-            start: 'top 92%',
+            start: isMobile ? 'top 94%' : 'top 92%',
             end: 'bottom top',
             toggleActions: 'play reverse play reverse'
           }
