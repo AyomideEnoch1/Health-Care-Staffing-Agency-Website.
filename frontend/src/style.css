@@ -479,7 +479,7 @@ ul {
 }
 
 .subpage-hero {
-  min-height: clamp(280px, 32vh, 380px);
+  min-height: clamp(380px, 45vh, 520px);
 }
 
 .hero-bg-container {
@@ -654,14 +654,14 @@ ul {
 }
 
 .subpage-hero .hero-content {
-  padding-top: clamp(3.5rem, 6vh, 5rem);
-  padding-bottom: clamp(2rem, 3.5vh, 3rem);
+  padding-top: clamp(5.5rem, 10vw, 8rem);
+  padding-bottom: clamp(3.5rem, 7vw, 6rem);
   padding-left: 1.5rem;
   padding-right: 1.5rem;
 }
 
 .hero-text-block {
-  max-width: min(1000px, 64vw);
+  max-width: min(620px, 52vw);
   width: 100%;
   margin-left: 0;
   margin-right: auto;
@@ -752,7 +752,7 @@ ul {
   .subpage-hero {
     display: flex !important;
     align-items: center !important; /* Perfect vertical centering in polygon */
-    min-height: clamp(320px, 36vh, 420px) !important; /* Compact subpage hero height */
+    min-height: clamp(500px, 62vh, 640px) !important; /* Retain full original hero height across all subpages */
     position: relative !important;
   }
 
@@ -787,7 +787,7 @@ ul {
 
   .subpage-hero .hero-text-block {
     width: 100% !important;
-    max-width: min(880px, 52vw) !important; /* Spread out naturally inside the widened polygon */
+    max-width: min(820px, 48vw) !important;
     margin-left: 0 !important;
     margin-right: auto !important;
     text-align: left !important;
@@ -835,7 +835,7 @@ ul {
 
   .subpage-hero .hero-subtitle {
     width: 100% !important;
-    max-width: min(740px, 45vw) !important;
+    max-width: min(650px, 42vw) !important;
     font-size: clamp(0.98rem, 1.18vw, 1.15rem) !important;
     line-height: 1.6 !important;
     margin-bottom: 0 !important;
@@ -890,7 +890,7 @@ ul {
     padding-left: clamp(3.2rem, 5vw, 6rem) !important;
   }
   .subpage-hero .hero-text-block {
-    max-width: min(920px, 52vw) !important;
+    max-width: min(850px, 46vw) !important;
   }
   #home .hero-text-block,
   .hero-section:not(.subpage-hero) .hero-text-block {
@@ -920,7 +920,7 @@ ul {
     padding-left: clamp(4.5rem, 6.5vw, 8.5rem) !important;
   }
   .subpage-hero .hero-text-block {
-    max-width: min(1000px, 50vw) !important;
+    max-width: min(880px, 46vw) !important;
   }
   #home .hero-text-block,
   .hero-section:not(.subpage-hero) .hero-text-block {
@@ -8863,280 +8863,192 @@ body.light-theme .action-btn:hover {
 
 
 /* ==========================================================================
-   HIRING ROLES SECTION: INTERACTIVE LAYOUT PREVIEW ENGINE
-   Supports: Style 1 (Vertical Cards), Style 2 (Horizontal Split), Style 3 (Spotlight)
+   BLOG & CAREERS PAGE: HORIZONTAL SPLIT CARDS & COMPLETE RESPONSIVE SUITE
    ========================================================================== */
 
-/* Layout Switcher Toolbar */
-.hiring-layout-preview-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 1rem;
-  background: #F8FAFC;
-  border: 1.5px solid #E2E8F0;
-  border-radius: 14px;
-  padding: 0.85rem 1.25rem;
-  margin: 2.2rem 0 1.5rem 0;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
-}
-
-.layout-switcher-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.layout-switcher-pills {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.layout-toggle-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 0.45rem 0.95rem;
-  font-family: var(--font-heading);
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: var(--navy);
-  background: #FFFFFF;
-  border: 1.5px solid #CBD5E1;
-  border-radius: 999px;
-  cursor: pointer;
-  transition: all 0.25s ease;
-}
-
-.layout-toggle-btn:hover {
-  background: #F1F5F9;
-  border-color: #94A3B8;
-  transform: translateY(-1px);
-}
-
-.layout-toggle-btn.active {
-  background: var(--navy);
-  color: #FFFFFF;
-  border-color: var(--navy);
-  box-shadow: 0 4px 12px rgba(26, 58, 99, 0.25);
-}
-
-.layout-toggle-btn.active i {
-  color: var(--teal-green, #3CAF8A);
-}
-
-/* Spotlight Role Selector Tabs */
-.spotlight-role-nav {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  flex-wrap: wrap;
-  margin: 1.5rem 0 2rem 0;
-}
-
-.spotlight-tab-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 0.75rem 1.4rem;
-  font-family: var(--font-heading);
-  font-size: 0.88rem;
-  font-weight: 700;
-  color: #475569;
-  background: #FFFFFF;
-  border: 1.5px solid #CBD5E1;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.25s ease;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
-}
-
-.spotlight-tab-btn:hover {
-  border-color: var(--teal-green);
-  color: var(--navy);
-  transform: translateY(-2px);
-}
-
-.spotlight-tab-btn.active {
-  background: linear-gradient(135deg, #1A3A63 0%, #102A45 100%);
-  color: #FFFFFF;
-  border-color: #1A3A63;
-  box-shadow: 0 6px 18px rgba(26, 58, 99, 0.25);
-}
-
-.spotlight-tab-btn.active i {
-  color: var(--teal-green);
-}
-
-/* --------------------------------------------------------------------------
-   STYLE 1: CLEAN VERTICAL CARDS (DEFAULT)
-   -------------------------------------------------------------------------- */
-.hiring-grid.layout-vertical {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 2rem;
-  margin-top: 1.5rem;
-}
-
-/* --------------------------------------------------------------------------
-   STYLE 2: MODERN HORIZONTAL SPLIT CARDS
-   -------------------------------------------------------------------------- */
+/* 1. HORIZONTAL SPLIT HIRING CARDS (PERMANENT PRODUCTION LAYOUT) */
 .hiring-grid.layout-horizontal {
   display: flex;
   flex-direction: column;
-  gap: 2.2rem;
-  margin-top: 1.5rem;
+  gap: 2.25rem;
+  margin-top: 2rem;
+  width: 100%;
 }
 
 .hiring-grid.layout-horizontal .hiring-card {
   display: flex;
   flex-direction: row;
-  min-height: 380px;
+  min-height: 400px;
+  background: #FFFFFF;
   border-radius: 20px;
   border: 1.5px solid #E2E8F0;
-  box-shadow: 0 10px 32px rgba(26, 58, 99, 0.07);
+  box-shadow: 0 10px 30px rgba(26, 58, 99, 0.06), 0 2px 8px rgba(0, 0, 0, 0.02);
+  overflow: hidden;
+  position: relative;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.hiring-grid.layout-horizontal .hiring-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 42px -8px rgba(26, 58, 99, 0.12), 0 8px 20px rgba(60, 175, 138, 0.1);
+  border-color: var(--teal-green, #3CAF8A);
 }
 
 .hiring-grid.layout-horizontal .hiring-card-image-wrap {
   width: 38%;
-  height: auto;
-  min-height: 100%;
+  min-width: 320px;
+  max-width: 440px;
   flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+  align-self: stretch;
+  background: #1A3A63;
+}
+
+.hiring-grid.layout-horizontal .hiring-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hiring-grid.layout-horizontal .hiring-card:hover .hiring-card-img {
+  transform: scale(1.05);
 }
 
 .hiring-grid.layout-horizontal .hiring-card-body {
-  width: 62%;
-  padding: 2.2rem;
+  flex: 1 1 auto;
+  padding: 2.4rem 2.6rem;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 }
 
 .hiring-grid.layout-horizontal .hiring-card-role-title {
-  font-size: 1.45rem;
-  margin-bottom: 0.6rem;
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--navy, #1A3A63);
+  margin: 0 0 0.6rem 0;
+  line-height: 1.28;
+}
+
+.hiring-grid.layout-horizontal .hiring-card-desc {
+  font-size: 0.94rem;
+  color: #64748B;
+  line-height: 1.6;
+  margin: 0 0 1.25rem 0;
 }
 
 .hiring-grid.layout-horizontal .hiring-specs-box {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 0.85rem;
-  margin: 1.25rem 0;
-  padding: 1.15rem;
+  gap: 0.85rem 1.25rem;
+  padding: 1.15rem 1.35rem;
   background: #F8FAFC;
   border-radius: 12px;
   border: 1px solid #E2E8F0;
+  margin: 0 0 1.35rem 0;
+}
+
+.hiring-grid.layout-horizontal .hiring-spec-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  font-size: 0.86rem;
+  line-height: 1.45;
+  color: #334155;
+}
+
+.hiring-grid.layout-horizontal .hiring-spec-icon {
+  width: 16px;
+  height: 16px;
+  color: var(--teal-green, #3CAF8A);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.hiring-grid.layout-horizontal .hiring-spec-text strong {
+  color: var(--navy, #1A3A63);
+  font-weight: 700;
+  margin-right: 4px;
 }
 
 .hiring-grid.layout-horizontal .hiring-perks-list {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
+  gap: 0.65rem 1.25rem;
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1.5rem 0;
+}
+
+.hiring-grid.layout-horizontal .hiring-perk-item {
+  display: flex;
+  align-items: flex-start;
   gap: 0.6rem;
-  margin-bottom: 1.5rem;
-}
-
-/* --------------------------------------------------------------------------
-   STYLE 3: INTERACTIVE ROLE SPOTLIGHT
-   -------------------------------------------------------------------------- */
-.hiring-grid.layout-spotlight {
-  display: block;
-  margin-top: 1rem;
-}
-
-.hiring-grid.layout-spotlight .hiring-card {
-  display: flex;
-  flex-direction: row;
-  min-height: 480px;
-  border-radius: 24px;
-  border: 2px solid #CBD5E1;
-  background: #FFFFFF;
-  box-shadow: 0 20px 50px rgba(26, 58, 99, 0.12);
-  animation: fadeInSpotlight 0.4s ease;
-}
-
-@keyframes fadeInSpotlight {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.hiring-grid.layout-spotlight .hiring-card-image-wrap {
-  width: 42%;
-  height: auto;
-  min-height: 100%;
-  flex-shrink: 0;
-}
-
-.hiring-grid.layout-spotlight .hiring-card-body {
-  width: 58%;
-  padding: 2.8rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-.hiring-grid.layout-spotlight .hiring-card-role-title {
-  font-size: 1.85rem;
-  margin-bottom: 0.75rem;
-  color: var(--navy);
-}
-
-.hiring-grid.layout-spotlight .hiring-card-desc {
-  font-size: 1.05rem;
-  line-height: 1.65;
+  font-size: 0.86rem;
+  line-height: 1.45;
   color: #475569;
 }
 
-.hiring-grid.layout-spotlight .hiring-specs-box {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
+.hiring-grid.layout-horizontal .hiring-perk-item svg {
+  width: 16px;
+  height: 16px;
+  color: var(--teal-green, #3CAF8A);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.hiring-grid.layout-horizontal .hiring-card-action {
+  padding-top: 1.25rem;
+  border-top: 1px solid #F1F5F9;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.hiring-grid.layout-horizontal .btn-hiring-apply {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.85rem 1.85rem;
+  font-family: var(--font-heading);
+  font-size: 0.88rem;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+  color: #FFFFFF;
+  background: var(--navy, #1A3A63);
+  border: 1.5px solid var(--navy, #1A3A63);
+  border-radius: 10px;
+  text-decoration: none;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 14px rgba(26, 58, 99, 0.2);
+}
+
+.hiring-grid.layout-horizontal .btn-hiring-apply:hover {
+  background: var(--teal-green, #3CAF8A);
+  border-color: var(--teal-green, #3CAF8A);
+  color: #FFFFFF;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(60, 175, 138, 0.35);
+}
+
+.hiring-grid.layout-horizontal .btn-hiring-apply i {
+  transition: transform 0.25s ease;
+}
+
+.hiring-grid.layout-horizontal .btn-hiring-apply:hover i {
+  transform: translateX(4px);
+}
+
+/* Travel Nursing Buttons Wrapper */
+.hiring-travel-btn-group {
+  display: flex;
   gap: 1rem;
-  margin: 1.5rem 0;
-  padding: 1.4rem;
-  background: #F1F5F9;
-  border-radius: 16px;
-  border: 1px solid #E2E8F0;
-}
-
-.hiring-grid.layout-spotlight .hiring-perks-list {
-  margin-bottom: 1.8rem;
-}
-
-.hiring-grid.layout-spotlight .hiring-perk-item {
-  font-size: 0.95rem;
-  padding: 0.35rem 0;
-}
-
-.hiring-grid.layout-spotlight .btn-hiring-apply {
-  padding: 1rem 2rem;
-  font-size: 0.95rem;
-  border-radius: 12px;
-}
-
-/* Responsive adjustments for layouts */
-@media (max-width: 991px) {
-  .hiring-grid.layout-horizontal .hiring-card,
-  .hiring-grid.layout-spotlight .hiring-card {
-    flex-direction: column !important;
-  }
-  .hiring-grid.layout-horizontal .hiring-card-image-wrap,
-  .hiring-grid.layout-spotlight .hiring-card-image-wrap {
-    width: 100% !important;
-    height: 240px !important;
-  }
-  .hiring-grid.layout-horizontal .hiring-card-body,
-  .hiring-grid.layout-spotlight .hiring-card-body {
-    width: 100% !important;
-    padding: 1.75rem !important;
-  }
-  .hiring-grid.layout-horizontal .hiring-specs-box,
-  .hiring-grid.layout-spotlight .hiring-specs-box,
-  .hiring-grid.layout-horizontal .hiring-perks-list {
-    grid-template-columns: 1fr !important;
-  }
+  flex-wrap: wrap;
+  align-items: center;
 }
 
 
@@ -9250,6 +9162,12 @@ body.light-theme .action-btn:hover {
 .clinician-benefit-card.accent-navy .benefit-pill-chip { color: #1A3A63; background: rgba(26, 58, 99, 0.06); border-color: rgba(26, 58, 99, 0.18); }
 .clinician-benefit-card.accent-lime .benefit-pill-chip { color: #4D7C0F; background: rgba(124, 194, 66, 0.10); border-color: rgba(124, 194, 66, 0.25); }
 
+
+/* ==========================================================================
+   BLOG & CAREERS PAGE: COMPREHENSIVE RESPONSIVENESS SUITE
+   ========================================================================== */
+
+/* Tablet (1024px and below) */
 @media (max-width: 1024px) {
   .clinician-benefits-grid {
     grid-template-columns: repeat(2, 1fr) !important;
@@ -9257,12 +9175,350 @@ body.light-theme .action-btn:hover {
   }
 }
 
-@media (max-width: 600px) {
-  .clinician-benefits-grid {
+/* Medium Tablet & Small Desktop (991px and below) */
+@media (max-width: 991px) {
+  /* Open Roles Horizontal Split Cards on Tablet */
+  .hiring-grid.layout-horizontal {
+    gap: 1.85rem !important;
+  }
+  .hiring-grid.layout-horizontal .hiring-card {
+    flex-direction: column !important;
+    min-height: auto !important;
+    border-radius: 18px !important;
+  }
+  .hiring-grid.layout-horizontal .hiring-card-image-wrap {
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+    height: 250px !important;
+    min-height: 250px !important;
+    border-radius: 18px 18px 0 0 !important;
+  }
+  .hiring-grid.layout-horizontal .hiring-card-body {
+    width: 100% !important;
+    padding: 1.85rem 1.6rem !important;
+  }
+  .hiring-grid.layout-horizontal .hiring-specs-box {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.8rem 1rem !important;
+  }
+  .hiring-grid.layout-horizontal .hiring-perks-list {
+    grid-template-columns: 1fr !important;
+    gap: 0.6rem !important;
+  }
+  .hiring-grid.layout-horizontal .btn-hiring-apply {
+    width: auto !important;
+  }
+
+  /* Travel Nursing Banner on Tablet */
+  .hiring-travel-banner {
+    grid-template-columns: 1fr !important;
+  }
+  .hiring-travel-img-wrap {
+    height: 280px !important;
+    min-height: 280px !important;
+  }
+  .hiring-travel-content {
+    padding: 2.5rem 2rem !important;
+  }
+
+  /* 3-Step Process Grid on Tablet */
+  .hiring-steps-grid {
     grid-template-columns: 1fr !important;
     gap: 1.25rem !important;
   }
-  .clinician-benefit-card {
-    padding: 1.75rem 1.4rem !important;
+}
+
+/* Mobile Devices (640px and below) */
+@media (max-width: 640px) {
+  /* Subpage Hero Buttons on Mobile */
+  .subpage-hero .hero-btn-row {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    gap: 0.75rem !important;
+    margin-top: 1.25rem !important;
   }
+  .subpage-hero .hero-btn-row .btn,
+  .subpage-hero .hero-btn-row .btn-pill-hero,
+  .subpage-hero .hero-btn-row .btn-pill-outline {
+    width: 100% !important;
+    max-width: 100% !important;
+    justify-content: center !important;
+    text-align: center !important;
+    min-height: 48px !important;
+    padding: 0.85rem 1.25rem !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Open Roles Section on Mobile */
+  .welcome-header .welcome-title {
+    font-size: clamp(1.4rem, 5.2vw, 1.85rem) !important;
+    line-height: 1.25 !important;
+    overflow-wrap: break-word !important;
+    word-break: normal !important;
+  }
+  .welcome-header .section-lead-text {
+    font-size: 0.92rem !important;
+    line-height: 1.55 !important;
+    padding: 0 0.25rem !important;
+  }
+
+  .hiring-grid.layout-horizontal {
+    gap: 1.35rem !important;
+    margin-top: 1.5rem !important;
+  }
+  .hiring-grid.layout-horizontal .hiring-card {
+    border-radius: 16px !important;
+  }
+  .hiring-grid.layout-horizontal .hiring-card-image-wrap {
+    height: 200px !important;
+    min-height: 200px !important;
+    border-radius: 16px 16px 0 0 !important;
+  }
+  .hiring-grid.layout-horizontal .hiring-card-body {
+    padding: 1.35rem 1.15rem !important;
+  }
+  .hiring-grid.layout-horizontal .hiring-card-role-title {
+    font-size: clamp(1.2rem, 4.8vw, 1.4rem) !important;
+    margin-bottom: 0.45rem !important;
+  }
+  .hiring-grid.layout-horizontal .hiring-card-desc {
+    font-size: 0.88rem !important;
+    line-height: 1.52 !important;
+    margin-bottom: 0.85rem !important;
+  }
+  .hiring-grid.layout-horizontal .hiring-specs-box {
+    grid-template-columns: 1fr !important;
+    gap: 0.65rem !important;
+    padding: 0.85rem 0.95rem !important;
+    margin: 0 0 1rem 0 !important;
+    border-radius: 10px !important;
+  }
+  .hiring-grid.layout-horizontal .hiring-spec-item {
+    font-size: 0.84rem !important;
+    line-height: 1.4 !important;
+  }
+  .hiring-grid.layout-horizontal .hiring-perks-list {
+    grid-template-columns: 1fr !important;
+    gap: 0.5rem !important;
+    margin-bottom: 1.15rem !important;
+  }
+  .hiring-grid.layout-horizontal .hiring-perk-item {
+    font-size: 0.84rem !important;
+    line-height: 1.4 !important;
+  }
+  .hiring-grid.layout-horizontal .hiring-card-action {
+    padding-top: 1rem !important;
+    width: 100% !important;
+  }
+  .hiring-grid.layout-horizontal .btn-hiring-apply {
+    width: 100% !important;
+    justify-content: center !important;
+    text-align: center !important;
+    min-height: 48px !important;
+    padding: 0.85rem 1.25rem !important;
+    font-size: 0.86rem !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Travel Nursing Banner on Mobile */
+  .hiring-travel-banner {
+    margin: 2.25rem 0 !important;
+    border-radius: 16px !important;
+  }
+  .hiring-travel-content {
+    padding: 1.6rem 1.2rem !important;
+  }
+  .hiring-travel-title {
+    font-size: clamp(1.3rem, 5vw, 1.65rem) !important;
+    line-height: 1.25 !important;
+  }
+  .hiring-travel-desc {
+    font-size: 0.88rem !important;
+    line-height: 1.55 !important;
+    margin-bottom: 1.25rem !important;
+  }
+  .hiring-travel-perks {
+    grid-template-columns: 1fr !important;
+    gap: 0.65rem !important;
+    margin-bottom: 1.35rem !important;
+  }
+  .hiring-travel-btn-group {
+    flex-direction: column !important;
+    width: 100% !important;
+    gap: 0.75rem !important;
+  }
+  .hiring-travel-btn-group .btn {
+    width: 100% !important;
+    justify-content: center !important;
+    text-align: center !important;
+    min-height: 46px !important;
+    box-sizing: border-box !important;
+  }
+  .hiring-travel-img-wrap {
+    height: 210px !important;
+    min-height: 210px !important;
+  }
+  .hiring-travel-floating-card {
+    bottom: 10px !important;
+    left: 10px !important;
+    right: 10px !important;
+    padding: 0.65rem 0.85rem !important;
+    border-radius: 10px !important;
+    gap: 8px !important;
+  }
+  .hiring-travel-floating-card strong {
+    font-size: 0.78rem !important;
+    line-height: 1.3 !important;
+  }
+  .hiring-travel-floating-card span {
+    font-size: 0.70rem !important;
+    line-height: 1.2 !important;
+  }
+
+  /* Clinician Benefits (Why Choose Us) on Mobile */
+  .clinician-benefits-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1.25rem !important;
+    margin-top: 2rem !important;
+  }
+  .clinician-benefit-card {
+    padding: 1.5rem 1.25rem !important;
+    border-radius: 16px !important;
+  }
+  .benefit-icon-box {
+    width: 48px !important;
+    height: 48px !important;
+    border-radius: 12px !important;
+    margin-bottom: 1rem !important;
+  }
+  .benefit-card-title {
+    font-size: clamp(1.1rem, 4vw, 1.22rem) !important;
+    margin-bottom: 0.5rem !important;
+  }
+  .benefit-card-desc {
+    font-size: 0.86rem !important;
+    line-height: 1.55 !important;
+    margin-bottom: 1.15rem !important;
+  }
+  .benefit-pill-chip {
+    font-size: 0.72rem !important;
+    padding: 0.28rem 0.6rem !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    white-space: normal !important;
+  }
+
+  /* 3-Step Process Cards on Mobile */
+  .hiring-steps-grid {
+    gap: 1rem !important;
+    margin-top: 1.75rem !important;
+  }
+  .hiring-step-card {
+    padding: 1.5rem 1.25rem !important;
+    border-radius: 14px !important;
+  }
+  .hiring-step-num {
+    font-size: 1.85rem !important;
+    margin-bottom: 0.4rem !important;
+  }
+  .hiring-step-title {
+    font-size: 1.05rem !important;
+  }
+  .hiring-step-desc {
+    font-size: 0.85rem !important;
+    line-height: 1.5 !important;
+  }
+
+  /* CTA Banner on Mobile */
+  .hiring-cta-bar {
+    padding: 1.85rem 1.25rem !important;
+    margin-top: 2.25rem !important;
+    border-radius: 16px !important;
+  }
+  .hiring-cta-bar h3 {
+    font-size: clamp(1.25rem, 4.8vw, 1.55rem) !important;
+    line-height: 1.3 !important;
+    margin-bottom: 0.5rem !important;
+  }
+  .hiring-cta-bar p {
+    font-size: 0.88rem !important;
+    line-height: 1.55 !important;
+    margin-bottom: 1.25rem !important;
+  }
+  .hiring-cta-btn-group {
+    flex-direction: column !important;
+    width: 100% !important;
+    gap: 0.75rem !important;
+  }
+  .hiring-cta-btn-group .btn {
+    width: 100% !important;
+    justify-content: center !important;
+    text-align: center !important;
+    min-height: 48px !important;
+    box-sizing: border-box !important;
+  }
+}
+
+/* Extra small mobile screens (iPhone SE, Galaxy Fold 320px - 380px) */
+@media (max-width: 380px) {
+  .hiring-grid.layout-horizontal .hiring-card-image-wrap {
+    height: 180px !important;
+    min-height: 180px !important;
+  }
+  .hiring-grid.layout-horizontal .hiring-card-body {
+    padding: 1.15rem 0.9rem !important;
+  }
+  .hiring-grid.layout-horizontal .btn-hiring-apply {
+    font-size: 0.8rem !important;
+    padding: 0.75rem 1rem !important;
+  }
+  .clinician-benefit-card {
+    padding: 1.35rem 1rem !important;
+  }
+  .hiring-travel-content {
+    padding: 1.35rem 1rem !important;
+  }
+}
+
+
+/* ==========================================================================
+   HOME PAGE TYPOGRAPHY: ARIAL FONT FAMILY (INDEX.HTML ONLY)
+   ========================================================================== */
+#home {
+  --font-heading: Arial, Helvetica, sans-serif !important;
+  --font-body: Arial, Helvetica, sans-serif !important;
+  --font-poppins: Arial, Helvetica, sans-serif !important;
+  font-family: Arial, Helvetica, sans-serif !important;
+}
+
+#home,
+#home h1,
+#home h2,
+#home h3,
+#home h4,
+#home h5,
+#home h6,
+#home p,
+#home a,
+#home span,
+#home strong,
+#home em,
+#home b,
+#home button,
+#home input,
+#home select,
+#home textarea,
+#home li,
+#home div,
+#home label {
+  font-family: Arial, Helvetica, sans-serif !important;
+}
+
+/* Ensure vector icons retain SVG attributes without font disruption */
+#home svg,
+#home i[data-lucide],
+#home [data-lucide] {
+  font-family: inherit;
 }

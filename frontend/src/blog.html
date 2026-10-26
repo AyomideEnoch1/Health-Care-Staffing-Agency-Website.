@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Montserrat:wght@400;500;600;700;800;900&family=Open+Sans:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&family=Pacifico&display=swap" rel="stylesheet">
   
-  <link rel="stylesheet" href="style.css?v=6.4.7">
+  <link rel="stylesheet" href="style.css?v=6.4.8">
   <link rel="stylesheet" href="prototype.css?v=6.2.0">
 </head>
 <body>
@@ -91,48 +91,10 @@
 
       <!-- 3 ACTIVE ROLE CARDS -->
       
-      <!-- INTERACTIVE LAYOUT PREVIEW TOOLBAR -->
-      <div class="hiring-layout-preview-bar">
-        <div class="layout-switcher-header">
-          <i data-lucide="palette" style="width: 16px; height: 16px; color: var(--teal-green);"></i>
-          <span style="font-size: 0.82rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: var(--navy);">PREVIEW LAYOUT STYLES:</span>
-        </div>
-        <div class="layout-switcher-pills">
-          <button type="button" class="layout-toggle-btn active" id="btn-layout-vertical" onclick="window.setHiringLayout('vertical')">
-            <i data-lucide="layout-grid" style="width: 14px; height: 14px;"></i>
-            <span>Style 1: Clean Vertical Cards</span>
-          </button>
-          <button type="button" class="layout-toggle-btn" id="btn-layout-horizontal" onclick="window.setHiringLayout('horizontal')">
-            <i data-lucide="rows" style="width: 14px; height: 14px;"></i>
-            <span>Style 2: Horizontal Split Cards</span>
-          </button>
-          <button type="button" class="layout-toggle-btn" id="btn-layout-spotlight" onclick="window.setHiringLayout('spotlight')">
-            <i data-lucide="sparkles" style="width: 14px; height: 14px;"></i>
-            <span>Style 3: Interactive Role Spotlight</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- ROLE SELECTOR TABS FOR SPOTLIGHT STYLE -->
-      <div class="spotlight-role-nav" id="spotlight-role-nav" style="display: none;">
-        <button type="button" class="spotlight-tab-btn active" onclick="window.setSpotlightRole(1)">
-          <i data-lucide="stethoscope" style="width: 15px; height: 15px;"></i>
-          <span>Registered Nurse (RN)</span>
-        </button>
-        <button type="button" class="spotlight-tab-btn" onclick="window.setSpotlightRole(2)">
-          <i data-lucide="activity" style="width: 15px; height: 15px;"></i>
-          <span>Registered Practical Nurse (RPN)</span>
-        </button>
-        <button type="button" class="spotlight-tab-btn" onclick="window.setSpotlightRole(3)">
-          <i data-lucide="heart-handshake" style="width: 15px; height: 15px;"></i>
-          <span>Personal Support Worker (PSW)</span>
-        </button>
-      </div>
-
-      <div class="hiring-grid layout-vertical" id="hiring-roles-grid">
+      <div class="hiring-grid layout-horizontal" id="hiring-roles-grid">
 
         <!-- CARD 1: REGISTERED NURSE (RN) -->
-        <article class="hiring-card active-spotlight anim-section slide-up" data-role-id="1">
+        <article class="hiring-card anim-section slide-up" data-role-id="1">
           <div class="hiring-card-image-wrap">
             <img src="assets/images/role_rn_care.jpg" alt="Registered Nurse Clinical Care" class="hiring-card-img">
           </div>
@@ -326,7 +288,7 @@
             </div>
           </div>
 
-          <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+          <div class="hiring-travel-btn-group">
             <a href="jobseekers.html#applicant-form" class="btn btn-pill-hero" style="background: var(--lime-green); color: var(--navy); border-color: var(--lime-green);">
               INQUIRE ABOUT TRAVEL CONTRACTS
             </a>
@@ -552,7 +514,7 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-  <script src="script.js?v=6.4.7"></script>
+  <script src="script.js?v=6.4.8"></script>
   <script>
     if (window.lucide) {
       lucide.createIcons();
