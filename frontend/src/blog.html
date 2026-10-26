@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Montserrat:wght@400;500;600;700;800;900&family=Open+Sans:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&family=Pacifico&display=swap" rel="stylesheet">
   
-  <link rel="stylesheet" href="style.css?v=6.4.5">
+  <link rel="stylesheet" href="style.css?v=6.4.6">
   <link rel="stylesheet" href="prototype.css?v=6.2.0">
 </head>
 <body>
@@ -352,57 +352,80 @@
   </section>
 
   <!-- WHY CLINICIANS CHOOSE US (BENEFITS) -->
-  <section class="section-padding" style="background-color: var(--bg-light); border-top: 1px solid #E2E8F0;">
+  <section class="section-padding clinician-advantage-section" style="background-color: var(--bg-light); border-top: 1px solid #E2E8F0;">
     <div class="container">
-      <div class="welcome-header anim-section">
-        <span class="proto-card-badge slide-top" style="margin-bottom: 0.5rem;">THE DIVINE FINGERS ADVANTAGE</span>
+      <div class="welcome-header anim-section text-center">
         <h2 class="welcome-title slide-left">Why Healthcare Professionals <span class="brand-highlight">CHOOSE US</span></h2>
         <div class="welcome-accent-line slide-right"></div>
-        <p class="section-lead-text slide-up" style="max-width: 720px; margin: 1rem auto 0 auto; color: var(--cool-gray); font-size: 0.95rem; line-height: 1.6;">
+        <p class="section-lead-text slide-up" style="max-width: 720px; margin: 1rem auto 0 auto; color: var(--cool-gray); font-size: 0.95rem; line-height: 1.65;">
           We believe high-quality patient care begins with respecting, supporting, and investing in our front-line nurses and care staff.
         </p>
       </div>
 
-      <div class="proto-four-pillar-grid" style="margin-top: 2.5rem;">
+      <div class="clinician-benefits-grid" style="margin-top: 2.8rem;">
         
-        <div class="proto-pillar-card anim-section slide-up">
-          <div class="proto-pillar-icon-badge">
-            <i data-lucide="wallet" style="width: 24px; height: 24px;"></i>
+        <!-- Pillar 1: Prompt, Transparent Pay -->
+        <div class="clinician-benefit-card accent-emerald anim-section slide-up">
+          <div class="benefit-card-top-bar"></div>
+          <div class="benefit-icon-box bg-emerald">
+            <i data-lucide="wallet" style="width: 26px; height: 26px; color: #10B981;"></i>
           </div>
-          <h3 class="proto-pillar-title">Prompt, Transparent Pay</h3>
-          <p class="proto-pillar-desc">
+          <h3 class="benefit-card-title">Prompt, Transparent Pay</h3>
+          <p class="benefit-card-desc">
             Direct deposit weekly payroll with accurate tracking, overtime rates, and shift differentials deposited reliably without delay.
           </p>
+          <div class="benefit-pill-chip">
+            <i data-lucide="check" style="width: 12px; height: 12px;"></i>
+            <span>Weekly Direct Deposit</span>
+          </div>
         </div>
 
-        <div class="proto-pillar-card anim-section slide-up" style="transition-delay: 0.1s;">
-          <div class="proto-pillar-icon-badge icon-cyan">
-            <i data-lucide="calendar" style="width: 24px; height: 24px;"></i>
+        <!-- Pillar 2: Total Scheduling Autonomy -->
+        <div class="clinician-benefit-card accent-cyan anim-section slide-up" style="transition-delay: 0.1s;">
+          <div class="benefit-card-top-bar"></div>
+          <div class="benefit-icon-box bg-cyan">
+            <i data-lucide="calendar" style="width: 26px; height: 26px; color: #06B6D4;"></i>
           </div>
-          <h3 class="proto-pillar-title">Total Scheduling Autonomy</h3>
-          <p class="proto-pillar-desc">
+          <h3 class="benefit-card-title">Total Scheduling Autonomy</h3>
+          <p class="benefit-card-desc">
             Take full control of your life. Pick shifts that suit your schedule—casual days, weekend blocks, or full-time consecutive contracts.
           </p>
+          <div class="benefit-pill-chip">
+            <i data-lucide="check" style="width: 12px; height: 12px;"></i>
+            <span>Flexible Self-Scheduling</span>
+          </div>
         </div>
 
-        <div class="proto-pillar-card anim-section slide-up" style="transition-delay: 0.2s;">
-          <div class="proto-pillar-icon-badge">
-            <i data-lucide="stethoscope" style="width: 24px; height: 24px;"></i>
+        <!-- Pillar 3: Clinical Leadership Mentorship -->
+        <div class="clinician-benefit-card accent-navy anim-section slide-up" style="transition-delay: 0.2s;">
+          <div class="benefit-card-top-bar"></div>
+          <div class="benefit-icon-box bg-navy">
+            <i data-lucide="stethoscope" style="width: 26px; height: 26px; color: #1A3A63;"></i>
           </div>
-          <h3 class="proto-pillar-title">Clinical Leadership Mentorship</h3>
-          <p class="proto-pillar-desc">
+          <h3 class="benefit-card-title">Clinical Leadership Mentorship</h3>
+          <p class="benefit-card-desc">
             Led by Livina Akadinwa (RN, BScN, MPH), our leadership provides continuous clinical education, triage support, and career guidance.
           </p>
+          <div class="benefit-pill-chip">
+            <i data-lucide="check" style="width: 12px; height: 12px;"></i>
+            <span>24/7 Nurse Leader Guidance</span>
+          </div>
         </div>
 
-        <div class="proto-pillar-card anim-section slide-up" style="transition-delay: 0.3s;">
-          <div class="proto-pillar-icon-badge icon-cyan">
-            <i data-lucide="zap" style="width: 24px; height: 24px;"></i>
+        <!-- Pillar 4: Rapid 48-Hour Onboarding -->
+        <div class="clinician-benefit-card accent-lime anim-section slide-up" style="transition-delay: 0.3s;">
+          <div class="benefit-card-top-bar"></div>
+          <div class="benefit-icon-box bg-lime">
+            <i data-lucide="zap" style="width: 26px; height: 26px; color: #7CC242;"></i>
           </div>
-          <h3 class="proto-pillar-title">Rapid 48-Hour Onboarding</h3>
-          <p class="proto-pillar-desc">
+          <h3 class="benefit-card-title">Rapid 48-Hour Onboarding</h3>
+          <p class="benefit-card-desc">
             Simple digital credentialing. Submit your documentation and start working your preferred shifts in as little as 48 hours.
           </p>
+          <div class="benefit-pill-chip">
+            <i data-lucide="check" style="width: 12px; height: 12px;"></i>
+            <span>Fast-Track Placement</span>
+          </div>
         </div>
 
       </div>
@@ -413,7 +436,6 @@
   <section class="hiring-process-section">
     <div class="container">
       <div class="welcome-header anim-section">
-        <span class="proto-card-badge slide-top" style="margin-bottom: 0.5rem;">FAST-TRACK ADMISSION</span>
         <h2 class="welcome-title slide-left">How To Join Our <span class="brand-highlight">CLINICAL ROSTER</span></h2>
         <div class="welcome-accent-line slide-right"></div>
       </div>
@@ -530,7 +552,7 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-  <script src="script.js?v=6.4.5"></script>
+  <script src="script.js?v=6.4.6"></script>
   <script>
     if (window.lucide) {
       lucide.createIcons();
