@@ -7004,3 +7004,255 @@ select optgroup,
   color: #f87171;
   border-color: rgba(239, 68, 68, 0.35);
 }
+
+
+/* ==========================================================================
+   Archive Retention Vault Mobile Responsiveness Engine (<= 768px & <= 480px)
+   ========================================================================== */
+@media (max-width: 768px) {
+  /* 1. Hero Banner Adaptations */
+  .archive-vault-hero-card {
+    padding: 1.15rem 1rem !important;
+    margin-bottom: 1rem !important;
+    border-radius: var(--radius-md) !important;
+  }
+
+  .archive-vault-hero-card > div {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.85rem !important;
+  }
+
+  .archive-vault-hero-title {
+    font-size: 1.12rem !important;
+    line-height: 1.3 !important;
+  }
+
+  .archive-vault-hero-desc {
+    font-size: 0.78rem !important;
+    line-height: 1.45 !important;
+  }
+
+  .archive-vault-hero-icon {
+    width: 34px !important;
+    height: 34px !important;
+    border-radius: 8px !important;
+  }
+
+  .archive-vault-hero-card .btn-secondary-action {
+    width: 100% !important;
+    justify-content: center !important;
+    padding: 0.5rem !important;
+    font-size: 0.8rem !important;
+  }
+
+  /* 2. KPI Metrics: Compact 2x2 Grid on Mobile */
+  #archive-tab .kpi-grid,
+  .archive-kpi-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.6rem !important;
+    margin-bottom: 1rem !important;
+  }
+
+  .archive-metric-cube {
+    padding: 0.85rem 0.75rem !important;
+    border-radius: var(--radius-sm) !important;
+  }
+
+  .archive-metric-number {
+    font-size: 1.45rem !important;
+  }
+
+  .archive-metric-cube div:first-child {
+    font-size: 0.68rem !important;
+    margin-bottom: 0.25rem !important;
+  }
+
+  .archive-metric-cube div:last-child {
+    font-size: 0.66rem !important;
+    display: none !important; /* Hide verbose subtitle to keep mobile cubes punchy */
+  }
+
+  /* 3. Filter Bar & Search Input */
+  .archive-filter-bar-wrapper {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.75rem !important;
+  }
+
+  .archive-filter-pills-row {
+    display: flex !important;
+    overflow-x: auto !important;
+    flex-wrap: nowrap !important;
+    gap: 0.4rem !important;
+    padding-bottom: 4px !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+  }
+
+  .archive-filter-pills-row::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .archive-filter-pill {
+    padding: 0.35rem 0.75rem !important;
+    font-size: 0.74rem !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+  }
+
+  .archive-search-box-wrapper {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  /* 4. Table Card Container */
+  #archive-tab .table-card,
+  .archive-table-card {
+    padding: 1rem 0.85rem !important;
+    border-radius: var(--radius-md) !important;
+  }
+
+  /* 5. Mobile Card Rows for Archived Entities */
+  #archive-records-table-body .table-card-row {
+    display: flex !important;
+    flex-direction: column !important;
+    background: var(--bg-card) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 12px !important;
+    padding: 1rem !important;
+    margin-bottom: 0.85rem !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08) !important;
+    box-sizing: border-box !important;
+    gap: 0.5rem !important;
+  }
+
+  [data-theme="dark"] #archive-records-table-body .table-card-row {
+    background: rgba(15, 23, 42, 0.75) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3) !important;
+  }
+
+  #archive-records-table-body .table-card-row > td {
+    display: flex !important;
+    width: 100% !important;
+    padding: 0 !important;
+    border: none !important;
+    box-sizing: border-box !important;
+  }
+
+  #archive-records-table-body .cell-primary {
+    border-bottom: 1px solid var(--border-color) !important;
+    padding-bottom: 0.75rem !important;
+    margin-bottom: 0.35rem !important;
+  }
+
+  #archive-records-table-body .cell-grid-item {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 0.25rem 0 !important;
+    font-size: 0.8rem !important;
+  }
+
+  #archive-records-table-body .cell-grid-item .meta-label {
+    font-size: 0.72rem !important;
+    font-weight: 700 !important;
+    color: var(--text-muted) !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+  }
+
+  #archive-records-table-body .cell-grid-item .meta-value {
+    font-size: 0.82rem !important;
+    color: var(--text-primary) !important;
+    text-align: right !important;
+    max-width: 60% !important;
+    word-break: break-word !important;
+  }
+
+  #archive-records-table-body .cell-actions {
+    border-top: 1px solid var(--border-color) !important;
+    padding-top: 0.75rem !important;
+    margin-top: 0.4rem !important;
+    width: 100% !important;
+  }
+
+  #archive-records-table-body .cell-actions > div {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr 42px !important;
+    gap: 6px !important;
+    width: 100% !important;
+  }
+
+  #archive-records-table-body .cell-actions button {
+    height: 36px !important;
+    font-size: 0.78rem !important;
+    justify-content: center !important;
+  }
+}
+
+@media (max-width: 480px) {
+  #archive-records-table-body .table-card-row {
+    padding: 0.85rem 0.75rem !important;
+  }
+  .archive-metric-cube {
+    padding: 0.75rem 0.6rem !important;
+  }
+  .archive-metric-number {
+    font-size: 1.3rem !important;
+  }
+}
+
+/* Desktop styles for archive mobile badge */
+.archive-mobile-badge {
+  display: none !important;
+}
+
+@media (max-width: 768px) {
+  .archive-mobile-badge {
+    display: inline-flex !important;
+  }
+
+  /* Empty state responsiveness in archive vault */
+  #archive-records-table-body tr:not(.table-card-row),
+  #archive-records-table-body tr:not(.table-card-row) > td {
+    display: block !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Snapshot inspection modal mobile adaptation */
+  #archive-inspect-modal {
+    padding: 0.65rem !important;
+    align-items: center !important;
+  }
+
+  #archive-inspect-modal .admin-modal-dialog {
+    max-height: 92vh !important;
+    width: 100% !important;
+    margin: 0 !important;
+    border-radius: 12px !important;
+  }
+
+  #archive-inspect-modal .admin-modal-dialog > div:first-child {
+    padding: 0.85rem 1rem !important;
+  }
+
+  #archive-inspect-modal .admin-modal-dialog > div:nth-child(2) {
+    padding: 0.85rem 1rem !important;
+  }
+
+  #archive-inspect-modal .admin-modal-dialog > div:last-child {
+    padding: 0.75rem 1rem !important;
+    flex-wrap: wrap !important;
+    gap: 0.5rem !important;
+  }
+
+  #archive-inspect-modal .admin-modal-dialog > div:last-child button {
+    flex: 1 1 auto !important;
+    justify-content: center !important;
+    font-size: 0.82rem !important;
+  }
+}

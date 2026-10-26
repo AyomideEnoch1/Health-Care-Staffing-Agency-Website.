@@ -6628,7 +6628,7 @@
     if (list.length === 0) {
       tableBody.innerHTML = `
         <tr>
-          <td colspan="7" style="text-align: center; padding: 3.5rem 1.5rem; color: var(--text-muted);">
+          <td colspan="6" style="text-align: center; padding: 3.5rem 1.5rem; color: var(--text-muted);">
             <div style="display: inline-flex; align-items: center; justify-content: center; width: 56px; height: 56px; border-radius: 50%; background: rgba(255,255,255,0.04); margin-bottom: 1rem; border: 1px solid var(--border-color);">
               <i data-lucide="archive" style="width: 26px; height: 26px; color: var(--brand-turquoise); opacity: 0.6;"></i>
             </div>
@@ -6662,45 +6662,64 @@
 
       return `
         <tr class="table-card-row" style="border-bottom: 1px solid var(--border-color);">
-          <td class="cell-primary" data-label="Entity Type" style="padding: 0.85rem 1rem;">
+          <!-- Header Cell: Display Name & Identifier (+ Mobile Type Badge) -->
+          <td class="cell-primary" data-label="Record" style="padding: 0.85rem 1rem;">
+            <div class="row-header-wrapper" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 0.65rem; width: 100%;">
+              <div class="user-meta-name" style="flex: 1 1 auto; min-width: 0;">
+                <strong class="user-display-name" style="color: var(--text-primary); font-size: 0.92rem; display: block; word-break: break-word;">${escapeHTML(item.display_name || '—')}</strong>
+                <div style="margin-top: 3px;">
+                  <code style="font-family: monospace; font-size: 0.74rem; background: var(--bg-subtle); padding: 2px 6px; border-radius: 4px; color: var(--brand-teal); border: 1px solid var(--border-color);">${escapeHTML(item.identifier || '—')}</code>
+                </div>
+              </div>
+              <!-- Mobile-only pill in header -->
+              <span class="archive-mobile-badge status-pill" style="align-items: center; gap: 4px; background: ${typeInfo.bg}; color: ${typeInfo.color}; border: 1px solid ${typeInfo.border}; padding: 3px 8px; border-radius: 6px; font-size: 0.72rem; font-weight: 700; flex-shrink: 0;">
+                <i data-lucide="${typeInfo.icon}" style="width: 12px; height: 12px;"></i>
+                ${typeInfo.label}
+              </span>
+            </div>
+          </td>
+
+          <!-- Desktop Entity Type Cell (hidden on mobile) -->
+          <td class="cell-status-desktop" data-label="Entity Type" style="padding: 0.85rem 1rem;">
             <span style="display: inline-flex; align-items: center; gap: 5px; background: ${typeInfo.bg}; color: ${typeInfo.color}; border: 1px solid ${typeInfo.border}; padding: 3px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 700;">
               <i data-lucide="${typeInfo.icon}" style="width: 12px; height: 12px;"></i>
               ${typeInfo.label}
             </span>
           </td>
 
-          <td class="cell-block-item" data-label="Display Name" style="padding: 0.85rem 1rem;">
-            <strong style="color: var(--text-primary); font-size: 0.88rem;">${escapeHTML(item.display_name || '—')}</strong>
+          <!-- Archived Date -->
+          <td class="cell-grid-item" data-label="Archived Date" style="padding: 0.85rem 1rem;">
+            <span class="meta-label">Archived Date</span>
+            <span class="meta-value" style="font-size: 0.8rem; color: var(--text-secondary);">${dateStr}</span>
           </td>
 
-          <td class="cell-grid-item" data-label="Identifier" style="padding: 0.85rem 1rem;">
-            <code style="font-family: monospace; font-size: 0.76rem; background: var(--bg-subtle); padding: 2px 6px; border-radius: 4px; color: var(--brand-teal); border: 1px solid var(--border-color);">${escapeHTML(item.identifier || '—')}</code>
-          </td>
-
-          <td class="cell-grid-item" data-label="Archived Date" style="padding: 0.85rem 1rem; font-size: 0.8rem; color: var(--text-secondary);">
-            ${dateStr}
-          </td>
-
-          <td class="cell-grid-item" data-label="Deleted By" style="padding: 0.85rem 1rem; font-size: 0.8rem; color: var(--text-muted);">
-            <div style="display: flex; align-items: center; gap: 4px;">
+          <!-- Deleted By -->
+          <td class="cell-grid-item" data-label="Deleted By" style="padding: 0.85rem 1rem;">
+            <span class="meta-label">Deleted By</span>
+            <span class="meta-value" style="display: inline-flex; align-items: center; gap: 4px; font-size: 0.8rem; color: var(--text-muted);">
               <i data-lucide="user-x" style="width: 12px; height: 12px; opacity: 0.6;"></i>
-              <span>${escapeHTML(item.deleted_by_name || 'System Admin')}</span>
-            </div>
+              ${escapeHTML(item.deleted_by_name || 'System Admin')}
+            </span>
           </td>
 
-          <td class="cell-grid-item" data-label="Reason" style="padding: 0.85rem 1rem; font-size: 0.78rem; color: var(--text-secondary); max-width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${escapeHTML(item.deletion_reason || '')}">
-            ${escapeHTML(item.deletion_reason || 'Administrative action')}
+          <!-- Reason -->
+          <td class="cell-grid-item" data-label="Reason" style="padding: 0.85rem 1rem;">
+            <span class="meta-label">Reason</span>
+            <span class="meta-value" style="font-size: 0.78rem; color: var(--text-secondary);" title="${escapeHTML(item.deletion_reason || '')}">
+              ${escapeHTML(item.deletion_reason || 'Administrative action')}
+            </span>
           </td>
 
+          <!-- Actions -->
           <td class="cell-actions" data-label="Actions" style="padding: 0.85rem 1rem; text-align: right;">
-            <div style="display: inline-flex; gap: 6px; align-items: center; justify-content: flex-end; flex-wrap: wrap;">
-              <button type="button" class="btn-secondary-action" style="padding: 0.35rem 0.65rem; font-size: 0.75rem; display: inline-flex; align-items: center; gap: 4px; border-radius: 4px;" onclick="window.viewArchivePayload('${item.id}')" title="Inspect Record Snapshot">
+            <div style="display: inline-flex; gap: 6px; align-items: center; justify-content: flex-end; flex-wrap: wrap; width: 100%;">
+              <button type="button" class="btn-secondary-action" style="padding: 0.4rem 0.65rem; font-size: 0.75rem; display: inline-flex; align-items: center; gap: 4px; border-radius: 4px;" onclick="window.viewArchivePayload('${item.id}')" title="Inspect Record Snapshot">
                 <i data-lucide="eye" style="width: 12px; height: 12px;"></i> Snapshot
               </button>
-              <button type="button" class="btn-primary-action" style="padding: 0.35rem 0.75rem; font-size: 0.75rem; display: inline-flex; align-items: center; gap: 4px; background: #10B981; border: none; border-radius: 4px;" onclick="window.restoreArchivedRecord('${item.id}', '${escapeHTML(item.display_name)}')" title="Restore to Active Database">
+              <button type="button" class="btn-primary-action" style="padding: 0.4rem 0.75rem; font-size: 0.75rem; display: inline-flex; align-items: center; gap: 4px; background: #10B981; border: none; border-radius: 4px;" onclick="window.restoreArchivedRecord('${item.id}', '${escapeHTML(item.display_name)}')" title="Restore to Active Database">
                 <i data-lucide="rotate-ccw" style="width: 12px; height: 12px;"></i> Restore
               </button>
-              <button type="button" class="btn-secondary-action" style="padding: 0.35rem 0.55rem; font-size: 0.75rem; display: inline-flex; align-items: center; gap: 4px; color: #f87171; border-color: rgba(239,68,68,0.25); border-radius: 4px;" onclick="window.purgeArchivedRecord('${item.id}', '${escapeHTML(item.display_name)}')" title="Permanently Purge Record">
+              <button type="button" class="btn-secondary-action" style="padding: 0.4rem 0.55rem; font-size: 0.75rem; display: inline-flex; align-items: center; gap: 4px; color: #f87171; border-color: rgba(239,68,68,0.25); border-radius: 4px;" onclick="window.purgeArchivedRecord('${item.id}', '${escapeHTML(item.display_name)}')" title="Permanently Purge Record">
                 <i data-lucide="trash-2" style="width: 12px; height: 12px;"></i>
               </button>
             </div>
@@ -6749,7 +6768,7 @@
       }
 
       modal.innerHTML = `
-        <div class="admin-modal-dialog" style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:12px;width:100%;max-width:720px;max-height:85vh;display:flex;flex-direction:column;box-shadow:var(--shadow-lg);overflow:hidden;">
+        <div class="admin-modal-dialog" style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:12px;width:100%;max-width:720px;max-height:90vh;display:flex;flex-direction:column;box-shadow:var(--shadow-lg);overflow:hidden;margin:0 auto;box-sizing:border-box;">
           <div style="padding:1.25rem 1.5rem;border-bottom:1px solid var(--border-color);display:flex;align-items:center;justify-content:space-between;background:var(--bg-surface-elevated);">
             <div style="display:flex;align-items:center;gap:10px;">
               <div style="width:36px;height:36px;border-radius:8px;background:rgba(27,174,207,0.15);display:flex;align-items:center;justify-content:center;color:var(--brand-teal);">

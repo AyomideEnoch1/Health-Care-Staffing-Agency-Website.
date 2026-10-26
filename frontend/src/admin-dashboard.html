@@ -12,7 +12,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
 
   <!-- Core Dashboard Design System -->
-  <link rel="stylesheet" href="admin.css?v=6.2.2">
+  <link rel="stylesheet" href="admin.css?v=6.4.4">
 
   <!-- Chart.js CDN for Gradient Visualizations -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -1226,7 +1226,7 @@
           </div>
 
           <!-- Archive KPI Metric Cubes -->
-          <div class="kpi-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+          <div class="kpi-grid archive-kpi-grid">
             <div class="archive-metric-cube">
               <div style="font-size: 0.76rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.4rem;">Total Preserved</div>
               <div class="archive-metric-number" id="archive-stat-total">0</div>
@@ -1250,9 +1250,9 @@
           </div>
 
           <!-- Archive Table Card with Search & Filters -->
-          <div class="table-card" style="padding: 1.5rem;">
-            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem;">
-              <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+          <div class="table-card archive-table-card" style="padding: 1.5rem;">
+            <div class="archive-filter-bar-wrapper" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem;">
+              <div class="archive-filter-pills-row" style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
                 <button type="button" class="archive-filter-pill active" onclick="window.filterArchiveType('all', this)">All Records</button>
                 <button type="button" class="archive-filter-pill" onclick="window.filterArchiveType('client', this)">Clients &amp; Facilities</button>
                 <button type="button" class="archive-filter-pill" onclick="window.filterArchiveType('staff', this)">Staff Caregivers</button>
@@ -1260,20 +1260,19 @@
                 <button type="button" class="archive-filter-pill" onclick="window.filterArchiveType('user', this)">Portal Users</button>
               </div>
 
-              <div style="position: relative; width: 280px; max-width: 100%;">
+              <div class="archive-search-box-wrapper" style="position: relative; width: 280px; max-width: 100%;">
                 <input type="text" id="archive-search-input" class="search-input" oninput="window.debounceArchiveSearch()" placeholder="Search archived name, email..." style="width: 100%; box-sizing: border-box; padding: 0.5rem 0.85rem 0.5rem 2.2rem; font-size: 0.82rem; border-radius: var(--radius-sm);">
                 <i data-lucide="search" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: var(--text-muted);"></i>
               </div>
             </div>
 
             <!-- Table of Archived Items -->
-            <div class="table-responsive" style="overflow-x: auto;">
-              <table class="admin-data-table" style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+            <div class="table-responsive-container">
+              <table class="data-table mobile-stacked-table admin-data-table" style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
                 <thead>
                   <tr style="border-bottom: 1px solid var(--border-color); text-align: left; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px;">
+                    <th style="padding: 0.75rem 1rem;">Record &amp; Identifier</th>
                     <th style="padding: 0.75rem 1rem;">Entity Type</th>
-                    <th style="padding: 0.75rem 1rem;">Display Name</th>
-                    <th style="padding: 0.75rem 1rem;">Identifier</th>
                     <th style="padding: 0.75rem 1rem;">Archived Date</th>
                     <th style="padding: 0.75rem 1rem;">Deleted By</th>
                     <th style="padding: 0.75rem 1rem;">Reason</th>
@@ -1282,7 +1281,7 @@
                 </thead>
                 <tbody id="archive-records-table-body">
                   <tr>
-                    <td colspan="7" style="text-align: center; color: #64748B; padding: 2.5rem 1rem;">
+                    <td colspan="6" style="text-align: center; color: #64748B; padding: 2.5rem 1rem;">
                       Loading archived records...
                     </td>
                   </tr>
@@ -2326,7 +2325,7 @@
   </div>
 
 <!-- Core Dashboard Application Script -->
-  <script src="admin.js?v=6.2.2"></script>
+  <script src="admin.js?v=6.4.4"></script>
 
 </body>
 </html>
