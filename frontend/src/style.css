@@ -8890,3 +8890,396 @@ body.has-gsap .proto-team-narrative-card {
     padding-right: 1.35rem !important;
   }
 }
+
+/* ==========================================================================
+   GSAP INTERFERENCE ELIMINATION ENGINE
+   GreenSock best practice: Disable CSS transitions on properties animated by GSAP
+   to prevent choppy animation, fighting transitions, and inverted disappearing bugs.
+   ========================================================================== */
+body.has-gsap .welcome-slide-heading,
+body.has-gsap .welcome-slide-body,
+body.has-gsap .welcome-slide-cta,
+body.has-gsap .workforce-slide-header,
+body.has-gsap .workforce-slide-body,
+body.has-gsap .workforce-slide-link,
+body.has-gsap .workforce-slide-right,
+body.has-gsap .about-slide-header,
+body.has-gsap .about-slide-body,
+body.has-gsap .about-slide-highlights,
+body.has-gsap .about-slide-right,
+body.has-gsap .purpose-slide-header,
+body.has-gsap .purpose-slide-body,
+body.has-gsap .purpose-slide-link,
+body.has-gsap .purpose-slide-right,
+body.has-gsap .values-slide-header,
+body.has-gsap .values-slide-card,
+body.has-gsap .proto-pillar-card,
+body.has-gsap .solutions-slide-header,
+body.has-gsap .solutions-slide-body,
+body.has-gsap .solutions-slide-link,
+body.has-gsap .solutions-slide-right,
+body.has-gsap .excellence-slide-header,
+body.has-gsap .excellence-slide-body,
+body.has-gsap .excellence-slide-link,
+body.has-gsap .excellence-slide-media,
+body.has-gsap .showcase-slide-photo,
+body.has-gsap .showcase-slide-header,
+body.has-gsap .showcase-slide-body,
+body.has-gsap .showcase-slide-actions,
+body.has-gsap .showcase-slide-hotline,
+body.has-gsap .team-slide-top-header,
+body.has-gsap .team-slide-media,
+body.has-gsap .team-slide-header,
+body.has-gsap .team-slide-body,
+body.has-gsap .team-slide-benefits,
+body.has-gsap .team-slide-link,
+body.has-gsap .contact-slide-top,
+body.has-gsap .contact-slide-sub,
+body.has-gsap .contact-slide-card,
+body.has-gsap .contact-slide-form,
+body.has-gsap .callout-slide-text,
+body.has-gsap .callout-slide-actions,
+body.has-gsap .footer-slide-col,
+body.has-gsap .strip-slide-text,
+body.has-gsap .strip-fade-form,
+body.has-gsap .strip-slide-social-text,
+body.has-gsap .strip-slide-icon,
+body.has-gsap .arch-main-photo,
+body.has-gsap .arch-vertical-photo,
+body.has-gsap .proto-showcase-action-card,
+body.has-gsap .card-facilities,
+body.has-gsap .card-staff,
+body.has-gsap .masonry-col,
+body.has-gsap .card-respect,
+body.has-gsap .card-accountability,
+body.has-gsap .card-partnership {
+  transition: none !important;
+}
+
+/* Ensure GSAP animated elements are not hidden by static CSS when GSAP is running */
+body.has-gsap .is-revealed .welcome-slide-heading,
+body.has-gsap .is-revealed .welcome-slide-cta,
+body.has-gsap .is-revealed .workforce-slide-header,
+body.has-gsap .is-revealed .workforce-slide-body,
+body.has-gsap .is-revealed .workforce-slide-link,
+body.has-gsap .is-revealed .workforce-slide-right,
+body.has-gsap .is-revealed .about-slide-header,
+body.has-gsap .is-revealed .about-slide-body,
+body.has-gsap .is-revealed .about-slide-highlights,
+body.has-gsap .is-revealed .about-slide-right,
+body.has-gsap .is-revealed .purpose-slide-header,
+body.has-gsap .is-revealed .purpose-slide-body,
+body.has-gsap .is-revealed .purpose-slide-link,
+body.has-gsap .is-revealed .purpose-slide-right,
+body.has-gsap .is-revealed .values-slide-header,
+body.has-gsap .is-revealed .values-slide-card,
+body.has-gsap .is-revealed .solutions-slide-header,
+body.has-gsap .is-revealed .solutions-slide-body,
+body.has-gsap .is-revealed .solutions-slide-link,
+body.has-gsap .is-revealed .solutions-slide-right,
+body.has-gsap .is-revealed .excellence-slide-header,
+body.has-gsap .is-revealed .excellence-slide-body,
+body.has-gsap .is-revealed .excellence-slide-link,
+body.has-gsap .is-revealed .excellence-slide-media,
+body.has-gsap .is-revealed .showcase-slide-photo,
+body.has-gsap .is-revealed .showcase-slide-header,
+body.has-gsap .is-revealed .showcase-slide-body,
+body.has-gsap .is-revealed .showcase-slide-actions,
+body.has-gsap .is-revealed .showcase-slide-hotline,
+body.has-gsap .is-revealed .team-slide-top-header,
+body.has-gsap .is-revealed .team-slide-media,
+body.has-gsap .is-revealed .team-slide-header,
+body.has-gsap .is-revealed .team-slide-body,
+body.has-gsap .is-revealed .team-slide-link,
+body.has-gsap .is-revealed .contact-slide-top,
+body.has-gsap .is-revealed .contact-slide-sub,
+body.has-gsap .is-revealed .contact-slide-card,
+body.has-gsap .is-revealed .contact-slide-form,
+body.has-gsap .is-revealed .callout-slide-text,
+body.has-gsap .is-revealed .callout-slide-actions,
+body.has-gsap .is-revealed .footer-slide-col,
+body.has-gsap .is-revealed .strip-slide-text,
+body.has-gsap .is-revealed .strip-fade-form,
+body.has-gsap .is-revealed .strip-slide-social-text,
+body.has-gsap .is-revealed .strip-slide-icon {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+
+/* ==========================================================================
+   HIRING ROLES SECTION: INTERACTIVE LAYOUT PREVIEW ENGINE
+   Supports: Style 1 (Vertical Cards), Style 2 (Horizontal Split), Style 3 (Spotlight)
+   ========================================================================== */
+
+/* Layout Switcher Toolbar */
+.hiring-layout-preview-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  background: #F8FAFC;
+  border: 1.5px solid #E2E8F0;
+  border-radius: 14px;
+  padding: 0.85rem 1.25rem;
+  margin: 2.2rem 0 1.5rem 0;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+}
+
+.layout-switcher-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.layout-switcher-pills {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.layout-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0.45rem 0.95rem;
+  font-family: var(--font-heading);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--navy);
+  background: #FFFFFF;
+  border: 1.5px solid #CBD5E1;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.layout-toggle-btn:hover {
+  background: #F1F5F9;
+  border-color: #94A3B8;
+  transform: translateY(-1px);
+}
+
+.layout-toggle-btn.active {
+  background: var(--navy);
+  color: #FFFFFF;
+  border-color: var(--navy);
+  box-shadow: 0 4px 12px rgba(26, 58, 99, 0.25);
+}
+
+.layout-toggle-btn.active i {
+  color: var(--teal-green, #3CAF8A);
+}
+
+/* Spotlight Role Selector Tabs */
+.spotlight-role-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 1.5rem 0 2rem 0;
+}
+
+.spotlight-tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0.75rem 1.4rem;
+  font-family: var(--font-heading);
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #475569;
+  background: #FFFFFF;
+  border: 1.5px solid #CBD5E1;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.spotlight-tab-btn:hover {
+  border-color: var(--teal-green);
+  color: var(--navy);
+  transform: translateY(-2px);
+}
+
+.spotlight-tab-btn.active {
+  background: linear-gradient(135deg, #1A3A63 0%, #102A45 100%);
+  color: #FFFFFF;
+  border-color: #1A3A63;
+  box-shadow: 0 6px 18px rgba(26, 58, 99, 0.25);
+}
+
+.spotlight-tab-btn.active i {
+  color: var(--teal-green);
+}
+
+/* --------------------------------------------------------------------------
+   STYLE 1: CLEAN VERTICAL CARDS (DEFAULT)
+   -------------------------------------------------------------------------- */
+.hiring-grid.layout-vertical {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  margin-top: 1.5rem;
+}
+
+/* --------------------------------------------------------------------------
+   STYLE 2: MODERN HORIZONTAL SPLIT CARDS
+   -------------------------------------------------------------------------- */
+.hiring-grid.layout-horizontal {
+  display: flex;
+  flex-direction: column;
+  gap: 2.2rem;
+  margin-top: 1.5rem;
+}
+
+.hiring-grid.layout-horizontal .hiring-card {
+  display: flex;
+  flex-direction: row;
+  min-height: 380px;
+  border-radius: 20px;
+  border: 1.5px solid #E2E8F0;
+  box-shadow: 0 10px 32px rgba(26, 58, 99, 0.07);
+}
+
+.hiring-grid.layout-horizontal .hiring-card-image-wrap {
+  width: 38%;
+  height: auto;
+  min-height: 100%;
+  flex-shrink: 0;
+}
+
+.hiring-grid.layout-horizontal .hiring-card-body {
+  width: 62%;
+  padding: 2.2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.hiring-grid.layout-horizontal .hiring-card-role-title {
+  font-size: 1.45rem;
+  margin-bottom: 0.6rem;
+}
+
+.hiring-grid.layout-horizontal .hiring-specs-box {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.85rem;
+  margin: 1.25rem 0;
+  padding: 1.15rem;
+  background: #F8FAFC;
+  border-radius: 12px;
+  border: 1px solid #E2E8F0;
+}
+
+.hiring-grid.layout-horizontal .hiring-perks-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.6rem;
+  margin-bottom: 1.5rem;
+}
+
+/* --------------------------------------------------------------------------
+   STYLE 3: INTERACTIVE ROLE SPOTLIGHT
+   -------------------------------------------------------------------------- */
+.hiring-grid.layout-spotlight {
+  display: block;
+  margin-top: 1rem;
+}
+
+.hiring-grid.layout-spotlight .hiring-card {
+  display: flex;
+  flex-direction: row;
+  min-height: 480px;
+  border-radius: 24px;
+  border: 2px solid #CBD5E1;
+  background: #FFFFFF;
+  box-shadow: 0 20px 50px rgba(26, 58, 99, 0.12);
+  animation: fadeInSpotlight 0.4s ease;
+}
+
+@keyframes fadeInSpotlight {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.hiring-grid.layout-spotlight .hiring-card-image-wrap {
+  width: 42%;
+  height: auto;
+  min-height: 100%;
+  flex-shrink: 0;
+}
+
+.hiring-grid.layout-spotlight .hiring-card-body {
+  width: 58%;
+  padding: 2.8rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.hiring-grid.layout-spotlight .hiring-card-role-title {
+  font-size: 1.85rem;
+  margin-bottom: 0.75rem;
+  color: var(--navy);
+}
+
+.hiring-grid.layout-spotlight .hiring-card-desc {
+  font-size: 1.05rem;
+  line-height: 1.65;
+  color: #475569;
+}
+
+.hiring-grid.layout-spotlight .hiring-specs-box {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin: 1.5rem 0;
+  padding: 1.4rem;
+  background: #F1F5F9;
+  border-radius: 16px;
+  border: 1px solid #E2E8F0;
+}
+
+.hiring-grid.layout-spotlight .hiring-perks-list {
+  margin-bottom: 1.8rem;
+}
+
+.hiring-grid.layout-spotlight .hiring-perk-item {
+  font-size: 0.95rem;
+  padding: 0.35rem 0;
+}
+
+.hiring-grid.layout-spotlight .btn-hiring-apply {
+  padding: 1rem 2rem;
+  font-size: 0.95rem;
+  border-radius: 12px;
+}
+
+/* Responsive adjustments for layouts */
+@media (max-width: 991px) {
+  .hiring-grid.layout-horizontal .hiring-card,
+  .hiring-grid.layout-spotlight .hiring-card {
+    flex-direction: column !important;
+  }
+  .hiring-grid.layout-horizontal .hiring-card-image-wrap,
+  .hiring-grid.layout-spotlight .hiring-card-image-wrap {
+    width: 100% !important;
+    height: 240px !important;
+  }
+  .hiring-grid.layout-horizontal .hiring-card-body,
+  .hiring-grid.layout-spotlight .hiring-card-body {
+    width: 100% !important;
+    padding: 1.75rem !important;
+  }
+  .hiring-grid.layout-horizontal .hiring-specs-box,
+  .hiring-grid.layout-spotlight .hiring-specs-box,
+  .hiring-grid.layout-horizontal .hiring-perks-list {
+    grid-template-columns: 1fr !important;
+  }
+}

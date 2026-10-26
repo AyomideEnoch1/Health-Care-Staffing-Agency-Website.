@@ -744,22 +744,15 @@ document.addEventListener('DOMContentLoaded', () => {
           opacity: 1, 
           duration: 0.75, 
           ease: 'power2.out',
+          clearProps: 'transform,opacity',
           scrollTrigger: {
             trigger: header,
             start: 'top 92%',
-            end: 'bottom top',
-            toggleActions: 'play reverse play reverse',
+            toggleActions: 'play none none none',
+            once: true,
             onEnter: () => {
               const sec = header.closest('section, .anim-section, footer');
               if (sec) sec.classList.add('is-revealed');
-            },
-            onEnterBack: () => {
-              const sec = header.closest('section, .anim-section, footer');
-              if (sec) sec.classList.add('is-revealed');
-            },
-            onLeaveBack: () => {
-              const sec = header.closest('section, .anim-section, footer');
-              if (sec) sec.classList.remove('is-revealed');
             }
           }
         }
@@ -783,12 +776,13 @@ document.addEventListener('DOMContentLoaded', () => {
           opacity: 1, 
           duration: 0.75, 
           delay: isMobile ? 0.05 : 0.16, 
-          ease: 'power2.out',
+          ease: 'power2.out', 
+          clearProps: 'transform,opacity',
           scrollTrigger: {
             trigger: para,
             start: 'top 92%',
-            end: 'bottom top',
-            toggleActions: 'play reverse play reverse'
+            toggleActions: 'play none none none',
+            once: true
           }
         }
       );
@@ -811,12 +805,13 @@ document.addEventListener('DOMContentLoaded', () => {
           opacity: 1, 
           duration: 0.72, 
           delay: isMobile ? 0.08 : 0.28, 
-          ease: 'power2.out',
+          ease: 'power2.out', 
+          clearProps: 'transform,opacity',
           scrollTrigger: {
             trigger: link,
             start: 'top 92%',
-            end: 'bottom top',
-            toggleActions: 'play reverse play reverse'
+            toggleActions: 'play none none none',
+            once: true
           }
         }
       );
@@ -835,13 +830,14 @@ document.addEventListener('DOMContentLoaded', () => {
             opacity: 1, 
             duration: 0.78, 
             delay: staggerDelay, 
-            ease: 'power2.out',
+            ease: 'power2.out', 
+            clearProps: 'transform,opacity',
             scrollTrigger: {
-              trigger: card,
-              start: isMobile ? 'top 92%' : 'top 88%',
-              end: 'bottom top',
-              toggleActions: 'play reverse play reverse'
-            }
+            trigger: card,
+            start: isMobile ? 'top 92%' : 'top 88%',
+            toggleActions: 'play none none none',
+            once: true
+          }
           }
         );
       });
@@ -858,12 +854,13 @@ document.addEventListener('DOMContentLoaded', () => {
           opacity: 1, 
           duration: 0.82, 
           delay: isMobile ? 0.05 : 0.12, 
-          ease: 'power2.out',
+          ease: 'power2.out', 
+          clearProps: 'transform,opacity',
           scrollTrigger: {
             trigger: img,
             start: 'top 90%',
-            end: 'bottom top',
-            toggleActions: 'play reverse play reverse'
+            toggleActions: 'play none none none',
+            once: true
           }
         }
       );
@@ -879,12 +876,13 @@ document.addEventListener('DOMContentLoaded', () => {
           opacity: 1, 
           duration: 0.82, 
           delay: isMobile ? 0.10 : 0.22, 
-          ease: 'power2.out',
+          ease: 'power2.out', 
+          clearProps: 'transform,opacity',
           scrollTrigger: {
             trigger: el,
             start: 'top 90%',
-            end: 'bottom top',
-            toggleActions: 'play reverse play reverse'
+            toggleActions: 'play none none none',
+            once: true
           }
         }
       );
@@ -904,11 +902,12 @@ document.addEventListener('DOMContentLoaded', () => {
           duration: 0.80,
           delay: isMobile ? 0 : idx * 0.14,
           ease: 'power2.out',
+          clearProps: 'transform,opacity',
           scrollTrigger: {
             trigger: col,
             start: isMobile ? 'top 92%' : 'top 88%',
-            end: 'bottom top',
-            toggleActions: 'play reverse play reverse'
+            toggleActions: 'play none none none',
+            once: true
           }
         }
       );
@@ -928,11 +927,12 @@ document.addEventListener('DOMContentLoaded', () => {
           duration: 0.80,
           delay: staggerDelay,
           ease: 'power2.out',
+          clearProps: 'transform,opacity',
           scrollTrigger: {
             trigger: c,
             start: isMobile ? 'top 92%' : 'top 88%',
-            end: 'bottom top',
-            toggleActions: 'play reverse play reverse'
+            toggleActions: 'play none none none',
+            once: true
           }
         }
       );
@@ -950,11 +950,12 @@ document.addEventListener('DOMContentLoaded', () => {
           duration: 0.78,
           delay: isMobile ? 0.10 : 0.32,
           ease: 'power2.out',
+          clearProps: 'transform,opacity',
           scrollTrigger: {
             trigger: showcaseHotline,
             start: isMobile ? 'top 94%' : 'top 92%',
-            end: 'bottom top',
-            toggleActions: 'play reverse play reverse'
+            toggleActions: 'play none none none',
+            once: true
           }
         }
       );
@@ -972,11 +973,12 @@ document.addEventListener('DOMContentLoaded', () => {
           duration: 0.82,
           delay: 0.08,
           ease: 'power2.out',
+          clearProps: 'transform,opacity',
           scrollTrigger: {
             trigger: contactLeftCard,
             start: 'top 90%',
-            end: 'bottom top',
-            toggleActions: 'play reverse play reverse'
+            toggleActions: 'play none none none',
+            once: true
           }
         }
       );
@@ -993,11 +995,12 @@ document.addEventListener('DOMContentLoaded', () => {
           duration: 0.82,
           delay: isMobile ? 0.08 : 0.18,
           ease: 'power2.out',
+          clearProps: 'transform,opacity',
           scrollTrigger: {
             trigger: contactRightForm,
             start: 'top 90%',
-            end: 'bottom top',
-            toggleActions: 'play reverse play reverse'
+            toggleActions: 'play none none none',
+            once: true
           }
         }
       );
@@ -1015,11 +1018,12 @@ document.addEventListener('DOMContentLoaded', () => {
           duration: 0.75,
           delay: isMobile ? 0 : idx * 0.08,
           ease: 'power2.out',
+          clearProps: 'transform,opacity',
           scrollTrigger: {
             trigger: col,
             start: 'top 94%',
-            end: 'bottom top',
-            toggleActions: 'play reverse play reverse'
+            toggleActions: 'play none none none',
+            once: true
           }
         }
       );
@@ -1039,12 +1043,13 @@ document.addEventListener('DOMContentLoaded', () => {
               duration: 0.80, 
               delay: isMobile ? 0 : (index % 2) * 0.08,
               ease: 'power2.out',
+              clearProps: 'transform,opacity',
               scrollTrigger: {
-                trigger: card,
-                start: 'top 88%',
-                end: 'bottom top',
-                toggleActions: 'play reverse play reverse'
-              }
+            trigger: card,
+            start: 'top 88%',
+            toggleActions: 'play none none none',
+            once: true
+          }
             }
           );
         });
@@ -1123,11 +1128,11 @@ document.addEventListener('DOMContentLoaded', () => {
             ease: 'power2.out',
             force3D: true,
             scrollTrigger: {
-              trigger: el,
-              start: 'top 88%',
-              end: 'bottom top',
-              toggleActions: 'play reverse play reverse'
-            }
+            trigger: el,
+            start: 'top 88%',
+            toggleActions: 'play none none none',
+            once: true
+          }
           }
         );
 
@@ -1146,11 +1151,11 @@ document.addEventListener('DOMContentLoaded', () => {
               ease: 'power2.out',
               force3D: true,
               scrollTrigger: {
-                trigger: el,
-                start: 'top 88%',
-                end: 'bottom top',
-                toggleActions: 'play reverse play reverse'
-              }
+            trigger: el,
+            start: 'top 88%',
+            toggleActions: 'play none none none',
+            once: true
+          }
             }
           );
         }
@@ -1162,9 +1167,6 @@ document.addEventListener('DOMContentLoaded', () => {
               if (entry.isIntersecting) {
                 el.classList.remove('slide-hidden');
                 el.classList.add('active-slide');
-              } else if (entry.boundingClientRect.top > (window.innerHeight || document.documentElement.clientHeight) || (window.scrollY || window.pageYOffset) < 80) {
-                el.classList.remove('active-slide');
-                el.classList.add('slide-hidden');
               }
             });
           },
@@ -1626,8 +1628,6 @@ document.addEventListener('DOMContentLoaded', () => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             entry.target.classList.add('stagger-revealed');
-          } else if (entry.boundingClientRect.top > (window.innerHeight || document.documentElement.clientHeight) || (window.scrollY || window.pageYOffset) < 80) {
-            entry.target.classList.remove('stagger-revealed');
           }
         });
       },
@@ -2197,3 +2197,66 @@ window.toggleTeamContent = function(btn) {
 
 
 
+
+
+  // ── Interactive Hiring Section Layout Switcher ───────────────────────────
+  window.setHiringLayout = function(layout) {
+    const grid = document.getElementById('hiring-roles-grid');
+    const spotlightNav = document.getElementById('spotlight-role-nav');
+    if (!grid) return;
+
+    // Update active button state
+    document.querySelectorAll('.layout-toggle-btn').forEach(btn => btn.classList.remove('active'));
+    const activeBtn = document.getElementById(`btn-layout-${layout}`);
+    if (activeBtn) activeBtn.classList.add('active');
+
+    // Remove existing layout classes and apply new one
+    grid.classList.remove('layout-vertical', 'layout-horizontal', 'layout-spotlight');
+    grid.classList.add(`layout-${layout}`);
+
+    if (layout === 'spotlight') {
+      if (spotlightNav) spotlightNav.style.display = 'flex';
+      window.setSpotlightRole(1); // default to first card
+    } else {
+      if (spotlightNav) spotlightNav.style.display = 'none';
+      // Reset card visibility
+      grid.querySelectorAll('.hiring-card').forEach(card => {
+        card.style.display = '';
+        card.classList.remove('active-spotlight');
+      });
+    }
+
+    if (window.lucide) lucide.createIcons();
+  };
+
+  window.setSpotlightRole = function(roleId) {
+    const grid = document.getElementById('hiring-roles-grid');
+    const spotlightNav = document.getElementById('spotlight-role-nav');
+    if (!grid || !grid.classList.contains('layout-spotlight')) return;
+
+    // Update spotlight tab buttons
+    if (spotlightNav) {
+      const tabs = spotlightNav.querySelectorAll('.spotlight-tab-btn');
+      tabs.forEach((tab, idx) => {
+        if (idx === (roleId - 1)) {
+          tab.classList.add('active');
+        } else {
+          tab.classList.remove('active');
+        }
+      });
+    }
+
+    // Show only selected role card in spotlight
+    const cards = grid.querySelectorAll('.hiring-card');
+    cards.forEach(card => {
+      if (card.getAttribute('data-role-id') === String(roleId)) {
+        card.style.display = 'flex';
+        card.classList.add('active-spotlight');
+      } else {
+        card.style.display = 'none';
+        card.classList.remove('active-spotlight');
+      }
+    });
+
+    if (window.lucide) lucide.createIcons();
+  };
