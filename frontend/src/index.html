@@ -113,9 +113,165 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Montserrat:wght@400;500;600;700;800;900&family=Open+Sans:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&family=Pacifico&display=swap" rel="stylesheet">
   
-  <link rel="stylesheet" href="style.css?v=6.4.8">
-  <link rel="stylesheet" href="prototype.css?v=6.3.0">
+  <link rel="stylesheet" href="style.css?v=6.5.6">
+  <link rel="stylesheet" href="prototype.css?v=6.3.9">
   <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    /* Instant Cache-Bypassing Mobile Overrides */
+    .collage-badge {
+      display: none !important;
+    }
+    /* Connected Clinical Ecosystem / Showcase Photo Panel Height on Mobile */
+    @media (max-width: 991px) {
+      .proto-showcase-photo-col,
+      .showcase-slide-photo {
+        min-height: clamp(380px, 52vh, 440px) !important;
+        height: clamp(380px, 52vh, 440px) !important;
+      }
+    }
+    @media (max-width: 768px) {
+      .proto-showcase-photo-col,
+      .showcase-slide-photo {
+        min-height: clamp(400px, 58vh, 460px) !important;
+        height: clamp(400px, 58vh, 460px) !important;
+      }
+      .proto-showcase-photo-overlay {
+        padding: clamp(1.85rem, 5vw, 2.4rem) clamp(1.4rem, 4.5vw, 1.85rem) !important;
+      }
+      .proto-showcase-photo-overlay p {
+        font-size: 0.88rem !important;
+        line-height: 1.52 !important;
+        display: block !important;
+        -webkit-line-clamp: unset !important;
+        overflow: visible !important;
+      }
+      .proto-showcase-stats-row {
+        margin-top: 1.25rem !important;
+        padding-top: 1.15rem !important;
+      }
+    }
+    @media (max-width: 480px) {
+      .proto-showcase-photo-col,
+      .showcase-slide-photo {
+        min-height: clamp(390px, 60vh, 450px) !important;
+        height: clamp(390px, 60vh, 450px) !important;
+      }
+      .proto-showcase-photo-overlay {
+        padding: 1.75rem 1.35rem !important;
+      }
+      .proto-showcase-photo-overlay h4 {
+        font-size: 1.35rem !important;
+        line-height: 1.25 !important;
+        margin-bottom: 0.5rem !important;
+      }
+      .proto-showcase-photo-overlay p {
+        font-size: 0.86rem !important;
+        line-height: 1.5 !important;
+        display: block !important;
+        -webkit-line-clamp: unset !important;
+        overflow: visible !important;
+      }
+      .proto-showcase-stats-row {
+        margin-top: 1.15rem !important;
+        padding-top: 1rem !important;
+      }
+    }
+
+    /* Our Core Values: Header Spacing & Mobile Card Gaps */
+    #core-values-section .values-slide-header,
+    #core-values-section .accent-heading-wrapper,
+    .values-slide-header {
+      margin-bottom: clamp(2.5rem, 4vw, 3.5rem) !important;
+    }
+    @media (max-width: 768px) {
+      #core-values-section .values-slide-header,
+      #core-values-section .accent-heading-wrapper,
+      .values-slide-header {
+        margin-bottom: clamp(2rem, 5.5vw, 2.75rem) !important;
+      }
+      #core-values-section .proto-tricard-grid,
+      .proto-tricard-section .proto-tricard-grid,
+      .proto-tricard-grid {
+        gap: clamp(2.2rem, 5.5vw, 2.85rem) !important;
+      }
+    }
+    @media (max-width: 480px) {
+      #core-values-section .values-slide-header,
+      #core-values-section .accent-heading-wrapper,
+      .values-slide-header {
+        margin-bottom: clamp(1.85rem, 5vw, 2.4rem) !important;
+      }
+      #core-values-section .proto-tricard-grid,
+      .proto-tricard-section .proto-tricard-grid,
+      .proto-tricard-grid {
+        gap: clamp(2rem, 5vw, 2.6rem) !important;
+      }
+    }
+
+    /* Stretched Solutions Header Layout */
+    .solutions-story-row {
+      grid-template-columns: 1.35fr 0.85fr !important;
+      gap: 3.5rem !important;
+    }
+    .solutions-slide-header {
+      width: 100% !important;
+      max-width: 100% !important;
+    }
+    .solutions-slide-header .proto-heading-lg {
+      width: 100% !important;
+      max-width: 100% !important;
+      font-size: clamp(1.65rem, 2.5vw, 2.35rem) !important;
+      line-height: 1.22 !important;
+      letter-spacing: -0.015em !important;
+    }
+    @media (max-width: 960px) {
+      .solutions-story-row {
+        grid-template-columns: 1fr !important;
+        gap: 2.25rem !important;
+      }
+      .solutions-slide-header .proto-heading-lg {
+        font-size: clamp(1.35rem, 4.6vw, 1.75rem) !important;
+        line-height: 1.25 !important;
+      }
+    }
+
+    /* Mobile Screen: Reasonable Spacing & Gap Between Home Page Sections */
+    @media (max-width: 768px) {
+      #home .section-padding {
+        padding-top: clamp(4.2rem, 9vw, 5.25rem) !important;
+        padding-bottom: clamp(4.2rem, 9vw, 5.25rem) !important;
+      }
+      #home .sharp-top-slant-left,
+      #home .sharp-top-slant-right {
+        margin-top: -1.5vw !important;
+        padding-top: calc(clamp(4.2rem, 9vw, 5.25rem) + 2vw) !important;
+        padding-bottom: clamp(4rem, 8.5vw, 5rem) !important;
+      }
+      #home .strip-section {
+        padding-top: clamp(3.2rem, 6.5vw, 4.2rem) !important;
+        padding-bottom: clamp(3.2rem, 6.5vw, 4.2rem) !important;
+      }
+      #home .callout-banner-section {
+        padding-top: clamp(3.8rem, 7.5vw, 4.8rem) !important;
+        padding-bottom: clamp(3.8rem, 7.5vw, 4.8rem) !important;
+      }
+    }
+
+    @media (max-width: 1024px) {
+      .accent-heading-wrapper,
+      .welcome-section .accent-heading-wrapper,
+      .welcome-slide-heading,
+      .values-slide-header,
+      .team-slide-top-header {
+        border-left: none !important;
+        border-inline-start: none !important;
+        padding-left: 0 !important;
+      }
+      .arch-stamp-badge {
+        display: none !important;
+      }
+    }
+  </style>
 </head>
 <body id="home">
 
@@ -295,7 +451,7 @@
        ========================================================================= -->
   <section class="proto-tricard-section section-padding geometric-ribbon-section sharp-top-slant-left" id="core-values-section">
     <div class="container">
-      <div class="accent-heading-wrapper values-slide-header" style="margin-bottom: 2.2rem;">
+      <div class="accent-heading-wrapper values-slide-header" style="margin-bottom: clamp(2.5rem, 4vw, 3.5rem);">
         <h2 class="welcome-title" style="margin-bottom: 0;">
           Our Core <span class="brand-highlight">VALUES</span>
         </h2>
@@ -548,7 +704,6 @@
           <div class="photo-collage-3">
             <div class="collage-item collage-item-main">
               <img src="assets/images/team_divine.jpg" alt="Divine Fingers Health Care Team" class="collage-img">
-              <span class="collage-badge">PATIENT-CENTERED CARE</span>
             </div>
             <div class="collage-row-sub">
               <div class="collage-item collage-item-sub">

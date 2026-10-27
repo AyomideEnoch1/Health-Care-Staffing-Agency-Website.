@@ -649,7 +649,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       try {
-        const res = await fetch('/api/newsletter/subscribe', {
+        const res = await fetch(`${API_BASE}/newsletter/subscribe`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, source: 'homepage_strip' })

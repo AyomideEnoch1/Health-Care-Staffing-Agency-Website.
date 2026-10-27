@@ -2633,6 +2633,9 @@
     padding: 3.8rem 0 !important;
   }
   .accent-heading-wrapper {
+    border-left: none !important;
+    border-inline-start: none !important;
+    padding-left: 0 !important;
     margin-bottom: 1.4rem !important;
   }
   .welcome-title {
@@ -2710,11 +2713,16 @@
   }
   .strip-social {
     display: flex !important;
+    flex-direction: row !important;
     align-items: center !important;
-    justify-content: space-between !important;
-    width: 100% !important;
-    padding-top: 1rem !important;
+    justify-content: flex-start !important;
+    flex-wrap: nowrap !important;
+    gap: 0.75rem !important;
+    width: auto !important;
+    max-width: 100% !important;
+    padding: 0.9rem 0.75rem 0.25rem 0.75rem !important;
     border-top: 1px solid rgba(26, 58, 99, 0.1) !important;
+    box-sizing: border-box !important;
   }
 }
 
@@ -2737,9 +2745,39 @@
     justify-content: center !important;
   }
   .strip-social {
-    flex-direction: column !important;
-    align-items: flex-start !important;
-    gap: 0.6rem !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    flex-wrap: nowrap !important;
+    gap: 0.65rem !important;
+    width: auto !important;
+    max-width: 100% !important;
+    padding: 0.85rem 0.75rem 0.25rem 0.75rem !important;
+    box-sizing: border-box !important;
+  }
+  .social-label,
+  .strip-section .strip-slide-social-text {
+    font-size: clamp(0.72rem, 3.2vw, 0.88rem) !important;
+    white-space: nowrap !important;
+    margin: 0 !important;
+  }
+  .social-buttons,
+  .strip-social-icons {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    flex-wrap: nowrap !important;
+    gap: 0.45rem !important;
+    flex-shrink: 0 !important;
+    margin: 0 !important;
+  }
+  .social-circle-btn {
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px !important;
+    min-height: 32px !important;
+    flex-shrink: 0 !important;
   }
 }
 
@@ -2940,8 +2978,8 @@
     grid-template-columns: 1fr !important;
   }
   .proto-showcase-photo-col {
-    min-height: 340px !important;
-    height: 340px !important;
+    min-height: clamp(380px, 52vh, 440px) !important;
+    height: clamp(380px, 52vh, 440px) !important;
   }
   .proto-showcase-content-col {
     padding: 2.2rem 1.8rem !important;
@@ -2954,8 +2992,8 @@
 
 @media (max-width: 640px) {
   .proto-showcase-photo-col {
-    min-height: 280px !important;
-    height: 280px !important;
+    min-height: clamp(400px, 58vh, 460px) !important;
+    height: clamp(400px, 58vh, 460px) !important;
   }
   .proto-showcase-photo-overlay {
     padding: 1.6rem 1.3rem !important;
@@ -4623,4 +4661,213 @@ img, video, canvas, svg {
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
+}
+
+
+/* Mobile Screen Only: Remove vertical header indicator lines & hide 100% CNO verified badge */
+@media (max-width: 768px) {
+  .accent-heading-wrapper,
+  .welcome-section .accent-heading-wrapper {
+    border-left: none !important;
+    padding-left: 0 !important;
+  }
+  .arch-stamp-badge {
+    display: none !important;
+  }
+}
+
+
+/* Bulletproof Mobile Override: Completely Remove Vertical Indicator Line Beside Headers */
+@media (max-width: 1024px) {
+  .accent-heading-wrapper,
+  .welcome-section .accent-heading-wrapper,
+  .welcome-slide-heading,
+  .values-slide-header,
+  .team-slide-top-header,
+  .welcome-header {
+    border-left: none !important;
+    border-inline-start: none !important;
+    padding-left: 0 !important;
+  }
+  .arch-stamp-badge {
+    display: none !important;
+  }
+}
+
+/* ==========================================================================
+   MOBILE SCREEN ONLY: REASONABLE SPACING / GAP BETWEEN HOME PAGE SECTIONS
+   ========================================================================== */
+@media (max-width: 768px) {
+  #home .section-padding {
+    padding-top: clamp(4.2rem, 9vw, 5.25rem) !important;
+    padding-bottom: clamp(4.2rem, 9vw, 5.25rem) !important;
+  }
+
+  #home .sharp-top-slant-left,
+  #home .sharp-top-slant-right {
+    margin-top: -1.5vw !important;
+    padding-top: calc(clamp(4.2rem, 9vw, 5.25rem) + 2vw) !important;
+    padding-bottom: clamp(4rem, 8.5vw, 5rem) !important;
+  }
+
+  #home .strip-section {
+    padding-top: clamp(3.2rem, 6.5vw, 4.2rem) !important;
+    padding-bottom: clamp(3.2rem, 6.5vw, 4.2rem) !important;
+  }
+
+  #home .callout-banner-section {
+    padding-top: clamp(3.8rem, 7.5vw, 4.8rem) !important;
+    padding-bottom: clamp(3.8rem, 7.5vw, 4.8rem) !important;
+  }
+}
+
+/* ==========================================================================
+   STRETCHED SOLUTIONS STORY ROW & HEADER LAYOUT
+   Prevents tight 3-line word wrapping on "No matter the clinical challenge, we've got a solution"
+   ========================================================================== */
+.solutions-story-row {
+  grid-template-columns: 1.35fr 0.85fr !important;
+  gap: 3.5rem !important;
+}
+
+.solutions-slide-header {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.solutions-slide-header .proto-heading-lg {
+  width: 100% !important;
+  max-width: 100% !important;
+  font-size: clamp(1.65rem, 2.5vw, 2.35rem) !important;
+  line-height: 1.22 !important;
+  letter-spacing: -0.015em !important;
+  word-break: normal !important;
+  overflow-wrap: break-word !important;
+  margin-bottom: 1.25rem !important;
+}
+
+@media (min-width: 1400px) {
+  .solutions-story-row {
+    grid-template-columns: 1.4fr 0.8fr !important;
+    gap: 4rem !important;
+  }
+  .solutions-slide-header .proto-heading-lg {
+    font-size: 2.45rem !important;
+  }
+}
+
+@media (max-width: 960px) {
+  .solutions-story-row {
+    grid-template-columns: 1fr !important;
+    gap: 2.25rem !important;
+  }
+  .solutions-slide-header .proto-heading-lg {
+    font-size: clamp(1.35rem, 4.6vw, 1.75rem) !important;
+    line-height: 1.25 !important;
+    margin-bottom: 1rem !important;
+  }
+}
+
+
+/* ==========================================================================
+   OUR CORE VALUES: HEADER SPACING & MOBILE CARD GAPS
+   ========================================================================== */
+#core-values-section .values-slide-header,
+#core-values-section .accent-heading-wrapper,
+.values-slide-header {
+  margin-bottom: clamp(2.5rem, 4vw, 3.5rem) !important;
+}
+
+@media (max-width: 768px) {
+  #core-values-section .values-slide-header,
+  #core-values-section .accent-heading-wrapper,
+  .values-slide-header {
+    margin-bottom: clamp(2rem, 5.5vw, 2.75rem) !important;
+  }
+
+  #core-values-section .proto-tricard-grid,
+  .proto-tricard-section .proto-tricard-grid,
+  .proto-tricard-grid {
+    gap: clamp(2.2rem, 5.5vw, 2.85rem) !important;
+  }
+}
+
+@media (max-width: 480px) {
+  #core-values-section .values-slide-header,
+  #core-values-section .accent-heading-wrapper,
+  .values-slide-header {
+    margin-bottom: clamp(1.85rem, 5vw, 2.4rem) !important;
+  }
+
+  #core-values-section .proto-tricard-grid,
+  .proto-tricard-section .proto-tricard-grid,
+  .proto-tricard-grid {
+    gap: clamp(2rem, 5vw, 2.6rem) !important;
+  }
+}
+
+
+/* ==========================================================================
+   SHOWCASE PHOTO PANEL (CONNECTED CLINICAL ECOSYSTEM) MOBILE HEIGHT
+   ========================================================================== */
+@media (max-width: 991px) {
+  .proto-showcase-photo-col,
+  .showcase-slide-photo {
+    min-height: clamp(380px, 52vh, 440px) !important;
+    height: clamp(380px, 52vh, 440px) !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .proto-showcase-photo-col,
+  .showcase-slide-photo {
+    min-height: clamp(400px, 58vh, 460px) !important;
+    height: clamp(400px, 58vh, 460px) !important;
+  }
+  .proto-showcase-photo-overlay {
+    padding: clamp(1.85rem, 5vw, 2.4rem) clamp(1.4rem, 4.5vw, 1.85rem) !important;
+  }
+  .proto-showcase-photo-overlay p {
+    font-size: 0.88rem !important;
+    line-height: 1.52 !important;
+    display: block !important;
+    -webkit-line-clamp: unset !important;
+    overflow: visible !important;
+  }
+  .proto-showcase-stats-row {
+    margin-top: 1.25rem !important;
+    padding-top: 1.15rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .proto-showcase-photo-col,
+  .showcase-slide-photo {
+    min-height: clamp(390px, 60vh, 450px) !important;
+    height: clamp(390px, 60vh, 450px) !important;
+  }
+  .proto-showcase-photo-overlay {
+    padding: 1.75rem 1.35rem !important;
+  }
+  .proto-showcase-photo-overlay h4 {
+    font-size: 1.35rem !important;
+    line-height: 1.25 !important;
+    margin-bottom: 0.5rem !important;
+  }
+  .proto-showcase-photo-overlay p {
+    font-size: 0.86rem !important;
+    line-height: 1.5 !important;
+    display: block !important;
+    -webkit-line-clamp: unset !important;
+    overflow: visible !important;
+  }
+  .proto-showcase-stats-row {
+    margin-top: 1.15rem !important;
+    padding-top: 1rem !important;
+  }
+}
+
+/* Hide collage badge tag */
+.collage-badge {
+  display: none !important;
 }

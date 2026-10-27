@@ -137,7 +137,8 @@ app.use(cors({
     if (
       (renderHost && origin.includes(renderHost)) ||
       origin.endsWith('.onrender.com') ||
-      origin.includes('divinefingershealthcare.ca')
+      origin.includes('divinefingershealthcare.ca') ||
+      origin.includes('divinefingershealthcareservice.ca')
     ) {
       return callback(null, true);
     }

@@ -2933,13 +2933,13 @@
   window.exportActiveReportCSV = function(overrideType) {
     const type = overrideType || LiveStore.activeReportType || 'shifts';
     if (type === 'shifts') {
-      window.location.href = '/api/shifts/export';
+      window.location.href = `${API_BASE}/shifts/export`;
     } else if (type === 'roster') {
       DivineFingersDB.exportCSV('df_staff_roster', 'Staff_Roster_Registry.csv');
     } else if (type === 'applicants') {
       DivineFingersDB.exportCSV('df_job_applicants', 'Candidate_ATS_Pipeline.csv');
     } else if (type === 'subscribers') {
-      window.location.href = '/api/newsletter/export';
+      window.location.href = `${API_BASE}/newsletter/export`;
     }
   };
 
