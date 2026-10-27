@@ -3808,13 +3808,16 @@ img, video, canvas, svg {
 
 @media (max-width: 860px) {
   .masonry-columns-wrapper.wide-spread {
-    grid-template-columns: 1fr;
-    gap: 16px;
+    grid-template-columns: 1fr !important;
+    gap: 0 !important;
   }
-  .masonry-columns-wrapper.wide-spread .masonry-col-1,
   .masonry-columns-wrapper.wide-spread .masonry-col-2,
   .masonry-columns-wrapper.wide-spread .masonry-col-3 {
-    height: 280px;
+    display: none !important;
+  }
+  .masonry-columns-wrapper.wide-spread .masonry-col-1 {
+    height: 280px !important;
+    width: 100% !important;
   }
 }
 .masonry-tag {
@@ -4870,4 +4873,937 @@ img, video, canvas, svg {
 /* Hide collage badge tag */
 .collage-badge {
   display: none !important;
+}
+
+
+/* ==========================================================================
+   SHOWCASE HOTLINE CARD: FULL WIDTH & INLINE PHONE ICON
+   ========================================================================== */
+.hotline-main-info {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  gap: 0.35rem !important;
+}
+
+.hotline-header-row {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.55rem !important;
+}
+
+.hotline-header-row .hotline-icon-box {
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px !important;
+  min-height: 32px !important;
+  border-radius: 50% !important;
+  background: rgba(60, 175, 138, 0.2) !important;
+  border: 1.5px solid rgba(60, 175, 138, 0.4) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: var(--teal-green, #3CAF8A) !important;
+  flex-shrink: 0 !important;
+}
+
+.hotline-header-row .hotline-icon-box svg,
+.hotline-header-row .hotline-icon-box i {
+  width: 16px !important;
+  height: 16px !important;
+}
+
+.hotline-header-row .hotline-eyebrow {
+  font-size: 0.72rem !important;
+  font-weight: 800 !important;
+  color: var(--teal-green, #3CAF8A) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.6px !important;
+  white-space: nowrap !important;
+  margin: 0 !important;
+  line-height: 1 !important;
+}
+
+.hotline-main-info .hotline-number {
+  font-size: 1.25rem !important;
+  font-family: var(--font-heading) !important;
+  font-weight: 800 !important;
+  color: #ffffff !important;
+  letter-spacing: 0.3px !important;
+  line-height: 1.2 !important;
+  margin: 0 !important;
+  padding-left: 2.35rem !important;
+}
+
+@media (max-width: 768px) {
+  #showcase-box-section.proto-showcase-box {
+    padding: 0 !important;
+  }
+  .proto-showcase-content-col {
+    padding: 1.6rem 0.85rem !important;
+  }
+  .proto-showcase-hotline-bar {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    margin: 1.25rem 0 0 0 !important;
+    padding: 1.15rem 1.1rem !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.95rem !important;
+    border-radius: 12px !important;
+  }
+  .hotline-header-row {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    width: 100% !important;
+  }
+  .hotline-header-row .hotline-eyebrow {
+    font-size: clamp(0.68rem, 2.5vw, 0.74rem) !important;
+    white-space: nowrap !important;
+    letter-spacing: 0.5px !important;
+  }
+  .hotline-main-info .hotline-number {
+    font-size: clamp(1.2rem, 4.5vw, 1.45rem) !important;
+    padding-left: 0 !important;
+    margin-top: 0.2rem !important;
+  }
+  .proto-showcase-hotline-bar .hotline-btn-pill {
+    width: 100% !important;
+    text-align: center !important;
+    justify-content: center !important;
+    padding: 0.75rem 1rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .proto-showcase-content-col {
+    padding: 1.4rem 0.75rem !important;
+  }
+  .proto-showcase-hotline-bar {
+    padding: 1.1rem 0.95rem !important;
+  }
+  .hotline-header-row .hotline-eyebrow {
+    font-size: clamp(0.64rem, 2.6vw, 0.7rem) !important;
+    letter-spacing: 0.3px !important;
+  }
+  .hotline-header-row .hotline-icon-box {
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px !important;
+    min-height: 28px !important;
+  }
+  .hotline-header-row .hotline-icon-box svg,
+  .hotline-header-row .hotline-icon-box i {
+    width: 14px !important;
+    height: 14px !important;
+  }
+}
+
+
+/* ==========================================================================
+   CONTACT SECTION: DEFAULT HOVER ICON COLOR & MOBILE COLUMN SURGE BOX
+   ========================================================================== */
+.preview-style-info-card .info-icon-circle {
+  background: var(--cyan-turquoise, #1BAECF) !important;
+  border: 1px solid var(--cyan-turquoise, #1BAECF) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 3px 10px rgba(27, 174, 207, 0.22) !important;
+}
+
+.preview-style-info-card .info-icon-circle svg,
+.preview-style-info-card .info-icon-circle i {
+  color: #FFFFFF !important;
+  stroke: #FFFFFF !important;
+}
+
+.preview-style-info-card .info-item:hover .info-icon-circle {
+  background: #0E7490 !important;
+  border-color: #0E7490 !important;
+  color: #FFFFFF !important;
+  transform: scale(1.06) !important;
+  box-shadow: 0 4px 14px rgba(14, 116, 144, 0.35) !important;
+}
+
+@media (max-width: 768px) {
+  .preview-style-info-card .surge-dispatch-box,
+  .surge-dispatch-box {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.5rem !important;
+  }
+}
+
+
+/* ==========================================================================
+   CONTACT FORM LABELS & ICONS: LEFT ALIGNED ICONS, LARGER SIZES ON LARGE SCREENS,
+   AND GROUNDED DEEP CYAN/TEAL ICON COLOR
+   ========================================================================== */
+.form-label,
+.custom-form .form-label,
+.auth-style-form .form-label,
+.style1-glass-card .form-label {
+  display: inline-flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 7px !important;
+  font-size: 0.88rem !important;
+  font-weight: 700 !important;
+  color: var(--navy, #1A3A63) !important;
+  margin-bottom: 0.42rem !important;
+  line-height: 1.25 !important;
+}
+
+.form-label .field-icon,
+.form-label i.field-icon,
+.form-label svg.field-icon,
+.form-label svg,
+.custom-form .form-label .field-icon,
+.custom-form .form-label svg.field-icon,
+.auth-style-form .form-label .field-icon,
+.auth-style-form .form-label svg.field-icon,
+.style1-glass-card .form-label .field-icon,
+.style1-glass-card .form-label svg.field-icon {
+  order: -1 !important;
+  width: 16px !important;
+  height: 16px !important;
+  color: #0E7490 !important;
+  stroke: #0E7490 !important;
+  stroke-width: 2.1px !important;
+  flex-shrink: 0 !important;
+  display: inline-block !important;
+  vertical-align: middle !important;
+  margin-left: 0 !important;
+  margin-right: 2px !important;
+}
+
+@media (min-width: 768px) {
+  .form-label,
+  .custom-form .form-label,
+  .auth-style-form .form-label,
+  .style1-glass-card .form-label {
+    font-size: clamp(0.92rem, 1.1vw, 1rem) !important;
+    gap: 8px !important;
+    margin-bottom: 0.45rem !important;
+  }
+
+  .form-label .field-icon,
+  .form-label i.field-icon,
+  .form-label svg.field-icon,
+  .form-label svg,
+  .custom-form .form-label .field-icon,
+  .custom-form .form-label svg.field-icon,
+  .auth-style-form .form-label .field-icon,
+  .auth-style-form .form-label svg.field-icon,
+  .style1-glass-card .form-label .field-icon,
+  .style1-glass-card .form-label svg.field-icon {
+    width: 18px !important;
+    height: 18px !important;
+  }
+}
+
+@media (min-width: 1200px) {
+  .form-label,
+  .custom-form .form-label,
+  .auth-style-form .form-label,
+  .style1-glass-card .form-label {
+    font-size: 1.02rem !important;
+    gap: 9px !important;
+  }
+
+  .form-label .field-icon,
+  .form-label i.field-icon,
+  .form-label svg.field-icon,
+  .form-label svg,
+  .custom-form .form-label .field-icon,
+  .custom-form .form-label svg.field-icon,
+  .auth-style-form .form-label .field-icon,
+  .auth-style-form .form-label svg.field-icon,
+  .style1-glass-card .form-label .field-icon,
+  .style1-glass-card .form-label svg.field-icon {
+    width: 19px !important;
+    height: 19px !important;
+  }
+}
+
+
+/* ==========================================================================
+   MOBILE SCREEN ONLY: REMOVE HOVER EFFECT ON OUR VALUES CARDS
+   ========================================================================== */
+@media (max-width: 768px) {
+  #core-values-section .proto-pillar-card:hover,
+  #core-values-section .values-slide-card:hover,
+  #core-values-section .values-slide-card.is-in-view:hover,
+  #core-values-section .proto-pillar-card.is-in-view:hover,
+  .proto-tricard-section .values-slide-card:hover,
+  .proto-pillar-card:hover,
+  .values-slide-card:hover,
+  .proto-value-card-2x2:hover {
+    transform: none !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04) !important;
+    border-color: rgba(26, 58, 99, 0.1) !important;
+  }
+
+  #core-values-section .proto-pillar-card:hover .proto-pillar-img-wrap img,
+  .proto-pillar-card:hover .proto-pillar-img-wrap img {
+    transform: none !important;
+  }
+
+  #core-values-section .proto-pillar-card:hover .proto-pillar-icon-badge,
+  .proto-pillar-card:hover .proto-pillar-icon-badge {
+    transform: none !important;
+  }
+
+  .proto-pillar-card.card-respect:hover .proto-pillar-icon-badge {
+    background: #ffffff !important;
+    color: var(--teal-green, #3CAF8A) !important;
+    border-color: #E2E8F0 !important;
+  }
+
+  .proto-pillar-card.card-accountability:hover .proto-pillar-icon-badge {
+    background: #ffffff !important;
+    color: var(--deep-blue, #1B4F8C) !important;
+    border-color: #E2E8F0 !important;
+  }
+
+  .proto-pillar-card.card-partnership:hover .proto-pillar-icon-badge {
+    background: #ffffff !important;
+    color: var(--cyan-turquoise, #1BAECF) !important;
+    border-color: #E2E8F0 !important;
+  }
+
+  .proto-value-card-2x2:hover .proto-card-num-watermark {
+    color: rgba(26, 58, 99, 0.06) !important;
+    transform: none !important;
+  }
+
+  .proto-value-card-2x2:hover .proto-value-icon-box-2x2 {
+    transform: none !important;
+    background: rgba(27, 174, 207, 0.1) !important;
+    color: var(--cyan-turquoise, #1BAECF) !important;
+  }
+}
+
+
+/* ==========================================================================
+   1. REMOVE TWO MASONRY IMAGES ON MOBILE SCREEN (role_icu_care & role_psw_care)
+   ========================================================================== */
+@media (max-width: 768px) {
+  .masonry-columns-wrapper.wide-spread .masonry-col-2,
+  .masonry-columns-wrapper.wide-spread .masonry-col-3,
+  .masonry-col-2,
+  .masonry-col-3 {
+    display: none !important;
+  }
+
+  .masonry-columns-wrapper.wide-spread {
+    grid-template-columns: 1fr !important;
+    gap: 0 !important;
+  }
+
+  .masonry-columns-wrapper.wide-spread .masonry-col-1 {
+    width: 100% !important;
+    height: clamp(240px, 42vh, 300px) !important;
+  }
+}
+
+/* ==========================================================================
+   2. HOTLINE CARD: INCREASE PHONE ICON & TITLE SIZE, CENTER ALL CONTENT
+   ========================================================================== */
+.hotline-header-row .hotline-icon-box {
+  width: clamp(38px, 5.5vw, 44px) !important;
+  height: clamp(38px, 5.5vw, 44px) !important;
+  min-width: clamp(38px, 5.5vw, 44px) !important;
+  min-height: clamp(38px, 5.5vw, 44px) !important;
+}
+
+.hotline-header-row .hotline-icon-box svg,
+.hotline-header-row .hotline-icon-box i {
+  width: clamp(20px, 3vw, 24px) !important;
+  height: clamp(20px, 3vw, 24px) !important;
+}
+
+.hotline-header-row .hotline-eyebrow {
+  font-size: clamp(0.85rem, 2.6vw, 1.05rem) !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.8px !important;
+}
+
+/* Centered Hotline Card Layout */
+.proto-showcase-hotline-bar {
+  text-align: center !important;
+}
+
+.hotline-main-info {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  text-align: center !important;
+  width: 100% !important;
+  gap: 0.45rem !important;
+}
+
+.hotline-header-row {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.75rem !important;
+  width: 100% !important;
+}
+
+.hotline-main-info .hotline-number {
+  text-align: center !important;
+  padding-left: 0 !important;
+  width: 100% !important;
+  margin: 0.2rem 0 0 0 !important;
+}
+
+@media (max-width: 768px) {
+  .proto-showcase-hotline-bar {
+    align-items: center !important;
+    text-align: center !important;
+  }
+
+  .hotline-main-info {
+    align-items: center !important;
+    text-align: center !important;
+  }
+
+  .hotline-header-row {
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 0.65rem !important;
+  }
+
+  .hotline-header-row .hotline-eyebrow {
+    font-size: clamp(0.8rem, 3.2vw, 0.95rem) !important;
+  }
+
+  .hotline-main-info .hotline-number {
+    font-size: clamp(1.25rem, 4.8vw, 1.55rem) !important;
+    text-align: center !important;
+    padding-left: 0 !important;
+  }
+}
+
+
+/* ==========================================================================
+   PERMANENT REMOVAL OF SECONDARY MASONRY IMAGES ON MOBILE & TABLET (<= 1024px)
+   ========================================================================== */
+@media (max-width: 1024px) {
+  .masonry-columns-wrapper.wide-spread .masonry-col-2,
+  .masonry-columns-wrapper.wide-spread .masonry-col-3,
+  .masonry-col-2,
+  .masonry-col-3,
+  .hide-on-mobile {
+    display: none !important;
+  }
+
+  .masonry-columns-wrapper.wide-spread {
+    grid-template-columns: 1fr !important;
+    gap: 0 !important;
+  }
+
+  .masonry-columns-wrapper.wide-spread .masonry-col-1 {
+    width: 100% !important;
+    height: clamp(250px, 45vh, 330px) !important;
+  }
+}
+
+
+/* ==========================================================================
+   STRETCH MONOGRAPH CAPTION CARD ("Patient-Centered Practice") ON LARGE SCREENS
+   ========================================================================== */
+@media (min-width: 768px) {
+      .monograph-caption-card {
+        max-width: 380px !important;
+        width: auto !important;
+        min-width: 280px !important;
+        padding: 0.95rem 1.35rem !important;
+        bottom: 24px !important;
+        right: -3rem !important;
+    border-radius: 6px !important;
+    box-shadow: 0 12px 30px rgba(26, 58, 99, 0.32) !important;
+  }
+
+  .monograph-caption-card strong {
+    font-size: clamp(0.9rem, 1.15vw, 1.02rem) !important;
+    white-space: nowrap !important;
+    margin-bottom: 0.35rem !important;
+    letter-spacing: 0.2px !important;
+  }
+
+  .monograph-caption-card p {
+    font-size: clamp(0.76rem, 0.9vw, 0.82rem) !important;
+    line-height: 1.45 !important;
+  }
+}
+
+@media (min-width: 1200px) {
+      .monograph-caption-card {
+        max-width: 410px !important;
+        min-width: 310px !important;
+        padding: 1.05rem 1.55rem !important;
+        bottom: 28px !important;
+        right: -3.5rem !important;
+  }
+
+  .monograph-caption-card strong {
+    font-size: 1.06rem !important;
+  }
+
+  .monograph-caption-card p {
+    font-size: 0.84rem !important;
+  }
+}
+
+
+/* ==========================================================================
+   HOTLINE CARD: ALIGNED TO THE LEFT ON LARGE SCREENS (>= 769px)
+   ========================================================================== */
+@media (min-width: 769px) {
+  .proto-showcase-hotline-bar {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    text-align: left !important;
+  }
+
+  .hotline-main-info {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    text-align: left !important;
+    width: auto !important;
+    gap: 0.25rem !important;
+  }
+
+  .hotline-header-row {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 0.65rem !important;
+    width: auto !important;
+  }
+
+  .hotline-main-info .hotline-number {
+    font-size: 1.35rem !important;
+    text-align: left !important;
+    padding-left: 0 !important;
+    margin: 0.15rem 0 0 0 !important;
+    width: auto !important;
+  }
+
+  .proto-showcase-hotline-bar .hotline-btn-pill {
+    width: auto !important;
+    flex-shrink: 0 !important;
+    margin: 0 !important;
+  }
+}
+
+
+/* ==========================================================================
+   MOBILE SCREEN: CENTER NAVBAR LOGO & CENTER NAV ITEMS (REMOVE HIGHLIGHT BORDER)
+   ========================================================================== */
+@media (max-width: 991px) {
+  .site-header .header-container,
+  .header-container.container {
+    position: relative !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .site-header .brand-logo,
+  .brand-logo {
+    margin: 0 auto !important;
+    display: flex !important;
+    justify-content: center !important;
+    text-align: center !important;
+  }
+
+  .brand-logo .logo-wrapper {
+    justify-content: center !important;
+    align-items: center !important;
+    margin: 0 auto !important;
+  }
+
+  .mobile-toggle {
+    position: absolute !important;
+    right: clamp(0.75rem, 3vw, 1.25rem) !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    z-index: 10001 !important;
+  }
+
+  /* Centered Nav Items with No Highlighted Border */
+  .nav-item {
+    text-align: center !important;
+    border-bottom: 1px solid rgba(26, 58, 99, 0.06) !important;
+    width: 100% !important;
+  }
+
+  .nav-link {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    margin: 0 auto !important;
+    padding: 0.85rem 1rem !important;
+    border: none !important;
+    border-bottom: none !important;
+    border-left: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    transform: none !important;
+    background: transparent !important;
+  }
+
+  .nav-link:hover,
+  .nav-link:focus,
+  .nav-link.active {
+    border: none !important;
+    border-bottom: none !important;
+    border-left: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    transform: none !important;
+    background: transparent !important;
+    color: var(--teal-green, #3CAF8A) !important;
+  }
+
+  /* Completely remove the highlighted gradient underline/line and arrow */
+  .nav-link::after,
+  .nav-link:hover::after,
+  .nav-link:focus::after,
+  .nav-link.active::after {
+    display: none !important;
+    content: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    border: none !important;
+    background: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+  }
+}
+
+
+/* ==========================================================================
+   OUR CORE VALUES: SMOOTH SCROLL FADE-IN & SLIDE-IN (LARGE SCREEN & MOBILE)
+   ========================================================================== */
+#core-values-section .proto-pillar-card,
+.proto-tricard-section .values-slide-card,
+.values-slide-card {
+  opacity: 0 !important;
+  transform: translate3d(0, 50px, 0) !important;
+  transition: transform 0.95s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.90s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  will-change: transform, opacity !important;
+  -webkit-backface-visibility: hidden !important;
+  backface-visibility: hidden !important;
+}
+
+/* Header reveals when section enters viewport */
+#core-values-section.is-revealed .values-slide-header,
+.proto-tricard-section.is-revealed .values-slide-header {
+  opacity: 1 !important;
+  transform: translate3d(0, 0, 0) !important;
+}
+
+/* Cards reveal individually when each card enters the viewport */
+#core-values-section .proto-pillar-card.card-revealed,
+#core-values-section .proto-pillar-card.is-in-view,
+.proto-tricard-section .values-slide-card.card-revealed,
+.proto-tricard-section .values-slide-card.is-in-view,
+.values-slide-card.card-revealed,
+.values-slide-card.is-in-view {
+  opacity: 1 !important;
+  transform: translate3d(0, 0, 0) !important;
+}
+
+/* Large Screens (>= 769px): Horizontal staggered cascade across the 3 cards */
+@media (min-width: 769px) {
+  #core-values-section .proto-pillar-card:nth-child(1),
+  .values-slide-card:nth-child(1) {
+    transition-delay: 0.08s !important;
+  }
+  #core-values-section .proto-pillar-card:nth-child(2),
+  .values-slide-card:nth-child(2) {
+    transition-delay: 0.24s !important;
+  }
+  #core-values-section .proto-pillar-card:nth-child(3),
+  .values-slide-card:nth-child(3) {
+    transition-delay: 0.40s !important;
+  }
+
+  /* Desktop hover lift after cards are revealed */
+  #core-values-section .proto-pillar-card.card-revealed:hover,
+  #core-values-section .proto-pillar-card.is-in-view:hover,
+  .values-slide-card.card-revealed:hover,
+  .values-slide-card.is-in-view:hover {
+    transform: translate3d(0, -8px, 0) !important;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, border-color 0.3s ease !important;
+    box-shadow: 0 16px 36px rgba(26, 58, 99, 0.12) !important;
+    border-color: var(--teal-green, #3CAF8A) !important;
+  }
+}
+
+/* Mobile Screens (<= 768px): Minimal delay so each stacked card animates smoothly when scrolled into view */
+@media (max-width: 768px) {
+  #core-values-section .proto-pillar-card,
+  .values-slide-card {
+    transition-delay: 0.05s !important;
+    transition-duration: 0.85s !important;
+  }
+}
+
+/* =========================================================================
+   Excellence Slide Media (Masonry Photo) & Showcase Section Scroll Animation
+   Smooth Fade-In and Slide-Up across all devices (Mobile & Desktop)
+   ========================================================================= */
+.excellence-slide-media,
+.masonry-columns-wrapper.wide-spread,
+#showcase-box-section,
+.proto-showcase-box.showcase-block {
+  opacity: 0 !important;
+  transform: translate3d(0, 50px, 0) !important;
+  transition: transform 0.95s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.90s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  will-change: transform, opacity !important;
+  -webkit-backface-visibility: hidden !important;
+  backface-visibility: hidden !important;
+}
+
+.excellence-block.is-revealed .excellence-slide-media,
+.excellence-slide-media.card-revealed,
+.excellence-slide-media.is-in-view,
+.excellence-slide-media.is-revealed,
+.masonry-columns-wrapper.wide-spread.card-revealed,
+.masonry-columns-wrapper.wide-spread.is-in-view,
+.masonry-columns-wrapper.wide-spread.is-revealed,
+#showcase-box-section.card-revealed,
+#showcase-box-section.is-in-view,
+#showcase-box-section.is-revealed,
+.proto-showcase-box.showcase-block.card-revealed,
+.proto-showcase-box.showcase-block.is-in-view,
+.proto-showcase-box.showcase-block.is-revealed {
+  opacity: 1 !important;
+  transform: translate3d(0, 0, 0) !important;
+}
+
+#showcase-box-section.card-revealed .showcase-slide-photo,
+#showcase-box-section.is-in-view .showcase-slide-photo,
+#showcase-box-section.is-revealed .showcase-slide-photo,
+#showcase-box-section.card-revealed .showcase-slide-header,
+#showcase-box-section.is-in-view .showcase-slide-header,
+#showcase-box-section.is-revealed .showcase-slide-header,
+#showcase-box-section.card-revealed .showcase-slide-body,
+#showcase-box-section.is-in-view .showcase-slide-body,
+#showcase-box-section.is-revealed .showcase-slide-body,
+#showcase-box-section.card-revealed .showcase-slide-actions,
+#showcase-box-section.is-in-view .showcase-slide-actions,
+#showcase-box-section.is-revealed .showcase-slide-actions,
+#showcase-box-section.card-revealed .showcase-slide-hotline,
+#showcase-box-section.is-in-view .showcase-slide-hotline,
+#showcase-box-section.is-revealed .showcase-slide-hotline {
+  opacity: 1 !important;
+  transform: translate(0, 0) !important;
+}
+
+
+/* ==========================================================================
+   NAVBAR: Font Family set to Arial
+   ========================================================================== */
+.site-header,
+.site-header *,
+.main-nav,
+.nav-list,
+.nav-item,
+.nav-link,
+.nav-cta-btn,
+.brand-logo,
+.brand-name,
+.brand-tagline,
+.mobile-nav-btn,
+#header-cta-btn,
+#mobile-header-cta-btn {
+  font-family: Arial, Helvetica, sans-serif !important;
+}
+
+
+/* ==========================================================================
+   SCROLL ANIMATIONS FOR 4 CORE SECTIONS (LARGE SCREEN & MOBILE)
+   1. "OUR CLINICAL EXCELLENCE EDGE"
+   2. "WORKFORCE DISPATCH" texts and cards
+   3. "Our Dedicated CLINICAL TEAM"
+   4. "Contact DIVINE FINGERS HEALTH CARE SERVICES INC." texts
+   ========================================================================== */
+
+/* ── 1. OUR CLINICAL EXCELLENCE EDGE ── */
+.excellence-slide-header,
+.excellence-slide-body,
+.excellence-slide-link {
+  opacity: 0 !important;
+  transform: translate3d(0, 45px, 0) !important;
+  transition: transform 0.90s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  will-change: transform, opacity !important;
+  -webkit-backface-visibility: hidden !important;
+  backface-visibility: hidden !important;
+}
+
+.excellence-slide-header { transition-delay: 0.05s !important; }
+.excellence-slide-body   { transition-delay: 0.20s !important; }
+.excellence-slide-link   { transition-delay: 0.35s !important; }
+
+.excellence-block.is-revealed .excellence-slide-header,
+.excellence-block.is-revealed .excellence-slide-body,
+.excellence-block.is-revealed .excellence-slide-link,
+#excellence-section.is-revealed .excellence-slide-header,
+#excellence-section.is-revealed .excellence-slide-body,
+#excellence-section.is-revealed .excellence-slide-link,
+.excellence-slide-header.is-in-view,
+.excellence-slide-body.is-in-view,
+.excellence-slide-link.is-in-view,
+.excellence-slide-header.card-revealed,
+.excellence-slide-body.card-revealed,
+.excellence-slide-link.card-revealed {
+  opacity: 1 !important;
+  transform: translate3d(0, 0, 0) !important;
+}
+
+/* ── 2. WORKFORCE DISPATCH TEXTS & CARDS ── */
+.showcase-slide-header,
+.showcase-slide-body,
+.showcase-slide-actions,
+.proto-showcase-action-card,
+.showcase-slide-hotline {
+  opacity: 0 !important;
+  transform: translate3d(0, 45px, 0) !important;
+  transition: transform 0.90s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  will-change: transform, opacity !important;
+  -webkit-backface-visibility: hidden !important;
+  backface-visibility: hidden !important;
+}
+
+.showcase-slide-header { transition-delay: 0.08s !important; }
+.showcase-slide-body   { transition-delay: 0.22s !important; }
+.showcase-slide-actions,
+.proto-showcase-action-card.card-facilities  { transition-delay: 0.36s !important; }
+.proto-showcase-action-card.card-jobseekers  { transition-delay: 0.48s !important; }
+.showcase-slide-hotline                      { transition-delay: 0.58s !important; }
+
+.showcase-block.is-revealed .showcase-slide-header,
+.showcase-block.is-revealed .showcase-slide-body,
+.showcase-block.is-revealed .showcase-slide-actions,
+.showcase-block.is-revealed .proto-showcase-action-card,
+.showcase-block.is-revealed .showcase-slide-hotline,
+#showcase-box-section.is-revealed .showcase-slide-header,
+#showcase-box-section.is-revealed .showcase-slide-body,
+#showcase-box-section.is-revealed .showcase-slide-actions,
+#showcase-box-section.is-revealed .proto-showcase-action-card,
+#showcase-box-section.is-revealed .showcase-slide-hotline,
+.showcase-slide-header.is-in-view,
+.showcase-slide-body.is-in-view,
+.showcase-slide-actions.is-in-view,
+.proto-showcase-action-card.is-in-view,
+.showcase-slide-hotline.is-in-view,
+.showcase-slide-header.card-revealed,
+.showcase-slide-body.card-revealed,
+.showcase-slide-actions.card-revealed,
+.proto-showcase-action-card.card-revealed,
+.showcase-slide-hotline.card-revealed {
+  opacity: 1 !important;
+  transform: translate3d(0, 0, 0) !important;
+}
+
+/* ── 3. OUR DEDICATED CLINICAL TEAM ── */
+.team-slide-top-header,
+.team-slide-header,
+.team-slide-body,
+.team-slide-media,
+.team-slide-benefits,
+.team-slide-link {
+  opacity: 0 !important;
+  transform: translate3d(0, 45px, 0) !important;
+  transition: transform 0.90s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  will-change: transform, opacity !important;
+  -webkit-backface-visibility: hidden !important;
+  backface-visibility: hidden !important;
+}
+
+.team-slide-top-header { transition-delay: 0.05s !important; }
+.team-slide-media      { transition-delay: 0.16s !important; }
+.team-slide-header     { transition-delay: 0.28s !important; }
+.team-slide-body       { transition-delay: 0.40s !important; }
+.team-slide-benefits,
+.team-slide-link       { transition-delay: 0.52s !important; }
+
+#team-section.is-revealed .team-slide-top-header,
+#team-section.is-revealed .team-slide-header,
+#team-section.is-revealed .team-slide-body,
+#team-section.is-revealed .team-slide-media,
+#team-section.is-revealed .team-slide-benefits,
+#team-section.is-revealed .team-slide-link,
+.proto-mission-section.is-revealed .team-slide-top-header,
+.proto-mission-section.is-revealed .team-slide-header,
+.proto-mission-section.is-revealed .team-slide-body,
+.proto-mission-section.is-revealed .team-slide-media,
+.proto-mission-section.is-revealed .team-slide-benefits,
+.proto-mission-section.is-revealed .team-slide-link,
+.team-slide-top-header.is-in-view,
+.team-slide-header.is-in-view,
+.team-slide-body.is-in-view,
+.team-slide-media.is-in-view,
+.team-slide-benefits.is-in-view,
+.team-slide-link.is-in-view,
+.team-slide-top-header.card-revealed,
+.team-slide-header.card-revealed,
+.team-slide-body.card-revealed,
+.team-slide-media.card-revealed,
+.team-slide-benefits.card-revealed,
+.team-slide-link.card-revealed {
+  opacity: 1 !important;
+  transform: translate3d(0, 0, 0) !important;
+}
+
+/* ── 4. CONTACT DIVINE FINGERS HEALTH CARE SERVICES INC. ── */
+.contact-slide-top,
+.contact-slide-sub,
+.contact-slide-card,
+.contact-slide-form {
+  opacity: 0 !important;
+  transform: translate3d(0, 45px, 0) !important;
+  transition: transform 0.90s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  will-change: transform, opacity !important;
+  -webkit-backface-visibility: hidden !important;
+  backface-visibility: hidden !important;
+}
+
+.contact-slide-top  { transition-delay: 0.05s !important; }
+.contact-slide-sub  { transition-delay: 0.18s !important; }
+.contact-slide-card { transition-delay: 0.30s !important; }
+.contact-slide-form { transition-delay: 0.44s !important; }
+
+.contact-section.is-revealed .contact-slide-top,
+.contact-section.is-revealed .contact-slide-sub,
+.contact-section.is-revealed .contact-slide-card,
+.contact-section.is-revealed .contact-slide-form,
+#home-contact.is-revealed .contact-slide-top,
+#home-contact.is-revealed .contact-slide-sub,
+#home-contact.is-revealed .contact-slide-card,
+#home-contact.is-revealed .contact-slide-form,
+#contact.is-revealed .contact-slide-top,
+#contact.is-revealed .contact-slide-sub,
+#contact.is-revealed .contact-slide-card,
+#contact.is-revealed .contact-slide-form,
+.contact-slide-top.is-in-view,
+.contact-slide-sub.is-in-view,
+.contact-slide-card.is-in-view,
+.contact-slide-form.is-in-view,
+.contact-slide-top.card-revealed,
+.contact-slide-sub.card-revealed,
+.contact-slide-card.card-revealed,
+.contact-slide-form.card-revealed {
+  opacity: 1 !important;
+  transform: translate3d(0, 0, 0) !important;
 }

@@ -41,6 +41,10 @@ services:
         sync: false
       - key: MAIL_DRIVER
         value: https
+      - key: AGENCY_ALERT_EMAIL
+        value: info@divinefingershealthcare.ca
+      - key: RUN_EMBEDDED_DAEMON
+        value: "true"
       - key: PUBLIC_BASE_URL
         fromService:
           type: web

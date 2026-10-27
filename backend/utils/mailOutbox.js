@@ -112,6 +112,7 @@ async function dispatchOutboxEntry(outboxId, type, recipient, vars) {
     const { subject, html, text } = render(type, vars);
     const info = await sendRawMail({
       to: recipient,
+      replyTo: vars.replyTo || (type === 'contact_alert' ? vars.email : undefined),
       subject,
       html,
       text

@@ -114,6 +114,7 @@ router.post('/', publicFormLimiter, async (req, res, next) => {
       vars: {
         name: validated.name,
         email: validated.email,
+        replyTo: validated.email,
         phone: validated.phone || 'Not provided',
         inquiry_type: validated.inquiry_type || 'General Inquiry',
         inquiry_code: inqCode,

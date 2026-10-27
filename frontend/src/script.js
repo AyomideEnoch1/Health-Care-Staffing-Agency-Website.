@@ -533,18 +533,23 @@ document.addEventListener('DOMContentLoaded', () => {
       const submitBtn = form.querySelector('button[type="submit"]');
       if (submitBtn) submitBtn.disabled = true;
 
-      let name = 'Website Visitor', email = '', phone = '', message = 'General Inquiry';
-      form.querySelectorAll('input, textarea').forEach(inp => {
-        if (inp.placeholder?.includes('NAME'))  name    = inp.value || name;
-        if (inp.type === 'email' || inp.placeholder?.includes('EMAIL')) email = inp.value || email;
-        if (inp.type === 'tel'   || inp.placeholder?.includes('PHONE')) phone = inp.value || phone;
-        if (inp.tagName === 'TEXTAREA') message = inp.value || message;
-      });
+      const prefix = formId === 'general-contact-form' ? 'contact' : 'home-contact';
+      const nameInput = form.querySelector(`#${prefix}-name`) || form.querySelector('input[name="name"], input[placeholder*="Jenkins"], input[placeholder*="NAME" i]');
+      const emailInput = form.querySelector(`#${prefix}-email`) || form.querySelector('input[type="email"]');
+      const phoneInput = form.querySelector(`#${prefix}-phone`) || form.querySelector('input[type="tel"]');
+      const subjectInput = form.querySelector(`#${prefix}-subject`) || form.querySelector('input[name="inquiry_type"], input[placeholder*="Staffing" i]');
+      const messageInput = form.querySelector(`#${prefix}-message`) || form.querySelector('textarea');
+
+      const name = nameInput?.value?.trim() || 'Website Visitor';
+      const email = emailInput?.value?.trim() || '';
+      const phone = phoneInput?.value?.trim() || '';
+      const inquiry_type = subjectInput?.value?.trim() || 'General Inquiry';
+      const message = messageInput?.value?.trim() || 'General Inquiry';
 
       if (feedback) { feedback.style.color = '#00A896'; feedback.textContent = 'Sending message...'; }
 
       try {
-        await apiPost('/contact', { name, email, phone: phone || undefined, message }, feedback);
+        await apiPost('/contact', { name, email, phone: phone || undefined, inquiry_type, message }, feedback);
         if (feedback) {
           feedback.style.color = '#3CAF8A';
           feedback.textContent = '✅ Message sent! Thank you for reaching out to Divine Fingers Healthcare Services.';
@@ -798,52 +803,84 @@ document.addEventListener('DOMContentLoaded', () => {
       );
     });
 
-    // D. Our Values Section Cards: Slide in from bottom and fade in on scroll smoothly with sequential stagger
-    const valuesCards = document.querySelectorAll('.values-slide-card, .proto-pillar-card, .card-respect, .card-accountability, .card-partnership, .proto-value-card-2x2');
+    // D. Our Values Section Cards: Smooth fade-in & slide-in on scroll (Large screen & Mobile)
+    const valuesCards = document.querySelectorAll('#core-values-section .proto-pillar-card, .proto-tricard-section .values-slide-card, .values-slide-card');
     if (valuesCards.length > 0) {
-      // Individual intersection observer for robust slide up on mobile
       if ('IntersectionObserver' in window) {
         const valuesCardObserver = new IntersectionObserver((entries, obs) => {
           entries.forEach(entry => {
             if (entry.isIntersecting) {
               entry.target.classList.add('card-revealed', 'is-in-view');
-              obs.unobserve(entry.target);
+            } else {
+              entry.target.classList.remove('card-revealed', 'is-in-view');
+            }
+          });
+        }, {
+          threshold: 0.10,
+          rootMargin: '0px 0px -30px 0px'
+        });
+        valuesCards.forEach(c => valuesCardObserver.observe(c));
+      } else {
+        valuesCards.forEach(c => c.classList.add('card-revealed', 'is-in-view'));
+      }
+    }
+
+    // D2. Excellence Media & Showcase Section: Fade in and slide up smoothly on scroll
+    const scrollFadeTargets = document.querySelectorAll('.excellence-slide-media, .masonry-columns-wrapper.wide-spread, #showcase-box-section, .proto-showcase-box.showcase-block');
+    if (scrollFadeTargets.length > 0) {
+      if ('IntersectionObserver' in window) {
+        const scrollFadeObserver = new IntersectionObserver((entries, obs) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('card-revealed', 'is-in-view', 'is-revealed');
+              const parentExcellence = entry.target.closest('#excellence-section, .excellence-block');
+              if (parentExcellence) parentExcellence.classList.add('is-revealed');
+            } else {
+              entry.target.classList.remove('card-revealed', 'is-in-view', 'is-revealed');
             }
           });
         }, {
           threshold: 0.12,
           rootMargin: '0px 0px -40px 0px'
         });
-        valuesCards.forEach(c => valuesCardObserver.observe(c));
+        scrollFadeTargets.forEach(el => scrollFadeObserver.observe(el));
+      } else {
+        scrollFadeTargets.forEach(el => el.classList.add('card-revealed', 'is-in-view', 'is-revealed'));
       }
+    }
 
-      valuesCards.forEach((card, index) => {
-        const isMobile = window.innerWidth <= 768;
-        const staggerDelay = isMobile ? 0 : (index % 3) * 0.16;
-        gsap.fromTo(card, 
-          { y: 48, opacity: 0 }, 
-          { 
-            y: 0, 
-            opacity: 1, 
-            duration: 0.85, 
-            delay: staggerDelay, 
-            ease: 'power2.out',
-            scrollTrigger: {
-              trigger: card,
-              start: isMobile ? 'top 90%' : 'top 86%',
-              toggleActions: 'play none none none',
-              once: true,
-              onEnter: () => {
-                card.classList.add('card-revealed', 'is-in-view');
-              }
+    
+    // D3. Four Core Sections Comprehensive Scroll Observer (Desktop & Mobile)
+    const fourSectionsElements = document.querySelectorAll(
+      '.excellence-slide-header, .excellence-slide-body, .excellence-slide-link, ' +
+      '.showcase-slide-header, .showcase-slide-body, .showcase-slide-actions, .proto-showcase-action-card, .showcase-slide-hotline, ' +
+      '.team-slide-top-header, .team-slide-header, .team-slide-body, .team-slide-media, .team-slide-benefits, .team-slide-link, ' +
+      '.contact-slide-top, .contact-slide-sub, .contact-slide-card, .contact-slide-form'
+    );
+    if (fourSectionsElements.length > 0) {
+      if ('IntersectionObserver' in window) {
+        const fourSectionsObserver = new IntersectionObserver((entries, obs) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-in-view', 'card-revealed');
+              const parentSec = entry.target.closest('#excellence-section, .excellence-block, #showcase-box-section, .showcase-block, #team-section, .proto-mission-section, #home-contact, .contact-section');
+              if (parentSec) parentSec.classList.add('is-revealed');
+            } else {
+              entry.target.classList.remove('is-in-view', 'card-revealed');
             }
-          }
-        );
-      });
+          });
+        }, {
+          threshold: 0.08,
+          rootMargin: '0px 0px -25px 0px'
+        });
+        fourSectionsElements.forEach(el => fourSectionsObserver.observe(el));
+      } else {
+        fourSectionsElements.forEach(el => el.classList.add('is-in-view', 'card-revealed'));
+      }
     }
 
     // E. Sections with Multiple Images: Slide in from left and right smoothly
-    const archMainPhotos = document.querySelectorAll('.arch-main-photo, .monograph-bg-plate img, .collage-item-main, .showcase-slide-photo');
+    const archMainPhotos = document.querySelectorAll('.arch-main-photo, .monograph-bg-plate img, .collage-item-main');
     archMainPhotos.forEach(img => {
       gsap.fromTo(img, 
         { x: -40, opacity: 0 }, 
@@ -1258,18 +1295,15 @@ document.addEventListener('DOMContentLoaded', () => {
       const vh = window.innerHeight || document.documentElement.clientHeight;
       const scrollY = window.scrollY || window.pageYOffset;
 
-      // When the top of the welcome section scrolls into view (at 75% viewport height)
-      if (rect.top <= vh * (window.innerWidth < 992 ? 0.88 : 0.78) && rect.bottom >= 0) {
+      if (rect.top <= vh * (window.innerWidth < 992 ? 0.90 : 0.80) && rect.bottom >= 40) {
         welcomeSection.classList.add('is-revealed');
-      } else if (scrollY < 60) {
-        // Reset when user scrolls back to the hero section or far off screen so it replays upon reverse scroll
+      } else if (rect.bottom < -60 || rect.top > vh + 60 || scrollY < 60) {
         welcomeSection.classList.remove('is-revealed');
       }
     };
 
     window.addEventListener('scroll', checkWelcomeScroll, { passive: true });
     window.addEventListener('resize', checkWelcomeScroll, { passive: true });
-    // Initial evaluation
     setTimeout(checkWelcomeScroll, 150);
   }
 
@@ -1286,12 +1320,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const vh = window.innerHeight || document.documentElement.clientHeight;
       const scrollY = window.scrollY || window.pageYOffset;
 
-      // Reveal when the top of the workforce section scrolls up to 78% of viewport
-      if (rect.top <= vh * (window.innerWidth < 992 ? 0.88 : 0.78) && rect.bottom >= 0) {
+      if (rect.top <= vh * (window.innerWidth < 992 ? 0.90 : 0.80) && rect.bottom >= 40) {
         workforceSection.classList.add('is-revealed');
         if (wmWorkforce) wmWorkforce.classList.add('is-revealed');
-      } else if (scrollY < 60) {
-        // Reset when user scrolls far above or below, or returns to the hero section
+      } else if (rect.bottom < -60 || rect.top > vh + 60 || scrollY < 60) {
         workforceSection.classList.remove('is-revealed');
         if (wmWorkforce) wmWorkforce.classList.remove('is-revealed');
       }
@@ -1342,7 +1374,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(checkPurposeScroll, 200);
   }
 
-  // 5d. Core Values Section Staggered Directional Scroll Animations (Large Screens >= 992px)
+  // 5d. Core Values Section Scroll Animations (Large Screens & Mobile Screens)
   const coreValuesSection = document.getElementById('core-values-section') || document.querySelector('.proto-tricard-section');
   if (coreValuesSection) {
     const checkCoreValuesScroll = () => {
@@ -1350,13 +1382,23 @@ document.addEventListener('DOMContentLoaded', () => {
       const vh = window.innerHeight || document.documentElement.clientHeight;
       const scrollY = window.scrollY || window.pageYOffset;
 
-      // Reveal when the top of the section enters 78% of the viewport height
-      if (rect.top <= vh * (window.innerWidth < 992 ? 0.88 : 0.78) && rect.bottom >= 0) {
+      // Reveal section header when section enters viewport
+      if (rect.top <= vh * (window.innerWidth < 992 ? 0.90 : 0.80) && rect.bottom >= 40) {
         coreValuesSection.classList.add('is-revealed');
-      } else if (scrollY < 60) {
-        // Reset when user scrolls back above this section so it can replay smoothly
+      } else if (rect.bottom < -60 || rect.top > vh + 60 || scrollY < 60) {
         coreValuesSection.classList.remove('is-revealed');
       }
+
+      // Check each card individually based on its own position in viewport (bidirectional)
+      const cards = coreValuesSection.querySelectorAll('.proto-pillar-card, .values-slide-card');
+      cards.forEach(card => {
+        const cRect = card.getBoundingClientRect();
+        if (cRect.top <= vh * 0.90 && cRect.bottom >= 40) {
+          card.classList.add('card-revealed', 'is-in-view');
+        } else if (cRect.bottom < -60 || cRect.top > vh + 60 || scrollY < 60) {
+          card.classList.remove('card-revealed', 'is-in-view');
+        }
+      });
     };
 
     window.addEventListener('scroll', checkCoreValuesScroll, { passive: true });
@@ -1372,12 +1414,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const vh = window.innerHeight || document.documentElement.clientHeight;
       const scrollY = window.scrollY || window.pageYOffset;
 
-      // Reveal when the top of the solutions row enters 78% of the viewport height
-      if (rect.top <= vh * (window.innerWidth < 992 ? 0.88 : 0.78) && rect.bottom >= 0) {
+      if (rect.top <= vh * (window.innerWidth < 992 ? 0.90 : 0.80) && rect.bottom >= 40) {
         solutionsStoryRow.classList.add('is-revealed');
         if (wmSolutions) wmSolutions.classList.add('is-revealed');
-      } else if (scrollY < 60) {
-        // Reset when user scrolls back above this section so it can replay smoothly
+      } else if (rect.bottom < -60 || rect.top > vh + 60 || scrollY < 60) {
         solutionsStoryRow.classList.remove('is-revealed');
         if (wmSolutions) wmSolutions.classList.remove('is-revealed');
       }
@@ -1396,11 +1436,17 @@ document.addEventListener('DOMContentLoaded', () => {
       const vh = window.innerHeight || document.documentElement.clientHeight;
       const scrollY = window.scrollY || window.pageYOffset;
 
-      if (rect.top <= vh * (window.innerWidth < 992 ? 0.88 : 0.78) && rect.bottom >= 0) {
-        excellenceSection.classList.add('is-revealed');
+      if (rect.top <= vh * (window.innerWidth < 992 ? 0.90 : 0.80) && rect.bottom >= 40) {
+        excellenceSection.classList.add('is-revealed', 'card-revealed', 'is-in-view');
+        const media = excellenceSection.querySelector('.excellence-slide-media, .masonry-columns-wrapper.wide-spread');
+        if (media) media.classList.add('is-revealed', 'card-revealed', 'is-in-view');
+        excellenceSection.querySelectorAll('.excellence-slide-header, .excellence-slide-body, .excellence-slide-link').forEach(el => el.classList.add('is-in-view', 'card-revealed'));
         if (wmExcellence) wmExcellence.classList.add('is-revealed');
-      } else if (scrollY < 60) {
-        excellenceSection.classList.remove('is-revealed');
+      } else if (rect.bottom < -60 || rect.top > vh + 60 || scrollY < 60) {
+        excellenceSection.classList.remove('is-revealed', 'card-revealed', 'is-in-view');
+        const media = excellenceSection.querySelector('.excellence-slide-media, .masonry-columns-wrapper.wide-spread');
+        if (media) media.classList.remove('is-revealed', 'card-revealed', 'is-in-view');
+        excellenceSection.querySelectorAll('.excellence-slide-header, .excellence-slide-body, .excellence-slide-link').forEach(el => el.classList.remove('is-in-view', 'card-revealed'));
         if (wmExcellence) wmExcellence.classList.remove('is-revealed');
       }
     };
@@ -1418,11 +1464,13 @@ document.addEventListener('DOMContentLoaded', () => {
       const vh = window.innerHeight || document.documentElement.clientHeight;
       const scrollY = window.scrollY || window.pageYOffset;
 
-      if (rect.top <= vh * (window.innerWidth < 992 ? 0.88 : 0.78) && rect.bottom >= 0) {
-        showcaseSection.classList.add('is-revealed');
+      if (rect.top <= vh * (window.innerWidth < 992 ? 0.90 : 0.80) && rect.bottom >= 40) {
+        showcaseSection.classList.add('is-revealed', 'card-revealed', 'is-in-view');
+        showcaseSection.querySelectorAll('.showcase-slide-header, .showcase-slide-body, .showcase-slide-actions, .proto-showcase-action-card, .showcase-slide-hotline').forEach(el => el.classList.add('is-in-view', 'card-revealed'));
         if (wmDispatch) wmDispatch.classList.add('is-revealed');
-      } else if (scrollY < 60) {
-        showcaseSection.classList.remove('is-revealed');
+      } else if (rect.bottom < -60 || rect.top > vh + 60 || scrollY < 60) {
+        showcaseSection.classList.remove('is-revealed', 'card-revealed', 'is-in-view');
+        showcaseSection.querySelectorAll('.showcase-slide-header, .showcase-slide-body, .showcase-slide-actions, .proto-showcase-action-card, .showcase-slide-hotline').forEach(el => el.classList.remove('is-in-view', 'card-revealed'));
         if (wmDispatch) wmDispatch.classList.remove('is-revealed');
       }
     };
@@ -1440,10 +1488,12 @@ document.addEventListener('DOMContentLoaded', () => {
       const vh = window.innerHeight || document.documentElement.clientHeight;
       const scrollY = window.scrollY || window.pageYOffset;
 
-      if (rect.top <= vh * (window.innerWidth < 992 ? 0.88 : 0.78) && rect.bottom >= 0) {
+      if (rect.top <= vh * (window.innerWidth < 992 ? 0.90 : 0.80) && rect.bottom >= 40) {
         teamSection.classList.add('is-revealed');
-      } else if (scrollY < 60) {
+        teamSection.querySelectorAll('.team-slide-top-header, .team-slide-header, .team-slide-body, .team-slide-media, .team-slide-benefits, .team-slide-link').forEach(el => el.classList.add('is-in-view', 'card-revealed'));
+      } else if (rect.bottom < -60 || rect.top > vh + 60 || scrollY < 60) {
         teamSection.classList.remove('is-revealed');
+        teamSection.querySelectorAll('.team-slide-top-header, .team-slide-header, .team-slide-body, .team-slide-media, .team-slide-benefits, .team-slide-link').forEach(el => el.classList.remove('is-in-view', 'card-revealed'));
       }
     };
 
@@ -1482,22 +1532,12 @@ document.addEventListener('DOMContentLoaded', () => {
       const vh = window.innerHeight || document.documentElement.clientHeight;
       const scrollY = window.scrollY || window.pageYOffset;
 
-      if (isSubpageContact) {
-        // Standalone Contact Page: reset when returning to hero fold (scroll back up to top)
-        if (scrollY < 60) {
-          contactSection.classList.remove('is-revealed');
-        } else if (rect.top <= vh * (window.innerWidth < 992 ? 0.88 : 0.78) && rect.bottom >= -60) {
-          contactSection.classList.add('is-revealed');
-        } else if (scrollY < 60) {
-          contactSection.classList.remove('is-revealed');
-        }
-      } else {
-        // Homepage Contact Section
-        if (rect.top <= vh * (window.innerWidth < 992 ? 0.88 : 0.78) && rect.bottom >= -60) {
-          contactSection.classList.add('is-revealed');
-        } else if (scrollY < 60) {
-          contactSection.classList.remove('is-revealed');
-        }
+      if (rect.top <= vh * (window.innerWidth < 992 ? 0.90 : 0.80) && rect.bottom >= 40) {
+        contactSection.classList.add('is-revealed');
+        contactSection.querySelectorAll('.contact-slide-top, .contact-slide-sub, .contact-slide-card, .contact-slide-form').forEach(el => el.classList.add('is-in-view', 'card-revealed'));
+      } else if (rect.bottom < -60 || rect.top > vh + 60 || scrollY < 60) {
+        contactSection.classList.remove('is-revealed');
+        contactSection.querySelectorAll('.contact-slide-top, .contact-slide-sub, .contact-slide-card, .contact-slide-form').forEach(el => el.classList.remove('is-in-view', 'card-revealed'));
       }
     };
 
