@@ -241,8 +241,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const isLocalHost = window.location.hostname === 'localhost' || 
                         window.location.hostname === '127.0.0.1' || 
                         window.location.hostname === '';
-    if (isFile || (isLocalHost && window.location.port !== '3000')) {
+    if (isFile) {
       return 'http://localhost:3000/api';
+    }
+    if (isLocalHost) {
+      return (window.location.port === '3000') ? '/api' : 'http://localhost:3000/api';
     }
     if (window.location.hostname.includes('onrender.com')) {
       return '/api';
@@ -826,14 +829,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // D2. Excellence Media & Showcase Section: Fade in and slide up smoothly on scroll
-    const scrollFadeTargets = document.querySelectorAll('.excellence-slide-media, .masonry-columns-wrapper.wide-spread, #showcase-box-section, .proto-showcase-box.showcase-block');
+    const scrollFadeTargets = document.querySelectorAll('.excellence-slide-media, .masonry-columns-wrapper.wide-spread, .masonry-col, .masonry-col-1, #showcase-box-section, .proto-showcase-box.showcase-block');
     if (scrollFadeTargets.length > 0) {
       if ('IntersectionObserver' in window) {
         const scrollFadeObserver = new IntersectionObserver((entries, obs) => {
           entries.forEach(entry => {
             if (entry.isIntersecting) {
               entry.target.classList.add('card-revealed', 'is-in-view', 'is-revealed');
-              const parentExcellence = entry.target.closest('#excellence-section, .excellence-block');
+              const parentExcellence = entry.target.closest('#compassionate-solutions-row, .solutions-story-row, #excellence-section, .excellence-block');
               if (parentExcellence) parentExcellence.classList.add('is-revealed');
             } else {
               entry.target.classList.remove('card-revealed', 'is-in-view', 'is-revealed');
@@ -852,10 +855,11 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // D3. Four Core Sections Comprehensive Scroll Observer (Desktop & Mobile)
     const fourSectionsElements = document.querySelectorAll(
-      '.excellence-slide-header, .excellence-slide-body, .excellence-slide-link, ' +
+      '.solutions-slide-header, .solutions-slide-body, .solutions-slide-link, .solutions-slide-right, .monograph-wrapper, .monograph-bg-plate, .monograph-fg-plate, ' +
+      '.excellence-slide-header, .excellence-slide-body, .excellence-slide-link, .masonry-col, .masonry-col-1, .masonry-col img, ' +
       '.showcase-slide-header, .showcase-slide-body, .showcase-slide-actions, .proto-showcase-action-card, .showcase-slide-hotline, ' +
-      '.team-slide-top-header, .team-slide-header, .team-slide-body, .team-slide-media, .team-slide-benefits, .team-slide-link, ' +
-      '.contact-slide-top, .contact-slide-sub, .contact-slide-card, .contact-slide-form'
+      '.team-slide-top-header, .team-slide-header, .team-slide-body, .team-slide-media, .team-slide-benefits, .team-slide-link, .collage-item-main, .collage-item-sub, .photo-collage-3 .collage-item, ' +
+      '.contact-slide-top, .contact-slide-sub, .contact-slide-card, .contact-slide-form, .contact-form-anim-group1, .contact-form-anim-group2, .contact-form-anim-group3, .contact-form-anim-group4, .contact-form-anim-group5, .contact-form-anim-btn, .callout-slide-text, .callout-slide-actions, .footer-slide-col, .footer-slide-bottom, .strip-slide-text, .strip-fade-form, .strip-slide-social-text, .strip-slide-icon'
     );
     if (fourSectionsElements.length > 0) {
       if ('IntersectionObserver' in window) {
@@ -863,7 +867,7 @@ document.addEventListener('DOMContentLoaded', () => {
           entries.forEach(entry => {
             if (entry.isIntersecting) {
               entry.target.classList.add('is-in-view', 'card-revealed');
-              const parentSec = entry.target.closest('#excellence-section, .excellence-block, #showcase-box-section, .showcase-block, #team-section, .proto-mission-section, #home-contact, .contact-section');
+              const parentSec = entry.target.closest('#excellence-section, .excellence-block, #showcase-box-section, .showcase-block, #team-section, .proto-mission-section, #home-contact, #contact, .contact-section, #callout-banner, .callout-banner-section, #site-footer, .site-footer, #newsletter-strip, .strip-section');
               if (parentSec) parentSec.classList.add('is-revealed');
             } else {
               entry.target.classList.remove('is-in-view', 'card-revealed');
@@ -880,7 +884,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // E. Sections with Multiple Images: Slide in from left and right smoothly
-    const archMainPhotos = document.querySelectorAll('.arch-main-photo, .monograph-bg-plate img, .collage-item-main');
+    const archMainPhotos = document.querySelectorAll('.arch-main-photo');
     archMainPhotos.forEach(img => {
       gsap.fromTo(img, 
         { x: -40, opacity: 0 }, 
@@ -900,7 +904,7 @@ document.addEventListener('DOMContentLoaded', () => {
       );
     });
 
-    const archSubPhotos = document.querySelectorAll('.arch-vertical-photo, .monograph-caption-card, .collage-row-sub .collage-item-sub, .solutions-slide-right');
+    const archSubPhotos = document.querySelectorAll('.arch-vertical-photo');
     archSubPhotos.forEach(el => {
       gsap.fromTo(el, 
         { x: 40, opacity: 0 }, 
@@ -1247,44 +1251,25 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('resize', checkHeroScroll, { passive: true });
   }
 
-  // 5a. Newsletter & Social Strip On-Refresh / In-View Directional Animations (Large Screens >= 992px)
+  // 5a. Newsletter & Social Strip Bidirectional Scroll Animations (Desktop & Mobile)
   const stripSection = document.getElementById('newsletter-strip') || document.querySelector('.strip-section');
   if (stripSection) {
-    const triggerStripReveal = () => {
+    const checkStripScroll = () => {
       const rect = stripSection.getBoundingClientRect();
       const vh = window.innerHeight || document.documentElement.clientHeight;
 
-      // Reveal if in initial viewport, near top fold, or on refresh
-      if (rect.top <= vh * 0.96 && rect.bottom >= 0) {
+      if (rect.top <= vh * (window.innerWidth < 992 ? 0.94 : 0.92) && rect.bottom >= 30) {
         stripSection.classList.add('is-revealed');
+        stripSection.querySelectorAll('.strip-slide-text, .strip-fade-form, .strip-slide-social-text, .strip-slide-icon').forEach(el => el.classList.add('is-in-view', 'card-revealed'));
+      } else if (rect.bottom < -60 || rect.top > vh + 60) {
+        stripSection.classList.remove('is-revealed');
+        stripSection.querySelectorAll('.strip-slide-text, .strip-fade-form, .strip-slide-social-text, .strip-slide-icon').forEach(el => el.classList.remove('is-in-view', 'card-revealed'));
       }
     };
 
-    // On refresh / load: trigger after a short tick to guarantee transition paint
-    const onRefreshTrigger = () => {
-      setTimeout(() => {
-        if (window.innerWidth >= 992) {
-          const rect = stripSection.getBoundingClientRect();
-          const vh = window.innerHeight || document.documentElement.clientHeight;
-          // If at top or strip is visible/peeking on load
-          if (rect.top <= vh * 1.15 && rect.bottom >= 0) {
-            stripSection.classList.add('is-revealed');
-          }
-        } else {
-          stripSection.classList.add('is-revealed');
-        }
-      }, 200);
-    };
-
-    if (document.readyState === 'complete') {
-      onRefreshTrigger();
-    } else {
-      window.addEventListener('load', onRefreshTrigger);
-    }
-
-    window.addEventListener('scroll', triggerStripReveal, { passive: true });
-    window.addEventListener('resize', triggerStripReveal, { passive: true });
-    setTimeout(triggerStripReveal, 250);
+    window.addEventListener('scroll', checkStripScroll, { passive: true });
+    window.addEventListener('resize', checkStripScroll, { passive: true });
+    setTimeout(checkStripScroll, 200);
   }
 
   // 5b. Welcome Section Staggered Directional Scroll Animations (Large Screens >= 992px)
@@ -1416,9 +1401,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (rect.top <= vh * (window.innerWidth < 992 ? 0.90 : 0.80) && rect.bottom >= 40) {
         solutionsStoryRow.classList.add('is-revealed');
+        solutionsStoryRow.querySelectorAll('.solutions-slide-header, .solutions-slide-body, .solutions-slide-link, .solutions-slide-right, .monograph-wrapper, .monograph-bg-plate, .monograph-fg-plate').forEach(el => el.classList.add('is-in-view', 'card-revealed'));
         if (wmSolutions) wmSolutions.classList.add('is-revealed');
       } else if (rect.bottom < -60 || rect.top > vh + 60 || scrollY < 60) {
         solutionsStoryRow.classList.remove('is-revealed');
+        solutionsStoryRow.querySelectorAll('.solutions-slide-header, .solutions-slide-body, .solutions-slide-link, .solutions-slide-right, .monograph-wrapper, .monograph-bg-plate, .monograph-fg-plate').forEach(el => el.classList.remove('is-in-view', 'card-revealed'));
         if (wmSolutions) wmSolutions.classList.remove('is-revealed');
       }
     };
@@ -1440,13 +1427,13 @@ document.addEventListener('DOMContentLoaded', () => {
         excellenceSection.classList.add('is-revealed', 'card-revealed', 'is-in-view');
         const media = excellenceSection.querySelector('.excellence-slide-media, .masonry-columns-wrapper.wide-spread');
         if (media) media.classList.add('is-revealed', 'card-revealed', 'is-in-view');
-        excellenceSection.querySelectorAll('.excellence-slide-header, .excellence-slide-body, .excellence-slide-link').forEach(el => el.classList.add('is-in-view', 'card-revealed'));
+        excellenceSection.querySelectorAll('.excellence-slide-header, .excellence-slide-body, .excellence-slide-link, .masonry-col, .masonry-col img, .masonry-col-1, .masonry-col-2, .masonry-col-3').forEach(el => el.classList.add('is-in-view', 'card-revealed'));
         if (wmExcellence) wmExcellence.classList.add('is-revealed');
       } else if (rect.bottom < -60 || rect.top > vh + 60 || scrollY < 60) {
         excellenceSection.classList.remove('is-revealed', 'card-revealed', 'is-in-view');
         const media = excellenceSection.querySelector('.excellence-slide-media, .masonry-columns-wrapper.wide-spread');
         if (media) media.classList.remove('is-revealed', 'card-revealed', 'is-in-view');
-        excellenceSection.querySelectorAll('.excellence-slide-header, .excellence-slide-body, .excellence-slide-link').forEach(el => el.classList.remove('is-in-view', 'card-revealed'));
+        excellenceSection.querySelectorAll('.excellence-slide-header, .excellence-slide-body, .excellence-slide-link, .masonry-col, .masonry-col img, .masonry-col-1, .masonry-col-2, .masonry-col-3').forEach(el => el.classList.remove('is-in-view', 'card-revealed'));
         if (wmExcellence) wmExcellence.classList.remove('is-revealed');
       }
     };
@@ -1456,23 +1443,44 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(checkExcellenceScroll, 200);
   }
 
-  // 5g. Workforce Dispatch Showcase Box Scroll Animations (Large Screens >= 992px)
+  // 5g. Workforce Dispatch Showcase Box Scroll Animations (Desktop & Mobile)
   const showcaseSection = document.getElementById('showcase-box-section') || document.querySelector('.showcase-block');
   if (showcaseSection) {
     const checkShowcaseScroll = () => {
       const rect = showcaseSection.getBoundingClientRect();
       const vh = window.innerHeight || document.documentElement.clientHeight;
       const scrollY = window.scrollY || window.pageYOffset;
+      const isMobile = window.innerWidth < 992;
 
-      if (rect.top <= vh * (window.innerWidth < 992 ? 0.90 : 0.80) && rect.bottom >= 40) {
+      // Section header and text reveal
+      if (rect.top <= vh * 0.90 && rect.bottom >= 40) {
         showcaseSection.classList.add('is-revealed', 'card-revealed', 'is-in-view');
-        showcaseSection.querySelectorAll('.showcase-slide-header, .showcase-slide-body, .showcase-slide-actions, .proto-showcase-action-card, .showcase-slide-hotline').forEach(el => el.classList.add('is-in-view', 'card-revealed'));
+        showcaseSection.querySelectorAll('.showcase-slide-header, .showcase-slide-body, .showcase-slide-actions').forEach(el => el.classList.add('is-in-view', 'card-revealed'));
         if (wmDispatch) wmDispatch.classList.add('is-revealed');
       } else if (rect.bottom < -60 || rect.top > vh + 60 || scrollY < 60) {
         showcaseSection.classList.remove('is-revealed', 'card-revealed', 'is-in-view');
-        showcaseSection.querySelectorAll('.showcase-slide-header, .showcase-slide-body, .showcase-slide-actions, .proto-showcase-action-card, .showcase-slide-hotline').forEach(el => el.classList.remove('is-in-view', 'card-revealed'));
+        showcaseSection.querySelectorAll('.showcase-slide-header, .showcase-slide-body, .showcase-slide-actions').forEach(el => el.classList.remove('is-in-view', 'card-revealed'));
         if (wmDispatch) wmDispatch.classList.remove('is-revealed');
       }
+
+      // Individual cards: check against their own viewport intersection
+      const cards = showcaseSection.querySelectorAll('.proto-showcase-action-card, .showcase-slide-hotline');
+      cards.forEach(card => {
+        if (isMobile) {
+          const cRect = card.getBoundingClientRect();
+          if (cRect.top <= vh * 0.92 && cRect.bottom >= 30) {
+            card.classList.add('is-in-view', 'card-revealed');
+          } else if (cRect.bottom < -60 || cRect.top > vh + 60) {
+            card.classList.remove('is-in-view', 'card-revealed');
+          }
+        } else {
+          if (rect.top <= vh * 0.80 && rect.bottom >= 40) {
+            card.classList.add('is-in-view', 'card-revealed');
+          } else if (rect.bottom < -60 || rect.top > vh + 60 || scrollY < 60) {
+            card.classList.remove('is-in-view', 'card-revealed');
+          }
+        }
+      });
     };
 
     window.addEventListener('scroll', checkShowcaseScroll, { passive: true });
@@ -1490,10 +1498,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (rect.top <= vh * (window.innerWidth < 992 ? 0.90 : 0.80) && rect.bottom >= 40) {
         teamSection.classList.add('is-revealed');
-        teamSection.querySelectorAll('.team-slide-top-header, .team-slide-header, .team-slide-body, .team-slide-media, .team-slide-benefits, .team-slide-link').forEach(el => el.classList.add('is-in-view', 'card-revealed'));
+        teamSection.querySelectorAll('.team-slide-top-header, .team-slide-header, .team-slide-body, .team-slide-media, .team-slide-benefits, .team-slide-link, .collage-item-main, .collage-item-sub, .photo-collage-3 .collage-item').forEach(el => el.classList.add('is-in-view', 'card-revealed'));
       } else if (rect.bottom < -60 || rect.top > vh + 60 || scrollY < 60) {
         teamSection.classList.remove('is-revealed');
-        teamSection.querySelectorAll('.team-slide-top-header, .team-slide-header, .team-slide-body, .team-slide-media, .team-slide-benefits, .team-slide-link').forEach(el => el.classList.remove('is-in-view', 'card-revealed'));
+        teamSection.querySelectorAll('.team-slide-top-header, .team-slide-header, .team-slide-body, .team-slide-media, .team-slide-benefits, .team-slide-link, .collage-item-main, .collage-item-sub, .photo-collage-3 .collage-item').forEach(el => el.classList.remove('is-in-view', 'card-revealed'));
       }
     };
 
@@ -1522,22 +1530,65 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(checkAboutTeamScroll, 200);
   }
 
-  // 5i. Contact Us Section Scroll Animations (Large Screens >= 992px)
+  // 5i. Contact Us Section & Form Input Scroll Animations (Desktop & Mobile)
   const contactSection = document.getElementById('contact') || document.querySelector('.contact-section');
   if (contactSection) {
-    const isSubpageContact = !document.getElementById('welcome-summary');
-
     const checkContactScroll = () => {
       const rect = contactSection.getBoundingClientRect();
       const vh = window.innerHeight || document.documentElement.clientHeight;
       const scrollY = window.scrollY || window.pageYOffset;
+      const isMobile = window.innerWidth < 992;
 
-      if (rect.top <= vh * (window.innerWidth < 992 ? 0.90 : 0.80) && rect.bottom >= 40) {
+      // Header and subtitle
+      if (rect.top <= vh * (isMobile ? 0.94 : 0.80) && rect.bottom >= 40) {
         contactSection.classList.add('is-revealed');
-        contactSection.querySelectorAll('.contact-slide-top, .contact-slide-sub, .contact-slide-card, .contact-slide-form').forEach(el => el.classList.add('is-in-view', 'card-revealed'));
+        contactSection.querySelectorAll('.contact-slide-top, .contact-slide-sub').forEach(el => el.classList.add('is-in-view', 'card-revealed'));
       } else if (rect.bottom < -60 || rect.top > vh + 60 || scrollY < 60) {
         contactSection.classList.remove('is-revealed');
-        contactSection.querySelectorAll('.contact-slide-top, .contact-slide-sub, .contact-slide-card, .contact-slide-form').forEach(el => el.classList.remove('is-in-view', 'card-revealed'));
+        contactSection.querySelectorAll('.contact-slide-top, .contact-slide-sub').forEach(el => el.classList.remove('is-in-view', 'card-revealed'));
+      }
+
+      // Contact Info Card (Dispatch & HQ) - independent viewport check on mobile
+      const contactCard = contactSection.querySelector('.contact-slide-card, .contact-info-card');
+      if (contactCard) {
+        if (isMobile) {
+          const cardRect = contactCard.getBoundingClientRect();
+          if (cardRect.top <= vh * 0.92 && cardRect.bottom >= 30) {
+            contactCard.classList.add('is-in-view', 'card-revealed');
+          } else if (cardRect.bottom < -60 || cardRect.top > vh + 60) {
+            contactCard.classList.remove('is-in-view', 'card-revealed');
+          }
+        } else {
+          if (rect.top <= vh * 0.80 && rect.bottom >= 40) {
+            contactCard.classList.add('is-in-view', 'card-revealed');
+          } else if (rect.bottom < -60 || rect.top > vh + 60 || scrollY < 60) {
+            contactCard.classList.remove('is-in-view', 'card-revealed');
+          }
+        }
+      }
+
+      // Contact Form & Inputs - independent viewport check on mobile
+      const contactForm = contactSection.querySelector('.contact-slide-form, #home-contact-form');
+      if (contactForm) {
+        const inputGroups = contactForm.querySelectorAll('.contact-form-anim-brand, .contact-form-anim-header, .contact-form-anim-group1, .contact-form-anim-group2, .contact-form-anim-group3, .contact-form-anim-group4, .contact-form-anim-group5, .contact-form-anim-btn');
+        if (isMobile) {
+          const formRect = contactForm.getBoundingClientRect();
+          if (formRect.top <= vh * 0.90 && formRect.bottom >= 30) {
+            contactForm.classList.add('is-in-view', 'card-revealed');
+            inputGroups.forEach(g => g.classList.add('is-in-view', 'card-revealed'));
+          } else if (formRect.bottom < -60 || formRect.top > vh + 60) {
+            contactForm.classList.remove('is-in-view', 'card-revealed');
+            inputGroups.forEach(g => g.classList.remove('is-in-view', 'card-revealed'));
+          }
+        } else {
+          if (rect.top <= vh * 0.80 && rect.bottom >= 40) {
+            contactForm.classList.add('is-in-view', 'card-revealed');
+            inputGroups.forEach(g => g.classList.add('is-in-view', 'card-revealed'));
+          } else if (rect.bottom < -60 || rect.top > vh + 60 || scrollY < 60) {
+            contactForm.classList.remove('is-in-view', 'card-revealed');
+            inputGroups.forEach(g => g.classList.remove('is-in-view', 'card-revealed'));
+          }
+        }
       }
     };
 
@@ -1561,7 +1612,7 @@ document.addEventListener('DOMContentLoaded', () => {
     genericWatermarks.forEach((wm) => genericWatermarkObserver.observe(wm));
   }
 
-  // 5j. Quick Contact Callout Banner Scroll Animations (Large Screens >= 992px)
+  // 5j. Quick Contact Callout Banner Scroll Animations (Desktop & Mobile)
   const calloutBanner = document.getElementById('callout-banner') || document.querySelector('.callout-banner-section');
   if (calloutBanner) {
     const checkCalloutScroll = () => {
@@ -1569,10 +1620,12 @@ document.addEventListener('DOMContentLoaded', () => {
       const vh = window.innerHeight || document.documentElement.clientHeight;
       const scrollY = window.scrollY || window.pageYOffset;
 
-      if (rect.top <= vh * (window.innerWidth < 992 ? 0.90 : 0.85) && rect.bottom >= 0) {
+      if (rect.top <= vh * (window.innerWidth < 992 ? 0.92 : 0.85) && rect.bottom >= 40) {
         calloutBanner.classList.add('is-revealed');
-      } else if (rect.top > vh * 1.05 || scrollY < 80) {
+        calloutBanner.querySelectorAll('.callout-slide-text, .callout-slide-actions').forEach(el => el.classList.add('is-in-view', 'card-revealed'));
+      } else if (rect.bottom < -60 || rect.top > vh + 60 || scrollY < 60) {
         calloutBanner.classList.remove('is-revealed');
+        calloutBanner.querySelectorAll('.callout-slide-text, .callout-slide-actions').forEach(el => el.classList.remove('is-in-view', 'card-revealed'));
       }
     };
 
@@ -1581,19 +1634,21 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(checkCalloutScroll, 200);
   }
 
-  // 5k. Site Footer Scroll Animations (Large Screens >= 992px)
+  // 5k. Site Footer Scroll Animations (Desktop & Mobile)
   const siteFooter = document.getElementById('site-footer') || document.querySelector('.site-footer');
   if (siteFooter) {
     const checkFooterScroll = () => {
       const rect = siteFooter.getBoundingClientRect();
       const vh = window.innerHeight || document.documentElement.clientHeight;
-
-      // Reveal when footer enters viewport (at 92% of viewport or scrolled near page bottom)
+      const scrollY = window.scrollY || window.pageYOffset;
       const scrolledToBottom = (window.innerHeight + window.scrollY) >= (document.documentElement.scrollHeight - 70);
+
       if (rect.top <= vh * 0.92 || scrolledToBottom) {
         siteFooter.classList.add('is-revealed');
-      } else if (rect.top > vh) {
+        siteFooter.querySelectorAll('.footer-slide-col, .footer-slide-bottom').forEach(el => el.classList.add('is-in-view', 'card-revealed'));
+      } else if (rect.top > vh + 60 || (rect.bottom < -60 && !scrolledToBottom)) {
         siteFooter.classList.remove('is-revealed');
+        siteFooter.querySelectorAll('.footer-slide-col, .footer-slide-bottom').forEach(el => el.classList.remove('is-in-view', 'card-revealed'));
       }
     };
 

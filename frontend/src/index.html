@@ -113,8 +113,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Montserrat:wght@400;500;600;700;800;900&family=Open+Sans:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&family=Pacifico&display=swap" rel="stylesheet">
   
-  <link rel="stylesheet" href="style.css?v=6.7.2">
-  <link rel="stylesheet" href="prototype.css?v=6.5.5">
+  <link rel="stylesheet" href="style.css?v=6.8.0">
+  <link rel="stylesheet" href="prototype.css?v=6.6.3">
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
     /* Instant Cache-Bypassing Mobile Overrides */
@@ -342,9 +342,21 @@
         visibility: hidden !important;
       }
     }
-    /* Stretched Monograph Caption Card on Large Screens */
-    @media (min-width: 768px) {
+    /* Monograph Caption Card ("Patient-Centered Practice"): Hidden on Mobile (< 992px), Shifted on Large Screens */
+    @media (max-width: 991.98px) {
       .monograph-caption-card {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+      }
+    }
+    @media (min-width: 992px) {
+      .monograph-caption-card {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
         max-width: 380px !important;
         width: auto !important;
         min-width: 280px !important;
@@ -935,46 +947,254 @@
 /* ── 2. WORKFORCE DISPATCH TEXTS & CARDS ── */
 .showcase-slide-header,
 .showcase-slide-body,
-.showcase-slide-actions,
-.proto-showcase-action-card,
-.showcase-slide-hotline {
+.showcase-slide-actions {
   opacity: 0 !important;
-  transform: translate3d(0, 45px, 0) !important;
+  transform: translate3d(0, 35px, 0) !important;
+  transition: transform 0.90s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  will-change: transform, opacity !important;
+  -webkit-backface-visibility: hidden !important;
+  backface-visibility: hidden !important;
+}
+.showcase-slide-header { transition-delay: 0.08s !important; }
+.showcase-slide-body   { transition-delay: 0.20s !important; }
+
+.showcase-block.is-revealed .showcase-slide-header,
+.showcase-block.is-revealed .showcase-slide-body,
+.showcase-block.is-revealed .showcase-slide-actions,
+#showcase-box-section.is-revealed .showcase-slide-header,
+#showcase-box-section.is-revealed .showcase-slide-body,
+#showcase-box-section.is-revealed .showcase-slide-actions,
+.showcase-slide-header.is-in-view,
+.showcase-slide-body.is-in-view,
+.showcase-slide-actions.is-in-view,
+.showcase-slide-header.card-revealed,
+.showcase-slide-body.card-revealed,
+.showcase-slide-actions.card-revealed {
+  opacity: 1 !important;
+  transform: translate3d(0, 0, 0) !important;
+}
+
+/* CARDS SLIDE-IN: FROM LEFT ON MOBILE (< 992px), FROM BOTTOM ON LARGE SCREENS (>= 992px) */
+@media (max-width: 991.98px) {
+  .proto-showcase-content-col {
+    overflow-x: clip !important;
+  }
+  .proto-showcase-action-card,
+  .showcase-slide-hotline {
+    opacity: 0 !important;
+    transform: translate3d(-55px, 0, 0) !important;
+    transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.80s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    will-change: transform, opacity !important;
+    -webkit-backface-visibility: hidden !important;
+    backface-visibility: hidden !important;
+  }
+  .proto-showcase-action-card.card-facilities { transition-delay: 0.12s !important; }
+  .proto-showcase-action-card.card-staff,
+  .proto-showcase-action-card.card-jobseekers { transition-delay: 0.24s !important; }
+  .showcase-slide-hotline                      { transition-delay: 0.36s !important; }
+
+  .showcase-block.is-revealed .proto-showcase-action-card,
+  .showcase-block.is-revealed .showcase-slide-hotline,
+  #showcase-box-section.is-revealed .proto-showcase-action-card,
+  #showcase-box-section.is-revealed .showcase-slide-hotline,
+  .proto-showcase-action-card.is-in-view,
+  .showcase-slide-hotline.is-in-view,
+  .proto-showcase-action-card.card-revealed,
+  .showcase-slide-hotline.card-revealed {
+    opacity: 1 !important;
+    transform: translate3d(0, 0, 0) !important;
+  }
+}
+
+@media (min-width: 992px) {
+  .proto-showcase-action-card,
+  .showcase-slide-hotline {
+    opacity: 0 !important;
+    transform: translate3d(0, 50px, 0) !important;
+    transition: transform 0.90s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    will-change: transform, opacity !important;
+    -webkit-backface-visibility: hidden !important;
+    backface-visibility: hidden !important;
+  }
+  .proto-showcase-action-card.card-facilities { transition-delay: 0.32s !important; }
+  .proto-showcase-action-card.card-staff,
+  .proto-showcase-action-card.card-jobseekers { transition-delay: 0.44s !important; }
+  .showcase-slide-hotline                      { transition-delay: 0.56s !important; }
+
+  .showcase-block.is-revealed .proto-showcase-action-card,
+  .showcase-block.is-revealed .showcase-slide-hotline,
+  #showcase-box-section.is-revealed .proto-showcase-action-card,
+  #showcase-box-section.is-revealed .showcase-slide-hotline,
+  .proto-showcase-action-card.is-in-view,
+  .showcase-slide-hotline.is-in-view,
+  .proto-showcase-action-card.card-revealed,
+  .showcase-slide-hotline.card-revealed {
+    opacity: 1 !important;
+    transform: translate3d(0, 0, 0) !important;
+  }
+}
+
+.proto-showcase-action-card.card-revealed:hover,
+.proto-showcase-action-card.is-in-view:hover {
+  transform: translateY(-4px) !important;
+}
+.showcase-slide-hotline.card-revealed:hover,
+.showcase-slide-hotline.is-in-view:hover {
+  transform: translateY(-3px) !important;
+}
+
+
+
+/* ==========================================================================
+   MONOGRAPH PHOTO COLLAGE: SLIDE-IN FROM RIGHT ON MOBILE & LARGE SCREENS
+   ========================================================================== */
+.solutions-story-row {
+  overflow-x: clip !important;
+}
+
+.solutions-slide-right,
+.solutions-slide-right .monograph-wrapper {
+  opacity: 0 !important;
+  transform: translate3d(55px, 0, 0) !important;
   transition: transform 0.90s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1) !important;
   will-change: transform, opacity !important;
   -webkit-backface-visibility: hidden !important;
   backface-visibility: hidden !important;
 }
 
-.showcase-slide-header { transition-delay: 0.08s !important; }
-.showcase-slide-body   { transition-delay: 0.22s !important; }
-.showcase-slide-actions,
-.proto-showcase-action-card.card-facilities  { transition-delay: 0.36s !important; }
-.proto-showcase-action-card.card-jobseekers  { transition-delay: 0.48s !important; }
-.showcase-slide-hotline                      { transition-delay: 0.58s !important; }
+.solutions-slide-right {
+  transition-delay: 0.16s !important;
+}
 
-.showcase-block.is-revealed .showcase-slide-header,
-.showcase-block.is-revealed .showcase-slide-body,
-.showcase-block.is-revealed .showcase-slide-actions,
-.showcase-block.is-revealed .proto-showcase-action-card,
-.showcase-block.is-revealed .showcase-slide-hotline,
-#showcase-box-section.is-revealed .showcase-slide-header,
-#showcase-box-section.is-revealed .showcase-slide-body,
-#showcase-box-section.is-revealed .showcase-slide-actions,
-#showcase-box-section.is-revealed .proto-showcase-action-card,
-#showcase-box-section.is-revealed .showcase-slide-hotline,
-.showcase-slide-header.is-in-view,
-.showcase-slide-body.is-in-view,
-.showcase-slide-actions.is-in-view,
-.proto-showcase-action-card.is-in-view,
-.showcase-slide-hotline.is-in-view,
-.showcase-slide-header.card-revealed,
-.showcase-slide-body.card-revealed,
-.showcase-slide-actions.card-revealed,
-.proto-showcase-action-card.card-revealed,
-.showcase-slide-hotline.card-revealed {
+.solutions-slide-right .monograph-fg-plate {
+  opacity: 0 !important;
+  transform: translate3d(35px, 0, 0) !important;
+  transition: transform 0.95s cubic-bezier(0.16, 1, 0.3, 1) 0.28s, opacity 0.90s cubic-bezier(0.16, 1, 0.3, 1) 0.28s !important;
+  will-change: transform, opacity !important;
+  -webkit-backface-visibility: hidden !important;
+  backface-visibility: hidden !important;
+}
+
+.solutions-story-row.is-revealed .solutions-slide-right,
+.solutions-story-row.is-revealed .monograph-wrapper,
+.solutions-story-row.is-revealed .monograph-fg-plate,
+#compassionate-solutions-row.is-revealed .solutions-slide-right,
+#compassionate-solutions-row.is-revealed .monograph-wrapper,
+#compassionate-solutions-row.is-revealed .monograph-fg-plate,
+.solutions-slide-right.is-in-view,
+.solutions-slide-right.card-revealed,
+.monograph-wrapper.is-in-view,
+.monograph-wrapper.card-revealed,
+.monograph-fg-plate.is-in-view,
+.monograph-fg-plate.card-revealed {
   opacity: 1 !important;
   transform: translate3d(0, 0, 0) !important;
+}
+
+
+/* ==========================================================================
+   CONSULTATION NURSE & CLINICAL EXCELLENCE IMAGES: SCROLL ANIMATION
+   ========================================================================== */
+.collage-row-sub .collage-item-sub:first-child,
+.collage-row-sub .collage-item-sub:first-child img,
+#team-section img[src*="role_rn.jpg"],
+.proto-mission-section img[src*="role_rn.jpg"],
+#excellence-section .masonry-col-1,
+#excellence-section .masonry-col-1 img,
+#excellence-section img[src*="service_travel_nurse.jpg"],
+.excellence-block img[src*="service_travel_nurse.jpg"],
+#excellence-section .masonry-columns-wrapper.wide-spread .masonry-col,
+.excellence-block .masonry-columns-wrapper.wide-spread .masonry-col {
+  opacity: 0 !important;
+  transform: translate3d(0, 48px, 0) !important;
+  transition: transform 0.90s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  will-change: transform, opacity !important;
+  -webkit-backface-visibility: hidden !important;
+  backface-visibility: hidden !important;
+}
+
+.collage-row-sub .collage-item-sub:first-child {
+  transition-delay: 0.18s !important;
+}
+
+.masonry-col-1 {
+  transition-delay: 0.16s !important;
+}
+
+#team-section.is-revealed .collage-row-sub .collage-item-sub:first-child,
+#team-section.is-revealed .collage-row-sub .collage-item-sub:first-child img,
+#team-section.is-revealed img[src*="role_rn.jpg"],
+.proto-mission-section.is-revealed .collage-row-sub .collage-item-sub:first-child,
+.proto-mission-section.is-revealed img[src*="role_rn.jpg"],
+.team-slide-media.is-in-view .collage-row-sub .collage-item-sub:first-child,
+.team-slide-media.card-revealed .collage-row-sub .collage-item-sub:first-child,
+.collage-item-sub:first-child.is-in-view,
+.collage-item-sub:first-child.card-revealed,
+.collage-item-sub:first-child.is-in-view img,
+.collage-item-sub:first-child.card-revealed img,
+#excellence-section.is-revealed .masonry-col-1,
+#excellence-section.is-revealed .masonry-col-1 img,
+#excellence-section.is-revealed img[src*="service_travel_nurse.jpg"],
+.excellence-block.is-revealed .masonry-col-1,
+.excellence-block.is-revealed .masonry-col-1 img,
+.excellence-slide-media.is-in-view .masonry-col-1,
+.excellence-slide-media.card-revealed .masonry-col-1,
+.masonry-col-1.is-in-view,
+.masonry-col-1.card-revealed,
+.masonry-col-1.is-in-view img,
+.masonry-col-1.card-revealed img,
+.masonry-columns-wrapper.wide-spread.is-in-view .masonry-col,
+.masonry-columns-wrapper.wide-spread.card-revealed .masonry-col {
+  opacity: 1 !important;
+  transform: translate3d(0, 0, 0) !important;
+}
+
+/* ==========================================================================
+   PHOTO COLLAGE IMAGES: SLIDE-IN FROM BOTTOM ON BOTH MOBILE & LARGE SCREENS
+   ========================================================================== */
+.photo-collage-3 .collage-item,
+.photo-collage-3 .collage-item-main,
+.photo-collage-3 .collage-item-sub,
+.collage-row-sub .collage-item-sub {
+  opacity: 0 !important;
+  transform: translate3d(0, 48px, 0) !important;
+  transition: transform 0.90s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  will-change: transform, opacity !important;
+  -webkit-backface-visibility: hidden !important;
+  backface-visibility: hidden !important;
+}
+
+.photo-collage-3 .collage-item-main             { transition-delay: 0.12s !important; }
+.collage-row-sub .collage-item-sub:first-child   { transition-delay: 0.24s !important; }
+.collage-row-sub .collage-item-sub:last-child    { transition-delay: 0.36s !important; }
+
+#team-section.is-revealed .photo-collage-3 .collage-item,
+#team-section.is-revealed .collage-item-main,
+#team-section.is-revealed .collage-item-sub,
+.proto-mission-section.is-revealed .photo-collage-3 .collage-item,
+.proto-mission-section.is-revealed .collage-item-main,
+.proto-mission-section.is-revealed .collage-item-sub,
+.team-slide-media.is-in-view .collage-item,
+.team-slide-media.card-revealed .collage-item,
+.team-slide-media.is-in-view .collage-item-main,
+.team-slide-media.card-revealed .collage-item-main,
+.team-slide-media.is-in-view .collage-item-sub,
+.team-slide-media.card-revealed .collage-item-sub,
+.collage-item.is-in-view,
+.collage-item.card-revealed,
+.collage-item-main.is-in-view,
+.collage-item-main.card-revealed,
+.collage-item-sub.is-in-view,
+.collage-item-sub.card-revealed {
+  opacity: 1 !important;
+  transform: translate3d(0, 0, 0) !important;
+}
+
+.collage-item.card-revealed:hover,
+.collage-item.is-in-view:hover,
+#team-section.is-revealed .collage-item:hover,
+.proto-mission-section.is-revealed .collage-item:hover {
+  transform: translateY(-4px) !important;
 }
 
 /* ── 3. OUR DEDICATED CLINICAL TEAM ── */
@@ -1027,6 +1247,123 @@
   transform: translate3d(0, 0, 0) !important;
 }
 
+
+/* ==========================================================================
+   MOBILE & DESKTOP INDEPENDENT SCROLL REVEAL RULES
+   - Showcase Cards: Slide-in from left on mobile
+   - Contact Info Card: Slide-up on mobile
+   - Contact Form Inputs: Staggered slide-up on mobile & desktop
+   ========================================================================== */
+
+/* ── A. SHOWCASE CARDS (Hospitals & Facilities, Staff Shift Portal, 24/7 Hotline) ── */
+@media (max-width: 991.98px) {
+  .proto-showcase-action-card,
+  .showcase-slide-hotline {
+    opacity: 0 !important;
+    transform: translate3d(-60px, 0, 0) !important;
+    transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.80s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    will-change: transform, opacity !important;
+    -webkit-backface-visibility: hidden !important;
+    backface-visibility: hidden !important;
+  }
+  .proto-showcase-action-card.card-facilities { transition-delay: 0.10s !important; }
+  .proto-showcase-action-card.card-staff      { transition-delay: 0.22s !important; }
+  .showcase-slide-hotline                      { transition-delay: 0.34s !important; }
+
+  .proto-showcase-action-card.is-in-view,
+  .proto-showcase-action-card.card-revealed,
+  .showcase-slide-hotline.is-in-view,
+  .showcase-slide-hotline.card-revealed {
+    opacity: 1 !important;
+    transform: translate3d(0, 0, 0) !important;
+  }
+}
+
+/* ── B. CONTACT INFO CARD (Dispatch & HQ) ── */
+@media (max-width: 991.98px) {
+  #home-contact .contact-info-card,
+  #contact .contact-info-card,
+  .contact-section .contact-info-card,
+  .contact-slide-card {
+    opacity: 0 !important;
+    transform: translate3d(0, 50px, 0) !important;
+    transition: transform 0.90s cubic-bezier(0.16, 1, 0.3, 1) 0.15s, opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1) 0.15s !important;
+    will-change: transform, opacity !important;
+    -webkit-backface-visibility: hidden !important;
+    backface-visibility: hidden !important;
+  }
+
+  #home-contact .contact-info-card.is-in-view,
+  #home-contact .contact-info-card.card-revealed,
+  #contact .contact-info-card.is-in-view,
+  #contact .contact-info-card.card-revealed,
+  .contact-section .contact-info-card.is-in-view,
+  .contact-section .contact-info-card.card-revealed,
+  .contact-slide-card.is-in-view,
+  .contact-slide-card.card-revealed {
+    opacity: 1 !important;
+    transform: translate3d(0, 0, 0) !important;
+  }
+}
+
+/* ── C. CONTACT FORM INPUTS & BUTTONS (Mobile & Desktop) ── */
+.contact-form-anim-brand,
+.contact-form-anim-header,
+.contact-form-anim-group1,
+.contact-form-anim-group2,
+.contact-form-anim-group3,
+.contact-form-anim-group4,
+.contact-form-anim-group5,
+.contact-form-anim-btn {
+  opacity: 0 !important;
+  transform: translate3d(0, 35px, 0) !important;
+  transition: transform 0.80s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  will-change: transform, opacity !important;
+  -webkit-backface-visibility: hidden !important;
+  backface-visibility: hidden !important;
+}
+
+.contact-form-anim-brand   { transition-delay: 0.05s !important; }
+.contact-form-anim-header  { transition-delay: 0.12s !important; }
+.contact-form-anim-group1  { transition-delay: 0.18s !important; }
+.contact-form-anim-group2  { transition-delay: 0.25s !important; }
+.contact-form-anim-group3  { transition-delay: 0.32s !important; }
+.contact-form-anim-group4  { transition-delay: 0.39s !important; }
+.contact-form-anim-group5  { transition-delay: 0.46s !important; }
+.contact-form-anim-btn     { transition-delay: 0.53s !important; }
+
+.contact-slide-form.is-in-view .contact-form-anim-brand,
+.contact-slide-form.is-in-view .contact-form-anim-header,
+.contact-slide-form.is-in-view .contact-form-anim-group1,
+.contact-slide-form.is-in-view .contact-form-anim-group2,
+.contact-slide-form.is-in-view .contact-form-anim-group3,
+.contact-slide-form.is-in-view .contact-form-anim-group4,
+.contact-slide-form.is-in-view .contact-form-anim-group5,
+.contact-slide-form.is-in-view .contact-form-anim-btn,
+.contact-slide-form.card-revealed .contact-form-anim-brand,
+.contact-slide-form.card-revealed .contact-form-anim-header,
+.contact-slide-form.card-revealed .contact-form-anim-group1,
+.contact-slide-form.card-revealed .contact-form-anim-group2,
+.contact-slide-form.card-revealed .contact-form-anim-group3,
+.contact-slide-form.card-revealed .contact-form-anim-group4,
+.contact-slide-form.card-revealed .contact-form-anim-group5,
+.contact-slide-form.card-revealed .contact-form-anim-btn,
+.contact-form-anim-group1.is-in-view,
+.contact-form-anim-group2.is-in-view,
+.contact-form-anim-group3.is-in-view,
+.contact-form-anim-group4.is-in-view,
+.contact-form-anim-group5.is-in-view,
+.contact-form-anim-btn.is-in-view,
+.contact-form-anim-group1.card-revealed,
+.contact-form-anim-group2.card-revealed,
+.contact-form-anim-group3.card-revealed,
+.contact-form-anim-group4.card-revealed,
+.contact-form-anim-group5.card-revealed,
+.contact-form-anim-btn.card-revealed {
+  opacity: 1 !important;
+  transform: translate3d(0, 0, 0) !important;
+}
+
 /* ── 4. CONTACT DIVINE FINGERS HEALTH CARE SERVICES INC. ── */
 .contact-slide-top,
 .contact-slide-sub,
@@ -1065,6 +1402,201 @@
 .contact-slide-sub.card-revealed,
 .contact-slide-card.card-revealed,
 .contact-slide-form.card-revealed {
+  opacity: 1 !important;
+  transform: translate3d(0, 0, 0) !important;
+}
+
+  
+/* ==========================================================================
+   COOKIE & PRIVACY CONSENT BANNER: CLEAN WHITE THEME
+   ========================================================================== */
+.cookie-consent-banner {
+  background: #FFFFFF !important;
+  color: #1E293B !important;
+  border-top: 1.5px solid #E2E8F0 !important;
+  box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.08) !important;
+}
+
+.cookie-consent-header {
+  color: #0A192F !important;
+}
+
+.cookie-consent-header strong {
+  color: #0A192F !important;
+}
+
+.cookie-consent-header .cookie-icon {
+  color: var(--teal-green, #3CAF8A) !important;
+}
+
+.cookie-consent-text {
+  color: #475569 !important;
+}
+
+.btn-cookie-secondary {
+  background: #F1F5F9 !important;
+  color: #1E293B !important;
+  border: 1px solid #CBD5E1 !important;
+}
+
+.btn-cookie-secondary:hover {
+  background: #E2E8F0 !important;
+  color: #0F172A !important;
+  border-color: #94A3B8 !important;
+}
+
+.btn-cookie-primary {
+  background: linear-gradient(135deg, #00A896 0%, #0284C7 100%) !important;
+  color: #FFFFFF !important;
+}
+
+  
+/* ==========================================================================
+   MOBILE & DESKTOP BIDIRECTIONAL SCROLL ANIMATIONS:
+   1. Contact Section (Card & Form)
+   2. Callout Banner (Section below Contact Form)
+   3. Site Footer
+   4. Newsletter & Social Strip
+   ========================================================================== */
+
+/* ── 1. CONTACT SECTION (Card, Form, Heading, Subtitle) ── */
+.contact-section .contact-slide-top,
+.contact-section .contact-slide-sub,
+.contact-section .contact-slide-card,
+.contact-section .contact-slide-form,
+#home-contact .contact-slide-card,
+#home-contact .contact-slide-form,
+#contact .contact-slide-card,
+#contact .contact-slide-form {
+  opacity: 0 !important;
+  transform: translate3d(0, 45px, 0) !important;
+  transition: transform 0.90s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  will-change: transform, opacity !important;
+  -webkit-backface-visibility: hidden !important;
+  backface-visibility: hidden !important;
+}
+
+.contact-section .contact-slide-top  { transition-delay: 0.05s !important; }
+.contact-section .contact-slide-sub  { transition-delay: 0.16s !important; }
+.contact-section .contact-slide-card { transition-delay: 0.28s !important; }
+.contact-section .contact-slide-form { transition-delay: 0.42s !important; }
+
+.contact-section.is-revealed .contact-slide-top,
+.contact-section.is-revealed .contact-slide-sub,
+.contact-section.is-revealed .contact-slide-card,
+.contact-section.is-revealed .contact-slide-form,
+#home-contact.is-revealed .contact-slide-card,
+#home-contact.is-revealed .contact-slide-form,
+#contact.is-revealed .contact-slide-card,
+#contact.is-revealed .contact-slide-form,
+.contact-slide-card.is-in-view,
+.contact-slide-form.is-in-view,
+.contact-slide-top.is-in-view,
+.contact-slide-sub.is-in-view,
+.contact-slide-card.card-revealed,
+.contact-slide-form.card-revealed {
+  opacity: 1 !important;
+  transform: translate3d(0, 0, 0) !important;
+}
+
+/* ── 2. CALLOUT BANNER SECTION (Below Contact Form) ── */
+.callout-banner-section .callout-slide-text,
+.callout-banner-section .callout-slide-actions,
+#callout-banner .callout-slide-text,
+#callout-banner .callout-slide-actions {
+  opacity: 0 !important;
+  transform: translate3d(0, 45px, 0) !important;
+  transition: transform 0.90s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  will-change: transform, opacity !important;
+  -webkit-backface-visibility: hidden !important;
+  backface-visibility: hidden !important;
+}
+
+.callout-banner-section .callout-slide-text    { transition-delay: 0.08s !important; }
+.callout-banner-section .callout-slide-actions { transition-delay: 0.24s !important; }
+
+.callout-banner-section.is-revealed .callout-slide-text,
+.callout-banner-section.is-revealed .callout-slide-actions,
+#callout-banner.is-revealed .callout-slide-text,
+#callout-banner.is-revealed .callout-slide-actions,
+.callout-slide-text.is-in-view,
+.callout-slide-actions.is-in-view,
+.callout-slide-text.card-revealed,
+.callout-slide-actions.card-revealed {
+  opacity: 1 !important;
+  transform: translate3d(0, 0, 0) !important;
+}
+
+/* ── 3. SITE FOOTER (Columns & Bottom Bar) ── */
+.site-footer .footer-slide-col,
+.site-footer .footer-slide-bottom,
+#site-footer .footer-slide-col,
+#site-footer .footer-slide-bottom {
+  opacity: 0 !important;
+  transform: translate3d(0, 45px, 0) !important;
+  transition: transform 0.90s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  will-change: transform, opacity !important;
+  -webkit-backface-visibility: hidden !important;
+  backface-visibility: hidden !important;
+}
+
+.site-footer .footer-slide-col:nth-child(1) { transition-delay: 0.05s !important; }
+.site-footer .footer-slide-col:nth-child(2) { transition-delay: 0.16s !important; }
+.site-footer .footer-slide-col:nth-child(3) { transition-delay: 0.28s !important; }
+.site-footer .footer-slide-col:nth-child(4) { transition-delay: 0.40s !important; }
+.site-footer .footer-slide-bottom          { transition-delay: 0.50s !important; }
+
+.site-footer.is-revealed .footer-slide-col,
+.site-footer.is-revealed .footer-slide-bottom,
+#site-footer.is-revealed .footer-slide-col,
+#site-footer.is-revealed .footer-slide-bottom,
+.footer-slide-col.is-in-view,
+.footer-slide-bottom.is-in-view,
+.footer-slide-col.card-revealed,
+.footer-slide-bottom.card-revealed {
+  opacity: 1 !important;
+  transform: translate3d(0, 0, 0) !important;
+}
+
+/* ── 4. NEWSLETTER & SOCIAL STRIP ── */
+.strip-section .strip-slide-text,
+.strip-section .strip-fade-form,
+.strip-section .strip-slide-social-text,
+.strip-section .strip-slide-icon,
+#newsletter-strip .strip-slide-text,
+#newsletter-strip .strip-fade-form,
+#newsletter-strip .strip-slide-social-text,
+#newsletter-strip .strip-slide-icon {
+  opacity: 0 !important;
+  transform: translate3d(0, 40px, 0) !important;
+  transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.80s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  will-change: transform, opacity !important;
+  -webkit-backface-visibility: hidden !important;
+  backface-visibility: hidden !important;
+}
+
+.strip-section .strip-slide-text        { transition-delay: 0.05s !important; }
+.strip-section .strip-fade-form         { transition-delay: 0.18s !important; }
+.strip-section .strip-slide-social-text { transition-delay: 0.28s !important; }
+.strip-section .strip-slide-icon:nth-child(1) { transition-delay: 0.38s !important; }
+.strip-section .strip-slide-icon:nth-child(2) { transition-delay: 0.48s !important; }
+
+.strip-section.is-revealed .strip-slide-text,
+.strip-section.is-revealed .strip-fade-form,
+.strip-section.is-revealed .strip-slide-social-text,
+.strip-section.is-revealed .strip-slide-icon,
+#newsletter-strip.is-revealed .strip-slide-text,
+#newsletter-strip.is-revealed .strip-fade-form,
+#newsletter-strip.is-revealed .strip-slide-social-text,
+#newsletter-strip.is-revealed .strip-slide-icon,
+.strip-slide-text.is-in-view,
+.strip-fade-form.is-in-view,
+.strip-slide-social-text.is-in-view,
+.strip-slide-icon.is-in-view,
+.strip-slide-text.card-revealed,
+.strip-fade-form.card-revealed,
+.strip-slide-social-text.card-revealed,
+.strip-slide-icon.card-revealed {
   opacity: 1 !important;
   transform: translate3d(0, 0, 0) !important;
 }
@@ -1798,7 +2330,7 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-  <script src="script.js?v=6.5.3"></script>
+  <script src="script.js?v=6.5.8"></script>
   <script>
     if (window.lucide) lucide.createIcons();
 

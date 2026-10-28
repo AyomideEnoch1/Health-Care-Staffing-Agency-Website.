@@ -10,8 +10,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Montserrat:wght@400;500;600;700;800;900&family=Open+Sans:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&family=Pacifico&display=swap" rel="stylesheet">
   
-  <link rel="stylesheet" href="style.css?v=6.4.8">
-  <link rel="stylesheet" href="prototype.css?v=6.2.0">
+  <link rel="stylesheet" href="style.css?v=6.8.6">
+  <link rel="stylesheet" href="prototype.css?v=6.6.6">
+  <link rel="stylesheet" href="scroll-reveal.css?v=1.2.0">
 </head>
 <body>
 
@@ -65,14 +66,14 @@
     </div>
 
     <div class="hero-content container">
-      <div class="hero-text-block">
+      <div class="hero-text-block" data-animate="hero-load">
         <h1 class="hero-title">Now Hiring: RNs, RPNs &amp; <br>Personal Support Workers</h1>
-        <p class="hero-subtitle">
+        <p class="hero-subtitle" data-animate="fade-up" data-delay="100">
           Divine Fingers Health Care Services Inc. is actively recruiting healthcare professionals across Canada. Explore flexible schedules, competitive wages, and travel nursing opportunities.
         </p>
         <div class="hero-btn-row">
-          <a href="jobseekers.html#applicant-form" class="btn btn-pill-hero">APPLY ONLINE NOW</a>
-          <a href="#open-roles" class="btn btn-pill-outline">VIEW OPEN POSITIONS</a>
+          <a href="jobseekers.html#applicant-form" class="btn btn-pill-hero" data-animate="fade-up" data-delay="180">APPLY ONLINE NOW</a>
+          <a href="#open-roles" class="btn btn-pill-outline" data-animate="fade-up" data-delay="240">VIEW OPEN POSITIONS</a>
         </div>
       </div>
     </div>
@@ -81,10 +82,10 @@
   <!-- MAIN HIRING SHOWCASE SECTION -->
   <section class="section-padding" id="open-roles" style="background-color: var(--white);">
     <div class="container">
-      <div class="welcome-header anim-section">
-        <h2 class="welcome-title slide-left">Current Openings for <span class="brand-highlight">NURSES &amp; PSWs</span></h2>
-        <div class="welcome-accent-line slide-right"></div>
-        <p class="section-lead-text slide-up" style="max-width: 780px; margin: 1rem auto 0 auto; color: var(--cool-gray); font-size: 1rem; line-height: 1.65;">
+      <div class="welcome-header" data-animate="fade-up">
+        <h2 class="welcome-title">Current Openings for <span class="brand-highlight">NURSES &amp; PSWs</span></h2>
+        <div class="welcome-accent-line"></div>
+        <p class="section-lead-text" data-animate="fade-up" data-delay="100" style="max-width: 780px; margin: 1rem auto 0 auto; color: var(--cool-gray); font-size: 1rem; line-height: 1.65;">
           Join our clinical roster to work with top-tier healthcare facilities, specialized clinics, and long-term care communities. We value people first, providing prompt compensation, clinical mentorship, and scheduling freedom.
         </p>
       </div>
@@ -94,7 +95,7 @@
       <div class="hiring-grid layout-horizontal" id="hiring-roles-grid">
 
         <!-- CARD 1: REGISTERED NURSE (RN) -->
-        <article class="hiring-card anim-section slide-up" data-role-id="1">
+        <article class="hiring-card" data-role-id="1" data-animate="fade-up" data-delay="0">
           <div class="hiring-card-image-wrap">
             <img src="assets/images/role_rn_care.jpg" alt="Registered Nurse Clinical Care" class="hiring-card-img">
           </div>
@@ -105,41 +106,41 @@
             </p>
 
             <div class="hiring-specs-box">
-              <div class="hiring-spec-item">
+              <div class="hiring-spec-item" data-animate="tablet-ripple" data-delay="80">
                 <i data-lucide="dollar-sign" class="hiring-spec-icon"></i>
                 <div class="hiring-spec-text"><strong>Compensation:</strong> <span>Top-Tier Hourly + Travel Per Diems</span></div>
               </div>
-              <div class="hiring-spec-item">
+              <div class="hiring-spec-item" data-animate="tablet-ripple" data-delay="160">
                 <i data-lucide="clock" class="hiring-spec-icon"></i>
                 <div class="hiring-spec-text"><strong>Shift Options:</strong> <span>8h / 12h Flexible (Days, Nights, Weekends)</span></div>
               </div>
-              <div class="hiring-spec-item">
+              <div class="hiring-spec-item" data-animate="tablet-ripple" data-delay="240">
                 <i data-lucide="map-pin" class="hiring-spec-icon"></i>
                 <div class="hiring-spec-text"><strong>Locations:</strong> <span>GTA, Ontario Facilities &amp; Remote Contracts</span></div>
               </div>
-              <div class="hiring-spec-item">
+              <div class="hiring-spec-item" data-animate="tablet-ripple" data-delay="320">
                 <i data-lucide="shield-check" class="hiring-spec-icon"></i>
                 <div class="hiring-spec-text"><strong>Licensing:</strong> <span>Current CNO (RN) License in good standing</span></div>
               </div>
             </div>
 
             <ul class="hiring-perks-list">
-              <li class="hiring-perk-item">
+              <li class="hiring-perk-item" data-animate="fade-up" data-delay="100">
                 <i data-lucide="check-circle-2"></i>
                 <span>Direct patient assessment, IV therapy &amp; medication administration</span>
               </li>
-              <li class="hiring-perk-item">
+              <li class="hiring-perk-item" data-animate="fade-up" data-delay="180">
                 <i data-lucide="check-circle-2"></i>
                 <span>Weekly direct deposit payroll with transparent hours breakdown</span>
               </li>
-              <li class="hiring-perk-item">
+              <li class="hiring-perk-item" data-animate="fade-up" data-delay="260">
                 <i data-lucide="check-circle-2"></i>
                 <span>24/7 dedicated clinical leadership support from senior nurse leaders</span>
               </li>
             </ul>
 
             <div class="hiring-card-action">
-              <a href="jobseekers.html#applicant-form" class="btn-hiring-apply">
+              <a href="jobseekers.html#applicant-form" class="btn-hiring-apply" data-animate="fade-up" data-delay="150">
                 <span>APPLY AS REGISTERED NURSE</span>
                 <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i>
               </a>
@@ -148,9 +149,9 @@
         </article>
 
         <!-- CARD 2: REGISTERED PRACTICAL NURSE (RPN) -->
-        <article class="hiring-card anim-section slide-up" data-role-id="2" style="transition-delay: 0.15s;">
+        <article class="hiring-card" data-role-id="2" data-animate="fade-up" data-delay="120">
           <div class="hiring-card-image-wrap">
-            <img src="assets/images/service_nurse.jpg" alt="Registered Practical Nurse Care" class="hiring-card-img">
+            <img src="assets/images/service_nurse.jpg" alt="Registered Practical Nurse Care" class="hiring-card-img" style="object-position: center top;">
           </div>
           <div class="hiring-card-body">
             <h3 class="hiring-card-role-title">Registered Practical Nurse (RPN)</h3>
@@ -159,41 +160,41 @@
             </p>
 
             <div class="hiring-specs-box">
-              <div class="hiring-spec-item">
+              <div class="hiring-spec-item" data-animate="tablet-ripple" data-delay="80">
                 <i data-lucide="dollar-sign" class="hiring-spec-icon"></i>
                 <div class="hiring-spec-text"><strong>Compensation:</strong> <span>Competitive Rates + Weekend Differentials</span></div>
               </div>
-              <div class="hiring-spec-item">
+              <div class="hiring-spec-item" data-animate="tablet-ripple" data-delay="160">
                 <i data-lucide="clock" class="hiring-spec-icon"></i>
                 <div class="hiring-spec-text"><strong>Shift Options:</strong> <span>Full-Time, Part-Time &amp; Casual Shifts</span></div>
               </div>
-              <div class="hiring-spec-item">
+              <div class="hiring-spec-item" data-animate="tablet-ripple" data-delay="240">
                 <i data-lucide="map-pin" class="hiring-spec-icon"></i>
                 <div class="hiring-spec-text"><strong>Locations:</strong> <span>Scarborough, Toronto, Durham &amp; Peel Region</span></div>
               </div>
-              <div class="hiring-spec-item">
+              <div class="hiring-spec-item" data-animate="tablet-ripple" data-delay="320">
                 <i data-lucide="shield-check" class="hiring-spec-icon"></i>
                 <div class="hiring-spec-text"><strong>Licensing:</strong> <span>Current CNO (RPN) License in good standing</span></div>
               </div>
             </div>
 
             <ul class="hiring-perks-list">
-              <li class="hiring-perk-item">
+              <li class="hiring-perk-item" data-animate="fade-up" data-delay="100">
                 <i data-lucide="check-circle-2"></i>
                 <span>Wound care management, vitals monitoring &amp; patient charting</span>
               </li>
-              <li class="hiring-perk-item">
+              <li class="hiring-perk-item" data-animate="fade-up" data-delay="180">
                 <i data-lucide="check-circle-2"></i>
                 <span>User-friendly self-scheduling portal for instant shift booking</span>
               </li>
-              <li class="hiring-perk-item">
+              <li class="hiring-perk-item" data-animate="fade-up" data-delay="260">
                 <i data-lucide="check-circle-2"></i>
                 <span>Supportive team culture with continuing clinical education</span>
               </li>
             </ul>
 
             <div class="hiring-card-action">
-              <a href="jobseekers.html#applicant-form" class="btn-hiring-apply">
+              <a href="jobseekers.html#applicant-form" class="btn-hiring-apply" data-animate="fade-up" data-delay="150">
                 <span>APPLY AS PRACTICAL NURSE</span>
                 <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i>
               </a>
@@ -202,7 +203,7 @@
         </article>
 
         <!-- CARD 3: PERSONAL SUPPORT WORKER (PSW) -->
-        <article class="hiring-card anim-section slide-up" data-role-id="3" style="transition-delay: 0.25s;">
+        <article class="hiring-card" data-role-id="3" data-animate="fade-up" data-delay="240">
           <div class="hiring-card-image-wrap">
             <img src="assets/images/role_psw_care.jpg" alt="Personal Support Worker" class="hiring-card-img">
           </div>
@@ -213,41 +214,41 @@
             </p>
 
             <div class="hiring-specs-box">
-              <div class="hiring-spec-item">
+              <div class="hiring-spec-item" data-animate="tablet-ripple" data-delay="80">
                 <i data-lucide="dollar-sign" class="hiring-spec-icon"></i>
                 <div class="hiring-spec-text"><strong>Compensation:</strong> <span>Rewarding Hourly Wages + Mileage Allowances</span></div>
               </div>
-              <div class="hiring-spec-item">
+              <div class="hiring-spec-item" data-animate="tablet-ripple" data-delay="160">
                 <i data-lucide="clock" class="hiring-spec-icon"></i>
                 <div class="hiring-spec-text"><strong>Shift Options:</strong> <span>Day, Evening &amp; Overnight Shifts</span></div>
               </div>
-              <div class="hiring-spec-item">
+              <div class="hiring-spec-item" data-animate="tablet-ripple" data-delay="240">
                 <i data-lucide="map-pin" class="hiring-spec-icon"></i>
                 <div class="hiring-spec-text"><strong>Locations:</strong> <span>Community Centers &amp; Residential Homes</span></div>
               </div>
-              <div class="hiring-spec-item">
+              <div class="hiring-spec-item" data-animate="tablet-ripple" data-delay="320">
                 <i data-lucide="shield-check" class="hiring-spec-icon"></i>
                 <div class="hiring-spec-text"><strong>Certification:</strong> <span>Ontario PSW Certificate or Recognized Equivalent</span></div>
               </div>
             </div>
 
             <ul class="hiring-perks-list">
-              <li class="hiring-perk-item">
+              <li class="hiring-perk-item" data-animate="fade-up" data-delay="100">
                 <i data-lucide="check-circle-2"></i>
                 <span>Dignified personal hygiene, mobility &amp; daily living support</span>
               </li>
-              <li class="hiring-perk-item">
+              <li class="hiring-perk-item" data-animate="fade-up" data-delay="180">
                 <i data-lucide="check-circle-2"></i>
                 <span>Compassionate companionship and vital patient observations</span>
               </li>
-              <li class="hiring-perk-item">
+              <li class="hiring-perk-item" data-animate="fade-up" data-delay="260">
                 <i data-lucide="check-circle-2"></i>
                 <span>Welcoming environment, rapid onboarding &amp; caring dispatch team</span>
               </li>
             </ul>
 
             <div class="hiring-card-action">
-              <a href="jobseekers.html#applicant-form" class="btn-hiring-apply">
+              <a href="jobseekers.html#applicant-form" class="btn-hiring-apply" data-animate="fade-up" data-delay="150">
                 <span>APPLY AS SUPPORT WORKER</span>
                 <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i>
               </a>
@@ -258,53 +259,80 @@
       </div>
 
       <!-- TRAVEL NURSING PROGRAM FEATURE BANNER -->
-      <div class="hiring-travel-banner anim-section slide-up">
+      <div class="hiring-travel-banner" data-animate="fade-up" data-delay="0">
         <div class="hiring-travel-content">
-          <div class="hiring-travel-badge">
+          <div class="hiring-travel-badge" data-animate="fade-up" data-delay="60">
             <i data-lucide="plane" style="width: 14px; height: 14px;"></i>
-            <span>TRAVELLING NURSES PROGRAM</span>
+            <span>TRAVELLING NURSES PROGRAM • CANADA-WIDE</span>
           </div>
-          <h3 class="hiring-travel-title">Expand Your Horizons With Travel Nursing Across Canada</h3>
-          <p class="hiring-travel-desc">
-            Divine Fingers places adventurous, qualified RNs and RPNs in remote, rural, and northern community health facilities across Canada. Enjoy exceptional compensation while making an unforgettable impact on communities in need.
+          <h3 class="hiring-travel-title" data-animate="fade-up" data-delay="120">Expand Your Horizons With Travel Nursing Across Canada</h3>
+          <p class="hiring-travel-desc" data-animate="fade-up" data-delay="180">
+            Divine Fingers Health Care connects adventurous, qualified RNs and RPNs with high-impact clinical placements in rural, northern, and community health networks. Benefit from top-tier compensation while delivering vital care where it is needed most.
           </p>
 
-          <div class="hiring-travel-perks">
-            <div class="hiring-travel-perk">
-              <i data-lucide="check"></i>
-              <span>100% Covered Flights &amp; Accommodations</span>
+          <div class="hiring-travel-perks-grid">
+            <div class="travel-perk-card" data-animate="tablet-ripple" data-delay="100">
+              <div class="travel-perk-icon">
+                <i data-lucide="check-circle-2"></i>
+              </div>
+              <div class="travel-perk-info">
+                <strong>100% Covered Travel</strong>
+                <span>Flights, transit &amp; private lodging</span>
+              </div>
             </div>
-            <div class="hiring-travel-perk">
-              <i data-lucide="check"></i>
-              <span>Generous Daily Meal &amp; Living Per Diems</span>
+            <div class="travel-perk-card" data-animate="tablet-ripple" data-delay="180">
+              <div class="travel-perk-icon">
+                <i data-lucide="check-circle-2"></i>
+              </div>
+              <div class="travel-perk-info">
+                <strong>Living Per Diems</strong>
+                <span>Generous daily meals &amp; living allowance</span>
+              </div>
             </div>
-            <div class="hiring-travel-perk">
-              <i data-lucide="check"></i>
-              <span>Flexible 4, 8, or 12-Week Contract Terms</span>
+            <div class="travel-perk-card" data-animate="tablet-ripple" data-delay="260">
+              <div class="travel-perk-icon">
+                <i data-lucide="check-circle-2"></i>
+              </div>
+              <div class="travel-perk-info">
+                <strong>Custom Placements</strong>
+                <span>Flexible 4, 8, or 12-week contract terms</span>
+              </div>
             </div>
-            <div class="hiring-travel-perk">
-              <i data-lucide="check"></i>
-              <span>24/7 Dedicated Clinical Preceptor Guidance</span>
+            <div class="travel-perk-card" data-animate="tablet-ripple" data-delay="340">
+              <div class="travel-perk-icon">
+                <i data-lucide="check-circle-2"></i>
+              </div>
+              <div class="travel-perk-info">
+                <strong>Clinical Preceptor</strong>
+                <span>24/7 dedicated coordinator guidance</span>
+              </div>
             </div>
           </div>
 
           <div class="hiring-travel-btn-group">
-            <a href="jobseekers.html#applicant-form" class="btn btn-pill-hero" style="background: var(--lime-green); color: var(--navy); border-color: var(--lime-green);">
-              INQUIRE ABOUT TRAVEL CONTRACTS
+            <a href="jobseekers.html#applicant-form" class="btn btn-travel-primary" data-animate="fade-up" data-delay="220">
+              <span>INQUIRE ABOUT TRAVEL CONTRACTS</span>
+              <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i>
             </a>
-            <a href="tel:+16472106463" class="btn btn-pill-outline">
-              CALL TRAVEL DESK (+1 647-210-6463)
+            <a href="tel:+16472106463" class="btn btn-travel-outline" data-animate="fade-up" data-delay="300">
+              <i data-lucide="phone-call" style="width: 15px; height: 15px;"></i>
+              <span>CALL TRAVEL DESK (+1 647-210-6463)</span>
             </a>
           </div>
         </div>
 
-        <div class="hiring-travel-img-wrap">
-          <img src="assets/images/service_travel_nurse.jpg" alt="Travelling Nurse Program Canada">
-          <div class="hiring-travel-floating-card">
-            <i data-lucide="award" style="width: 24px; height: 24px; color: var(--lime-green); flex-shrink: 0;"></i>
-            <div>
-              <strong>Premium Contract Compensation</strong>
-              <span>Travel Nursing Placements Across Canadian Provinces</span>
+        <div class="hiring-travel-media-wrap" data-animate="fade-up" data-delay="150">
+          <div class="hiring-travel-media-inner">
+            <img src="assets/images/service_travel_nurse.jpg" alt="Travelling Nurse Program Canada" class="hiring-travel-img">
+            <div class="hiring-travel-floating-card" data-animate="scale-up" data-delay="280">
+              <div class="floating-card-icon">
+                <i data-lucide="award"></i>
+              </div>
+              <div class="floating-card-text">
+                <strong>Premium Contract Compensation</strong>
+                <span>Travel Nursing Deployments Across Canada</span>
+              </div>
+              <span class="floating-card-pill" data-animate="scale-up" data-delay="360">HIGH DEMAND</span>
             </div>
           </div>
         </div>
@@ -316,10 +344,10 @@
   <!-- WHY CLINICIANS CHOOSE US (BENEFITS) -->
   <section class="section-padding clinician-advantage-section" style="background-color: var(--bg-light); border-top: 1px solid #E2E8F0;">
     <div class="container">
-      <div class="welcome-header anim-section text-center">
-        <h2 class="welcome-title slide-left">Why Healthcare Professionals <span class="brand-highlight">CHOOSE US</span></h2>
-        <div class="welcome-accent-line slide-right"></div>
-        <p class="section-lead-text slide-up" style="max-width: 720px; margin: 1rem auto 0 auto; color: var(--cool-gray); font-size: 0.95rem; line-height: 1.65;">
+      <div class="welcome-header text-center" data-animate="fade-up">
+        <h2 class="welcome-title">Why Healthcare Professionals <span class="brand-highlight">CHOOSE US</span></h2>
+        <div class="welcome-accent-line"></div>
+        <p class="section-lead-text" data-animate="fade-up" data-delay="100" style="max-width: 720px; margin: 1rem auto 0 auto; color: var(--cool-gray); font-size: 0.95rem; line-height: 1.65;">
           We believe high-quality patient care begins with respecting, supporting, and investing in our front-line nurses and care staff.
         </p>
       </div>
@@ -327,64 +355,60 @@
       <div class="clinician-benefits-grid" style="margin-top: 2.8rem;">
         
         <!-- Pillar 1: Prompt, Transparent Pay -->
-        <div class="clinician-benefit-card accent-emerald anim-section slide-up">
-          <div class="benefit-card-top-bar"></div>
-          <div class="benefit-icon-box bg-emerald">
-            <i data-lucide="wallet" style="width: 26px; height: 26px; color: #10B981;"></i>
+        <div class="clinician-benefit-card" data-animate="fade-up" data-delay="0">
+          <div class="benefit-icon-box" data-animate="scale-up">
+            <i data-lucide="wallet" style="width: 24px; height: 24px;"></i>
           </div>
           <h3 class="benefit-card-title">Prompt, Transparent Pay</h3>
           <p class="benefit-card-desc">
             Direct deposit weekly payroll with accurate tracking, overtime rates, and shift differentials deposited reliably without delay.
           </p>
-          <div class="benefit-pill-chip">
+          <div class="benefit-pill-chip" data-animate="tablet-ripple" data-delay="120">
             <i data-lucide="check" style="width: 12px; height: 12px;"></i>
             <span>Weekly Direct Deposit</span>
           </div>
         </div>
 
         <!-- Pillar 2: Total Scheduling Autonomy -->
-        <div class="clinician-benefit-card accent-cyan anim-section slide-up" style="transition-delay: 0.1s;">
-          <div class="benefit-card-top-bar"></div>
-          <div class="benefit-icon-box bg-cyan">
-            <i data-lucide="calendar" style="width: 26px; height: 26px; color: #06B6D4;"></i>
+        <div class="clinician-benefit-card" data-animate="fade-up" data-delay="100">
+          <div class="benefit-icon-box" data-animate="scale-up">
+            <i data-lucide="calendar" style="width: 24px; height: 24px;"></i>
           </div>
           <h3 class="benefit-card-title">Total Scheduling Autonomy</h3>
           <p class="benefit-card-desc">
             Take full control of your life. Pick shifts that suit your schedule—casual days, weekend blocks, or full-time consecutive contracts.
           </p>
-          <div class="benefit-pill-chip">
+          <div class="benefit-pill-chip" data-animate="tablet-ripple" data-delay="200">
             <i data-lucide="check" style="width: 12px; height: 12px;"></i>
             <span>Flexible Self-Scheduling</span>
           </div>
         </div>
 
         <!-- Pillar 3: Clinical Leadership Mentorship -->
-        <div class="clinician-benefit-card accent-navy anim-section slide-up" style="transition-delay: 0.2s;">
-          <div class="benefit-card-top-bar"></div>
-          <div class="benefit-icon-box bg-navy">
-            <i data-lucide="stethoscope" style="width: 26px; height: 26px; color: #1A3A63;"></i>
+        <div class="clinician-benefit-card" data-animate="fade-up" data-delay="200">
+          <div class="benefit-icon-box" data-animate="scale-up">
+            <i data-lucide="stethoscope" style="width: 24px; height: 24px;"></i>
           </div>
           <h3 class="benefit-card-title">Clinical Leadership Mentorship</h3>
           <p class="benefit-card-desc">
             Led by Livina Akadinwa (RN, BScN, MPH), our leadership provides continuous clinical education, triage support, and career guidance.
           </p>
-          <div class="benefit-pill-chip">
+          <div class="benefit-pill-chip" data-animate="tablet-ripple" data-delay="280">
             <i data-lucide="check" style="width: 12px; height: 12px;"></i>
             <span>24/7 Nurse Leader Guidance</span>
           </div>
         </div>
 
         <!-- Pillar 4: Rapid 48-Hour Onboarding -->
-        <div class="clinician-benefit-card accent-lime anim-section slide-up" style="transition-delay: 0.3s;">
-          <div class="benefit-card-top-bar"></div>
-          <div class="benefit-icon-box bg-lime">
-            <i data-lucide="zap" style="width: 26px; height: 26px; color: #7CC242;"></i>
+        <div class="clinician-benefit-card" data-animate="fade-up" data-delay="300">
+          <div class="benefit-icon-box" data-animate="scale-up">
+            <i data-lucide="zap" style="width: 24px; height: 24px;"></i>
           </div>
           <h3 class="benefit-card-title">Rapid 48-Hour Onboarding</h3>
           <p class="benefit-card-desc">
             Simple digital credentialing. Submit your documentation and start working your preferred shifts in as little as 48 hours.
           </p>
-          <div class="benefit-pill-chip">
+          <div class="benefit-pill-chip" data-animate="tablet-ripple" data-delay="360">
             <i data-lucide="check" style="width: 12px; height: 12px;"></i>
             <span>Fast-Track Placement</span>
           </div>
@@ -397,13 +421,13 @@
   <!-- 3-STEP APPLICATION PROCESS -->
   <section class="hiring-process-section">
     <div class="container">
-      <div class="welcome-header anim-section">
-        <h2 class="welcome-title slide-left">How To Join Our <span class="brand-highlight">CLINICAL ROSTER</span></h2>
-        <div class="welcome-accent-line slide-right"></div>
+      <div class="welcome-header" data-animate="fade-up">
+        <h2 class="welcome-title">How To Join Our <span class="brand-highlight">CLINICAL ROSTER</span></h2>
+        <div class="welcome-accent-line"></div>
       </div>
 
       <div class="hiring-steps-grid">
-        <div class="hiring-step-card anim-section slide-left">
+        <div class="hiring-step-card" data-animate="fade-up" data-delay="0">
           <div class="hiring-step-num">01</div>
           <h3 class="hiring-step-title">Submit Application &amp; Credentials</h3>
           <p class="hiring-step-desc">
@@ -411,7 +435,7 @@
           </p>
         </div>
 
-        <div class="hiring-step-card anim-section slide-up" style="transition-delay: 0.15s;">
+        <div class="hiring-step-card" data-animate="fade-up" data-delay="120">
           <div class="hiring-step-num">02</div>
           <h3 class="hiring-step-title">Rapid Clinical Verification</h3>
           <p class="hiring-step-desc">
@@ -419,7 +443,7 @@
           </p>
         </div>
 
-        <div class="hiring-step-card anim-section slide-right" style="transition-delay: 0.3s;">
+        <div class="hiring-step-card" data-animate="fade-up" data-delay="240">
           <div class="hiring-step-num">03</div>
           <h3 class="hiring-step-title">Book Shifts &amp; Start Working</h3>
           <p class="hiring-step-desc">
@@ -429,20 +453,20 @@
       </div>
 
       <!-- CALL TO ACTION BANNER -->
-      <div class="hiring-cta-bar anim-section slide-up">
-        <h3>Ready to Take the Next Step in Your Healthcare Career?</h3>
-        <p>
+      <div class="hiring-cta-bar" data-animate="scale-up" data-delay="80">
+        <h3 data-animate="fade-up" data-delay="120">Ready to Take the Next Step in Your Healthcare Career?</h3>
+        <p data-animate="fade-up" data-delay="180">
           Apply today and join a supportive, clinician-led agency that respects your clinical expertise and values your hard work.
         </p>
         <div class="hiring-cta-btn-group">
-          <a href="jobseekers.html#applicant-form" class="btn btn-pill-hero" style="background: #FFFFFF; color: var(--navy); border-color: #FFFFFF;">
+          <a href="jobseekers.html#applicant-form" class="btn btn-pill-hero" data-animate="fade-up" data-delay="220" style="background: #FFFFFF; color: var(--navy); border-color: #FFFFFF;">
             SUBMIT APPLICATION NOW
           </a>
-          <a href="tel:+16472106463" class="btn btn-pill-outline" style="border-color: #FFFFFF; color: #FFFFFF;">
+          <a href="tel:+16472106463" class="btn btn-pill-outline" data-animate="fade-up" data-delay="280" style="border-color: #FFFFFF; color: #FFFFFF;">
             <i data-lucide="phone" style="width: 15px; height: 15px; display: inline-block; vertical-align: middle; margin-right: 4px;"></i>
             CALL RECRUITMENT DESK
           </a>
-          <a href="contact.html" class="btn btn-pill-outline" style="border-color: #FFFFFF; color: #FFFFFF;">
+          <a href="contact.html" class="btn btn-pill-outline" data-animate="fade-up" data-delay="340" style="border-color: #FFFFFF; color: #FFFFFF;">
             CONTACT RECRUITER
           </a>
         </div>
@@ -452,7 +476,7 @@
   </section>
 
   <!-- FOOTER -->
-  <footer class="site-footer">
+  <footer class="site-footer" data-animate="fade-up">
     <div class="footer-diagonal-top"></div>
     <div class="container footer-content">
       <div class="footer-col footer-brand">
@@ -515,6 +539,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <script src="script.js?v=6.4.8"></script>
+  <script src="scroll-reveal.js?v=1.2.0"></script>
   <script>
     if (window.lucide) {
       lucide.createIcons();

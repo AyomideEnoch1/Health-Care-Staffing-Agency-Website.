@@ -29,11 +29,11 @@
   --gradient-btn: linear-gradient(135deg, #3CAF8A 0%, #1BAECF 100%);
   --gradient-footer: linear-gradient(135deg, #1B4F8C 0%, #1A3A63 100%);
 
-  /* Fonts - Modern HealthTech Standard */
-  --font-heading: 'Plus Jakarta Sans', 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-body: 'Inter', 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-poppins: 'Plus Jakarta Sans', 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-script: 'Pacifico', cursive;
+  /* Fonts - Arial System Standard */
+  --font-heading: Arial, Helvetica, sans-serif;
+  --font-body: Arial, Helvetica, sans-serif;
+  --font-poppins: Arial, Helvetica, sans-serif;
+  --font-script: Arial, Helvetica, sans-serif;
 
   /* Layout & Spacing */
   --container-max: 1200px;
@@ -61,8 +61,12 @@ html {
   max-width: 100vw;
 }
 
+body, button, input, select, textarea, optgroup {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
 body {
-  font-family: var(--font-body);
+  font-family: Arial, Helvetica, sans-serif;
   color: var(--text-dark);
   background-color: var(--white);
   line-height: 1.6;
@@ -3664,9 +3668,6 @@ body.has-gsap .proto-gradient-callout {
   /* 5. MULTIPLE IMAGES: Slide in from left and right smoothly */
   /* Left / Main image slides from left */
   .arch-collage-wrapper .arch-main-photo,
-  .monograph-bg-plate img,
-  .photo-collage-3 .collage-item-main,
-  .collage-row-sub .collage-item-sub:first-child,
   .proto-trio-photo-grid img:first-child {
     opacity: 0;
     transform: translate3d(-38px, 0, 0);
@@ -3677,7 +3678,6 @@ body.has-gsap .proto-gradient-callout {
   /* Right / Secondary image slides from right */
   .arch-collage-wrapper .arch-vertical-photo,
   .monograph-fg-plate img,
-  .photo-collage-3 .collage-row-sub .collage-item-sub:last-child,
   .proto-trio-photo-grid img:last-child,
   .solutions-slide-right,
   .workforce-slide-right,
@@ -6535,7 +6535,7 @@ body.has-gsap .proto-gradient-callout {
   min-height: 100vh;
   background-color: #0A0F1D;
   color: #F8FAFC;
-  font-family: 'Open Sans', sans-serif;
+  font-family: Arial, Helvetica, sans-serif;
   position: relative;
   overflow-x: hidden;
 }
@@ -7491,7 +7491,7 @@ body.light-theme .action-btn:hover {
 }
 
 .custom-alert-title {
-  font-family: 'Montserrat', sans-serif;
+  font-family: Arial, Helvetica, sans-serif;
   font-size: 1.45rem;
   font-weight: 900;
   color: #FFFFFF;
@@ -7522,7 +7522,7 @@ body.light-theme .action-btn:hover {
 .custom-alert-btn {
   background: linear-gradient(135deg, #00A896 0%, #00F5D4 100%);
   color: #0B192C;
-  font-family: 'Montserrat', sans-serif;
+  font-family: Arial, Helvetica, sans-serif;
   font-weight: 800;
   font-size: 0.95rem;
   border: none;
@@ -8245,6 +8245,7 @@ body.light-theme .action-btn:hover {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center top;
   transition: transform 0.5s ease;
 }
 
@@ -8395,21 +8396,26 @@ body.light-theme .action-btn:hover {
   color: #FFFFFF !important;
 }
 
-/* Travel Nursing Feature Banner */
+/* Travel Nursing Feature Banner - Compact & Brand Aligned */
+/* ==========================================================================
+   TRAVEL NURSING PROGRAM FEATURE BANNER (FORMAL, CLEAN & PRESENTABLE)
+   ========================================================================== */
 .hiring-travel-banner {
-  background: linear-gradient(135deg, #1A3A63 0%, #0F233D 100%);
+  background: linear-gradient(135deg, #132A4A 0%, #0B1D33 100%);
+  border: 1px solid rgba(60, 175, 138, 0.28);
   border-radius: 20px;
   overflow: hidden;
   color: #FFFFFF;
-  margin: 3.5rem 0;
-  box-shadow: 0 16px 40px -10px rgba(26, 58, 99, 0.25);
+  margin: 2.5rem 0;
+  box-shadow: 0 20px 48px -12px rgba(11, 29, 51, 0.45);
   display: grid;
-  grid-template-columns: 1.2fr 0.8fr;
+  grid-template-columns: 1.25fr 0.85fr;
   position: relative;
+  align-items: stretch;
 }
 
 .hiring-travel-content {
-  padding: clamp(2rem, 4vw, 3.5rem);
+  padding: clamp(1.8rem, 3vw, 2.6rem) clamp(1.6rem, 3.2vw, 2.8rem);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -8418,96 +8424,274 @@ body.light-theme .action-btn:hover {
 .hiring-travel-badge {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  background: rgba(124, 194, 66, 0.18);
-  border: 1px solid #7CC242;
-  color: #A3E635;
+  gap: 7px;
+  background: rgba(60, 175, 138, 0.14);
+  border: 1px solid rgba(60, 175, 138, 0.38);
+  color: var(--teal-green, #3CAF8A);
   font-family: var(--font-heading);
   font-size: 0.72rem;
   font-weight: 800;
-  letter-spacing: 0.6px;
+  letter-spacing: 0.75px;
   text-transform: uppercase;
-  padding: 0.35rem 0.85rem;
+  padding: 0.32rem 0.85rem;
   border-radius: 999px;
-  margin-bottom: 1rem;
+  margin-bottom: 0.85rem;
   width: fit-content;
 }
 
 .hiring-travel-title {
   font-family: var(--font-heading);
-  font-size: clamp(1.4rem, 2.4vw, 2rem);
+  font-size: clamp(1.35rem, 2vw, 1.75rem);
   font-weight: 800;
   color: #FFFFFF;
   line-height: 1.25;
-  margin-bottom: 0.9rem;
+  margin-bottom: 0.65rem;
+  letter-spacing: -0.2px;
 }
 
 .hiring-travel-desc {
-  font-size: 0.94rem;
-  color: rgba(255, 255, 255, 0.85);
-  line-height: 1.6;
-  margin-bottom: 1.5rem;
+  font-size: 0.92rem;
+  color: rgba(255, 255, 255, 0.84);
+  line-height: 1.58;
+  margin-bottom: 1.35rem;
+  max-width: 620px;
 }
 
-.hiring-travel-perks {
+/* Formal 2x2 Perks Micro-Cards Grid */
+.hiring-travel-perks-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 0.75rem;
-  margin-bottom: 1.8rem;
+  gap: 0.75rem 1rem;
+  margin-bottom: 1.6rem;
 }
 
-.hiring-travel-perk {
+.travel-perk-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 0.65rem 0.85rem;
+  transition: all 0.25s ease;
+}
+
+.travel-perk-card:hover {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(60, 175, 138, 0.35);
+  transform: translateY(-2px);
+}
+
+.travel-perk-icon {
+  color: var(--teal-green, #3CAF8A);
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 0.84rem;
-  color: #FFFFFF;
-}
-
-.hiring-travel-perk svg {
-  color: #7CC242;
-  width: 16px;
-  height: 16px;
+  justify-content: center;
   flex-shrink: 0;
+  margin-top: 2px;
 }
 
-.hiring-travel-img-wrap {
+.travel-perk-icon svg {
+  width: 17px;
+  height: 17px;
+}
+
+.travel-perk-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.travel-perk-info strong {
+  font-family: var(--font-heading);
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  line-height: 1.3;
+}
+
+.travel-perk-info span {
+  font-size: 0.74rem;
+  color: rgba(255, 255, 255, 0.72);
+  line-height: 1.35;
+  margin-top: 1px;
+}
+
+/* Button Group */
+.hiring-travel-btn-group {
+  display: flex;
+  gap: 0.85rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.btn-travel-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: linear-gradient(135deg, var(--teal-green, #3CAF8A) 0%, var(--cyan-turquoise, #1BAECF) 100%);
+  color: #FFFFFF !important;
+  border: 1.5px solid var(--teal-green, #3CAF8A);
+  border-radius: var(--radius-pill, 50px);
+  padding: 0.7rem 1.45rem;
+  font-family: var(--font-heading);
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-decoration: none;
+  box-shadow: 0 6px 18px rgba(60, 175, 138, 0.32);
+  transition: all 0.28s ease;
+  cursor: pointer;
+}
+
+.btn-travel-primary:hover {
+  background: linear-gradient(135deg, var(--cyan-turquoise, #1BAECF) 0%, var(--teal-green, #3CAF8A) 100%);
+  border-color: var(--cyan-turquoise, #1BAECF);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(27, 174, 207, 0.42);
+}
+
+.btn-travel-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #FFFFFF !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.24);
+  border-radius: var(--radius-pill, 50px);
+  padding: 0.7rem 1.45rem;
+  font-family: var(--font-heading);
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-decoration: none;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: all 0.28s ease;
+  cursor: pointer;
+}
+
+.btn-travel-outline:hover {
+  background: #FFFFFF;
+  color: var(--navy, #1A3A63) !important;
+  border-color: #FFFFFF;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(255, 255, 255, 0.2);
+}
+
+/* Framed Media Container on Right */
+.hiring-travel-media-wrap {
   position: relative;
-  min-height: 320px;
+  padding: 1.25rem 1.25rem 1.25rem 0;
+  display: flex;
+  align-items: stretch;
 }
 
-.hiring-travel-img-wrap img {
+.hiring-travel-media-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 320px;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.25);
+}
+
+.hiring-travel-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center 15%;
+  display: block;
+  opacity: 1 !important;
+  transform: none !important;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+.hiring-travel-banner:hover .hiring-travel-img {
+  transform: scale(1.03);
+}
+
+/* Gradient Vignette over bottom of image for the floating card */
+.hiring-travel-media-inner::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(11, 29, 51, 0) 45%, rgba(11, 29, 51, 0.82) 100%);
+  pointer-events: none;
+}
+
+/* Floating Credential Card */
 .hiring-travel-floating-card {
   position: absolute;
-  bottom: 20px;
-  left: 20px;
-  right: 20px;
-  background: rgba(26, 58, 99, 0.88);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  bottom: 14px;
+  left: 14px;
+  right: 14px;
+  background: rgba(15, 35, 61, 0.88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(60, 175, 138, 0.35);
   border-radius: 12px;
-  padding: 0.9rem 1.1rem;
+  padding: 0.75rem 1rem;
   color: #FFFFFF;
   display: flex;
   align-items: center;
   gap: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+  z-index: 2;
 }
 
-.hiring-travel-floating-card strong {
+.floating-card-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: rgba(60, 175, 138, 0.18);
+  border: 1px solid rgba(60, 175, 138, 0.4);
+  color: var(--teal-green, #3CAF8A);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.floating-card-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.floating-card-text {
+  flex: 1;
+}
+
+.floating-card-text strong {
   display: block;
-  font-size: 0.86rem;
+  font-family: var(--font-heading);
+  font-size: 0.84rem;
+  font-weight: 700;
   color: #FFFFFF;
+  line-height: 1.25;
 }
 
-.hiring-travel-floating-card span {
-  font-size: 0.76rem;
-  color: rgba(255, 255, 255, 0.75);
+.floating-card-text span {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.76);
+  line-height: 1.2;
+}
+
+.floating-card-pill {
+  font-family: var(--font-heading);
+  font-size: 0.64rem;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  color: var(--teal-green, #3CAF8A);
+  background: rgba(60, 175, 138, 0.15);
+  border: 1px solid rgba(60, 175, 138, 0.35);
+  padding: 0.22rem 0.55rem;
+  border-radius: 6px;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
 /* 3-Step Process Section */
@@ -8536,15 +8720,22 @@ body.light-theme .action-btn:hover {
 .hiring-step-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 10px 25px rgba(26, 58, 99, 0.08);
+  border-color: #CBD5E1;
 }
 
 .hiring-step-num {
   font-family: var(--font-heading);
   font-size: 2.2rem;
   font-weight: 900;
-  color: rgba(27, 174, 207, 0.25);
+  color: rgba(26, 58, 99, 0.08);
   line-height: 1;
   margin-bottom: 0.6rem;
+  transition: color 0.3s ease;
+  user-select: none;
+}
+
+.hiring-step-card:hover .hiring-step-num {
+  color: rgba(60, 175, 138, 0.22);
 }
 
 .hiring-step-title {
@@ -8602,9 +8793,10 @@ body.light-theme .action-btn:hover {
   }
   .hiring-travel-banner {
     grid-template-columns: 1fr;
+    margin: 1.75rem 0;
   }
   .hiring-travel-img-wrap {
-    min-height: 240px;
+    min-height: 200px;
   }
   .hiring-steps-grid {
     grid-template-columns: 1fr;
@@ -8917,19 +9109,30 @@ body.light-theme .action-btn:hover {
   width: 38%;
   min-width: 320px;
   max-width: 440px;
-  flex-shrink: 0;
+  flex: 0 0 38%;
   position: relative;
   overflow: hidden;
   align-self: stretch;
+  height: auto !important;
+  min-height: 100% !important;
   background: #1A3A63;
 }
 
 .hiring-grid.layout-horizontal .hiring-card-img {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center top;
   display: block;
   transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hiring-card-image-wrap img[src*="service_nurse"],
+.hiring-card-img[src*="service_nurse"] {
+  object-position: center top !important;
 }
 
 .hiring-grid.layout-horizontal .hiring-card:hover .hiring-card-img {
@@ -9062,13 +9265,7 @@ body.light-theme .action-btn:hover {
   transform: translateX(4px);
 }
 
-/* Travel Nursing Buttons Wrapper */
-.hiring-travel-btn-group {
-  display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
-  align-items: center;
-}
+
 
 
 /* ==========================================================================
@@ -9077,15 +9274,15 @@ body.light-theme .action-btn:hover {
 .clinician-benefits-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 1.75rem;
+  gap: 1.5rem;
 }
 
 .clinician-benefit-card {
   background: #FFFFFF;
-  border: 1.5px solid #E2E8F0;
-  border-radius: 18px;
-  padding: 2.2rem 1.6rem 1.8rem 1.6rem;
-  box-shadow: 0 4px 18px rgba(26, 58, 99, 0.05), 0 1px 3px rgba(0, 0, 0, 0.02);
+  border: 1px solid #E2E8F0;
+  border-radius: 14px;
+  padding: 1.85rem 1.45rem 1.6rem 1.45rem;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -9093,70 +9290,57 @@ body.light-theme .action-btn:hover {
   text-align: left;
   position: relative;
   overflow: hidden;
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
 }
 
 .clinician-benefit-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 20px 40px -10px rgba(26, 58, 99, 0.12), 0 4px 12px rgba(60, 175, 138, 0.08);
+  transform: translateY(-4px);
+  border-color: #CBD5E1;
+  box-shadow: 0 12px 28px -6px rgba(15, 23, 42, 0.09), 0 2px 6px rgba(0, 0, 0, 0.02);
 }
 
+/* No highlighted top bars */
 .benefit-card-top-bar {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: #CBD5E1;
-  transition: height 0.25s ease;
+  display: none !important;
 }
-
-.clinician-benefit-card:hover .benefit-card-top-bar {
-  height: 6px;
-}
-
-.clinician-benefit-card.accent-emerald .benefit-card-top-bar { background: linear-gradient(90deg, #10B981, #34D399); }
-.clinician-benefit-card.accent-cyan .benefit-card-top-bar { background: linear-gradient(90deg, #06B6D4, #38BDF8); }
-.clinician-benefit-card.accent-navy .benefit-card-top-bar { background: linear-gradient(90deg, #1A3A63, #2563EB); }
-.clinician-benefit-card.accent-lime .benefit-card-top-bar { background: linear-gradient(90deg, #7CC242, #A3E635); }
-
-.clinician-benefit-card.accent-emerald:hover { border-color: #10B981; }
-.clinician-benefit-card.accent-cyan:hover { border-color: #06B6D4; }
-.clinician-benefit-card.accent-navy:hover { border-color: #1A3A63; }
-.clinician-benefit-card.accent-lime:hover { border-color: #7CC242; }
 
 .benefit-icon-box {
-  width: 56px;
-  height: 56px;
-  border-radius: 14px;
+  width: 48px;
+  height: 48px;
+  border-radius: 11px;
+  background: rgba(60, 175, 138, 0.09);
+  border: 1px solid rgba(60, 175, 138, 0.18);
+  color: var(--teal-green, #3CAF8A);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 1.25rem;
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  margin-bottom: 1.15rem;
+  transition: transform 0.25s ease, background-color 0.25s ease;
+}
+
+.benefit-icon-box svg {
+  width: 22px;
+  height: 22px;
+  color: var(--teal-green, #3CAF8A) !important;
 }
 
 .clinician-benefit-card:hover .benefit-icon-box {
-  transform: scale(1.08);
+  transform: translateY(-2px);
+  background: rgba(60, 175, 138, 0.14);
 }
-
-.benefit-icon-box.bg-emerald { background: rgba(16, 185, 129, 0.12); }
-.benefit-icon-box.bg-cyan { background: rgba(6, 182, 212, 0.12); }
-.benefit-icon-box.bg-navy { background: rgba(26, 58, 99, 0.08); }
-.benefit-icon-box.bg-lime { background: rgba(124, 194, 66, 0.14); }
 
 .benefit-card-title {
   font-family: var(--font-heading);
-  font-size: 1.15rem;
-  font-weight: 800;
+  font-size: 1.08rem;
+  font-weight: 700;
   line-height: 1.35;
-  color: var(--navy);
-  margin: 0 0 0.65rem 0;
+  color: var(--navy, #1A3A63);
+  margin: 0 0 0.55rem 0;
 }
 
 .benefit-card-desc {
-  font-size: 0.88rem;
-  line-height: 1.6;
+  font-size: 0.86rem;
+  line-height: 1.58;
   color: #64748B;
   margin: 0 0 1.25rem 0;
   flex-grow: 1;
@@ -9165,21 +9349,28 @@ body.light-theme .action-btn:hover {
 .benefit-pill-chip {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
   font-size: 0.74rem;
-  font-weight: 700;
-  color: #0F172A;
-  background: #F1F5F9;
+  font-weight: 600;
+  color: #334155;
+  background: #F8FAFC;
   border: 1px solid #E2E8F0;
-  padding: 0.3rem 0.65rem;
+  padding: 0.32rem 0.72rem;
   border-radius: 999px;
   margin-top: auto;
+  transition: background 0.2s ease, border-color 0.2s ease;
 }
 
-.clinician-benefit-card.accent-emerald .benefit-pill-chip { color: #047857; background: rgba(16, 185, 129, 0.08); border-color: rgba(16, 185, 129, 0.2); }
-.clinician-benefit-card.accent-cyan .benefit-pill-chip { color: #0E7490; background: rgba(6, 182, 212, 0.08); border-color: rgba(6, 182, 212, 0.2); }
-.clinician-benefit-card.accent-navy .benefit-pill-chip { color: #1A3A63; background: rgba(26, 58, 99, 0.06); border-color: rgba(26, 58, 99, 0.18); }
-.clinician-benefit-card.accent-lime .benefit-pill-chip { color: #4D7C0F; background: rgba(124, 194, 66, 0.10); border-color: rgba(124, 194, 66, 0.25); }
+.benefit-pill-chip svg {
+  color: var(--teal-green, #3CAF8A) !important;
+  width: 12px;
+  height: 12px;
+}
+
+.clinician-benefit-card:hover .benefit-pill-chip {
+  background: #F1F5F9;
+  border-color: #CBD5E1;
+}
 
 
 /* ==========================================================================
@@ -9232,13 +9423,20 @@ body.light-theme .action-btn:hover {
   /* Travel Nursing Banner on Tablet */
   .hiring-travel-banner {
     grid-template-columns: 1fr !important;
+    margin: 1.75rem 0 !important;
   }
+  .hiring-travel-media-wrap,
   .hiring-travel-img-wrap {
-    height: 280px !important;
-    min-height: 280px !important;
+    padding: 0 1.35rem 1.35rem 1.35rem !important;
+    height: auto !important;
+    min-height: auto !important;
+  }
+  .hiring-travel-media-inner {
+    height: 240px !important;
+    min-height: 240px !important;
   }
   .hiring-travel-content {
-    padding: 2.5rem 2rem !important;
+    padding: 1.6rem 1.35rem !important;
   }
 
   /* 3-Step Process Grid on Tablet */
@@ -9291,8 +9489,8 @@ body.light-theme .action-btn:hover {
     border-radius: 16px !important;
   }
   .hiring-grid.layout-horizontal .hiring-card-image-wrap {
-    height: 200px !important;
-    min-height: 200px !important;
+    height: 220px !important;
+    min-height: 220px !important;
     border-radius: 16px 16px 0 0 !important;
   }
   .hiring-grid.layout-horizontal .hiring-card-body {
@@ -9341,58 +9539,77 @@ body.light-theme .action-btn:hover {
     box-sizing: border-box !important;
   }
 
-  /* Travel Nursing Banner on Mobile */
+  /* Travel Nursing Banner on Mobile - Sleek & Compact */
   .hiring-travel-banner {
-    margin: 2.25rem 0 !important;
+    margin: 1.35rem 0 !important;
     border-radius: 16px !important;
   }
   .hiring-travel-content {
-    padding: 1.6rem 1.2rem !important;
+    padding: 1.35rem 1.1rem !important;
+  }
+  .hiring-travel-badge {
+    margin-bottom: 0.5rem !important;
+    padding: 0.28rem 0.72rem !important;
+    font-size: 0.68rem !important;
   }
   .hiring-travel-title {
-    font-size: clamp(1.3rem, 5vw, 1.65rem) !important;
+    font-size: clamp(1.2rem, 4.8vw, 1.45rem) !important;
     line-height: 1.25 !important;
+    margin-bottom: 0.5rem !important;
   }
   .hiring-travel-desc {
-    font-size: 0.88rem !important;
-    line-height: 1.55 !important;
-    margin-bottom: 1.25rem !important;
+    font-size: 0.86rem !important;
+    line-height: 1.5 !important;
+    margin-bottom: 0.95rem !important;
   }
+  .hiring-travel-perks-grid,
   .hiring-travel-perks {
     grid-template-columns: 1fr !important;
-    gap: 0.65rem !important;
-    margin-bottom: 1.35rem !important;
+    gap: 0.55rem !important;
+    margin-bottom: 1.15rem !important;
+  }
+  .travel-perk-card {
+    padding: 0.55rem 0.75rem !important;
+  }
+  .hiring-travel-media-wrap {
+    padding: 0 1.1rem 1.1rem 1.1rem !important;
+  }
+  .hiring-travel-media-inner {
+    height: 210px !important;
+    min-height: 210px !important;
   }
   .hiring-travel-btn-group {
     flex-direction: column !important;
     width: 100% !important;
-    gap: 0.75rem !important;
+    gap: 0.65rem !important;
   }
   .hiring-travel-btn-group .btn {
     width: 100% !important;
     justify-content: center !important;
     text-align: center !important;
-    min-height: 46px !important;
+    min-height: 42px !important;
+    padding: 0.65rem 1rem !important;
+    font-size: 0.8rem !important;
     box-sizing: border-box !important;
   }
   .hiring-travel-img-wrap {
-    height: 210px !important;
-    min-height: 210px !important;
+    height: 160px !important;
+    min-height: 160px !important;
   }
   .hiring-travel-floating-card {
-    bottom: 10px !important;
-    left: 10px !important;
-    right: 10px !important;
-    padding: 0.65rem 0.85rem !important;
-    border-radius: 10px !important;
+    bottom: 8px !important;
+    left: 8px !important;
+    right: 8px !important;
+    padding: 0.5rem 0.75rem !important;
+    border-radius: 8px !important;
     gap: 8px !important;
   }
   .hiring-travel-floating-card strong {
-    font-size: 0.78rem !important;
+    font-size: 0.74rem !important;
     line-height: 1.3 !important;
   }
   .hiring-travel-floating-card span {
-    font-size: 0.70rem !important;
+    font-size: 0.66rem !important;
     line-height: 1.2 !important;
   }
 
@@ -9403,27 +9620,27 @@ body.light-theme .action-btn:hover {
     margin-top: 2rem !important;
   }
   .clinician-benefit-card {
-    padding: 1.5rem 1.25rem !important;
-    border-radius: 16px !important;
+    padding: 1.4rem 1.15rem !important;
+    border-radius: 14px !important;
   }
   .benefit-icon-box {
-    width: 48px !important;
-    height: 48px !important;
-    border-radius: 12px !important;
-    margin-bottom: 1rem !important;
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 10px !important;
+    margin-bottom: 0.95rem !important;
   }
   .benefit-card-title {
-    font-size: clamp(1.1rem, 4vw, 1.22rem) !important;
-    margin-bottom: 0.5rem !important;
+    font-size: 1.05rem !important;
+    margin-bottom: 0.45rem !important;
   }
   .benefit-card-desc {
-    font-size: 0.86rem !important;
-    line-height: 1.55 !important;
-    margin-bottom: 1.15rem !important;
+    font-size: 0.84rem !important;
+    line-height: 1.52 !important;
+    margin-bottom: 1rem !important;
   }
   .benefit-pill-chip {
     font-size: 0.72rem !important;
-    padding: 0.28rem 0.6rem !important;
+    padding: 0.28rem 0.65rem !important;
     max-width: 100% !important;
     box-sizing: border-box !important;
     white-space: normal !important;
@@ -9483,8 +9700,8 @@ body.light-theme .action-btn:hover {
 /* Extra small mobile screens (iPhone SE, Galaxy Fold 320px - 380px) */
 @media (max-width: 380px) {
   .hiring-grid.layout-horizontal .hiring-card-image-wrap {
-    height: 180px !important;
-    min-height: 180px !important;
+    height: 200px !important;
+    min-height: 200px !important;
   }
   .hiring-grid.layout-horizontal .hiring-card-body {
     padding: 1.15rem 0.9rem !important;
@@ -9497,7 +9714,7 @@ body.light-theme .action-btn:hover {
     padding: 1.35rem 1rem !important;
   }
   .hiring-travel-content {
-    padding: 1.35rem 1rem !important;
+    padding: 1.1rem 0.85rem !important;
   }
 }
 
@@ -10237,16 +10454,29 @@ body.light-theme .action-btn:hover {
 
 
 /* ==========================================================================
-   STRETCH MONOGRAPH CAPTION CARD ("Patient-Centered Practice") ON LARGE SCREENS
+   MONOGRAPH CAPTION CARD ("Patient-Centered Practice"): HIDDEN ON MOBILE (< 992px)
    ========================================================================== */
-@media (min-width: 768px) {
-      .monograph-caption-card {
-        max-width: 380px !important;
-        width: auto !important;
-        min-width: 280px !important;
-        padding: 0.95rem 1.35rem !important;
-        bottom: 24px !important;
-        right: -3rem !important;
+@media (max-width: 991.98px) {
+  .monograph-caption-card {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+}
+
+@media (min-width: 992px) {
+  .monograph-caption-card {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    max-width: 380px !important;
+    width: auto !important;
+    min-width: 280px !important;
+    padding: 0.95rem 1.35rem !important;
+    bottom: 24px !important;
+    right: -3rem !important;
     border-radius: 6px !important;
     box-shadow: 0 12px 30px rgba(26, 58, 99, 0.32) !important;
   }
@@ -10598,46 +10828,100 @@ body.light-theme .action-btn:hover {
 /* ── 2. WORKFORCE DISPATCH TEXTS & CARDS ── */
 .showcase-slide-header,
 .showcase-slide-body,
-.showcase-slide-actions,
-.proto-showcase-action-card,
-.showcase-slide-hotline {
+.showcase-slide-actions {
   opacity: 0 !important;
-  transform: translate3d(0, 45px, 0) !important;
+  transform: translate3d(0, 35px, 0) !important;
   transition: transform 0.90s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1) !important;
   will-change: transform, opacity !important;
   -webkit-backface-visibility: hidden !important;
   backface-visibility: hidden !important;
 }
-
 .showcase-slide-header { transition-delay: 0.08s !important; }
-.showcase-slide-body   { transition-delay: 0.22s !important; }
-.showcase-slide-actions,
-.proto-showcase-action-card.card-facilities  { transition-delay: 0.36s !important; }
-.proto-showcase-action-card.card-jobseekers  { transition-delay: 0.48s !important; }
-.showcase-slide-hotline                      { transition-delay: 0.58s !important; }
+.showcase-slide-body   { transition-delay: 0.20s !important; }
 
 .showcase-block.is-revealed .showcase-slide-header,
 .showcase-block.is-revealed .showcase-slide-body,
 .showcase-block.is-revealed .showcase-slide-actions,
-.showcase-block.is-revealed .proto-showcase-action-card,
-.showcase-block.is-revealed .showcase-slide-hotline,
 #showcase-box-section.is-revealed .showcase-slide-header,
 #showcase-box-section.is-revealed .showcase-slide-body,
 #showcase-box-section.is-revealed .showcase-slide-actions,
-#showcase-box-section.is-revealed .proto-showcase-action-card,
-#showcase-box-section.is-revealed .showcase-slide-hotline,
 .showcase-slide-header.is-in-view,
 .showcase-slide-body.is-in-view,
 .showcase-slide-actions.is-in-view,
-.proto-showcase-action-card.is-in-view,
-.showcase-slide-hotline.is-in-view,
 .showcase-slide-header.card-revealed,
 .showcase-slide-body.card-revealed,
-.showcase-slide-actions.card-revealed,
-.proto-showcase-action-card.card-revealed,
-.showcase-slide-hotline.card-revealed {
+.showcase-slide-actions.card-revealed {
   opacity: 1 !important;
   transform: translate3d(0, 0, 0) !important;
+}
+
+/* CARDS SLIDE-IN: FROM LEFT ON MOBILE (< 992px), FROM BOTTOM ON LARGE SCREENS (>= 992px) */
+@media (max-width: 991.98px) {
+  .proto-showcase-content-col {
+    overflow-x: clip !important;
+  }
+  .proto-showcase-action-card,
+  .showcase-slide-hotline {
+    opacity: 0 !important;
+    transform: translate3d(-55px, 0, 0) !important;
+    transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.80s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    will-change: transform, opacity !important;
+    -webkit-backface-visibility: hidden !important;
+    backface-visibility: hidden !important;
+  }
+  .proto-showcase-action-card.card-facilities { transition-delay: 0.12s !important; }
+  .proto-showcase-action-card.card-staff,
+  .proto-showcase-action-card.card-jobseekers { transition-delay: 0.24s !important; }
+  .showcase-slide-hotline                      { transition-delay: 0.36s !important; }
+
+  .showcase-block.is-revealed .proto-showcase-action-card,
+  .showcase-block.is-revealed .showcase-slide-hotline,
+  #showcase-box-section.is-revealed .proto-showcase-action-card,
+  #showcase-box-section.is-revealed .showcase-slide-hotline,
+  .proto-showcase-action-card.is-in-view,
+  .showcase-slide-hotline.is-in-view,
+  .proto-showcase-action-card.card-revealed,
+  .showcase-slide-hotline.card-revealed {
+    opacity: 1 !important;
+    transform: translate3d(0, 0, 0) !important;
+  }
+}
+
+@media (min-width: 992px) {
+  .proto-showcase-action-card,
+  .showcase-slide-hotline {
+    opacity: 0 !important;
+    transform: translate3d(0, 50px, 0) !important;
+    transition: transform 0.90s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    will-change: transform, opacity !important;
+    -webkit-backface-visibility: hidden !important;
+    backface-visibility: hidden !important;
+  }
+  .proto-showcase-action-card.card-facilities { transition-delay: 0.32s !important; }
+  .proto-showcase-action-card.card-staff,
+  .proto-showcase-action-card.card-jobseekers { transition-delay: 0.44s !important; }
+  .showcase-slide-hotline                      { transition-delay: 0.56s !important; }
+
+  .showcase-block.is-revealed .proto-showcase-action-card,
+  .showcase-block.is-revealed .showcase-slide-hotline,
+  #showcase-box-section.is-revealed .proto-showcase-action-card,
+  #showcase-box-section.is-revealed .showcase-slide-hotline,
+  .proto-showcase-action-card.is-in-view,
+  .showcase-slide-hotline.is-in-view,
+  .proto-showcase-action-card.card-revealed,
+  .showcase-slide-hotline.card-revealed {
+    opacity: 1 !important;
+    transform: translate3d(0, 0, 0) !important;
+  }
+}
+
+.proto-showcase-action-card.card-revealed:hover,
+.proto-showcase-action-card.is-in-view:hover {
+  transform: translateY(-4px) !important;
+}
+.showcase-slide-hotline.card-revealed:hover,
+.showcase-slide-hotline.is-in-view:hover {
+  transform: translateY(-3px) !important;
 }
 
 /* ── 3. OUR DEDICATED CLINICAL TEAM ── */
@@ -10731,3 +11015,473 @@ body.light-theme .action-btn:hover {
   opacity: 1 !important;
   transform: translate3d(0, 0, 0) !important;
 }
+
+
+/* ==========================================================================
+   COOKIE & PRIVACY CONSENT BANNER: CLEAN WHITE THEME
+   ========================================================================== */
+.cookie-consent-banner {
+  background: #FFFFFF !important;
+  color: #1E293B !important;
+  border-top: 1.5px solid #E2E8F0 !important;
+  box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.08) !important;
+}
+
+.cookie-consent-header {
+  color: #0A192F !important;
+}
+
+.cookie-consent-header strong {
+  color: #0A192F !important;
+}
+
+.cookie-consent-header .cookie-icon {
+  color: var(--teal-green, #3CAF8A) !important;
+}
+
+.cookie-consent-text {
+  color: #475569 !important;
+}
+
+.btn-cookie-secondary {
+  background: #F1F5F9 !important;
+  color: #1E293B !important;
+  border: 1px solid #CBD5E1 !important;
+}
+
+.btn-cookie-secondary:hover {
+  background: #E2E8F0 !important;
+  color: #0F172A !important;
+  border-color: #94A3B8 !important;
+}
+
+.btn-cookie-primary {
+  background: linear-gradient(135deg, #00A896 0%, #0284C7 100%) !important;
+  color: #FFFFFF !important;
+}
+
+
+/* ==========================================================================
+   MOBILE & DESKTOP BIDIRECTIONAL SCROLL ANIMATIONS:
+   1. Contact Section (Card & Form)
+   2. Callout Banner (Section below Contact Form)
+   3. Site Footer
+   4. Newsletter & Social Strip
+   ========================================================================== */
+
+/* ── 1. CONTACT SECTION (Card, Form, Heading, Subtitle) ── */
+.contact-section .contact-slide-top,
+.contact-section .contact-slide-sub,
+.contact-section .contact-slide-card,
+.contact-section .contact-slide-form,
+#home-contact .contact-slide-card,
+#home-contact .contact-slide-form,
+#contact .contact-slide-card,
+#contact .contact-slide-form {
+  opacity: 0 !important;
+  transform: translate3d(0, 45px, 0) !important;
+  transition: transform 0.90s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  will-change: transform, opacity !important;
+  -webkit-backface-visibility: hidden !important;
+  backface-visibility: hidden !important;
+}
+
+.contact-section .contact-slide-top  { transition-delay: 0.05s !important; }
+.contact-section .contact-slide-sub  { transition-delay: 0.16s !important; }
+.contact-section .contact-slide-card { transition-delay: 0.28s !important; }
+.contact-section .contact-slide-form { transition-delay: 0.42s !important; }
+
+.contact-section.is-revealed .contact-slide-top,
+.contact-section.is-revealed .contact-slide-sub,
+.contact-section.is-revealed .contact-slide-card,
+.contact-section.is-revealed .contact-slide-form,
+#home-contact.is-revealed .contact-slide-card,
+#home-contact.is-revealed .contact-slide-form,
+#contact.is-revealed .contact-slide-card,
+#contact.is-revealed .contact-slide-form,
+.contact-slide-card.is-in-view,
+.contact-slide-form.is-in-view,
+.contact-slide-top.is-in-view,
+.contact-slide-sub.is-in-view,
+.contact-slide-card.card-revealed,
+.contact-slide-form.card-revealed {
+  opacity: 1 !important;
+  transform: translate3d(0, 0, 0) !important;
+}
+
+/* ── 2. CALLOUT BANNER SECTION (Below Contact Form) ── */
+.callout-banner-section .callout-slide-text,
+.callout-banner-section .callout-slide-actions,
+#callout-banner .callout-slide-text,
+#callout-banner .callout-slide-actions {
+  opacity: 0 !important;
+  transform: translate3d(0, 45px, 0) !important;
+  transition: transform 0.90s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  will-change: transform, opacity !important;
+  -webkit-backface-visibility: hidden !important;
+  backface-visibility: hidden !important;
+}
+
+.callout-banner-section .callout-slide-text    { transition-delay: 0.08s !important; }
+.callout-banner-section .callout-slide-actions { transition-delay: 0.24s !important; }
+
+.callout-banner-section.is-revealed .callout-slide-text,
+.callout-banner-section.is-revealed .callout-slide-actions,
+#callout-banner.is-revealed .callout-slide-text,
+#callout-banner.is-revealed .callout-slide-actions,
+.callout-slide-text.is-in-view,
+.callout-slide-actions.is-in-view,
+.callout-slide-text.card-revealed,
+.callout-slide-actions.card-revealed {
+  opacity: 1 !important;
+  transform: translate3d(0, 0, 0) !important;
+}
+
+/* ── 3. SITE FOOTER (Columns & Bottom Bar) ── */
+.site-footer .footer-slide-col,
+.site-footer .footer-slide-bottom,
+#site-footer .footer-slide-col,
+#site-footer .footer-slide-bottom {
+  opacity: 0 !important;
+  transform: translate3d(0, 45px, 0) !important;
+  transition: transform 0.90s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  will-change: transform, opacity !important;
+  -webkit-backface-visibility: hidden !important;
+  backface-visibility: hidden !important;
+}
+
+.site-footer .footer-slide-col:nth-child(1) { transition-delay: 0.05s !important; }
+.site-footer .footer-slide-col:nth-child(2) { transition-delay: 0.16s !important; }
+.site-footer .footer-slide-col:nth-child(3) { transition-delay: 0.28s !important; }
+.site-footer .footer-slide-col:nth-child(4) { transition-delay: 0.40s !important; }
+.site-footer .footer-slide-bottom          { transition-delay: 0.50s !important; }
+
+.site-footer.is-revealed .footer-slide-col,
+.site-footer.is-revealed .footer-slide-bottom,
+#site-footer.is-revealed .footer-slide-col,
+#site-footer.is-revealed .footer-slide-bottom,
+.footer-slide-col.is-in-view,
+.footer-slide-bottom.is-in-view,
+.footer-slide-col.card-revealed,
+.footer-slide-bottom.card-revealed {
+  opacity: 1 !important;
+  transform: translate3d(0, 0, 0) !important;
+}
+
+/* ── 4. NEWSLETTER & SOCIAL STRIP ── */
+.strip-section .strip-slide-text,
+.strip-section .strip-fade-form,
+.strip-section .strip-slide-social-text,
+.strip-section .strip-slide-icon,
+#newsletter-strip .strip-slide-text,
+#newsletter-strip .strip-fade-form,
+#newsletter-strip .strip-slide-social-text,
+#newsletter-strip .strip-slide-icon {
+  opacity: 0 !important;
+  transform: translate3d(0, 40px, 0) !important;
+  transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.80s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  will-change: transform, opacity !important;
+  -webkit-backface-visibility: hidden !important;
+  backface-visibility: hidden !important;
+}
+
+.strip-section .strip-slide-text        { transition-delay: 0.05s !important; }
+.strip-section .strip-fade-form         { transition-delay: 0.18s !important; }
+.strip-section .strip-slide-social-text { transition-delay: 0.28s !important; }
+.strip-section .strip-slide-icon:nth-child(1) { transition-delay: 0.38s !important; }
+.strip-section .strip-slide-icon:nth-child(2) { transition-delay: 0.48s !important; }
+
+.strip-section.is-revealed .strip-slide-text,
+.strip-section.is-revealed .strip-fade-form,
+.strip-section.is-revealed .strip-slide-social-text,
+.strip-section.is-revealed .strip-slide-icon,
+#newsletter-strip.is-revealed .strip-slide-text,
+#newsletter-strip.is-revealed .strip-fade-form,
+#newsletter-strip.is-revealed .strip-slide-social-text,
+#newsletter-strip.is-revealed .strip-slide-icon,
+.strip-slide-text.is-in-view,
+.strip-fade-form.is-in-view,
+.strip-slide-social-text.is-in-view,
+.strip-slide-icon.is-in-view,
+.strip-slide-text.card-revealed,
+.strip-fade-form.card-revealed,
+.strip-slide-social-text.card-revealed,
+.strip-slide-icon.card-revealed {
+  opacity: 1 !important;
+  transform: translate3d(0, 0, 0) !important;
+}
+
+
+/* ==========================================================================
+   PHOTO COLLAGE IMAGES: SLIDE-IN FROM BOTTOM ON BOTH MOBILE & LARGE SCREENS
+   ========================================================================== */
+.photo-collage-3 .collage-item,
+.photo-collage-3 .collage-item-main,
+.photo-collage-3 .collage-item-sub,
+.collage-row-sub .collage-item-sub {
+  opacity: 0 !important;
+  transform: translate3d(0, 48px, 0) !important;
+  transition: transform 0.90s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  will-change: transform, opacity !important;
+  -webkit-backface-visibility: hidden !important;
+  backface-visibility: hidden !important;
+}
+
+.photo-collage-3 .collage-item-main             { transition-delay: 0.12s !important; }
+.collage-row-sub .collage-item-sub:first-child   { transition-delay: 0.24s !important; }
+.collage-row-sub .collage-item-sub:last-child    { transition-delay: 0.36s !important; }
+
+#team-section.is-revealed .photo-collage-3 .collage-item,
+#team-section.is-revealed .collage-item-main,
+#team-section.is-revealed .collage-item-sub,
+.proto-mission-section.is-revealed .photo-collage-3 .collage-item,
+.proto-mission-section.is-revealed .collage-item-main,
+.proto-mission-section.is-revealed .collage-item-sub,
+.team-slide-media.is-in-view .collage-item,
+.team-slide-media.card-revealed .collage-item,
+.team-slide-media.is-in-view .collage-item-main,
+.team-slide-media.card-revealed .collage-item-main,
+.team-slide-media.is-in-view .collage-item-sub,
+.team-slide-media.card-revealed .collage-item-sub,
+.collage-item.is-in-view,
+.collage-item.card-revealed,
+.collage-item-main.is-in-view,
+.collage-item-main.card-revealed,
+.collage-item-sub.is-in-view,
+.collage-item-sub.card-revealed {
+  opacity: 1 !important;
+  transform: translate3d(0, 0, 0) !important;
+}
+
+.collage-item.card-revealed:hover,
+.collage-item.is-in-view:hover,
+#team-section.is-revealed .collage-item:hover,
+.proto-mission-section.is-revealed .collage-item:hover {
+  transform: translateY(-4px) !important;
+}
+
+
+
+/* ==========================================================================
+   MONOGRAPH PHOTO COLLAGE: SLIDE-IN FROM RIGHT ON MOBILE & LARGE SCREENS
+   ========================================================================== */
+.solutions-story-row {
+  overflow-x: clip !important;
+}
+
+.solutions-slide-right,
+.solutions-slide-right .monograph-wrapper {
+  opacity: 0 !important;
+  transform: translate3d(55px, 0, 0) !important;
+  transition: transform 0.90s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  will-change: transform, opacity !important;
+  -webkit-backface-visibility: hidden !important;
+  backface-visibility: hidden !important;
+}
+
+.solutions-slide-right {
+  transition-delay: 0.16s !important;
+}
+
+.solutions-slide-right .monograph-fg-plate {
+  opacity: 0 !important;
+  transform: translate3d(35px, 0, 0) !important;
+  transition: transform 0.95s cubic-bezier(0.16, 1, 0.3, 1) 0.28s, opacity 0.90s cubic-bezier(0.16, 1, 0.3, 1) 0.28s !important;
+  will-change: transform, opacity !important;
+  -webkit-backface-visibility: hidden !important;
+  backface-visibility: hidden !important;
+}
+
+.solutions-story-row.is-revealed .solutions-slide-right,
+.solutions-story-row.is-revealed .monograph-wrapper,
+.solutions-story-row.is-revealed .monograph-fg-plate,
+#compassionate-solutions-row.is-revealed .solutions-slide-right,
+#compassionate-solutions-row.is-revealed .monograph-wrapper,
+#compassionate-solutions-row.is-revealed .monograph-fg-plate,
+.solutions-slide-right.is-in-view,
+.solutions-slide-right.card-revealed,
+.monograph-wrapper.is-in-view,
+.monograph-wrapper.card-revealed,
+.monograph-fg-plate.is-in-view,
+.monograph-fg-plate.card-revealed {
+  opacity: 1 !important;
+  transform: translate3d(0, 0, 0) !important;
+}
+
+
+
+/* ==========================================================================
+   CONSULTATION NURSE & CLINICAL EXCELLENCE IMAGES: SCROLL ANIMATION
+   ========================================================================== */
+.collage-row-sub .collage-item-sub:first-child,
+.collage-row-sub .collage-item-sub:first-child img,
+#team-section img[src*="role_rn.jpg"],
+.proto-mission-section img[src*="role_rn.jpg"],
+#excellence-section .masonry-col-1,
+#excellence-section .masonry-col-1 img,
+#excellence-section img[src*="service_travel_nurse.jpg"],
+.excellence-block img[src*="service_travel_nurse.jpg"],
+#excellence-section .masonry-columns-wrapper.wide-spread .masonry-col,
+.excellence-block .masonry-columns-wrapper.wide-spread .masonry-col {
+  opacity: 0 !important;
+  transform: translate3d(0, 48px, 0) !important;
+  transition: transform 0.90s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  will-change: transform, opacity !important;
+  -webkit-backface-visibility: hidden !important;
+  backface-visibility: hidden !important;
+}
+
+.collage-row-sub .collage-item-sub:first-child {
+  transition-delay: 0.18s !important;
+}
+
+.masonry-col-1 {
+  transition-delay: 0.16s !important;
+}
+
+#team-section.is-revealed .collage-row-sub .collage-item-sub:first-child,
+#team-section.is-revealed .collage-row-sub .collage-item-sub:first-child img,
+#team-section.is-revealed img[src*="role_rn.jpg"],
+.proto-mission-section.is-revealed .collage-row-sub .collage-item-sub:first-child,
+.proto-mission-section.is-revealed img[src*="role_rn.jpg"],
+.team-slide-media.is-in-view .collage-row-sub .collage-item-sub:first-child,
+.team-slide-media.card-revealed .collage-row-sub .collage-item-sub:first-child,
+.collage-item-sub:first-child.is-in-view,
+.collage-item-sub:first-child.card-revealed,
+.collage-item-sub:first-child.is-in-view img,
+.collage-item-sub:first-child.card-revealed img,
+#excellence-section.is-revealed .masonry-col-1,
+#excellence-section.is-revealed .masonry-col-1 img,
+#excellence-section.is-revealed img[src*="service_travel_nurse.jpg"],
+.excellence-block.is-revealed .masonry-col-1,
+.excellence-block.is-revealed .masonry-col-1 img,
+.excellence-slide-media.is-in-view .masonry-col-1,
+.excellence-slide-media.card-revealed .masonry-col-1,
+.masonry-col-1.is-in-view,
+.masonry-col-1.card-revealed,
+.masonry-col-1.is-in-view img,
+.masonry-col-1.card-revealed img,
+.masonry-columns-wrapper.wide-spread.is-in-view .masonry-col,
+.masonry-columns-wrapper.wide-spread.card-revealed .masonry-col {
+  opacity: 1 !important;
+  transform: translate3d(0, 0, 0) !important;
+}
+
+
+
+/* ==========================================================================
+   MOBILE & DESKTOP INDEPENDENT SCROLL REVEAL RULES
+   - Showcase Cards: Slide-in from left on mobile
+   - Contact Info Card: Slide-up on mobile
+   - Contact Form Inputs: Staggered slide-up on mobile & desktop
+   ========================================================================== */
+
+/* ── A. SHOWCASE CARDS (Hospitals & Facilities, Staff Shift Portal, 24/7 Hotline) ── */
+@media (max-width: 991.98px) {
+  .proto-showcase-action-card,
+  .showcase-slide-hotline {
+    opacity: 0 !important;
+    transform: translate3d(-60px, 0, 0) !important;
+    transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.80s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    will-change: transform, opacity !important;
+    -webkit-backface-visibility: hidden !important;
+    backface-visibility: hidden !important;
+  }
+  .proto-showcase-action-card.card-facilities { transition-delay: 0.10s !important; }
+  .proto-showcase-action-card.card-staff      { transition-delay: 0.22s !important; }
+  .showcase-slide-hotline                      { transition-delay: 0.34s !important; }
+
+  .proto-showcase-action-card.is-in-view,
+  .proto-showcase-action-card.card-revealed,
+  .showcase-slide-hotline.is-in-view,
+  .showcase-slide-hotline.card-revealed {
+    opacity: 1 !important;
+    transform: translate3d(0, 0, 0) !important;
+  }
+}
+
+/* ── B. CONTACT INFO CARD (Dispatch & HQ) ── */
+@media (max-width: 991.98px) {
+  #home-contact .contact-info-card,
+  #contact .contact-info-card,
+  .contact-section .contact-info-card,
+  .contact-slide-card {
+    opacity: 0 !important;
+    transform: translate3d(0, 50px, 0) !important;
+    transition: transform 0.90s cubic-bezier(0.16, 1, 0.3, 1) 0.15s, opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1) 0.15s !important;
+    will-change: transform, opacity !important;
+    -webkit-backface-visibility: hidden !important;
+    backface-visibility: hidden !important;
+  }
+
+  #home-contact .contact-info-card.is-in-view,
+  #home-contact .contact-info-card.card-revealed,
+  #contact .contact-info-card.is-in-view,
+  #contact .contact-info-card.card-revealed,
+  .contact-section .contact-info-card.is-in-view,
+  .contact-section .contact-info-card.card-revealed,
+  .contact-slide-card.is-in-view,
+  .contact-slide-card.card-revealed {
+    opacity: 1 !important;
+    transform: translate3d(0, 0, 0) !important;
+  }
+}
+
+/* ── C. CONTACT FORM INPUTS & BUTTONS (Mobile & Desktop) ── */
+.contact-form-anim-brand,
+.contact-form-anim-header,
+.contact-form-anim-group1,
+.contact-form-anim-group2,
+.contact-form-anim-group3,
+.contact-form-anim-group4,
+.contact-form-anim-group5,
+.contact-form-anim-btn {
+  opacity: 0 !important;
+  transform: translate3d(0, 35px, 0) !important;
+  transition: transform 0.80s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  will-change: transform, opacity !important;
+  -webkit-backface-visibility: hidden !important;
+  backface-visibility: hidden !important;
+}
+
+.contact-form-anim-brand   { transition-delay: 0.05s !important; }
+.contact-form-anim-header  { transition-delay: 0.12s !important; }
+.contact-form-anim-group1  { transition-delay: 0.18s !important; }
+.contact-form-anim-group2  { transition-delay: 0.25s !important; }
+.contact-form-anim-group3  { transition-delay: 0.32s !important; }
+.contact-form-anim-group4  { transition-delay: 0.39s !important; }
+.contact-form-anim-group5  { transition-delay: 0.46s !important; }
+.contact-form-anim-btn     { transition-delay: 0.53s !important; }
+
+.contact-slide-form.is-in-view .contact-form-anim-brand,
+.contact-slide-form.is-in-view .contact-form-anim-header,
+.contact-slide-form.is-in-view .contact-form-anim-group1,
+.contact-slide-form.is-in-view .contact-form-anim-group2,
+.contact-slide-form.is-in-view .contact-form-anim-group3,
+.contact-slide-form.is-in-view .contact-form-anim-group4,
+.contact-slide-form.is-in-view .contact-form-anim-group5,
+.contact-slide-form.is-in-view .contact-form-anim-btn,
+.contact-slide-form.card-revealed .contact-form-anim-brand,
+.contact-slide-form.card-revealed .contact-form-anim-header,
+.contact-slide-form.card-revealed .contact-form-anim-group1,
+.contact-slide-form.card-revealed .contact-form-anim-group2,
+.contact-slide-form.card-revealed .contact-form-anim-group3,
+.contact-slide-form.card-revealed .contact-form-anim-group4,
+.contact-slide-form.card-revealed .contact-form-anim-group5,
+.contact-slide-form.card-revealed .contact-form-anim-btn,
+.contact-form-anim-group1.is-in-view,
+.contact-form-anim-group2.is-in-view,
+.contact-form-anim-group3.is-in-view,
+.contact-form-anim-group4.is-in-view,
+.contact-form-anim-group5.is-in-view,
+.contact-form-anim-btn.is-in-view,
+.contact-form-anim-group1.card-revealed,
+.contact-form-anim-group2.card-revealed,
+.contact-form-anim-group3.card-revealed,
+.contact-form-anim-group4.card-revealed,
+.contact-form-anim-group5.card-revealed,
+.contact-form-anim-btn.card-revealed {
+  opacity: 1 !important;
+  transform: translate3d(0, 0, 0) !important;
+}
+

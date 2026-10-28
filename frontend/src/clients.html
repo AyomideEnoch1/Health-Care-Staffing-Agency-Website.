@@ -16,8 +16,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Montserrat:wght@400;500;600;700;800;900&family=Open+Sans:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&family=Pacifico&display=swap" rel="stylesheet">
   
-  <link rel="stylesheet" href="style.css?v=6.4.8">
-  <link rel="stylesheet" href="prototype.css?v=5.7.0">
+  <link rel="stylesheet" href="style.css?v=6.8.6">
+  <link rel="stylesheet" href="prototype.css?v=6.6.6">
+  <link rel="stylesheet" href="scroll-reveal.css?v=1.2.0">
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
@@ -72,7 +73,7 @@
     </div>
 
     <div class="hero-content container">
-      <div class="hero-text-block">
+      <div class="hero-text-block" data-animate="hero-load">
         <h1 class="hero-title">Facility &amp; Community <br>Staffing Solutions</h1>
         <p class="hero-subtitle">
           Partnership Not Transactions — Crafting high-quality patient centered care across Canada.
@@ -87,7 +88,7 @@
     <div class="container sectors-section" style="max-width: 1440px;">
 
       <!-- Row 1: Segment Header -->
-      <div class="service-section-header-row" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 2.2rem; border-bottom: 2px solid rgba(0, 168, 150, 0.2); padding-bottom: 1.2rem;">
+      <div class="service-section-header-row" data-animate="fade-up" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 2.2rem; border-bottom: 2px solid rgba(0, 168, 150, 0.2); padding-bottom: 1.2rem;">
         <div class="accent-heading-wrapper" style="margin-bottom: 0;">
           <h2 class="welcome-title" style="margin-bottom: 0;">Who We <span class="brand-highlight">PARTNER WITH</span></h2>
           <div class="welcome-accent-line"></div>
@@ -99,7 +100,7 @@
       <div class="contact-grid-row" style="margin-top: 0; align-items: start; margin-bottom: 3.5rem;">
         
         <!-- Left: Context Card -->
-        <div class="proto-content-card slide-from-left" style="padding: 1.8rem 2rem;">
+        <div class="proto-content-card" data-animate="slide-left" style="padding: 1.8rem 2rem;">
           <div>
             <span class="proto-card-badge" style="margin-bottom: 0.4rem;">TRUSTED CLINICAL EXPERTISE</span>
             <h3 class="contact-card-title" style="margin-bottom: 0.5rem;">Value-Driven Health Care Collaboration</h3>
@@ -117,7 +118,7 @@
         </div>
 
         <!-- Right: Who we serve block list -->
-        <div class="proto-content-card slide-from-right">
+        <div class="proto-content-card" data-animate="fade-up" data-delay="100">
           <div>
             <span class="proto-card-badge" style="margin-bottom: 0.4rem;">SECTORS WE SUPPORT</span>
             <h3 class="contact-card-title">Organizations We Serve</h3>
@@ -157,7 +158,7 @@
     <div class="container sectors-section" style="max-width: 1440px;">
 
       <!-- Row 1: Segment Header -->
-      <div class="service-section-header-row" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 2.2rem; border-bottom: 2px solid rgba(27, 174, 207, 0.2); padding-bottom: 1.2rem;">
+      <div class="service-section-header-row" data-animate="fade-up" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 2.2rem; border-bottom: 2px solid rgba(27, 174, 207, 0.2); padding-bottom: 1.2rem;">
         <div class="accent-heading-wrapper" style="margin-bottom: 0;">
           <h2 class="welcome-title" style="margin-bottom: 0;">Our Partnership <span class="brand-highlight">COMMITMENTS</span></h2>
           <div class="welcome-accent-line"></div>
@@ -169,7 +170,7 @@
       <div class="contact-grid-row" style="margin-top: 0; align-items: stretch; margin-bottom: 3.5rem;">
 
         <!-- Left commitment card -->
-        <div class="proto-content-card slide-from-left">
+        <div class="proto-content-card" data-animate="fade-up" data-delay="0">
           <div>
             <div class="proto-card-header-icon-row">
               <div class="proto-icon-box-md">
@@ -201,7 +202,7 @@
         </div>
 
         <!-- Right commitment card -->
-        <div class="proto-content-card slide-from-right">
+        <div class="proto-content-card" data-animate="fade-up" data-delay="100">
           <div>
             <div class="proto-card-header-icon-row">
               <div class="proto-icon-box-md icon-cyan">
@@ -236,14 +237,14 @@
 
       <!-- Row 3: Quality commitment full-width block -->
       <div>
-        <div class="accent-heading-wrapper" style="margin-bottom: 1.8rem;">
+        <div class="accent-heading-wrapper" data-animate="fade-up" style="margin-bottom: 1.8rem;">
           <h3 style="font-family: var(--font-heading); font-size: 1.3rem; font-weight: 800; color: var(--navy); margin-bottom: 0; text-transform: uppercase; letter-spacing: 0.5px;">Quality Over Quantity — Our Standard</h3>
           <div class="welcome-accent-line"></div>
         </div>
 
         <div class="proto-grid-2col">
 
-          <div class="proto-content-card slide-from-left">
+          <div class="proto-content-card" data-animate="fade-up" data-delay="0">
             <div>
               <div class="proto-card-header-icon-row">
                 <div class="proto-icon-box-md">
@@ -271,7 +272,7 @@
             </div>
           </div>
 
-          <div class="proto-content-card slide-from-right">
+          <div class="proto-content-card" data-animate="fade-up" data-delay="100">
             <div>
               <div class="proto-card-header-icon-row">
                 <div class="proto-icon-box-md icon-cyan">
@@ -311,7 +312,7 @@
     <div class="container sectors-section" style="max-width: 1440px;">
 
       <!-- Row 1: Segment Header -->
-      <div class="service-section-header-row slide-from-top" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 2.2rem; border-bottom: 2px solid rgba(78, 205, 196, 0.2); padding-bottom: 1.2rem;">
+      <div class="service-section-header-row" data-animate="fade-up" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 2.2rem; border-bottom: 2px solid rgba(78, 205, 196, 0.2); padding-bottom: 1.2rem;">
         <div class="accent-heading-wrapper" style="margin-bottom: 0;">
           <h2 class="welcome-title" style="margin-bottom: 0;">Submit a <span class="brand-highlight">STAFFING REQUEST</span></h2>
           <div class="welcome-accent-line"></div>
@@ -323,7 +324,7 @@
       <div class="contact-grid-row" style="margin-top: 0; align-items: start;">
 
         <!-- Left: Context / Guarantee Card -->
-        <div class="contact-info-card slide-from-left">
+        <div class="contact-info-card" data-animate="scale-up" data-delay="100">
           <div>
             <span class="proto-card-badge" style="margin-bottom: 0.4rem;">RAPID CLINICAL MATCHING</span>
             <h3 class="contact-card-title">Staffing Request Coordination</h3>
@@ -363,7 +364,7 @@
         </div>
 
         <!-- Right: The Form -->
-        <div class="slide-from-right">
+        <div data-animate="fade-up" data-delay="150">
           <form class="custom-form" id="client-request-form">
             <!-- Brand Header -->
             <div class="form-brand-header">
@@ -425,7 +426,7 @@
 
 
   <!-- FOOTER -->
-  <footer class="site-footer">
+  <footer class="site-footer" data-animate="fade-up">
     <div class="footer-diagonal-top"></div>
     <div class="container footer-content">
       <div class="footer-col footer-brand">
@@ -487,6 +488,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <script src="script.js?v=6.4.8"></script>
+  <script src="scroll-reveal.js?v=1.2.0"></script>
   <script>
     if (window.lucide) lucide.createIcons();
   </script>

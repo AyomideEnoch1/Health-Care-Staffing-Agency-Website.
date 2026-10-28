@@ -1,0 +1,246 @@
+/* ==========================================================================
+   SCROLL REVEAL UTILITY (Targeted exclusively to Job Seekers & For Clients)
+   Performant, accessible, hardware-accelerated scroll animations
+   ========================================================================== */
+
+:root {
+  --sr-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --sr-duration-fast: 500ms;
+  --sr-duration-base: 650ms;
+  --sr-duration-slow: 750ms;
+  --sr-distance-y: 24px;
+  --sr-distance-x: 40px;
+  --sr-distance-x-mobile: 20px;
+}
+
+/* 1. PROGRESSIVE ENHANCEMENT:
+   Content remains 100% visible if JavaScript is disabled.
+   Hidden states are ONLY applied when html has the 'js-enabled' class. */
+html.js-enabled [data-animate] {
+  opacity: 0;
+  transition-property: transform, opacity;
+  transition-timing-function: var(--sr-ease);
+  transition-duration: var(--sr-duration-base);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+/* 2. INITIAL UNREVEALED STATES BY TYPE */
+/* Fade Up (Headings, Cards, Forms) */
+html.js-enabled [data-animate="fade-up"] {
+  transform: translate3d(0, var(--sr-distance-y), 0);
+}
+
+/* Simple Fade */
+html.js-enabled [data-animate="fade"] {
+  transform: none;
+}
+
+/* Scale Up (CTAs & Action Cards) */
+html.js-enabled [data-animate="scale-up"] {
+  transform: scale(0.97);
+}
+
+/* Slide Left (Desktop 40px, Mobile 20px) */
+html.js-enabled [data-animate="slide-left"] {
+  transform: translate3d(calc(-1 * var(--sr-distance-x)), 0, 0);
+}
+@media (max-width: 768px) {
+  html.js-enabled [data-animate="slide-left"] {
+    transform: translate3d(calc(-1 * var(--sr-distance-x-mobile)), 0, 0);
+  }
+}
+
+/* Slide Right (Desktop 40px, Mobile 20px) */
+html.js-enabled [data-animate="slide-right"] {
+  transform: translate3d(var(--sr-distance-x), 0, 0);
+}
+@media (max-width: 768px) {
+  html.js-enabled [data-animate="slide-right"] {
+    transform: translate3d(var(--sr-distance-x-mobile), 0, 0);
+  }
+}
+
+/* Hero Load-In (immediate load-in, no scroll trigger above fold) */
+html.js-enabled [data-animate="hero-load"] {
+  opacity: 0;
+  transform: translate3d(0, 20px, 0);
+  transition: transform 650ms var(--sr-ease), opacity 650ms var(--sr-ease);
+}
+html.js-enabled [data-animate="hero-load"].sr-revealed {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+/* 3. REVEALED ACTIVE STATE */
+html.js-enabled [data-animate].sr-revealed,
+html.js-enabled .contact-info-card.sr-revealed,
+html.js-enabled .custom-form.sr-revealed {
+  opacity: 1 !important;
+  transform: translate3d(0, 0, 0) scale(1) !important;
+}
+
+/* Fast & Slow duration modifiers */
+html.js-enabled [data-duration="fast"] {
+  transition-duration: var(--sr-duration-fast);
+}
+html.js-enabled [data-duration="slow"] {
+  transition-duration: var(--sr-duration-slow);
+}
+
+/* Staggered Delay utilities */
+html.js-enabled [data-delay="60"]   { transition-delay: 60ms; }
+html.js-enabled [data-delay="80"]   { transition-delay: 80ms; }
+html.js-enabled [data-delay="100"]  { transition-delay: 100ms; }
+html.js-enabled [data-delay="120"]  { transition-delay: 120ms; }
+html.js-enabled [data-delay="140"]  { transition-delay: 140ms; }
+html.js-enabled [data-delay="150"]  { transition-delay: 150ms; }
+html.js-enabled [data-delay="160"]  { transition-delay: 160ms; }
+html.js-enabled [data-delay="180"]  { transition-delay: 180ms; }
+html.js-enabled [data-delay="200"]  { transition-delay: 200ms; }
+html.js-enabled [data-delay="220"]  { transition-delay: 220ms; }
+html.js-enabled [data-delay="240"]  { transition-delay: 240ms; }
+html.js-enabled [data-delay="260"]  { transition-delay: 260ms; }
+html.js-enabled [data-delay="280"]  { transition-delay: 280ms; }
+html.js-enabled [data-delay="300"]  { transition-delay: 300ms; }
+html.js-enabled [data-delay="320"]  { transition-delay: 320ms; }
+html.js-enabled [data-delay="340"]  { transition-delay: 340ms; }
+html.js-enabled [data-delay="360"]  { transition-delay: 360ms; }
+html.js-enabled [data-delay="420"]  { transition-delay: 420ms; }
+
+/* 4. CARD TABLETS, SPEC ITEMS & BENEFIT CHIPS: RIPPLE SLIDE-IN FROM LEFT
+   Targeting card tablets, specifications, perks and chips with smooth gliding */
+html.js-enabled .contact-detail-list .detail-item,
+html.js-enabled .hiring-specs-box .hiring-spec-item,
+html.js-enabled .hiring-travel-perks-grid .travel-perk-card,
+html.js-enabled [data-animate="tablet-ripple"] {
+  opacity: 0;
+  transform: translate3d(-34px, 0, 0);
+  transition: transform 680ms var(--sr-ease), opacity 650ms var(--sr-ease) !important;
+  will-change: transform, opacity;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+@media (max-width: 768px) {
+  html.js-enabled .contact-detail-list .detail-item,
+  html.js-enabled .hiring-specs-box .hiring-spec-item,
+  html.js-enabled .hiring-travel-perks-grid .travel-perk-card,
+  html.js-enabled [data-animate="tablet-ripple"] {
+    transform: translate3d(-18px, 0, 0);
+  }
+}
+
+html.js-enabled .contact-detail-list .detail-item.sr-revealed,
+html.js-enabled .hiring-specs-box .hiring-spec-item.sr-revealed,
+html.js-enabled .hiring-travel-perks-grid .travel-perk-card.sr-revealed,
+html.js-enabled [data-animate="tablet-ripple"].sr-revealed {
+  opacity: 1 !important;
+  transform: translate3d(0, 0, 0) !important;
+}
+
+/* Stagger / Ripple delays for consecutive tablet siblings */
+html.js-enabled .contact-detail-list .detail-item:nth-child(1),
+html.js-enabled .hiring-specs-box .hiring-spec-item:nth-child(1),
+html.js-enabled .hiring-travel-perks-grid .travel-perk-card:nth-child(1),
+html.js-enabled [data-animate="tablet-ripple"]:nth-child(1) { transition-delay: 75ms !important; }
+
+html.js-enabled .contact-detail-list .detail-item:nth-child(2),
+html.js-enabled .hiring-specs-box .hiring-spec-item:nth-child(2),
+html.js-enabled .hiring-travel-perks-grid .travel-perk-card:nth-child(2),
+html.js-enabled [data-animate="tablet-ripple"]:nth-child(2) { transition-delay: 150ms !important; }
+
+html.js-enabled .contact-detail-list .detail-item:nth-child(3),
+html.js-enabled .hiring-specs-box .hiring-spec-item:nth-child(3),
+html.js-enabled .hiring-travel-perks-grid .travel-perk-card:nth-child(3),
+html.js-enabled [data-animate="tablet-ripple"]:nth-child(3) { transition-delay: 225ms !important; }
+
+html.js-enabled .contact-detail-list .detail-item:nth-child(4),
+html.js-enabled .hiring-specs-box .hiring-spec-item:nth-child(4),
+html.js-enabled .hiring-travel-perks-grid .travel-perk-card:nth-child(4),
+html.js-enabled [data-animate="tablet-ripple"]:nth-child(4) { transition-delay: 300ms !important; }
+
+html.js-enabled .contact-detail-list .detail-item:nth-child(5),
+html.js-enabled [data-animate="tablet-ripple"]:nth-child(5) { transition-delay: 375ms !important; }
+
+html.js-enabled .contact-detail-list .detail-item:nth-child(6),
+html.js-enabled [data-animate="tablet-ripple"]:nth-child(6) { transition-delay: 450ms !important; }
+
+html.js-enabled .contact-detail-list .detail-item:nth-child(7),
+html.js-enabled [data-animate="tablet-ripple"]:nth-child(7) { transition-delay: 525ms !important; }
+
+html.js-enabled .contact-detail-list .detail-item:nth-child(8),
+html.js-enabled [data-animate="tablet-ripple"]:nth-child(8) { transition-delay: 600ms !important; }
+
+/* 4b. Benefit Pill Chips & Highlights Checklist Animations */
+html.js-enabled .benefit-pill-chip,
+html.js-enabled .hiring-perks-list .hiring-perk-item {
+  opacity: 0;
+  transform: translate3d(0, 16px, 0);
+  transition: transform 600ms var(--sr-ease), opacity 550ms var(--sr-ease) !important;
+  will-change: transform, opacity;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+html.js-enabled .benefit-pill-chip.sr-revealed,
+html.js-enabled .hiring-perks-list .hiring-perk-item.sr-revealed {
+  opacity: 1 !important;
+  transform: translate3d(0, 0, 0) !important;
+}
+
+html.js-enabled .hiring-perks-list .hiring-perk-item:nth-child(1) { transition-delay: 90ms !important; }
+html.js-enabled .hiring-perks-list .hiring-perk-item:nth-child(2) { transition-delay: 170ms !important; }
+html.js-enabled .hiring-perks-list .hiring-perk-item:nth-child(3) { transition-delay: 250ms !important; }
+
+/* 5. CONNECTING STEP LINE ANIMATION (For step sequences) */
+.sr-step-connector {
+  position: relative;
+}
+.sr-step-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 20px;
+  width: 2px;
+  background: linear-gradient(180deg, var(--teal-green, #00A896) 0%, var(--cyan-turquoise, #1BAECF) 100%);
+  transform-origin: top center;
+  transform: scaleY(0);
+  transition: transform 800ms var(--sr-ease);
+}
+.sr-step-connector.sr-revealed .sr-step-line {
+  transform: scaleY(1);
+}
+
+/* 6. ACCESSIBILITY: PREFERS-REDUCED-MOTION
+   Completely removes motion, preserves layout and immediate accessibility */
+@media (prefers-reduced-motion: reduce) {
+  html.js-enabled [data-animate],
+  html.js-enabled [data-animate].sr-revealed,
+  html.js-enabled [data-animate="hero-load"],
+  html.js-enabled [data-animate="hero-load"].sr-revealed,
+  html.js-enabled .contact-detail-list .detail-item,
+  html.js-enabled [data-animate="tablet-ripple"],
+  html.js-enabled .contact-detail-list .detail-item.sr-revealed,
+  html.js-enabled [data-animate="tablet-ripple"].sr-revealed {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+    animation: none !important;
+  }
+  .sr-step-line {
+    transform: scaleY(1) !important;
+    transition: none !important;
+  }
+}
+
+/* 7. CONTAINER PROTECTION: PREVENT HORIZONTAL SCROLLBARS */
+.hero-section,
+.section-padding,
+.hiring-process-section,
+.proto-content-card,
+.contact-detail-list,
+.hiring-card,
+.hiring-travel-banner {
+  overflow-x: clip;
+}

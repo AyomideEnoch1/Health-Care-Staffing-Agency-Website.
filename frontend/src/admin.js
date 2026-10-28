@@ -14,8 +14,11 @@
     const isLocalHost = window.location.hostname === 'localhost' || 
                         window.location.hostname === '127.0.0.1' || 
                         window.location.hostname === '';
-    if (isFile || (isLocalHost && window.location.port !== '3000')) {
+    if (isFile) {
       return 'http://localhost:3000/api';
+    }
+    if (isLocalHost) {
+      return (window.location.port === '3000') ? '/api' : 'http://localhost:3000/api';
     }
     if (window.location.hostname.includes('onrender.com') || window.location.hostname.startsWith('admin.')) {
       return '/api';
@@ -5228,7 +5231,7 @@
 
   function renderContractedTermsCell(f) {
     let tags = [];
-    if (f.active_terms_tags) {
+    if (f && f.active_terms_tags) {
       tags = String(f.active_terms_tags).split('|').filter(Boolean);
     }
     
@@ -5237,34 +5240,40 @@
         const parts = tag.split(':');
         const role = parts[0] || 'Role';
         const rate = parts[1] || '';
-        return `<span class="term-badge-pill"><i data-lucide="tag" style="width: 10px; height: 10px; opacity: 0.85;"></i> ${escapeHTML(role)}: ${escapeHTML(rate)}/hr</span>`;
+        return `<span class="term-badge-pill" style="white-space: nowrap;"><i data-lucide="tag" style="width: 10px; height: 10px; opacity: 0.85;"></i> ${escapeHTML(role)}: ${escapeHTML(rate)}/hr</span>`;
       }).join('');
 
       return `
-        <div style="display: flex; flex-wrap: wrap; gap: 3px; align-items: center;">
-          ${pills}
-        </div>
-        <div style="font-size: 0.68rem; color: var(--text-muted); margin-top: 3px; font-weight: 600;">
-          ${f.active_rate_cards_count || tags.length} Active Contracted ${(f.active_rate_cards_count || tags.length) === 1 ? 'Rate' : 'Rates'}
+        <div class="contracted-terms-content">
+          <div style="display: flex; flex-wrap: wrap; gap: 4px; align-items: center; justify-content: flex-end;">
+            ${pills}
+          </div>
+          <div class="contracted-terms-subtitle" style="font-size: 0.68rem; color: var(--text-muted); margin-top: 2px; font-weight: 600;">
+            ${f.active_rate_cards_count || tags.length} Active Contracted ${(f.active_rate_cards_count || tags.length) === 1 ? 'Rate' : 'Rates'}
+          </div>
         </div>
       `;
     }
 
-    if (f.active_rate_cards_count > 0) {
+    if (f && f.active_rate_cards_count > 0) {
       return `
-        <span class="status-pill verified" style="font-size: 0.72rem; padding: 2px 8px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
-          <i data-lucide="tag" style="width: 10px; height: 10px;"></i>
-          <strong>${f.active_rate_cards_count}</strong> active terms
-        </span>
-        <div style="font-size: 0.68rem; color: var(--text-muted); margin-top: 3px;">Custom contracted rate terms</div>
+        <div class="contracted-terms-content">
+          <span class="status-pill verified" style="font-size: 0.72rem; padding: 2px 8px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;">
+            <i data-lucide="tag" style="width: 10px; height: 10px;"></i>
+            <strong>${f.active_rate_cards_count}</strong> active terms
+          </span>
+          <div class="contracted-terms-subtitle" style="font-size: 0.68rem; color: var(--text-muted); margin-top: 2px;">Custom contracted rate terms</div>
+        </div>
       `;
     }
 
     return `
-      <span class="status-pill pending" style="font-size: 0.72rem; padding: 3px 8px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; background: rgba(245, 158, 11, 0.12); color: #d97706; border: 1px solid rgba(245, 158, 11, 0.35); border-radius: 5px;">
-        <i data-lucide="file-text" style="width: 11px; height: 11px;"></i> Agency Standard Rates
-      </span>
-      <div style="font-size: 0.68rem; color: var(--text-muted); margin-top: 3px;">Standard tier pricing applied</div>
+      <div class="contracted-terms-content">
+        <span class="status-pill pending" style="font-size: 0.72rem; padding: 3px 8px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; background: rgba(245, 158, 11, 0.12); color: #d97706; border: 1px solid rgba(245, 158, 11, 0.35); border-radius: 5px; white-space: nowrap;">
+          <i data-lucide="file-text" style="width: 11px; height: 11px; flex-shrink: 0;"></i> Standard Rates
+        </span>
+        <div class="contracted-terms-subtitle" style="font-size: 0.68rem; color: var(--text-muted); margin-top: 2px;">Standard tier pricing applied</div>
+      </div>
     `;
   }
 
@@ -5425,7 +5434,7 @@
           </td>
 
           <!-- Contracted Terms -->
-          <td class="cell-grid-item" data-label="Contracted Terms">
+          <td class="cell-grid-item cell-contracted-terms" data-label="Contracted Terms">
             <div class="meta-label">Contracted Terms</div>
             <div class="meta-value">
               ${renderContractedTermsCell(f)}
