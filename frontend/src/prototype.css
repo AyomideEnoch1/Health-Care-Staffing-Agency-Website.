@@ -3771,7 +3771,7 @@ img, video, canvas, svg {
 
 /* ── Full Container Spread for Clinical Excellence Edge ── */
 .proto-excellence-wide-block {
-  margin-bottom: 6rem;
+  margin-bottom: clamp(2.5rem, 4.5vw, 4rem);
   position: relative;
   z-index: 2;
 }
@@ -5632,6 +5632,18 @@ img, video, canvas, svg {
 /* ==========================================================================
    NAVBAR: Font Family set to Arial
    ========================================================================== */
+:root,
+body {
+  --font-heading: Arial, Helvetica, sans-serif !important;
+  --font-body: Arial, Helvetica, sans-serif !important;
+  --font-poppins: Arial, Helvetica, sans-serif !important;
+}
+
+body,
+body * {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
 .site-header,
 .site-header *,
 .main-nav,
@@ -6214,19 +6226,40 @@ img, video, canvas, svg {
 .collage-item-sub:first-child.card-revealed,
 .collage-item-sub:first-child.is-in-view img,
 .collage-item-sub:first-child.card-revealed img,
+#excellence-section.is-revealed .masonry-columns-wrapper.wide-spread .masonry-col,
+#excellence-section.is-revealed .masonry-columns-wrapper.wide-spread .masonry-col img,
+#excellence-section.is-revealed .masonry-col,
+#excellence-section.is-revealed .masonry-col img,
 #excellence-section.is-revealed .masonry-col-1,
-#excellence-section.is-revealed .masonry-col-1 img,
+#excellence-section.is-revealed .masonry-col-2,
+#excellence-section.is-revealed .masonry-col-3,
 #excellence-section.is-revealed img[src*="service_travel_nurse.jpg"],
+#excellence-section.card-revealed .masonry-columns-wrapper.wide-spread .masonry-col,
+#excellence-section.card-revealed .masonry-columns-wrapper.wide-spread .masonry-col img,
+#excellence-section.is-in-view .masonry-columns-wrapper.wide-spread .masonry-col,
+#excellence-section.is-in-view .masonry-columns-wrapper.wide-spread .masonry-col img,
+.excellence-block.is-revealed .masonry-columns-wrapper.wide-spread .masonry-col,
+.excellence-block.is-revealed .masonry-columns-wrapper.wide-spread .masonry-col img,
 .excellence-block.is-revealed .masonry-col-1,
 .excellence-block.is-revealed .masonry-col-1 img,
-.excellence-slide-media.is-in-view .masonry-col-1,
-.excellence-slide-media.card-revealed .masonry-col-1,
+.excellence-slide-media.is-in-view .masonry-col,
+.excellence-slide-media.is-in-view .masonry-col img,
+.excellence-slide-media.card-revealed .masonry-col,
+.excellence-slide-media.card-revealed .masonry-col img,
+.excellence-slide-media.is-revealed .masonry-col,
+.masonry-col.is-in-view,
+.masonry-col.card-revealed,
+.masonry-col.is-revealed,
+.masonry-col.is-in-view img,
+.masonry-col.card-revealed img,
+.masonry-col.is-revealed img,
 .masonry-col-1.is-in-view,
 .masonry-col-1.card-revealed,
 .masonry-col-1.is-in-view img,
 .masonry-col-1.card-revealed img,
 .masonry-columns-wrapper.wide-spread.is-in-view .masonry-col,
-.masonry-columns-wrapper.wide-spread.card-revealed .masonry-col {
+.masonry-columns-wrapper.wide-spread.card-revealed .masonry-col,
+.masonry-columns-wrapper.wide-spread.is-revealed .masonry-col {
   opacity: 1 !important;
   transform: translate3d(0, 0, 0) !important;
 }

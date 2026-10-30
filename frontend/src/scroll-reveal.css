@@ -31,6 +31,36 @@ html.js-enabled [data-animate="fade-up"] {
   transform: translate3d(0, var(--sr-distance-y), 0);
 }
 
+/* Slide In from Bottom (Cards, Pillars) */
+html.js-enabled [data-animate="slide-bottom"],
+html.js-enabled .clinician-benefit-card {
+  opacity: 0;
+  transform: translate3d(0, 52px, 0);
+  transition: transform 720ms cubic-bezier(0.16, 1, 0.3, 1), opacity 650ms cubic-bezier(0.16, 1, 0.3, 1) !important;
+  will-change: transform, opacity;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+@media (max-width: 768px) {
+  html.js-enabled [data-animate="slide-bottom"],
+  html.js-enabled .clinician-benefit-card {
+    transform: translate3d(0, 38px, 0);
+    transition: transform 620ms cubic-bezier(0.16, 1, 0.3, 1), opacity 550ms ease-out !important;
+  }
+}
+
+html.js-enabled [data-animate="slide-bottom"].sr-revealed,
+html.js-enabled .clinician-benefit-card.sr-revealed {
+  opacity: 1 !important;
+  transform: translate3d(0, 0, 0) !important;
+}
+
+/* Maintain hover elevation after card is revealed */
+html.js-enabled .clinician-benefit-card.sr-revealed:hover {
+  transform: translate3d(0, -4px, 0) !important;
+}
+
 /* Simple Fade */
 html.js-enabled [data-animate="fade"] {
   transform: none;
@@ -192,6 +222,42 @@ html.js-enabled .hiring-perks-list .hiring-perk-item.sr-revealed {
 html.js-enabled .hiring-perks-list .hiring-perk-item:nth-child(1) { transition-delay: 90ms !important; }
 html.js-enabled .hiring-perks-list .hiring-perk-item:nth-child(2) { transition-delay: 170ms !important; }
 html.js-enabled .hiring-perks-list .hiring-perk-item:nth-child(3) { transition-delay: 250ms !important; }
+
+/* 4c. Clinician Benefit Cards Stagger Delays */
+html.js-enabled .clinician-benefit-card:nth-child(1) { transition-delay: 60ms !important; }
+html.js-enabled .clinician-benefit-card:nth-child(2) { transition-delay: 150ms !important; }
+html.js-enabled .clinician-benefit-card:nth-child(3) { transition-delay: 240ms !important; }
+html.js-enabled .clinician-benefit-card:nth-child(4) { transition-delay: 330ms !important; }
+
+/* 4d. Hiring Role Card Images: Dedicated Smooth Fade-In */
+html.js-enabled .hiring-card-image-wrap {
+  opacity: 0;
+  transition: opacity 750ms var(--sr-ease) !important;
+  will-change: opacity;
+}
+
+html.js-enabled .hiring-card-img {
+  opacity: 0;
+  transform: scale(1.04);
+  transition: opacity 720ms var(--sr-ease), transform 850ms var(--sr-ease) !important;
+  will-change: opacity, transform;
+}
+
+html.js-enabled .hiring-card.sr-revealed .hiring-card-image-wrap,
+html.js-enabled .hiring-card-image-wrap.sr-revealed {
+  opacity: 1 !important;
+}
+
+html.js-enabled .hiring-card.sr-revealed .hiring-card-img,
+html.js-enabled .hiring-card-image-wrap.sr-revealed .hiring-card-img {
+  opacity: 1 !important;
+  transform: scale(1) !important;
+}
+
+html.js-enabled .hiring-card.sr-revealed:hover .hiring-card-img {
+  transform: scale(1.05) !important;
+  transition: transform 0.5s ease !important;
+}
 
 /* 5. CONNECTING STEP LINE ANIMATION (For step sequences) */
 .sr-step-connector {

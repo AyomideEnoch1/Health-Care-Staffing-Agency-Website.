@@ -16,22 +16,27 @@
 
   const initScrollReveal = () => {
     // 1. Hero immediate load-in (above the fold) and re-trigger on reverse scroll to top
-    const heroElements = document.querySelectorAll('[data-animate="hero-load"]');
+    const heroElements = document.querySelectorAll('[data-animate="hero-load"], .subpage-hero [data-animate]');
     if (heroElements.length > 0) {
-      setTimeout(() => {
+      const triggerHero = () => {
         heroElements.forEach((el) => {
           el.style.willChange = 'transform, opacity';
           el.classList.add('sr-revealed');
         });
-      }, 60);
+      };
+
+      setTimeout(triggerHero, 60);
 
       // Scroll-to-top handler: re-animates hero when user scrolls back to the very top fold
       window.addEventListener('scroll', () => {
         const scrollY = window.scrollY || window.pageYOffset;
-        if (scrollY > 450) {
-          heroElements.forEach((el) => el.classList.remove('sr-revealed'));
+        if (scrollY > 350) {
+          heroElements.forEach((el) => {
+            el.classList.remove('sr-revealed');
+            el.style.willChange = 'auto';
+          });
         } else if (scrollY <= 140) {
-          heroElements.forEach((el) => el.classList.add('sr-revealed'));
+          triggerHero();
         }
       }, { passive: true });
     }
@@ -93,7 +98,7 @@
 
     // 5. IntersectionObserver for scroll-triggered elements (BIDIRECTIONAL)
     const animElements = document.querySelectorAll(
-      '[data-animate]:not([data-animate="hero-load"]), .sr-step-connector, .contact-detail-list .detail-item, .hiring-specs-box .hiring-spec-item, .hiring-travel-perks-grid .travel-perk-card, .benefit-pill-chip, .hiring-perks-list .hiring-perk-item, [data-animate="tablet-ripple"]'
+      '[data-animate]:not([data-animate="hero-load"]):not(.subpage-hero [data-animate]), .sr-step-connector, .contact-detail-list .detail-item, .hiring-specs-box .hiring-spec-item, .hiring-travel-perks-grid .travel-perk-card, .benefit-pill-chip, .hiring-perks-list .hiring-perk-item, [data-animate="tablet-ripple"]'
     );
 
     if (!('IntersectionObserver' in window)) {
@@ -114,8 +119,6 @@
     const revealObserver = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         const el = entry.target;
-        const rect = entry.boundingClientRect;
-        const vh = window.innerHeight || document.documentElement.clientHeight;
 
         if (entry.isIntersecting) {
           // Element entered viewport (scrolling down or scrolling back up)
@@ -137,15 +140,14 @@
           }
         } else {
           // Element left viewport (scrolled past it downwards or upwards)
-          if (rect.bottom < -60 || rect.top > vh + 60) {
-            el.classList.remove('sr-revealed');
-            el.style.willChange = 'auto';
+          // Reset so the element cleanly re-animates whenever scrolling back
+          el.classList.remove('sr-revealed');
+          el.style.willChange = 'auto';
 
-            // Reset countup flag so it counts up again when re-entering
-            const countEl = el.querySelector('[data-countup]') || (el.hasAttribute('data-countup') ? el : null);
-            if (countEl) {
-              countEl.classList.remove('is-counting');
-            }
+          // Reset countup flag so it counts up again when re-entering
+          const countEl = el.querySelector('[data-countup]') || (el.hasAttribute('data-countup') ? el : null);
+          if (countEl) {
+            countEl.classList.remove('is-counting');
           }
         }
       });
@@ -186,17 +188,36 @@
     handleAnchorJump();
     window.addEventListener('hashchange', handleAnchorJump);
 
-    // Reverse scroll to top helper: Ensure elements in top viewport re-reveal when returning to top
+    // Reverse scroll tracker: guarantees re-reveals smoothly when scrolling back to the top
+    let lastScrollY = window.scrollY || window.pageYOffset;
+    let ticking = false;
+
     window.addEventListener('scroll', () => {
-      const scrollY = window.scrollY || window.pageYOffset;
-      if (scrollY <= 80) {
-        const vh = window.innerHeight || document.documentElement.clientHeight;
-        animElements.forEach((el) => {
-          const rect = el.getBoundingClientRect();
-          if (rect.top <= vh * 0.95 && rect.bottom >= 0) {
-            el.classList.add('sr-revealed');
+      const currentScrollY = window.scrollY || window.pageYOffset;
+      const scrollingUp = currentScrollY < lastScrollY;
+      lastScrollY = currentScrollY;
+
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const vh = window.innerHeight || document.documentElement.clientHeight;
+
+          // When scrolling up towards top or when in the upper sections
+          if (scrollingUp || currentScrollY <= 250) {
+            animElements.forEach((el) => {
+              const rect = el.getBoundingClientRect();
+              if (rect.top <= vh * 0.92 && rect.bottom >= 15) {
+                if (!el.classList.contains('sr-revealed')) {
+                  el.style.willChange = 'transform, opacity';
+                  el.classList.add('sr-revealed');
+                }
+              } else if (rect.top > vh + 60 || rect.bottom < -60) {
+                el.classList.remove('sr-revealed');
+              }
+            });
           }
+          ticking = false;
         });
+        ticking = true;
       }
     }, { passive: true });
   };

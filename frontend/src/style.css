@@ -215,6 +215,7 @@ ul {
 }
 
 .main-nav .nav-item:not(.mobile-nav-action) {
+  font-weight: 500;
   opacity: 0.82;
   transition: opacity 0.25s ease;
 }
@@ -227,7 +228,7 @@ ul {
 .nav-link {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 0.88rem;
-  font-weight: 600;
+  font-weight: 500;
   letter-spacing: 0.5px;
   color: #0A192F;
   padding: 0.4rem 0;
@@ -344,6 +345,13 @@ ul {
   }
 
   /* 2. Desktop Nav Menu Items: drop down from top with individual stagger */
+  .site-header .nav-item,
+  .site-header .nav-link,
+  .main-nav .nav-item,
+  .main-nav .nav-link {
+    font-weight: 500 !important;
+  }
+
   .site-header .nav-item.header-slide-item {
     opacity: 0;
     transform: translateY(-16px);
@@ -4456,55 +4464,92 @@ body.has-gsap .proto-gradient-callout {
   }
 
   .main-nav {
-    flex: 1 !important;
+    flex: 0 !important;
     min-width: 0 !important;
-    display: flex !important;
-    justify-content: center !important;
-    margin: 0 0.35rem !important;
+    order: 3 !important;
   }
 
   .nav-list {
+    display: none !important;
+    position: absolute !important;
+    top: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    background-color: #FFFFFF !important;
+    flex-direction: column !important;
+    padding: 0.75rem 1.25rem 1.5rem !important;
+    gap: 0 !important;
+    max-height: calc(100dvh - 65px) !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    box-shadow: 0 16px 36px rgba(26, 58, 99, 0.16) !important;
+    border-bottom: 3px solid var(--teal-green, #3CAF8A) !important;
+    z-index: 9999 !important;
+  }
+
+  .nav-list.open {
     display: flex !important;
-    position: static !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    background: transparent !important;
-    box-shadow: none !important;
-    padding: 0 !important;
-    gap: clamp(0.2rem, 0.65vw, 0.65rem) !important;
-    width: auto !important;
+  }
+
+  .nav-item {
+    width: 100% !important;
+    display: block !important;
+    border-bottom: 1px solid rgba(26, 58, 99, 0.07) !important;
   }
 
   .nav-link {
-    font-size: clamp(0.64rem, 0.72vw, 0.76rem) !important;
-    padding: 0.32rem 0.15rem !important;
-    letter-spacing: 0.1px !important;
+    font-size: 0.95rem !important;
+    font-weight: 600 !important;
+    padding: 0.85rem 0.5rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+    min-height: 48px !important;
     white-space: nowrap !important;
+    color: #1A3A63 !important;
   }
 
   .mobile-toggle {
-    display: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
+    margin-left: 0.4rem !important;
+    background: transparent !important;
+    border: none !important;
+    cursor: pointer !important;
+    z-index: 10002 !important;
   }
 
   .header-cta-right {
     flex-shrink: 0 !important;
     display: flex !important;
     margin-left: auto !important;
+    align-items: center !important;
   }
 
   .header-cta-right .nav-cta-btn {
-    padding: 0.44rem 0.82rem !important;
-    font-size: 0.7rem !important;
+    padding: 0.48rem 1.15rem !important;
+    font-size: 0.76rem !important;
+    min-height: 40px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
   }
 
   .mobile-nav-action {
     display: none !important;
   }
 
-  /* ── Tablet Hero: Full Bleed Photo with Smooth Left-to-Right Scrim Gradient ── */
+  /* ── Tablet Hero: Reduced Height with Smooth Left-to-Right Scrim Gradient ── */
   .hero-section:not(.subpage-hero),
   #hero-slider {
-    min-height: clamp(520px, 60vh, 600px) !important;
+    min-height: clamp(380px, 44vh, 440px) !important;
     position: relative !important;
     background-color: #0A192F !important;
     overflow: hidden !important;
@@ -4689,12 +4734,12 @@ body.has-gsap .proto-gradient-callout {
   }
 
   .subpage-hero {
-    min-height: clamp(290px, 32vh, 370px) !important;
+    min-height: clamp(200px, 23vh, 240px) !important;
   }
 
   .subpage-hero .hero-content {
-    padding-top: clamp(3.2rem, 5.5vw, 4.5rem) !important;
-    padding-bottom: clamp(1.8rem, 3vw, 2.5rem) !important;
+    padding-top: clamp(2.2rem, 3.8vw, 2.8rem) !important;
+    padding-bottom: clamp(1.2rem, 2vw, 1.6rem) !important;
   }
 
   .subpage-hero .hero-title {
@@ -4915,7 +4960,13 @@ body.has-gsap .proto-gradient-callout {
   }
 
   .header-cta-right {
-    display: none !important;
+    display: flex !important;
+    margin-left: auto !important;
+    margin-right: 0.4rem !important;
+  }
+  .header-cta-right .nav-cta-btn {
+    padding: 0.46rem 1rem !important;
+    font-size: 0.74rem !important;
   }
 
   /* Nav list collapses into full-width, scrollable mobile dropdown drawer */
@@ -5092,15 +5143,12 @@ body.has-gsap .proto-gradient-callout {
   }
 
   /* ── Tablet & Intermediate Hero Layout (429px to 880px) ── */
-  /* Occupies 90% of the viewport height as requested */
+  /* Compact & balanced height on tablet screens */
   .hero-section:not(.subpage-hero),
   #hero-slider {
-    height: 90vh !important;
-    height: 90dvh !important;
-    min-height: 90vh !important;
-    min-height: 90dvh !important;
-    max-height: 90vh !important;
-    max-height: 90dvh !important;
+    height: clamp(350px, 42vh, 410px) !important;
+    min-height: clamp(350px, 42vh, 410px) !important;
+    max-height: clamp(380px, 46vh, 440px) !important;
     display: flex !important;
     flex-direction: column !important;
     justify-content: center !important;
@@ -5159,8 +5207,8 @@ body.has-gsap .proto-gradient-callout {
     height: auto !important;
     min-height: 0 !important;
     max-height: none !important;
-    padding-top: clamp(6.2rem, 12vh, 8.5rem) !important;
-    padding-bottom: clamp(3.5rem, 6vh, 5rem) !important;
+    padding-top: clamp(3rem, 5.5vh, 4.2rem) !important;
+    padding-bottom: clamp(1.6rem, 3vh, 2.4rem) !important;
     padding-left: clamp(2rem, 5vw, 4rem) !important;
     padding-right: clamp(1.5rem, 3vw, 2.5rem) !important;
     display: flex !important;
@@ -5177,7 +5225,7 @@ body.has-gsap .proto-gradient-callout {
   .hero-section:not(.subpage-hero) .hero-text-block,
   #hero-slider .hero-text-block,
   #home .hero-text-block {
-    margin-top: clamp(14px, 3vh, 24px) !important;
+    margin-top: 0 !important;
     margin-bottom: 0 !important;
     margin-left: 0 !important;
     margin-right: auto !important;
@@ -5590,15 +5638,15 @@ body.has-gsap .proto-gradient-callout {
 
 /* ── Mobile Screens (Up to 600px: Bottom-Up Gradient Fade, Centralized Dots, Full Width Subpages) ── */
 @media (max-width: 600px) {
-  /* Between 429px and 600px: occupies 90% of the viewport */
+  /* Mobile screens: occupies 85% of the viewport as requested */
   .hero-section:not(.subpage-hero),
   #hero-slider {
-    height: 90vh !important;
-    height: 90dvh !important;
-    min-height: 90vh !important;
-    min-height: 90dvh !important;
-    max-height: 90vh !important;
-    max-height: 90dvh !important;
+    height: 85vh !important;
+    height: 85dvh !important;
+    min-height: 85vh !important;
+    min-height: 85dvh !important;
+    max-height: 85vh !important;
+    max-height: 85dvh !important;
     overflow: hidden !important;
     display: flex !important;
     flex-direction: column !important;
@@ -5663,8 +5711,8 @@ body.has-gsap .proto-gradient-callout {
     min-height: 0 !important;
     width: 100% !important;
     max-width: 100% !important;
-    padding-top: clamp(4.5rem, 11vh, 6.5rem) !important;
-    padding-bottom: clamp(4rem, 8vh, 5.5rem) !important;
+    padding-top: clamp(2.5rem, 6vh, 4rem) !important;
+    padding-bottom: clamp(2rem, 4.5vh, 3.2rem) !important;
     padding-left: clamp(1.25rem, 4vw, 1.75rem) !important;
     padding-right: clamp(1.25rem, 4vw, 1.75rem) !important;
     margin: 0 !important;
@@ -5684,7 +5732,7 @@ body.has-gsap .proto-gradient-callout {
   #home .hero-text-block {
     width: 100% !important;
     max-width: 100% !important;
-    margin-top: clamp(18px, 4vh, 30px) !important;
+    margin-top: 0 !important;
     margin-bottom: 0 !important;
     margin-left: 0 !important;
     margin-right: 0 !important;
@@ -5932,17 +5980,17 @@ body.has-gsap .proto-gradient-callout {
   }
 }
 
-/* ── Standard Smartphones: From 428px by 928px and downward (Occupies 90% of Viewport) ── */
+/* ── Standard Smartphones: From 428px by 928px and downward (Occupies 85% of Viewport) ── */
 @media (max-width: 428px) {
-  /* Hero occupies 90% of device viewport on mobile screens */
+  /* Hero occupies 85% of device viewport on mobile screens */
   .hero-section:not(.subpage-hero),
   #hero-slider {
-    height: 90vh !important;
-    height: 90dvh !important;
-    min-height: 90vh !important;
-    min-height: 90dvh !important;
-    max-height: 90vh !important;
-    max-height: 90dvh !important;
+    height: 85vh !important;
+    height: 85dvh !important;
+    min-height: 85vh !important;
+    min-height: 85dvh !important;
+    max-height: 85vh !important;
+    max-height: 85dvh !important;
   }
 
   .site-header {
@@ -7945,9 +7993,86 @@ body.light-theme .action-btn:hover {
   padding: 3rem 3.5rem;
   margin-bottom: 2.5rem;
 }
+
+.legal-card-title {
+  font-family: var(--font-heading);
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #0F172A;
+  margin: 0.65rem 0 0.85rem 0;
+  line-height: 1.25;
+}
+
 @media (max-width: 768px) {
+  .legal-page-container {
+    padding: 1.75rem 0.85rem 3.5rem !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
   .legal-card {
-    padding: 1.75rem 1.25rem;
+    padding: 1.6rem 1.15rem !important;
+    border-radius: 14px !important;
+  }
+  .legal-header-badge {
+    display: flex !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    justify-content: center !important;
+    align-items: center !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+    padding: 0.45rem 0.75rem !important;
+    font-size: clamp(0.58rem, 2.7vw, 0.74rem) !important;
+    letter-spacing: 0.05em !important;
+    margin-bottom: 0.85rem !important;
+  }
+  .legal-card-title {
+    font-size: clamp(1.3rem, 5vw, 1.65rem) !important;
+    line-height: 1.28 !important;
+    text-align: left !important;
+    margin: 0.75rem 0 0.85rem 0 !important;
+    word-break: normal !important;
+    overflow-wrap: break-word !important;
+  }
+  .legal-meta-row {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.65rem 0.85rem !important;
+    padding: 0.85rem !important;
+    margin-bottom: 1.75rem !important;
+    background: #F8FAFC !important;
+    border: 1px solid #E2E8F0 !important;
+    border-radius: 10px !important;
+  }
+  .legal-meta-item {
+    font-size: 0.76rem !important;
+    line-height: 1.35 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 2px !important;
+  }
+  .legal-meta-item strong {
+    font-size: 0.68rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.4px !important;
+    color: #64748B !important;
+  }
+  .legal-section-title {
+    font-size: 1.05rem !important;
+    line-height: 1.35 !important;
+    align-items: flex-start !important;
+    gap: 8px !important;
+  }
+  .legal-section-title .section-num {
+    margin-top: 1px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .legal-meta-row {
+    grid-template-columns: 1fr !important;
+    gap: 0.55rem !important;
   }
 }
 .legal-header-badge {
@@ -7963,6 +8088,10 @@ body.light-theme .action-btn:hover {
   padding: 0.35rem 0.85rem;
   border-radius: 9999px;
   margin-bottom: 1rem;
+  white-space: nowrap;
+}
+.legal-header-badge span {
+  white-space: nowrap;
 }
 .legal-meta-row {
   display: flex;
@@ -8029,42 +8158,134 @@ body.light-theme .action-btn:hover {
   color: #1E293B;
 }
 .legal-contact-card {
-  background: linear-gradient(135deg, #0F172A, #1E293B);
+  background: linear-gradient(145deg, #1A3554 0%, #234670 100%);
   color: #FFFFFF;
-  border-radius: 12px;
-  padding: 2rem;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: clamp(1.4rem, 4vw, 2.2rem);
   margin-top: 2.5rem;
+  box-shadow: 0 12px 32px rgba(13, 28, 46, 0.16);
+  position: relative;
+  overflow: hidden;
 }
+
 .legal-contact-card h4 {
+  font-family: var(--font-heading);
   color: #FFFFFF;
-  font-size: 1.15rem;
-  margin: 0 0 0.5rem 0;
+  font-size: clamp(1.15rem, 3.5vw, 1.3rem);
+  font-weight: 800;
+  margin: 0 0 0.55rem 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
+
 .legal-contact-card p {
-  color: #94A3B8;
+  color: rgba(255, 255, 255, 0.82);
   font-size: 0.88rem;
   line-height: 1.6;
-  margin-bottom: 1rem;
+  margin-bottom: 1.25rem;
 }
+
 .legal-contact-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.85rem;
   margin-top: 1rem;
 }
+
 .legal-contact-item {
   display: flex;
   align-items: flex-start;
-  gap: 10px;
-  font-size: 0.86rem;
+  gap: 12px;
+  font-size: 0.85rem;
   color: #E2E8F0;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 10px;
+  padding: 0.85rem 1rem;
+  transition: all 0.22s ease;
 }
+
+.legal-contact-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(60, 175, 138, 0.35);
+  transform: translateY(-2px);
+}
+
+.legal-contact-item i,
+.legal-contact-item svg {
+  color: var(--teal-green, #3CAF8A) !important;
+  stroke: var(--teal-green, #3CAF8A) !important;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.legal-contact-item strong {
+  color: #FFFFFF;
+  font-size: 0.86rem;
+  font-weight: 700;
+  display: block;
+  margin-bottom: 2px;
+}
+
+.legal-contact-item div {
+  flex: 1;
+  min-width: 0;
+  line-height: 1.45;
+}
+
 .legal-contact-item a {
   color: #38BDF8;
+  font-weight: 600;
   text-decoration: none;
+  word-break: break-all;
+  overflow-wrap: anywhere;
+  display: inline-block;
+  transition: color 0.2s ease;
 }
+
 .legal-contact-item a:hover {
+  color: #7DD3FC;
   text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .legal-contact-card {
+    padding: 1.35rem 1.1rem !important;
+    border-radius: 14px !important;
+    margin-top: 2rem !important;
+  }
+  .legal-contact-card h4 {
+    font-size: 1.1rem !important;
+    line-height: 1.3 !important;
+    margin-bottom: 0.45rem !important;
+  }
+  .legal-contact-card p {
+    font-size: 0.84rem !important;
+    line-height: 1.5 !important;
+    margin-bottom: 1rem !important;
+  }
+  .legal-contact-grid {
+    grid-template-columns: 1fr !important;
+    gap: 0.65rem !important;
+  }
+  .legal-contact-item {
+    padding: 0.75rem 0.85rem !important;
+    border-radius: 9px !important;
+    gap: 10px !important;
+    font-size: 0.82rem !important;
+  }
+  .legal-contact-item strong {
+    font-size: 0.82rem !important;
+  }
+  .legal-contact-item a {
+    font-size: 0.82rem !important;
+    word-break: break-all !important;
+    overflow-wrap: anywhere !important;
+  }
 }
 
 /* ==========================================================================
@@ -8437,6 +8658,11 @@ body.light-theme .action-btn:hover {
   border-radius: 999px;
   margin-bottom: 0.85rem;
   width: fit-content;
+  white-space: nowrap;
+}
+
+.hiring-travel-badge span {
+  white-space: nowrap;
 }
 
 .hiring-travel-title {
@@ -8694,6 +8920,15 @@ body.light-theme .action-btn:hover {
   white-space: nowrap;
 }
 
+@media (max-width: 768px) {
+  .hiring-travel-floating-card {
+    display: none !important;
+  }
+  .hiring-travel-media-inner::after {
+    display: none !important;
+  }
+}
+
 /* 3-Step Process Section */
 .hiring-process-section {
   padding: 3.5rem 0;
@@ -8784,6 +9019,58 @@ body.light-theme .action-btn:hover {
   align-items: center;
   gap: 1rem;
   flex-wrap: wrap;
+}
+
+/* Scoped CTA bar button contrast & hover visibility */
+.hiring-cta-bar .btn-pill-hero {
+  background: #FFFFFF !important;
+  color: var(--navy, #1A3A63) !important;
+  border: 2px solid #FFFFFF !important;
+  font-weight: 800;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.hiring-cta-bar .btn-pill-hero:hover,
+.hiring-cta-bar .btn-pill-hero:focus {
+  background: #0D223A !important;
+  color: #FFFFFF !important;
+  border-color: #0D223A !important;
+  box-shadow: 0 10px 26px rgba(13, 34, 58, 0.4) !important;
+  transform: translateY(-2px);
+}
+
+.hiring-cta-bar .btn-pill-outline {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #FFFFFF !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.85) !important;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.hiring-cta-bar .btn-pill-outline:hover,
+.hiring-cta-bar .btn-pill-outline:focus {
+  background: #FFFFFF !important;
+  color: var(--navy, #1A3A63) !important;
+  border-color: #FFFFFF !important;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.2) !important;
+  transform: translateY(-2px);
+}
+
+.hiring-cta-bar .btn-pill-outline i,
+.hiring-cta-bar .btn-pill-outline svg {
+  color: #FFFFFF;
+  stroke: #FFFFFF;
+  transition: color 0.25s ease, stroke 0.25s ease;
+}
+
+.hiring-cta-bar .btn-pill-outline:hover i,
+.hiring-cta-bar .btn-pill-outline:hover svg,
+.hiring-cta-bar .btn-pill-outline:focus i,
+.hiring-cta-bar .btn-pill-outline:focus svg {
+  color: var(--navy, #1A3A63) !important;
+  stroke: var(--navy, #1A3A63) !important;
 }
 
 @media (max-width: 991px) {
@@ -9548,9 +9835,21 @@ body.light-theme .action-btn:hover {
     padding: 1.35rem 1.1rem !important;
   }
   .hiring-travel-badge {
-    margin-bottom: 0.5rem !important;
-    padding: 0.28rem 0.72rem !important;
-    font-size: 0.68rem !important;
+    display: flex !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    justify-content: center !important;
+    align-items: center !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+    margin-bottom: 0.65rem !important;
+    padding: 0.35rem 0.75rem !important;
+    font-size: clamp(0.58rem, 2.7vw, 0.7rem) !important;
+    letter-spacing: 0.5px !important;
+    box-sizing: border-box !important;
+  }
+  .hiring-travel-badge span {
+    white-space: nowrap !important;
   }
   .hiring-travel-title {
     font-size: clamp(1.2rem, 4.8vw, 1.45rem) !important;
@@ -9575,8 +9874,10 @@ body.light-theme .action-btn:hover {
     padding: 0 1.1rem 1.1rem 1.1rem !important;
   }
   .hiring-travel-media-inner {
-    height: 210px !important;
-    min-height: 210px !important;
+    height: 220px !important;
+    min-height: 220px !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
   }
   .hiring-travel-btn-group {
     flex-direction: column !important;
@@ -9596,21 +9897,12 @@ body.light-theme .action-btn:hover {
     height: 160px !important;
     min-height: 160px !important;
   }
+  /* Remove floating overlay card on mobile screen for a clean, unobscured image */
   .hiring-travel-floating-card {
-    bottom: 8px !important;
-    left: 8px !important;
-    right: 8px !important;
-    padding: 0.5rem 0.75rem !important;
-    border-radius: 8px !important;
-    gap: 8px !important;
+    display: none !important;
   }
-  .hiring-travel-floating-card strong {
-    font-size: 0.74rem !important;
-    line-height: 1.3 !important;
-  }
-  .hiring-travel-floating-card span {
-    font-size: 0.66rem !important;
-    line-height: 1.2 !important;
+  .hiring-travel-media-inner::after {
+    display: none !important;
   }
 
   /* Clinician Benefits (Why Choose Us) on Mobile */
@@ -9720,15 +10012,51 @@ body.light-theme .action-btn:hover {
 
 
 /* ==========================================================================
-   HOME PAGE TYPOGRAPHY: ARIAL FONT FAMILY (INDEX.HTML ONLY)
+   GLOBAL WEBSITE TYPOGRAPHY: ARIAL FONT FAMILY (ALL WEBPAGES & HOME PAGE)
    ========================================================================== */
+:root,
+body,
 #home {
   --font-heading: Arial, Helvetica, sans-serif !important;
   --font-body: Arial, Helvetica, sans-serif !important;
   --font-poppins: Arial, Helvetica, sans-serif !important;
+  --font-script: Arial, Helvetica, sans-serif !important;
   font-family: Arial, Helvetica, sans-serif !important;
 }
 
+body,
+body *,
+#home,
+#home * {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+body h1,
+body h2,
+body h3,
+body h4,
+body h5,
+body h6,
+body p,
+body a,
+body span,
+body strong,
+body em,
+body b,
+body button,
+body input,
+body select,
+body textarea,
+body li,
+body div,
+body label,
+body section,
+body article,
+body aside,
+body header,
+body footer,
+body nav,
+body main,
 #home,
 #home h1,
 #home h2,
@@ -9753,10 +10081,21 @@ body.light-theme .action-btn:hover {
 }
 
 /* Ensure vector icons retain SVG attributes without font disruption */
-#home svg,
-#home i[data-lucide],
-#home [data-lucide] {
-  font-family: inherit;
+svg,
+svg *,
+i[data-lucide],
+[data-lucide] {
+  font-family: inherit !important;
+}
+
+/* Ensure monospace code and timestamp elements retain their monospace font */
+code,
+pre,
+kbd,
+samp,
+.monospace,
+[style*="monospace"] {
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace !important;
 }
 
 
@@ -11350,19 +11689,40 @@ body.light-theme .action-btn:hover {
 .collage-item-sub:first-child.card-revealed,
 .collage-item-sub:first-child.is-in-view img,
 .collage-item-sub:first-child.card-revealed img,
+#excellence-section.is-revealed .masonry-columns-wrapper.wide-spread .masonry-col,
+#excellence-section.is-revealed .masonry-columns-wrapper.wide-spread .masonry-col img,
+#excellence-section.is-revealed .masonry-col,
+#excellence-section.is-revealed .masonry-col img,
 #excellence-section.is-revealed .masonry-col-1,
-#excellence-section.is-revealed .masonry-col-1 img,
+#excellence-section.is-revealed .masonry-col-2,
+#excellence-section.is-revealed .masonry-col-3,
 #excellence-section.is-revealed img[src*="service_travel_nurse.jpg"],
+#excellence-section.card-revealed .masonry-columns-wrapper.wide-spread .masonry-col,
+#excellence-section.card-revealed .masonry-columns-wrapper.wide-spread .masonry-col img,
+#excellence-section.is-in-view .masonry-columns-wrapper.wide-spread .masonry-col,
+#excellence-section.is-in-view .masonry-columns-wrapper.wide-spread .masonry-col img,
+.excellence-block.is-revealed .masonry-columns-wrapper.wide-spread .masonry-col,
+.excellence-block.is-revealed .masonry-columns-wrapper.wide-spread .masonry-col img,
 .excellence-block.is-revealed .masonry-col-1,
 .excellence-block.is-revealed .masonry-col-1 img,
-.excellence-slide-media.is-in-view .masonry-col-1,
-.excellence-slide-media.card-revealed .masonry-col-1,
+.excellence-slide-media.is-in-view .masonry-col,
+.excellence-slide-media.is-in-view .masonry-col img,
+.excellence-slide-media.card-revealed .masonry-col,
+.excellence-slide-media.card-revealed .masonry-col img,
+.excellence-slide-media.is-revealed .masonry-col,
+.masonry-col.is-in-view,
+.masonry-col.card-revealed,
+.masonry-col.is-revealed,
+.masonry-col.is-in-view img,
+.masonry-col.card-revealed img,
+.masonry-col.is-revealed img,
 .masonry-col-1.is-in-view,
 .masonry-col-1.card-revealed,
 .masonry-col-1.is-in-view img,
 .masonry-col-1.card-revealed img,
 .masonry-columns-wrapper.wide-spread.is-in-view .masonry-col,
-.masonry-columns-wrapper.wide-spread.card-revealed .masonry-col {
+.masonry-columns-wrapper.wide-spread.card-revealed .masonry-col,
+.masonry-columns-wrapper.wide-spread.is-revealed .masonry-col {
   opacity: 1 !important;
   transform: translate3d(0, 0, 0) !important;
 }
@@ -11483,5 +11843,324 @@ body.light-theme .action-btn:hover {
 .contact-form-anim-btn.card-revealed {
   opacity: 1 !important;
   transform: translate3d(0, 0, 0) !important;
+}
+
+/* ==========================================================================
+   TABLET RESPONSIVE ARCHITECTURE (600px to 1100px)
+   ========================================================================== */
+
+/* ── 1. GLOBAL TABLET FOUNDATION (600px - 1100px) ── */
+@media (min-width: 600px) and (max-width: 1100px) {
+  /* Fluid container with consistent side padding (24-40px) */
+  .container,
+  .site-header .header-container,
+  .footer-container {
+    padding-left: clamp(1.5rem, 3.5vw, 2.5rem) !important;
+    padding-right: clamp(1.5rem, 3.5vw, 2.5rem) !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Consistent vertical rhythm (56-80px scaled from desktop) */
+  .section-padding {
+    padding: clamp(3.5rem, 6.5vw, 5rem) 0 !important;
+  }
+
+  /* Sticky header anchor offset so section content is never clipped */
+  [id],
+  section[id],
+  div[id] {
+    scroll-margin-top: clamp(70px, 9vh, 88px) !important;
+  }
+
+  /* Fluid typography & balanced text wrapping */
+  h1, .hero-title, .proto-hero-title {
+    text-wrap: balance !important;
+  }
+
+  h2, .proto-heading-lg, .section-title {
+    font-size: clamp(1.75rem, 3.6vw, 2.35rem) !important;
+    line-height: 1.25 !important;
+    text-wrap: balance !important;
+  }
+
+  p, .proto-body-text, .welcome-text {
+    line-height: 1.65 !important;
+    max-width: 75ch !important;
+  }
+
+  /* Prevent overflow */
+  html, body {
+    overflow-x: clip !important;
+    max-width: 100% !important;
+  }
+
+  h1, h2, h3, h4, h5, p, span, a {
+    overflow-wrap: anywhere;
+  }
+
+  /* Responsive image scaling */
+  img {
+    max-width: 100% !important;
+    height: auto;
+  }
+
+  /* 44x44px minimum touch targets */
+  .btn,
+  .nav-cta-btn,
+  .btn-pill-hero,
+  .btn-pill-outline,
+  .mobile-toggle,
+  .auth-tab-btn,
+  .auth-tab-btn-pill,
+  .hiring-apply-btn,
+  .proto-arrow-link {
+    min-height: 44px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    touch-action: manipulation !important;
+  }
+
+  /* Forms: 16px minimum font size prevents iOS zoom on focus */
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+    min-height: 46px !important;
+    border-radius: 8px !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Tables & wide content horizontal scrolling */
+  .table-responsive,
+  table {
+    display: block !important;
+    width: 100% !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+}
+
+/* ── 2. PORTRAIT TABLETS (600px - 991.98px) ── */
+@media (min-width: 600px) and (max-width: 991.98px) {
+  /* Reduced Hero Section Heights */
+  .hero-section:not(.subpage-hero),
+  #hero-slider {
+    height: clamp(340px, 40vh, 400px) !important;
+    min-height: clamp(340px, 40vh, 400px) !important;
+    max-height: clamp(370px, 44vh, 430px) !important;
+  }
+
+  .hero-section:not(.subpage-hero) .hero-content,
+  #hero-slider .hero-content,
+  #home .hero-content {
+    padding-top: clamp(2.8rem, 5vh, 3.8rem) !important;
+    padding-bottom: clamp(1.5rem, 2.8vh, 2.2rem) !important;
+  }
+
+  .subpage-hero {
+    min-height: clamp(200px, 23vh, 240px) !important;
+  }
+
+  .subpage-hero .hero-content {
+    padding-top: clamp(2.2rem, 3.8vw, 2.8rem) !important;
+    padding-bottom: clamp(1.2rem, 2vw, 1.6rem) !important;
+  }
+
+  .subpage-hero .hero-title {
+    font-size: clamp(1.85rem, 4.2vw, 2.45rem) !important;
+    line-height: 1.2 !important;
+    margin-bottom: 0.5rem !important;
+  }
+
+  .subpage-hero .hero-subtitle {
+    font-size: clamp(0.92rem, 2.2vw, 1.05rem) !important;
+    line-height: 1.5 !important;
+    max-width: 620px !important;
+  }
+
+  /* Header Navigation: Clean logo, CTA and hamburger alignment */
+  .site-header {
+    padding: 0.75rem 0 !important;
+  }
+
+  .site-header .header-container {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 0.85rem !important;
+  }
+
+  .brand-logo {
+    flex-shrink: 0 !important;
+  }
+
+  .header-cta-right {
+    display: flex !important;
+    margin-left: auto !important;
+    margin-right: 0.5rem !important;
+    order: 2 !important;
+  }
+
+  .mobile-toggle {
+    display: flex !important;
+    order: 3 !important;
+    margin-left: 0.25rem !important;
+  }
+
+  /* Multi-column grid step-down: 4 cols -> 2 cols; 3 cols -> 2 cols */
+  .key-indicators-grid,
+  .stat-grid,
+  .proto-exec-highlights-row {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 1.25rem !important;
+  }
+
+  .why-choose-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 1.25rem !important;
+  }
+
+  .clinician-benefits-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 1.25rem !important;
+  }
+
+  .services-grid,
+  .services-page-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 1.35rem !important;
+  }
+
+  /* Orphan card handling (3 cards total): let the 3rd card span full width centered */
+  .hiring-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 1.35rem !important;
+  }
+
+  .hiring-grid .hiring-card:last-child:nth-child(odd),
+  .services-grid .service-card:last-child:nth-child(odd) {
+    grid-column: span 2 !important;
+    max-width: 680px !important;
+    margin: 0 auto !important;
+    width: 100% !important;
+  }
+
+  /* Two-column text + image sections: Stack vertically with constrained image */
+  .proto-split-grid,
+  .split-grid {
+    grid-template-columns: 1fr !important;
+    gap: 2.25rem !important;
+  }
+
+  .workforce-media-col img,
+  .about-overview-section img,
+  .purpose-narrative-col + .workforce-media-col img {
+    max-height: 380px !important;
+    width: 100% !important;
+    object-fit: cover !important;
+    border-radius: 12px !important;
+  }
+
+  /* Contact cards: 2x2 grid */
+  .contact-detail-grid,
+  .contact-cards-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 1.25rem !important;
+  }
+
+  /* Footer: 2-column balanced grid */
+  .footer-container,
+  .site-footer .footer-col-wrap {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 2rem 1.5rem !important;
+  }
+
+  /* Clinical Edge Masonry Section */
+  .masonry-columns-wrapper.wide-spread {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 1.25rem !important;
+  }
+
+  /* Auth page hero top banner */
+  .auth-page-wrapper::before {
+    height: 220px !important;
+  }
+
+  .auth-card-container {
+    max-width: 480px !important;
+    margin: 0 auto !important;
+  }
+}
+
+/* ── 3. LANDSCAPE TABLETS & SMALL LAPTOPS (992px - 1100px) ── */
+@media (min-width: 992px) and (max-width: 1100px) {
+  /* Reduced Hero Section Heights */
+  .hero-section:not(.subpage-hero),
+  #hero-slider {
+    height: clamp(380px, 42vh, 440px) !important;
+    min-height: clamp(380px, 42vh, 440px) !important;
+    max-height: clamp(400px, 46vh, 460px) !important;
+  }
+
+  .hero-section:not(.subpage-hero) .hero-content,
+  #hero-slider .hero-content,
+  #home .hero-content {
+    padding-top: clamp(3rem, 5vh, 4rem) !important;
+    padding-bottom: clamp(1.5rem, 2.8vh, 2.2rem) !important;
+  }
+
+  .subpage-hero {
+    min-height: clamp(230px, 26vh, 270px) !important;
+  }
+
+  .subpage-hero .hero-content {
+    padding-top: clamp(2.6rem, 4vw, 3.2rem) !important;
+    padding-bottom: clamp(1.4rem, 2.2vw, 1.8rem) !important;
+  }
+
+  /* Horizontal Navigation: refined spacing without wrapping */
+  .nav-list {
+    display: flex !important;
+    flex-direction: row !important;
+    position: static !important;
+    gap: clamp(0.5rem, 1.1vw, 1.15rem) !important;
+    width: auto !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
+
+  .nav-link {
+    font-size: clamp(0.72rem, 0.82vw, 0.8rem) !important;
+    padding: 0.45rem 0.2rem !important;
+    white-space: nowrap !important;
+    min-height: 44px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+  }
+
+  .mobile-toggle {
+    display: none !important;
+  }
+
+  .header-cta-right {
+    display: flex !important;
+  }
+
+  /* Two-column split grids side-by-side with balanced gap */
+  .proto-split-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 2.5rem !important;
+  }
+
+  /* 3-column grids with proportional gap */
+  .hiring-grid,
+  .services-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 1.25rem !important;
+  }
 }
 
