@@ -147,11 +147,8 @@ router.post('/login', authLoginLimiter, async (req, res, next) => {
       [hashedOtp, admin.id]
     );
 
-    // Target email: If admin has corporate address without active MX records, deliver to master administrator inbox (SMTP_USER)
-    let targetEmail = admin.email;
-    if (admin.email.endsWith('@divinefingershealthcare.ca') && process.env.SMTP_USER && process.env.SMTP_USER.includes('@')) {
-      targetEmail = process.env.SMTP_USER;
-    }
+    // Deliver OTP strictly to the admin's personal/registered email address
+    const targetEmail = admin.email;
 
     // Deliver OTP strictly to email via hardened SMTP mailer
     try {
@@ -375,10 +372,8 @@ router.post('/email/resend', authLoginLimiter, async (req, res, next) => {
       [hashedOtp, admin.id]
     );
 
-    let targetEmail = admin.email;
-    if (admin.email.endsWith('@divinefingershealthcare.ca') && process.env.SMTP_USER && process.env.SMTP_USER.includes('@')) {
-      targetEmail = process.env.SMTP_USER;
-    }
+    // Deliver OTP strictly to the admin's registered email address
+    const targetEmail = admin.email;
 
     try {
       const emailContent = buildAdminVerificationOtpEmail(admin.full_name, emailOtp);
