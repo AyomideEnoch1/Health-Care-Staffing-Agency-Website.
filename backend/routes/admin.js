@@ -677,6 +677,51 @@ router.post('/applications/:id/resume', requirePermission('applications:edit'), 
   try {
     if (!req.file) {
       return res.status(400).json({ success: false, error: 'Resume file (PDF, DOC, or DOCX) is required.' });
+    }
+
+    const { id } = req.params;
+    let fileBuffer = null;
+    try {
+      if (req.file.path && fs.existsSync(req.file.path)) {
+        fileBuffer = fs.readFileSync(req.file.path);
+      }
+    } catch (_) {}
+
+    try {
+      await pool.query(
+        `UPDATE job_applications 
+         SET resume_original_name = ?, resume_stored_name = ?, resume_mime_type = ?, 
+             resume_file_size = ?, resume_storage_path = ?, file_data = ?
+         WHERE id = ?`,
+        [req.file.originalname, req.file.filename, req.file.mimetype, req.file.size, req.file.path, fileBuffer, id]
+      );
+    } catch (_) {
+      await pool.query(
+        `UPDATE job_applications 
+         SET resume_original_name = ?, resume_stored_name = ?, resume_mime_type = ?, 
+             resume_file_size = ?, resume_storage_path = ?
+         WHERE id = ?`,
+        [req.file.originalname, req.file.filename, req.file.mimetype, req.file.size, req.file.path, id]
+      );
+    }
+
+    await pool.query(
+      `INSERT INTO audit_logs (id, admin_id, actor_name, action, target_entity, target_id, details, severity, ip_address)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [crypto.randomUUID(), req.admin.id, req.admin.full_name,
+       'RESUME_UPLOADED', 'job_applications', id,
+       `Attached resume "${req.file.originalname}" to application ${id.slice(0,8)}`, 'info', req.ip]
+    );
+
+    res.json({
+      success: true,
+      message: 'Resume uploaded and attached to candidate profile successfully.',
+      data: {
+        resume_original_name: req.file.originalname
+      }
+    });
+  } catch (err) { next(err); }
+});
 
 // POST /api/admin/applications/:id/resend-cv — Trigger Resend CV email with portal link
 router.post('/applications/:id/resend-cv', requirePermission('applications:manage'), async (req, res, next) => {
@@ -780,52 +825,6 @@ router.delete('/applications/:id', requirePermission('applications:manage'), asy
   } finally {
     conn.release();
   }
-});
-
-    }
-
-    const { id } = req.params;
-    let fileBuffer = null;
-    try {
-      if (req.file.path && fs.existsSync(req.file.path)) {
-        fileBuffer = fs.readFileSync(req.file.path);
-      }
-    } catch (_) {}
-
-    try {
-      await pool.query(
-        `UPDATE job_applications 
-         SET resume_original_name = ?, resume_stored_name = ?, resume_mime_type = ?, 
-             resume_file_size = ?, resume_storage_path = ?, file_data = ?
-         WHERE id = ?`,
-        [req.file.originalname, req.file.filename, req.file.mimetype, req.file.size, req.file.path, fileBuffer, id]
-      );
-    } catch (_) {
-      await pool.query(
-        `UPDATE job_applications 
-         SET resume_original_name = ?, resume_stored_name = ?, resume_mime_type = ?, 
-             resume_file_size = ?, resume_storage_path = ?
-         WHERE id = ?`,
-        [req.file.originalname, req.file.filename, req.file.mimetype, req.file.size, req.file.path, id]
-      );
-    }
-
-    await pool.query(
-      `INSERT INTO audit_logs (id, admin_id, actor_name, action, target_entity, target_id, details, severity, ip_address)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [crypto.randomUUID(), req.admin.id, req.admin.full_name,
-       'RESUME_UPLOADED', 'job_applications', id,
-       `Attached resume "${req.file.originalname}" to application ${id.slice(0,8)}`, 'info', req.ip]
-    );
-
-    res.json({
-      success: true,
-      message: 'Resume uploaded and attached to candidate profile successfully.',
-      data: {
-        resume_original_name: req.file.originalname
-      }
-    });
-  } catch (err) { next(err); }
 });
 
 /// ============================================================================
