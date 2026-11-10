@@ -89,7 +89,7 @@ async function enqueueMail({ type, to, userId = null, vars = {}, sendAfter = nul
   // Immediate Outbox Dispatch — prevents orphaned queue entries in serverless and local dev
   if (!suppressed && (!sendAfter || new Date(sendAfter) <= new Date())) {
     const isServerless = Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
-    const isCritical = ['password_reset', 'staff_welcome', 'auth_password_reset', 'applicant_confirmation', 'application_alert'].includes(type);
+    const isCritical = ['password_reset', 'staff_welcome', 'auth_password_reset', 'applicant_confirmation', 'application_alert', 'resend_resume_request'].includes(type);
 
     if (isServerless || isCritical) {
       await dispatchOutboxEntry(outboxId, type, addr, vars);

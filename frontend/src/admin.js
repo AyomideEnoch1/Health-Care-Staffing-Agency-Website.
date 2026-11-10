@@ -1467,10 +1467,13 @@
         </td>
         <td class="cell-grid-item" data-label="Resume / CV">
           <div class="meta-label">Resume / CV</div>
-          <div class="meta-value">
+          <div class="meta-value" style="display:flex;flex-direction:column;gap:5px;">
             ${a.resume_original_name
-              ? `<a href="${API_BASE}/admin/applications/${a.id}/resume" target="_blank" style="color:var(--brand-cyan);font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:4px;"><i data-lucide="download" style="width:13px;height:13px;"></i> Download</a>`
+              ? `<a href="${API_BASE}/admin/applications/${a.id}/resume" target="_blank" style="color:var(--brand-cyan);font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:4px;" title="Download Resume File"><i data-lucide="download" style="width:13px;height:13px;"></i> Download</a>`
               : '<span style="color:var(--text-muted);font-size:0.75rem;">None</span>'}
+            <button type="button" title="Send email to candidate requesting to re-submit resume with public portal link" style="background:rgba(14,165,233,0.08);border:1px solid rgba(14,165,233,0.25);color:var(--brand-cyan);padding:2px 7px;border-radius:4px;font-size:0.7rem;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:3px;width:fit-content;" onclick="window.sendApplicantResendCVEmail('${a.id}', '${(a.full_name || 'Candidate').replace(/'/g, "\\'")}', '${(a.email || '').replace(/'/g, "\\'")}')">
+              <i data-lucide="mail" style="width:11px;height:11px;"></i> Request Resend
+            </button>
           </div>
         </td>
         <td class="cell-status-desktop" data-label="Onboarding Stage">
@@ -1490,10 +1493,15 @@
             </select>
           </div>
         </td>
-        <td class="cell-actions" data-label="Enroll Action">
-          <button type="button" class="btn-primary-action" style="font-size:.75rem;padding:.35rem .65rem;height:36px;display:inline-flex;align-items:center;gap:4px;width:100%;justify-content:center;" onclick="window.openAddStaffModal({ full_name: '${(a.full_name || '').replace(/'/g, "\\'")}', role_applied: '${a.role_applied || 'RN'}', email: '${a.email || ''}', phone: '${a.phone || ''}', license_registration: '${a.license_registration || ''}' })">
-            <i data-lucide="user-plus" style="width:13px;height:13px;"></i> Enroll as Staff
-          </button>
+        <td class="cell-actions" data-label="Actions">
+          <div style="display:flex;align-items:center;gap:6px;">
+            <button type="button" class="btn-primary-action" style="font-size:.75rem;padding:.35rem .65rem;height:36px;display:inline-flex;align-items:center;gap:4px;flex:1;justify-content:center;" onclick="window.openAddStaffModal({ full_name: '${(a.full_name || '').replace(/'/g, "\\'")}', role_applied: '${a.role_applied || 'RN'}', email: '${a.email || ''}', phone: '${a.phone || ''}', license_registration: '${a.license_registration || ''}' })">
+              <i data-lucide="user-plus" style="width:13px;height:13px;"></i> Enroll as Staff
+            </button>
+            <button type="button" class="btn-icon" title="Clear Out / Delete Application" style="height:36px;width:36px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.25);border-radius:6px;cursor:pointer;color:#EF4444;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;" onclick="window.deleteApplicantRecord('${a.id}', '${(a.full_name || 'Applicant').replace(/'/g, "\\'")}')">
+              <i data-lucide="trash-2" style="width:15px;height:15px;"></i>
+            </button>
+          </div>
         </td>
       </tr>`).join('');
 
@@ -4709,6 +4717,27 @@
   const formAddStaff         = document.getElementById('form-add-staff');
 
   
+  window.sendApplicantResendCVEmail = async function(appId, name, email) {
+    if (!email) {
+      showToast('This candidate does not have an email address on file.', 'warning');
+      return;
+    }
+    if (!confirm(`Send automated "Resend CV / Resume" email to "${name}" (${email})?\n\nThis will send an official email with a direct link to the careers portal on the public website for them to re-submit.`)) {
+      return;
+    }
+    try {
+      showToast(`Sending Resend CV email to ${name}...`, 'info');
+      const res = await apiRequest(`/admin/applications/${appId}/resend-cv`, { method: 'POST' });
+      if (res && res.success) {
+        showToast(res.message || `Resend CV email delivered to ${email}!`, 'success');
+      } else {
+        showToast(res?.error || 'Failed to dispatch email.', 'warning');
+      }
+    } catch (err) {
+      showToast(`Error: ${err.message}`, 'error');
+    }
+  };
+
   window.deleteApplicantRecord = async function(appId, name) {
     if (!confirm(`Are you sure you want to remove the application for "${name}"?\n\nThis will clear it from your dashboard and safely archive it in the Archive Vault.`)) {
       return;

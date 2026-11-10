@@ -410,6 +410,62 @@ router.patch('/requests/:id/status', requirePermission('requests:dispatch'), asy
   } catch (err) { next(err); }
 });
 
+
+// DELETE /api/admin/requests/:id — Clear out & archive staffing request
+router.delete('/requests/:id', requirePermission('requests:dispatch'), async (req, res, next) => {
+  const conn = await pool.getConnection();
+  try {
+    await conn.beginTransaction();
+    const { id } = req.params;
+    const [rows] = await conn.query('SELECT * FROM staffing_requests WHERE id = ?', [id]);
+    if (!rows || rows.length === 0) {
+      await conn.rollback();
+      return res.status(404).json({ success: false, error: 'Staffing request not found.' });
+    }
+    const requestItem = rows[0];
+
+    // Safely archive into archived_records
+    await recordArchive(conn, {
+      entityType: 'staffing_request',
+      originalId: id,
+      displayName: requestItem.facility_name || 'Staffing Request',
+      identifier: requestItem.request_code || id,
+      dataPayload: requestItem,
+      deletedByName: req.admin?.full_name || 'Administrator',
+      deletedById: req.admin?.id || null,
+      reason: req.body?.reason || 'Staffing request cleared via Admin Console'
+    });
+
+    await conn.query('DELETE FROM staffing_requests WHERE id = ?', [id]);
+
+    await conn.query(
+      `INSERT INTO audit_logs (id, admin_id, actor_name, action, target_entity, target_id, details, severity, ip_address)
+       VALUES (?, ?, ?, 'REQUEST_ARCHIVED_DELETED', 'staffing_requests', ?, ?, 'info', ?)`,
+      [
+        crypto.randomUUID(),
+        req.admin?.id || null,
+        req.admin?.full_name || 'Administrator',
+        id,
+        `Cleared and archived staffing request: ${requestItem.request_code} for ${requestItem.facility_name}`,
+        req.ip
+      ]
+    );
+
+    await conn.commit();
+    adminEvents.emit('request:deleted', { id, request_code: requestItem.request_code });
+
+    res.json({
+      success: true,
+      message: `Staffing request ${requestItem.request_code} has been cleared out and archived.`
+    });
+  } catch (err) {
+    await conn.rollback();
+    next(err);
+  } finally {
+    conn.release();
+  }
+});
+
 // ============================================================================
 // JOB APPLICATIONS (ATS)
 // GET /api/admin/applications
@@ -544,27 +600,73 @@ router.get('/applications/:id/resume', requirePermission('applications:view'), a
       }
     }
 
-    // Physical file is not on server disk (e.g. Render container restart / ephemeral storage)
-    // Check if client expects HTML (browser navigation like clicking a link) or JSON
+    // Physical file is not on server disk
+    // 1. Dispatch automated Resend CV email with careers portal link
+    try {
+      if (app.email) {
+        const careersUrl = process.env.PUBLIC_CAREERS_URL || 'https://www.divinefingershealthcareservice.ca/jobseekers.html';
+        const { enqueueMail } = require('../utils/mailOutbox');
+        await enqueueMail({
+          type: 'resend_resume_request',
+          to: app.email,
+          vars: {
+            full_name: app.full_name,
+            role_applied: app.role_applied,
+            application_code: app.application_code,
+            careers_url: careersUrl
+          }
+        });
+      }
+    } catch (mailErr) {
+      console.warn('[Auto Resend CV Mail Warning]:', mailErr.message);
+    }
+
+    // 2. Return clean notification notice (NO dossier page)
     const acceptsHtml = req.accepts(['html', 'json']) === 'html' || !req.xhr;
     if (acceptsHtml && req.query.format !== 'json') {
       res.setHeader('Content-Type', 'text/html; charset=utf-8');
-      return res.send(generateApplicantDossierHtml(app));
+      return res.send(`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Resume Attachment Notice — Divine Fingers Healthcare</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #0B192C; color: #f8fafc; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box; }
+    .card { background: #1E293B; border: 1px solid #334155; border-radius: 12px; padding: 36px; max-width: 520px; width: 100%; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.5); text-align: center; }
+    .icon { font-size: 52px; margin-bottom: 18px; }
+    h2 { margin: 0 0 12px; font-size: 1.4rem; color: #FFFFFF; font-weight: 800; }
+    p { color: #94A3B8; font-size: 0.95rem; line-height: 1.6; margin: 0 0 20px; }
+    .badge { display: inline-block; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); color: #34D399; padding: 8px 16px; border-radius: 20px; font-weight: 700; font-size: 0.88rem; margin-bottom: 24px; }
+    .btn { display: inline-block; background: #007799; color: #fff; padding: 12px 28px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 0.9rem; cursor: pointer; border: none; }
+    .btn:hover { background: #0099bb; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon">✉️</div>
+    <h2>Resume Re-submission Email Sent!</h2>
+    <p>The original file attachment was cleared during earlier cloud container restarts. An automated <strong>Resend CV Request</strong> email has been sent directly to <strong>${escapeHtml(app.full_name || 'Candidate')}</strong> (<code>${escapeHtml(app.email || '')}</code>) with a direct link to submit their resume on the public application portal.</p>
+    <div class="badge">✓ Email Dispatched to Candidate</div><br>
+    <button class="btn" onclick="window.close()">Close Window</button>
+  </div>
+</body>
+</html>`);
     }
 
     return res.status(404).json({
       success: false,
+      missing: true,
+      emailSent: true,
       error: 'Resume file not found on server.',
-      reason: 'ephemeral_cloud_storage',
-      message: 'The physical file was cleared during an ephemeral container restart. Candidate contact details are available in the dossier.',
+      message: 'The physical file was cleared during earlier cloud restarts. An automated Resend CV email has been sent to ' + app.email,
       applicant: {
         id: app.id,
         application_code: app.application_code,
         full_name: app.full_name,
         role_applied: app.role_applied,
         email: app.email,
-        phone: app.phone,
-        resume_original_name: app.resume_original_name
+        phone: app.phone
       }
     });
   } catch (err) { next(err); }
@@ -575,6 +677,111 @@ router.post('/applications/:id/resume', requirePermission('applications:edit'), 
   try {
     if (!req.file) {
       return res.status(400).json({ success: false, error: 'Resume file (PDF, DOC, or DOCX) is required.' });
+
+// POST /api/admin/applications/:id/resend-cv — Trigger Resend CV email with portal link
+router.post('/applications/:id/resend-cv', requirePermission('applications:manage'), async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const [rows] = await pool.query(
+      'SELECT id, application_code, full_name, role_applied, email, phone FROM job_applications WHERE id = ?',
+      [id]
+    );
+    if (!rows.length) {
+      return res.status(404).json({ success: false, error: 'Application record not found.' });
+    }
+    const app = rows[0];
+    if (!app.email) {
+      return res.status(400).json({ success: false, error: 'Candidate has no email address on file.' });
+    }
+
+    const careersUrl = process.env.PUBLIC_CAREERS_URL || 'https://www.divinefingershealthcareservice.ca/jobseekers.html';
+    const { enqueueMail } = require('../utils/mailOutbox');
+    await enqueueMail({
+      type: 'resend_resume_request',
+      to: app.email,
+      vars: {
+        full_name: app.full_name,
+        role_applied: app.role_applied,
+        application_code: app.application_code,
+        careers_url: careersUrl
+      }
+    });
+
+    await pool.query(
+      `INSERT INTO audit_logs (id, admin_id, actor_name, action, target_entity, target_id, details, severity, ip_address)
+       VALUES (?, ?, ?, 'RESUME_RESUBMIT_REQUESTED', 'job_applications', ?, ?, 'info', ?)`,
+      [
+        crypto.randomUUID(),
+        req.admin?.id || null,
+        req.admin?.full_name || 'Administrator',
+        id,
+        `Sent Resend CV request email to ${app.full_name} (${app.email}) with portal link: ${careersUrl}`,
+        req.ip
+      ]
+    );
+
+    res.json({
+      success: true,
+      message: `Resend CV email delivered to ${app.full_name} (${app.email}) with direct link to application portal.`
+    });
+  } catch (err) { next(err); }
+});
+
+// DELETE /api/admin/applications/:id — Clear out & archive job application
+router.delete('/applications/:id', requirePermission('applications:manage'), async (req, res, next) => {
+  const conn = await pool.getConnection();
+  try {
+    await conn.beginTransaction();
+    const { id } = req.params;
+    const [rows] = await conn.query('SELECT * FROM job_applications WHERE id = ?', [id]);
+    if (!rows || rows.length === 0) {
+      await conn.rollback();
+      return res.status(404).json({ success: false, error: 'Job application not found.' });
+    }
+    const appItem = rows[0];
+
+    const { file_data, ...appSnapshot } = appItem;
+    await recordArchive(conn, {
+      entityType: 'job_application',
+      originalId: id,
+      displayName: appItem.full_name || 'Job Applicant',
+      identifier: appItem.application_code || appItem.email || id,
+      dataPayload: appSnapshot,
+      deletedByName: req.admin?.full_name || 'Administrator',
+      deletedById: req.admin?.id || null,
+      reason: req.body?.reason || 'Job application cleared via Admin Console'
+    });
+
+    await conn.query('DELETE FROM job_applications WHERE id = ?', [id]);
+
+    await conn.query(
+      `INSERT INTO audit_logs (id, admin_id, actor_name, action, target_entity, target_id, details, severity, ip_address)
+       VALUES (?, ?, ?, 'APPLICATION_ARCHIVED_DELETED', 'job_applications', ?, ?, 'info', ?)`,
+      [
+        crypto.randomUUID(),
+        req.admin?.id || null,
+        req.admin?.full_name || 'Administrator',
+        id,
+        `Cleared and archived application: ${appItem.application_code} (${appItem.full_name} - ${appItem.role_applied})`,
+        req.ip
+      ]
+    );
+
+    await conn.commit();
+    adminEvents.emit('application:deleted', { id, application_code: appItem.application_code });
+
+    res.json({
+      success: true,
+      message: `Job application for ${appItem.full_name} has been cleared out and archived.`
+    });
+  } catch (err) {
+    await conn.rollback();
+    next(err);
+  } finally {
+    conn.release();
+  }
+});
+
     }
 
     const { id } = req.params;

@@ -88,6 +88,41 @@ const templates = {
     };
   },
 
+  resend_resume_request: (vars) => {
+    const name = escapeHtml(sanitizeHeader(vars.full_name || 'Candidate'));
+    const role = escapeHtml(sanitizeHeader(vars.role_applied || 'Clinical Healthcare Position'));
+    const code = escapeHtml(sanitizeHeader(vars.application_code || 'REF'));
+    const careersUrl = vars.careers_url || 'https://www.divinefingershealthcareservice.ca/jobseekers.html';
+
+    return {
+      subject: `Action Required: Please Re-submit Your Resume / CV — Divine Fingers Healthcare (${code})`,
+      html: wrapTemplate(
+        'Resume Re-submission Request',
+        `<h3 style="color: #0f172a; margin-top: 0;">Resume Re-submission Required</h3>
+         <p>Hello <strong>${name}</strong>,</p>
+         <p>Thank you for applying to Divine Fingers Healthcare Services Inc. for the <strong>${role}</strong> position (Reference: <strong>${code}</strong>).</p>
+         <div style="background: #fffbeb; border: 1px solid #fde68a; padding: 14px 18px; border-radius: 8px; margin: 18px 0;">
+           <p style="margin: 0; font-size: 0.92rem; color: #92400e; line-height: 1.5;">
+             Our clinical compliance and recruitment team is currently reviewing inbound applications. We noticed that your previously submitted resume attachment was unreadable or unavailable on the server.
+           </p>
+         </div>
+         <p style="font-size: 0.92rem; color: #334155;">To ensure your application is processed promptly for active healthcare placement across Ontario facilities, please re-submit an updated copy of your Resume / CV (in PDF or DOCX format) using our official job application portal below:</p>
+         <div style="text-align: center; margin: 26px 0;">
+           <a href="${careersUrl}" style="display: inline-block; background: #007799; color: #ffffff; padding: 13px 28px; border-radius: 6px; text-decoration: none; font-weight: 700; font-size: 0.95rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
+             Submit Your Resume / CV Online →
+           </a>
+         </div>
+         <p style="font-size: 0.85rem; color: #64748b; line-height: 1.4;">
+           Direct application link: <a href="${careersUrl}" style="color: #007799; word-break: break-all;">${careersUrl}</a>
+         </p>
+         <p style="font-size: 0.88rem; color: #475569; margin-top: 20px;">
+           <em>Alternatively, you can reply directly to this email with your updated Resume / CV attached.</em>
+         </p>`
+      ),
+      text: `Hello ${name},\n\nThank you for applying to Divine Fingers Healthcare Services Inc. for the ${role} position (Reference: ${code}).\n\nOur recruitment team was unable to access your previously uploaded resume file. Please submit an updated copy of your Resume / CV directly via our careers page:\n${careersUrl}\n\nAlternatively, you may reply directly to this email with your resume attached.\n\nDivine Fingers Healthcare Services Inc.\nRecruitment & Clinical Dispatch Desk`
+    };
+  },
+
   admin_verification_otp: (vars) => {
     const name = escapeHtml(sanitizeHeader(vars.full_name || 'Administrator'));
     const otp = escapeHtml(sanitizeHeader(vars.otp_code || ''));
