@@ -357,12 +357,19 @@ function generateApplicantDossierHtml(app) {
     <main class="dossier-body">
       <div class="notice-card">
         <div class="notice-icon">📋</div>
-        <div class="notice-text">
+        <div class="notice-text" style="flex:1;">
           <h4>Candidate Record Preserved in Cloud Database</h4>
           <p>
-            The applicant's original file attachment (<strong>${originalFileName}</strong>) was submitted in an earlier cloud container session. 
-            All application details, contact numbers, and professional credentials have been retrieved directly from the secure database below.
+            The original file attachment (<strong>${originalFileName}</strong>) was submitted in an earlier cloud container session prior to database storage synchronization.
+            All verified submission details, contact numbers, and professional credentials have been retrieved directly from your secure database below.
           </p>
+          <div style="margin-top: 14px; padding-top: 12px; border-top: 1px dashed rgba(245, 158, 11, 0.5); display: flex; align-items: center; flex-wrap: wrap; gap: 10px;">
+            <label style="display: inline-flex; align-items: center; gap: 8px; background: #0B192C; color: #FFFFFF; padding: 8px 16px; border-radius: 6px; font-size: 0.82rem; font-weight: 700; cursor: pointer; transition: background 0.2s;">
+              📁 Upload &amp; Attach Resume File
+              <input type="file" accept=".pdf,.doc,.docx" style="display:none;" onchange="uploadReplacementResume(this, '${app.id}')">
+            </label>
+            <span id="upload-status" style="font-size: 0.82rem; font-weight: 600;"></span>
+          </div>
         </div>
       </div>
 
@@ -425,6 +432,36 @@ function generateApplicantDossierHtml(app) {
       </footer>
     </main>
   </div>
+  <script>
+    async function uploadReplacementResume(input, appId) {
+      const file = input.files[0];
+      if (!file) return;
+      const status = document.getElementById('upload-status');
+      status.textContent = 'Uploading resume file...';
+      status.style.color = '#0B192C';
+      const formData = new FormData();
+      formData.append('resume', file);
+      try {
+        const res = await fetch('/api/admin/applications/' + appId + '/resume', {
+          method: 'POST',
+          credentials: 'include',
+          body: formData
+        });
+        const data = await res.json();
+        if (data.success) {
+          status.textContent = '✅ Resume uploaded successfully! Refreshing to download...';
+          status.style.color = '#10B981';
+          setTimeout(() => window.location.reload(), 800);
+        } else {
+          status.textContent = '❌ ' + (data.error || 'Upload failed');
+          status.style.color = '#EF4444';
+        }
+      } catch (e) {
+        status.textContent = '❌ Upload error: ' + e.message;
+        status.style.color = '#EF4444';
+      }
+    }
+  </script>
 </body>
 </html>`;
 }
