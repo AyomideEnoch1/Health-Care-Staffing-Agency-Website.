@@ -128,6 +128,33 @@ try {
         try { await conn.query('ALTER TABLE job_applications ADD COLUMN file_data LONGBLOB NULL'); } catch (_) {}
         try { await conn.query('ALTER TABLE staff_documents ADD COLUMN file_data LONGBLOB NULL'); } catch (_) {}
 
+        // Auto-synchronize existing local files into database BLOB storage
+        try {
+          const resumesDir = path.join(__dirname, 'uploads/resumes');
+          if (fs.existsSync(resumesDir)) {
+            const files = fs.readdirSync(resumesDir);
+            for (const f of files) {
+              if (f.startsWith('.')) continue;
+              const fp = path.join(resumesDir, f);
+              try {
+                const stat = fs.statSync(fp);
+                if (stat.isFile() && stat.size > 0 && stat.size < 15 * 1024 * 1024) {
+                  const buf = fs.readFileSync(fp);
+                  await conn.query(
+                    `UPDATE job_applications 
+                     SET file_data = ? 
+                     WHERE (resume_stored_name = ? OR resume_storage_path LIKE ?) 
+                       AND (file_data IS NULL OR LENGTH(file_data) = 0)`,
+                    [buf, f, `%${f}%`]
+                  );
+                }
+              } catch (_) {}
+            }
+          }
+        } catch (syncErr) {
+          console.warn('⚠️ [Resume DB Sync Warning]:', syncErr.message);
+        }
+
         await conn.query(`
           CREATE TABLE IF NOT EXISTS facilities (
             id VARCHAR(36) NOT NULL,

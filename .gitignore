@@ -45,3 +45,5 @@ preview-server.js
 deploy-bundle/
 *.zip
 *.docx
+
+backend/scripts/sync_to_aiven.js

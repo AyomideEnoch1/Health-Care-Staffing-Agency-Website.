@@ -1467,13 +1467,10 @@
         </td>
         <td class="cell-grid-item" data-label="Resume / CV">
           <div class="meta-label">Resume / CV</div>
-          <div class="meta-value" style="display:flex;align-items:center;gap:8px;">
+          <div class="meta-value">
             ${a.resume_original_name
-              ? `<a href="${API_BASE}/admin/applications/${a.id}/resume" target="_blank" style="color:var(--brand-cyan);font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:4px;" title="Download File or View Dossier"><i data-lucide="download" style="width:13px;height:13px;"></i> Download</a>`
+              ? `<a href="${API_BASE}/admin/applications/${a.id}/resume" target="_blank" style="color:var(--brand-cyan);font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:4px;"><i data-lucide="download" style="width:13px;height:13px;"></i> Download</a>`
               : '<span style="color:var(--text-muted);font-size:0.75rem;">None</span>'}
-            <button type="button" class="btn-icon" title="Upload or Replace Resume File" style="background:transparent;border:none;cursor:pointer;color:var(--text-muted);padding:3px;display:inline-flex;align-items:center;border-radius:4px;" onclick="window.promptUploadApplicantResume('${a.id}', '${(a.full_name || 'Candidate').replace(/'/g, "\\'")}')">
-              <i data-lucide="upload" style="width:13px;height:13px;"></i>
-            </button>
           </div>
         </td>
         <td class="cell-status-desktop" data-label="Onboarding Stage">
@@ -1494,14 +1491,9 @@
           </div>
         </td>
         <td class="cell-actions" data-label="Enroll Action">
-          <div style="display:flex;align-items:center;gap:6px;">
-            <button type="button" class="btn-primary-action" style="font-size:.75rem;padding:.35rem .65rem;height:36px;display:inline-flex;align-items:center;gap:4px;flex:1;justify-content:center;" onclick="window.openAddStaffModal({ full_name: '${(a.full_name || '').replace(/'/g, "\\'")}', role_applied: '${a.role_applied || 'RN'}', email: '${a.email || ''}', phone: '${a.phone || ''}', license_registration: '${a.license_registration || ''}' })">
-              <i data-lucide="user-plus" style="width:13px;height:13px;"></i> Enroll as Staff
-            </button>
-            <button type="button" class="btn-icon" title="Clear out / Delete Application" style="height:36px;width:36px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.25);border-radius:6px;cursor:pointer;color:#EF4444;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;" onclick="window.deleteApplicantRecord('${a.id}', '${(a.full_name || 'Applicant').replace(/'/g, "\\'")}')">
-              <i data-lucide="trash-2" style="width:15px;height:15px;"></i>
-            </button>
-          </div>
+          <button type="button" class="btn-primary-action" style="font-size:.75rem;padding:.35rem .65rem;height:36px;display:inline-flex;align-items:center;gap:4px;width:100%;justify-content:center;" onclick="window.openAddStaffModal({ full_name: '${(a.full_name || '').replace(/'/g, "\\'")}', role_applied: '${a.role_applied || 'RN'}', email: '${a.email || ''}', phone: '${a.phone || ''}', license_registration: '${a.license_registration || ''}' })">
+            <i data-lucide="user-plus" style="width:13px;height:13px;"></i> Enroll as Staff
+          </button>
         </td>
       </tr>`).join('');
 
