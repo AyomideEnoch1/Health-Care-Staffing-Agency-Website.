@@ -14,6 +14,7 @@
 const express = require('express');
 const router = express.Router();
 const crypto = require('crypto');
+const fs = require('fs');
 const { z } = require('zod');
 const pool = require('../db');
 const { uploadResume, validateMimeContent } = require('../middleware/upload');
@@ -46,21 +47,47 @@ router.post(
       const id      = crypto.randomUUID();
       const appCode = `APP-${Date.now().toString(36).toUpperCase()}`;
 
-      await pool.query(
-        `INSERT INTO job_applications
-          (id, application_code, full_name, role_applied, email, phone,
-           license_registration, stage, resume_original_name, resume_stored_name,
-           resume_mime_type, resume_file_size, resume_storage_path, ip_address)
-         VALUES (?, ?, ?, ?, ?, ?, ?, 'new', ?, ?, ?, ?, ?, ?)`,
-        [
-          id, appCode,
-          validated.full_name, validated.role_applied,
-          validated.email, validated.phone, validated.license_registration,
-          req.file.originalname, req.file.filename,
-          req.file.mimetype, req.file.size, req.file.path,
-          req.ip
-        ]
-      );
+      let fileBuffer = null;
+      try {
+        if (req.file && req.file.path && fs.existsSync(req.file.path)) {
+          fileBuffer = fs.readFileSync(req.file.path);
+        }
+      } catch (_) {}
+
+      try {
+        await pool.query(
+          `INSERT INTO job_applications
+            (id, application_code, full_name, role_applied, email, phone,
+             license_registration, stage, resume_original_name, resume_stored_name,
+             resume_mime_type, resume_file_size, resume_storage_path, file_data, ip_address)
+           VALUES (?, ?, ?, ?, ?, ?, ?, 'new', ?, ?, ?, ?, ?, ?, ?)`,
+          [
+            id, appCode,
+            validated.full_name, validated.role_applied,
+            validated.email, validated.phone, validated.license_registration,
+            req.file.originalname, req.file.filename,
+            req.file.mimetype, req.file.size, req.file.path, fileBuffer,
+            req.ip
+          ]
+        );
+      } catch (insertErr) {
+        // Fallback for database schema before file_data column was added
+        await pool.query(
+          `INSERT INTO job_applications
+            (id, application_code, full_name, role_applied, email, phone,
+             license_registration, stage, resume_original_name, resume_stored_name,
+             resume_mime_type, resume_file_size, resume_storage_path, ip_address)
+           VALUES (?, ?, ?, ?, ?, ?, ?, 'new', ?, ?, ?, ?, ?, ?)`,
+          [
+            id, appCode,
+            validated.full_name, validated.role_applied,
+            validated.email, validated.phone, validated.license_registration,
+            req.file.originalname, req.file.filename,
+            req.file.mimetype, req.file.size, req.file.path,
+            req.ip
+          ]
+        );
+      }
 
       // Broadcast live update to connected admin dashboards
       adminEvents.emit('application:created', {

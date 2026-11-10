@@ -126,6 +126,8 @@ try {
         try { await conn.query('ALTER TABLE staff_roster MODIFY COLUMN avatar_url VARCHAR(500) NULL'); } catch (_) {}
         try { await conn.query('ALTER TABLE users MODIFY COLUMN phone VARCHAR(50) NULL'); } catch (_) {}
         try { await conn.query('ALTER TABLE facilities MODIFY COLUMN contact_phone VARCHAR(50) NULL'); } catch (_) {}
+        try { await conn.query('ALTER TABLE job_applications ADD COLUMN file_data LONGBLOB NULL'); } catch (_) {}
+        try { await conn.query('ALTER TABLE staff_documents ADD COLUMN file_data LONGBLOB NULL'); } catch (_) {}
 
         await conn.query(`
           CREATE TABLE IF NOT EXISTS facilities (
@@ -1060,8 +1062,9 @@ function handleInMemoryQuery(sql, params = []) {
       return [{ affectedRows: reqItem ? 1 : 0 }];
     }
     if (normalized.startsWith('delete')) {
-      inMemoryStore.staffing_requests = [];
-      return [{ affectedRows: 0 }];
+      const targetId = params && params[0];
+      inMemoryStore.staffing_requests = targetId ? inMemoryStore.staffing_requests.filter(r => r.id !== targetId) : [];
+      return [{ affectedRows: 1 }];
     }
   }
 
@@ -1089,8 +1092,9 @@ function handleInMemoryQuery(sql, params = []) {
       return [{ affectedRows: 1, insertId: params[0] }];
     }
     if (normalized.startsWith('delete')) {
-      inMemoryStore.job_applications = [];
-      return [{ affectedRows: 0 }];
+      const targetId = params && params[0];
+      inMemoryStore.job_applications = targetId ? inMemoryStore.job_applications.filter(a => a.id !== targetId) : [];
+      return [{ affectedRows: 1 }];
     }
   }
 

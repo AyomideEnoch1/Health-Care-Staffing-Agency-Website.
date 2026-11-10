@@ -127,6 +127,7 @@ CREATE TABLE IF NOT EXISTS `job_applications` (
   `resume_mime_type` VARCHAR(100) NOT NULL,
   `resume_file_size` INT UNSIGNED NOT NULL,
   `resume_storage_path` VARCHAR(255) NOT NULL,
+  `file_data` LONGBLOB NULL,
   `experience_summary` TEXT NULL,
   `ip_address` VARCHAR(45) NULL,
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,

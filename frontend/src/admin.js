@@ -1467,10 +1467,13 @@
         </td>
         <td class="cell-grid-item" data-label="Resume / CV">
           <div class="meta-label">Resume / CV</div>
-          <div class="meta-value">
+          <div class="meta-value" style="display:flex;align-items:center;gap:8px;">
             ${a.resume_original_name
-              ? `<a href="${API_BASE}/admin/applications/${a.id}/resume" target="_blank" style="color:var(--brand-cyan);font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:4px;"><i data-lucide="download" style="width:13px;height:13px;"></i> Download</a>`
+              ? `<a href="${API_BASE}/admin/applications/${a.id}/resume" target="_blank" style="color:var(--brand-cyan);font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:4px;" title="Download File or View Dossier"><i data-lucide="download" style="width:13px;height:13px;"></i> Download</a>`
               : '<span style="color:var(--text-muted);font-size:0.75rem;">None</span>'}
+            <button type="button" class="btn-icon" title="Upload or Replace Resume File" style="background:transparent;border:none;cursor:pointer;color:var(--text-muted);padding:3px;display:inline-flex;align-items:center;border-radius:4px;" onclick="window.promptUploadApplicantResume('${a.id}', '${(a.full_name || 'Candidate').replace(/'/g, "\\'")}')">
+              <i data-lucide="upload" style="width:13px;height:13px;"></i>
+            </button>
           </div>
         </td>
         <td class="cell-status-desktop" data-label="Onboarding Stage">
@@ -1491,9 +1494,14 @@
           </div>
         </td>
         <td class="cell-actions" data-label="Enroll Action">
-          <button type="button" class="btn-primary-action" style="font-size:.75rem;padding:.35rem .65rem;height:36px;display:inline-flex;align-items:center;gap:4px;width:100%;justify-content:center;" onclick="window.openAddStaffModal({ full_name: '${(a.full_name || '').replace(/'/g, "\\'")}', role_applied: '${a.role_applied || 'RN'}', email: '${a.email || ''}', phone: '${a.phone || ''}', license_registration: '${a.license_registration || ''}' })">
-            <i data-lucide="user-plus" style="width:13px;height:13px;"></i> Enroll as Staff
-          </button>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <button type="button" class="btn-primary-action" style="font-size:.75rem;padding:.35rem .65rem;height:36px;display:inline-flex;align-items:center;gap:4px;flex:1;justify-content:center;" onclick="window.openAddStaffModal({ full_name: '${(a.full_name || '').replace(/'/g, "\\'")}', role_applied: '${a.role_applied || 'RN'}', email: '${a.email || ''}', phone: '${a.phone || ''}', license_registration: '${a.license_registration || ''}' })">
+              <i data-lucide="user-plus" style="width:13px;height:13px;"></i> Enroll as Staff
+            </button>
+            <button type="button" class="btn-icon" title="Clear out / Delete Application" style="height:36px;width:36px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.25);border-radius:6px;cursor:pointer;color:#EF4444;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;" onclick="window.deleteApplicantRecord('${a.id}', '${(a.full_name || 'Applicant').replace(/'/g, "\\'")}')">
+              <i data-lucide="trash-2" style="width:15px;height:15px;"></i>
+            </button>
+          </div>
         </td>
       </tr>`).join('');
 
@@ -4629,8 +4637,11 @@
             ${staffOptions}
           </select>
         </div>
-        <button class="btn-primary-action" onclick="window.saveRequestUpdate('${req.id}')" style="width: 100%; height: 48px; font-size: 0.9rem; font-weight: 800; justify-content: center; margin-bottom: 2rem;">
+        <button class="btn-primary-action" onclick="window.saveRequestUpdate('${req.id}')" style="width: 100%; height: 48px; font-size: 0.9rem; font-weight: 800; justify-content: center; margin-bottom: 0.75rem;">
           <i data-lucide="check" style="width: 16px; height: 16px;"></i> Save Shift Dispatch Changes
+        </button>
+        <button type="button" onclick="window.deleteStaffingRequest('${req.id}', '${escapeHTML(req.request_code)}')" style="width: 100%; height: 40px; font-size: 0.82rem; font-weight: 700; justify-content: center; color: #EF4444; border: 1px solid rgba(239,68,68,0.35); background: rgba(239,68,68,0.05); border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 2rem;">
+          <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i> Clear Out / Delete This Request
         </button>
       </div>`;
 
@@ -4705,6 +4716,46 @@
   const modalAddStaffCancel  = document.getElementById('modal-add-staff-cancel');
   const formAddStaff         = document.getElementById('form-add-staff');
 
+  
+  window.deleteApplicantRecord = async function(appId, name) {
+    if (!confirm(`Are you sure you want to remove the application for "${name}"?\n\nThis will clear it from your dashboard and safely archive it in the Archive Vault.`)) {
+      return;
+    }
+    try {
+      const res = await apiRequest(`/admin/applications/${appId}`, { method: 'DELETE' });
+      if (res && res.success) {
+        showToast(res.message || `Application for ${name} removed.`, 'success');
+        await fetchAndRenderApplicants();
+        await fetchAndRenderKPIs();
+      } else {
+        showToast(res?.error || 'Failed to remove application.', 'warning');
+      }
+    } catch (err) {
+      showToast(`Error: ${err.message}`, 'error');
+    }
+  };
+
+  window.deleteStaffingRequest = async function(reqId, code) {
+    if (!confirm(`Are you sure you want to delete staffing request "${code}"?\n\nThis will remove it from your active dispatch board and safely archive it in the Archive Vault.`)) {
+      return;
+    }
+    try {
+      const res = await apiRequest(`/admin/requests/${reqId}`, { method: 'DELETE' });
+      if (res && res.success) {
+        showToast(res.message || `Request ${code} removed.`, 'success');
+        const drawer = document.getElementById('request-drawer-backdrop');
+        if (drawer) drawer.classList.remove('open');
+        await fetchAndRenderRequests();
+        await fetchAndRenderKPIs();
+        renderShiftScheduler();
+      } else {
+        showToast(res?.error || 'Failed to delete request.', 'warning');
+      }
+    } catch (err) {
+      showToast(`Error: ${err.message}`, 'error');
+    }
+  };
+
   function openAddStaffModal(prefillData = null) {
     if (!modalAddStaff) return;
     const isEvent = (prefillData instanceof Event) || (prefillData && prefillData.target) || (prefillData && typeof prefillData.preventDefault === 'function');
@@ -4767,6 +4818,44 @@
     } catch (err) {
       showToast(`Failed to update stage: ${err.message}`, 'warning');
     }
+  };
+
+  window.promptUploadApplicantResume = function(appId, candidateName) {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.pdf,.doc,.docx';
+    input.onchange = async () => {
+      const file = input.files[0];
+      if (!file) return;
+      if (file.size > 10 * 1024 * 1024) {
+        showToast('File exceeds 10MB limit. Please choose a smaller file.', 'warning');
+        return;
+      }
+      const formData = new FormData();
+      formData.append('resume', file);
+      try {
+        showToast(`Uploading resume for ${candidateName}...`, 'info');
+        const token = (typeof getCsrfToken === 'function') ? getCsrfToken() : '';
+        const headers = {};
+        if (token) headers['X-CSRF-Token'] = token;
+        const res = await fetch(`${API_BASE}/admin/applications/${appId}/resume`, {
+          method: 'POST',
+          credentials: 'include',
+          headers,
+          body: formData
+        });
+        const result = await res.json();
+        if (result.success) {
+          showToast(`Resume attached for ${candidateName}!`, 'success');
+          await fetchAndRenderApplicants();
+        } else {
+          showToast(result.error || 'Failed to upload resume.', 'warning');
+        }
+      } catch (err) {
+        showToast(`Upload error: ${err.message}`, 'warning');
+      }
+    };
+    input.click();
   };
 
   if (btnAddStaffModal) btnAddStaffModal.addEventListener('click', openAddStaffModal);

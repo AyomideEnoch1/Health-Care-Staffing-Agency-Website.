@@ -31,6 +31,8 @@ const pool = require('../db');
 const bcrypt = require('bcryptjs');
 const { z } = require('zod');
 const { uploadCredential } = require('../middleware/uploadCredentials');
+const { uploadResume } = require('../middleware/upload');
+const { resolveUploadFile, generateApplicantDossierHtml } = require('../utils/fileResolver');
 const { uploadAvatar, validateAvatarContent } = require('../middleware/avatarUpload');
 const { uploadContract, validateContractMime } = require('../middleware/contractUpload');
 const { requireAdminAuth, requirePermission, requireSuperAdmin, normalizePermissions, ALL_PERMISSIONS } = require('../middleware/auth');
@@ -501,31 +503,121 @@ router.patch('/applications/:id/stage', requirePermission('applications:manage')
   } catch (err) { next(err); }
 });
 
-// GET /api/admin/applications/:id/resume — Secure file download
+// GET /api/admin/applications/:id/resume — Resilient secure file download & applicant dossier
 router.get('/applications/:id/resume', requirePermission('applications:view'), async (req, res, next) => {
   try {
-    const [rows] = await pool.query(
-      'SELECT resume_stored_name, resume_original_name, resume_mime_type, resume_storage_path FROM job_applications WHERE id = ?',
-      [req.params.id]
-    );
-    if (!rows.length || !rows[0].resume_stored_name) {
-      return res.status(404).json({ success: false, error: 'Resume not found.' });
+    let rows;
+    try {
+      [rows] = await pool.query(
+        'SELECT id, application_code, full_name, email, phone, role_applied, license_registration, stage, created_at, experience_summary, resume_stored_name, resume_original_name, resume_mime_type, resume_storage_path, file_data FROM job_applications WHERE id = ?',
+        [req.params.id]
+      );
+    } catch (_) {
+      [rows] = await pool.query(
+        'SELECT id, application_code, full_name, email, phone, role_applied, license_registration, stage, created_at, experience_summary, resume_stored_name, resume_original_name, resume_mime_type, resume_storage_path FROM job_applications WHERE id = ?',
+        [req.params.id]
+      );
     }
 
-    const { resume_stored_name, resume_original_name, resume_mime_type, resume_storage_path } = rows[0];
-    const filePath = resume_storage_path || path.join(
-      process.env.UPLOAD_DIR || path.join(__dirname, '../uploads/resumes'),
-      resume_stored_name
-    );
-
-    if (!fs.existsSync(filePath)) {
-      return res.status(404).json({ success: false, error: 'Resume file not found on server.' });
+    if (!rows.length) {
+      return res.status(404).json({ success: false, error: 'Application record not found.' });
     }
 
-    // Serve with original filename for download, not the UUID name
-    res.setHeader('Content-Type', resume_mime_type || 'application/octet-stream');
-    res.setHeader('Content-Disposition', `attachment; filename="${resume_original_name.replace(/[^a-zA-Z0-9._-]/g, '_')}"`);
-    fs.createReadStream(filePath).pipe(res);
+    const app = rows[0];
+    const { found, filePath, buffer } = resolveUploadFile({
+      storedPath: app.resume_storage_path,
+      fileName: app.resume_stored_name,
+      subDir: 'resumes',
+      fileBuffer: app.file_data
+    });
+
+    const originalName = app.resume_original_name || app.resume_stored_name || `Resume-${(app.full_name || 'Candidate').replace(/\s+/g, '_')}.pdf`;
+    const mimeType = app.resume_mime_type || 'application/pdf';
+
+    if (found) {
+      res.setHeader('Content-Type', mimeType);
+      res.setHeader('Content-Disposition', `attachment; filename="${originalName.replace(/[^a-zA-Z0-9._-]/g, '_')}"`);
+      if (filePath) {
+        return fs.createReadStream(filePath).pipe(res);
+      } else if (buffer) {
+        return res.send(buffer);
+      }
+    }
+
+    // Physical file is not on server disk (e.g. Render container restart / ephemeral storage)
+    // Check if client expects HTML (browser navigation like clicking a link) or JSON
+    const acceptsHtml = req.accepts(['html', 'json']) === 'html' || !req.xhr;
+    if (acceptsHtml && req.query.format !== 'json') {
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+      return res.send(generateApplicantDossierHtml(app));
+    }
+
+    return res.status(404).json({
+      success: false,
+      error: 'Resume file not found on server.',
+      reason: 'ephemeral_cloud_storage',
+      message: 'The physical file was cleared during an ephemeral container restart. Candidate contact details are available in the dossier.',
+      applicant: {
+        id: app.id,
+        application_code: app.application_code,
+        full_name: app.full_name,
+        role_applied: app.role_applied,
+        email: app.email,
+        phone: app.phone,
+        resume_original_name: app.resume_original_name
+      }
+    });
+  } catch (err) { next(err); }
+});
+
+// POST /api/admin/applications/:id/resume — Upload or replace candidate resume
+router.post('/applications/:id/resume', requirePermission('applications:edit'), uploadResume.single('resume'), async (req, res, next) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ success: false, error: 'Resume file (PDF, DOC, or DOCX) is required.' });
+    }
+
+    const { id } = req.params;
+    let fileBuffer = null;
+    try {
+      if (req.file.path && fs.existsSync(req.file.path)) {
+        fileBuffer = fs.readFileSync(req.file.path);
+      }
+    } catch (_) {}
+
+    try {
+      await pool.query(
+        `UPDATE job_applications 
+         SET resume_original_name = ?, resume_stored_name = ?, resume_mime_type = ?, 
+             resume_file_size = ?, resume_storage_path = ?, file_data = ?
+         WHERE id = ?`,
+        [req.file.originalname, req.file.filename, req.file.mimetype, req.file.size, req.file.path, fileBuffer, id]
+      );
+    } catch (_) {
+      await pool.query(
+        `UPDATE job_applications 
+         SET resume_original_name = ?, resume_stored_name = ?, resume_mime_type = ?, 
+             resume_file_size = ?, resume_storage_path = ?
+         WHERE id = ?`,
+        [req.file.originalname, req.file.filename, req.file.mimetype, req.file.size, req.file.path, id]
+      );
+    }
+
+    await pool.query(
+      `INSERT INTO audit_logs (id, admin_id, actor_name, action, target_entity, target_id, details, severity, ip_address)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [crypto.randomUUID(), req.admin.id, req.admin.full_name,
+       'RESUME_UPLOADED', 'job_applications', id,
+       `Attached resume "${req.file.originalname}" to application ${id.slice(0,8)}`, 'info', req.ip]
+    );
+
+    res.json({
+      success: true,
+      message: 'Resume uploaded and attached to candidate profile successfully.',
+      data: {
+        resume_original_name: req.file.originalname
+      }
+    });
   } catch (err) { next(err); }
 });
 
@@ -1088,23 +1180,39 @@ router.post('/staff/:id/documents', uploadCredential.single('document'), async (
   } catch (err) { next(err); }
 });
 
-// GET /api/admin/staff/documents/:docId/download — Preview or download credential document
+// GET /api/admin/staff/documents/:docId/download — Preview or download credential document (resilient)
 router.get('/staff/documents/:docId/download', async (req, res, next) => {
   try {
     const { docId } = req.params;
-    const [rows] = await pool.query('SELECT * FROM staff_documents WHERE id = ?', [docId]);
+    let rows;
+    try {
+      [rows] = await pool.query('SELECT *, file_data FROM staff_documents WHERE id = ?', [docId]);
+    } catch (_) {
+      [rows] = await pool.query('SELECT * FROM staff_documents WHERE id = ?', [docId]);
+    }
     if (!rows.length) {
       return res.status(404).json({ success: false, error: 'Document not found.' });
     }
 
     const doc = rows[0];
-    if (!fs.existsSync(doc.file_path)) {
+    const { found, filePath, buffer } = resolveUploadFile({
+      storedPath: doc.file_path,
+      fileName: doc.file_name,
+      subDir: 'credentials',
+      fileBuffer: doc.file_data
+    });
+
+    if (!found) {
       return res.status(404).json({ success: false, error: 'Document file missing from server storage.' });
     }
 
     res.setHeader('Content-Type', doc.mime_type || 'application/octet-stream');
-    res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(doc.file_name)}"`);
-    fs.createReadStream(doc.file_path).pipe(res);
+    res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(doc.file_name || 'document.pdf')}"`);
+    if (filePath) {
+      return fs.createReadStream(filePath).pipe(res);
+    } else if (buffer) {
+      return res.send(buffer);
+    }
   } catch (err) { next(err); }
 });
 
@@ -2842,7 +2950,7 @@ router.post('/archives/:id/restore', requireSuperAdmin(), async (req, res, next)
           payload.role || 'operations'
         ]
       );
-    } else if (entityType === 'request') {
+    } else if (entityType === 'request' || entityType === 'staffing_request') {
       // Restore staffing request
       await conn.query(
         `INSERT INTO staffing_requests 
@@ -2860,6 +2968,30 @@ router.post('/archives/:id/restore', requireSuperAdmin(), async (req, res, next)
           payload.start_date || new Date().toISOString().split('T')[0],
           payload.urgency_level || 'routine',
           payload.special_instructions || null
+        ]
+      );
+    } else if (entityType === 'job_application' || entityType === 'application') {
+      // Restore job application
+      await conn.query(
+        `INSERT INTO job_applications
+         (id, application_code, full_name, role_applied, email, phone, license_registration, stage, resume_original_name, resume_stored_name, resume_mime_type, resume_file_size, resume_storage_path, experience_summary, created_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
+         ON DUPLICATE KEY UPDATE stage = VALUES(stage), updated_at = NOW()`,
+        [
+          rec.original_id,
+          payload.application_code || rec.identifier || 'APP-RESTORED',
+          payload.full_name || rec.display_name,
+          payload.role_applied || 'RN',
+          payload.email || rec.identifier,
+          payload.phone || '000-000-0000',
+          payload.license_registration || 'Pending',
+          payload.stage || 'new',
+          payload.resume_original_name || 'restored_resume.pdf',
+          payload.resume_stored_name || 'restored_resume.pdf',
+          payload.resume_mime_type || 'application/pdf',
+          payload.resume_file_size || 0,
+          payload.resume_storage_path || '',
+          payload.experience_summary || null
         ]
       );
     }

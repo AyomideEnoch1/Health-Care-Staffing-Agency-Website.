@@ -16,6 +16,7 @@ const path = require('path');
 const fs = require('fs');
 const jwt = require('jsonwebtoken');
 const pool = require('../db');
+const { resolveUploadFile } = require('../utils/fileResolver');
 
 const JWT_ADMIN_SECRET = process.env.JWT_ADMIN_SECRET || process.env.JWT_SECRET || 'divine_fingers_default_admin_jwt_secret_key_2026';
 const JWT_USER_SECRET = process.env.JWT_USER_SECRET || process.env.USER_JWT_SECRET || process.env.JWT_SECRET || 'divine_fingers_default_user_jwt_secret_key_2026';
@@ -52,20 +53,33 @@ router.get('/resume/:filename', async (req, res) => {
   }
 
   const safeFilename = path.basename(req.params.filename);
-  const filePath = path.resolve(RESUME_DIR, safeFilename);
+  let fileData = null;
+  try {
+    const [rows] = await pool.query(
+      'SELECT file_data FROM job_applications WHERE resume_stored_name = ? OR resume_original_name = ? LIMIT 1',
+      [safeFilename, safeFilename]
+    );
+    if (rows && rows.length > 0) fileData = rows[0].file_data;
+  } catch (_) {}
 
-  if (!filePath.startsWith(path.resolve(RESUME_DIR) + path.sep)) {
-    return res.status(400).json({ error: 'Invalid file reference.' });
-  }
+  const { found, filePath, buffer } = resolveUploadFile({
+    fileName: safeFilename,
+    subDir: 'resumes',
+    fileBuffer: fileData
+  });
 
-  if (!fs.existsSync(filePath)) {
+  if (!found) {
     return res.status(404).json({ error: 'Document not found.' });
   }
 
   res.setHeader('Content-Disposition', `attachment; filename="${safeFilename}"`);
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('Content-Security-Policy', "default-src 'none'");
-  return res.sendFile(filePath);
+  if (filePath) {
+    return res.sendFile(filePath);
+  } else if (buffer) {
+    return res.send(buffer);
+  }
 });
 
 // GET /api/documents/credential/:filename — Admin or credential owner
