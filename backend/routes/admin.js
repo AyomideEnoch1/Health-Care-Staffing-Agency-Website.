@@ -519,7 +519,7 @@ router.patch('/applications/:id/stage', requirePermission('applications:manage')
             }
 
             // Check staff_roster table
-            const [rosterRows] = await pool.query('SELECT id FROM staff_roster WHERE email = ?', [emailClean]);
+            const [rosterRows] = await pool.query('SELECT id FROM staff_roster WHERE id = ? OR LOWER(email) = ? LIMIT 1', [id, emailClean]);
             if (!rosterRows || rosterRows.length === 0) {
               const [countRows] = await pool.query('SELECT COUNT(*) AS total FROM staff_roster');
               const nextNum = String((countRows?.[0]?.total || 0) + 1).padStart(3, '0');
@@ -534,7 +534,8 @@ router.patch('/applications/:id/stage', requirePermission('applications:manage')
               await pool.query(
                 `INSERT INTO staff_roster
                   (id, name, role, specialty, status, credential_status, rating, region, phone, email, staff_code, hourly_rate, cpr_expiry_date)
-                 VALUES (?, ?, ?, 'General Care', 'available', 'verified', 5.0, 'Greater Toronto Area', ?, ?, ?, 45.00, DATE_ADD(CURDATE(), INTERVAL 1 YEAR))`,
+                 VALUES (?, ?, ?, 'General Care', 'available', 'verified', 5.0, 'Greater Toronto Area', ?, ?, ?, 45.00, DATE_ADD(CURDATE(), INTERVAL 1 YEAR))
+                 ON DUPLICATE KEY UPDATE name = VALUES(name), role = VALUES(role), phone = VALUES(phone)`,
                 [id, app.full_name, mappedRole, app.phone || null, emailClean, staffCode]
               );
             }
@@ -969,23 +970,83 @@ router.post('/roster', requirePermission('roster:manage'), async (req, res, next
     const emailClean = email.toLowerCase().trim();
     // Keep user id and staff roster id aligned if user already exists
     let id = crypto.randomUUID();
-    const [existingUser] = await pool.query('SELECT id FROM users WHERE email = ?', [emailClean]);
+    const [existingUser] = await pool.query('SELECT id, full_name, email, role FROM users WHERE LOWER(email) = ?', [emailClean]);
     if (existingUser && existingUser.length > 0) {
       id = existingUser[0].id;
+    }
+
+    const effectiveStatus = (status && status !== 'pending_verification') ? status : 'available';
+
+    // Pre-check: If staff member already exists in staff_roster (by id or email), perform an in-place update
+    const [existingStaff] = await pool.query(
+      'SELECT id, staff_code, name, email FROM staff_roster WHERE id = ? OR LOWER(email) = ? LIMIT 1',
+      [id, emailClean]
+    );
+
+    if (existingStaff && existingStaff.length > 0) {
+      const targetId = existingStaff[0].id;
+      const targetCode = existingStaff[0].staff_code || 'STF-001';
+
+      await pool.query(
+        `UPDATE staff_roster SET
+          name = ?, role = ?, specialty = ?, region = ?, phone = ?, email = ?,
+          hourly_rate = ?, cpr_expiry_date = ?, cno_registration_num = ?, status = ?,
+          credential_status = ?, vss_status = ?, n95_fit_test = ?
+         WHERE id = ?`,
+        [
+          name, role, specialty || 'General Care', region || 'Greater Toronto Area', phone, emailClean,
+          parseFloat(hourly_rate) || 35.00,
+          cpr_expiry_date || new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
+          cno_registration_num || null,
+          effectiveStatus,
+          credential_status || 'pending',
+          vss_status || 'Not Uploaded',
+          n95_fit_test || 'Not Uploaded',
+          targetId
+        ]
+      );
+
+      // Keep users record aligned
+      if (existingUser && existingUser.length > 0) {
+        await pool.query(
+          `UPDATE users SET is_active = 1, role = 'healthcare_worker', phone = COALESCE(?, phone), full_name = ? WHERE id = ?`,
+          [phone ? phone.trim() : null, name.trim(), existingUser[0].id]
+        ).catch(() => {});
+      }
+
+      await pool.query(
+        `INSERT INTO audit_logs (id, admin_id, actor_name, action, target_entity, target_id, details, severity, ip_address)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [crypto.randomUUID(), req.admin.id, req.admin.full_name,
+         'STAFF_UPDATED', 'staff_roster', targetId,
+         `Updated profile for existing staff member ${name} (${targetCode}, ${role})`, 'info', req.ip]
+      ).catch(() => {});
+
+      adminEvents.emit('status:changed', { entity: 'staff_roster', id: targetId, action: 'updated' });
+
+      return res.status(200).json({
+        success: true,
+        message: `Staff member ${name} (${targetCode}) was already enrolled on the roster. Their details have been updated successfully.`,
+        data: { id: targetId, staff_code: targetCode, name, role, email: emailClean, status: effectiveStatus }
+      });
     }
 
     const countRes = await pool.query('SELECT COUNT(*) AS total FROM staff_roster');
     const nextNum = (countRes[0][0].total || 0) + 1;
     const staffCode = `STF-${String(nextNum).padStart(3, '0')}`;
 
-    const effectiveStatus = (status && status !== 'pending_verification') ? status : 'available';
-
     await pool.query(
       `INSERT INTO staff_roster
         (id, staff_code, name, role, specialty, region, phone, email,
          hourly_rate, cpr_expiry_date, cno_registration_num, status,
          credential_status, vss_status, n95_fit_test)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+       ON DUPLICATE KEY UPDATE
+         name = VALUES(name), role = VALUES(role), specialty = VALUES(specialty),
+         region = VALUES(region), phone = VALUES(phone), hourly_rate = VALUES(hourly_rate),
+         cpr_expiry_date = VALUES(cpr_expiry_date), cno_registration_num = VALUES(cno_registration_num),
+         status = VALUES(status), credential_status = VALUES(credential_status),
+         vss_status = VALUES(vss_status), n95_fit_test = VALUES(n95_fit_test)`,
       [
         id, staffCode, name, role, specialty || 'General Care',
         region || 'Greater Toronto Area', phone, emailClean,
