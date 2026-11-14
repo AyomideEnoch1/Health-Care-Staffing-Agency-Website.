@@ -846,16 +846,43 @@
             loadAllDashboardData();
           } else if (msg.type === 'inquiry:created' || msg.type === 'inquiry:replied') {
             showToast(`💬 Dispatch Communication Updated`, 'info');
-          } else if (msg.type === 'client:registered') {
-            const org = msg.payload?.organization_name || 'Healthcare Facility';
-            const name = msg.payload?.full_name || 'Client';
-            showToast(`🏥 New Client Registered: ${org} (${name})`, 'info');
+          } else if (msg.type === 'client:registered' || msg.type === 'client:status_toggled' || msg.type === 'client:deleted') {
+            if (msg.type === 'client:registered') {
+              const org = msg.payload?.organization_name || 'Healthcare Facility';
+              const name = msg.payload?.full_name || 'Client';
+              showToast(`🏥 New Client Registered: ${org} (${name})`, 'info');
+            } else if (msg.type === 'client:status_toggled') {
+              showToast(`👤 Client Account ${msg.payload?.email || ''} ${msg.payload?.is_active ? 'Activated' : 'Suspended'}`, 'info');
+            } else if (msg.type === 'client:deleted') {
+              showToast(`🗑️ Client Account Removed`, 'info');
+            }
             if (typeof fetchAndRenderFacilities === 'function') fetchAndRenderFacilities();
             if (typeof loadAllDashboardData === 'function') loadAllDashboardData();
-          } else if (msg.type === 'facility:created') {
-            showToast(`🏢 New Facility Added: ${msg.payload?.name || 'Facility'}`, 'info');
+          } else if (msg.type === 'facility:created' || msg.type === 'facility:updated' || msg.type === 'facility:deleted') {
+            if (msg.type === 'facility:created') {
+              showToast(`🏢 New Facility Added: ${msg.payload?.name || 'Facility'}`, 'info');
+            } else if (msg.type === 'facility:updated') {
+              showToast(`🏢 Facility Profile Updated: ${msg.payload?.name || 'Facility'}`, 'info');
+            } else if (msg.type === 'facility:deleted') {
+              showToast(`🏢 Facility Removed: ${msg.payload?.name || 'Facility'}`, 'info');
+            }
             if (typeof fetchAndRenderFacilities === 'function') fetchAndRenderFacilities();
             if (typeof loadAllDashboardData === 'function') loadAllDashboardData();
+          } else if (msg.type === 'rate_card:created' || msg.type === 'rate_card:deleted') {
+            if (msg.type === 'rate_card:created') {
+              showToast(`💲 Contracted Rate Established: ${msg.payload?.facility_name || 'Facility'} (${msg.payload?.role} - ${msg.payload?.bill_rate}/hr)`, 'info');
+            } else if (msg.type === 'rate_card:deleted') {
+              showToast(`💲 Rate Term Deleted for ${msg.payload?.role || 'Role'}`, 'info');
+            }
+            if (typeof fetchAndRenderFacilities === 'function') fetchAndRenderFacilities();
+            if (modalManageRateCards && modalManageRateCards.classList.contains('open') && msg.payload?.facility_id) {
+              window.loadFacilityRateCardsIntoModal(msg.payload.facility_id);
+            }
+          } else if (msg.type === 'archive:restored') {
+            showToast(`♻️ Record Restored from Archive Vault`, 'info');
+            if (typeof fetchAndRenderFacilities === 'function') fetchAndRenderFacilities();
+            if (typeof loadAllDashboardData === 'function') loadAllDashboardData();
+            if (typeof window.loadArchiveRecords === 'function') window.loadArchiveRecords();
           } else if (msg.type === 'status:changed') {
             if (msg.payload && msg.payload.action === 'running_late') {
               showToast(`⏱️ Delay Notice: ${msg.payload.staff_name || 'Caregiver'} running ${msg.payload.minutes_late || 15}m late. Reason: "${msg.payload.reason || 'Delayed'}"`, 'warning');
@@ -5255,7 +5282,7 @@
       const totalTerms    = LiveStore.facilities.reduce((acc, f) => acc + (f.active_rate_cards_count || 0), 0);
       const registeredClientsCount = (LiveStore.registeredClients && LiveStore.registeredClients.length > 0) 
         ? LiveStore.registeredClients.length 
-        : (LiveStore.facilities ? LiveStore.facilities.length : 0);
+        : 0;
 
       const elActive   = document.getElementById('stat-active-facilities');
       const elTerms    = document.getElementById('stat-active-rate-cards');
@@ -5580,26 +5607,7 @@
     if (!tableBody) return;
 
     const query = (facilitiesSearchInput?.value || '').trim().toLowerCase();
-    let clients = (LiveStore.registeredClients && LiveStore.registeredClients.length > 0) ? LiveStore.registeredClients : [];
-    
-    // Auto-fallback: If registeredClients array is empty but facilities exist, map facilities so they are always visible
-    if (clients.length === 0 && LiveStore.facilities && LiveStore.facilities.length > 0) {
-      clients = LiveStore.facilities.map(f => ({
-        id: f.id,
-        email: f.contact_email || (f.registered_user_emails ? f.registered_user_emails.split(',')[0].trim() : 'client@hospital.ca'),
-        full_name: f.contact_name || 'Facility Administrator',
-        organization_name: f.name,
-        facility_id: f.id,
-        facility_code: f.facility_code || 'FAC',
-        linked_facility_name: f.name,
-        facility_status: f.effective_status || f.status || 'pending',
-        phone: f.contact_phone || '—',
-        is_active: 1,
-        email_verified: 1,
-        created_at: f.created_at,
-        total_requests_count: f.total_shifts_requested || 0
-      }));
-    }
+    const clients = (LiveStore.registeredClients && LiveStore.registeredClients.length > 0) ? LiveStore.registeredClients : [];
 
     const filtered = clients.filter(c => {
       if (!query) return true;
@@ -7244,6 +7252,16 @@
   setTimeout(handleHashNavigation, 250);
 
   // ── 17. Initialization ──────────────────────────────────────────────────────
+  // Real-time visibility change listener: Keep Facilities & Rates updated when returning to tab
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      const activeTabBtn = document.querySelector('.nav-item-btn.active');
+      if (activeTabBtn && activeTabBtn.dataset?.tab === 'facilities-tab') {
+        if (typeof fetchAndRenderFacilities === 'function') fetchAndRenderFacilities();
+      }
+    }
+  });
+
   initTheme();
   initLiveTopbarClock();
   checkAuth();

@@ -70,17 +70,31 @@ router.get('/stream', (req, res) => {
   const onApplication        = (data) => res.write(`data: ${JSON.stringify({ type: 'application:created',   payload: data })}\n\n`);
   const onInquiry            = (data) => res.write(`data: ${JSON.stringify({ type: 'inquiry:created',       payload: data })}\n\n`);
   const onStatusChange       = (data) => res.write(`data: ${JSON.stringify({ type: 'status:changed',        payload: data })}\n\n`);
-  const onClientRegistered   = (data) => res.write(`data: ${JSON.stringify({ type: 'client:registered',    payload: data })}\n\n`);
-  const onFacilityCreated    = (data) => res.write(`data: ${JSON.stringify({ type: 'facility:created',     payload: data })}\n\n`);
+  const onClientRegistered    = (data) => res.write(`data: ${JSON.stringify({ type: 'client:registered',     payload: data })}\n\n`);
+  const onClientStatusToggled = (data) => res.write(`data: ${JSON.stringify({ type: 'client:status_toggled', payload: data })}\n\n`);
+  const onClientDeleted       = (data) => res.write(`data: ${JSON.stringify({ type: 'client:deleted',        payload: data })}\n\n`);
+  const onFacilityCreated     = (data) => res.write(`data: ${JSON.stringify({ type: 'facility:created',      payload: data })}\n\n`);
+  const onFacilityUpdated     = (data) => res.write(`data: ${JSON.stringify({ type: 'facility:updated',      payload: data })}\n\n`);
+  const onFacilityDeleted     = (data) => res.write(`data: ${JSON.stringify({ type: 'facility:deleted',      payload: data })}\n\n`);
+  const onRateCardCreated     = (data) => res.write(`data: ${JSON.stringify({ type: 'rate_card:created',     payload: data })}\n\n`);
+  const onRateCardDeleted     = (data) => res.write(`data: ${JSON.stringify({ type: 'rate_card:deleted',     payload: data })}\n\n`);
+  const onArchiveRestored     = (data) => res.write(`data: ${JSON.stringify({ type: 'archive:restored',      payload: data })}\n\n`);
 
-  adminEvents.on('request:created',       onRequest);
-  adminEvents.on('request:cancelled',     onRequestCancelled);
-  adminEvents.on('request:rate_updated',  onRequestRateUpdated);
-  adminEvents.on('application:created',   onApplication);
-  adminEvents.on('inquiry:created',       onInquiry);
-  adminEvents.on('status:changed',        onStatusChange);
-  adminEvents.on('client:registered',     onClientRegistered);
-  adminEvents.on('facility:created',      onFacilityCreated);
+  adminEvents.on('request:created',        onRequest);
+  adminEvents.on('request:cancelled',      onRequestCancelled);
+  adminEvents.on('request:rate_updated',   onRequestRateUpdated);
+  adminEvents.on('application:created',    onApplication);
+  adminEvents.on('inquiry:created',        onInquiry);
+  adminEvents.on('status:changed',         onStatusChange);
+  adminEvents.on('client:registered',      onClientRegistered);
+  adminEvents.on('client:status_toggled',  onClientStatusToggled);
+  adminEvents.on('client:deleted',         onClientDeleted);
+  adminEvents.on('facility:created',       onFacilityCreated);
+  adminEvents.on('facility:updated',       onFacilityUpdated);
+  adminEvents.on('facility:deleted',       onFacilityDeleted);
+  adminEvents.on('rate_card:created',      onRateCardCreated);
+  adminEvents.on('rate_card:deleted',      onRateCardDeleted);
+  adminEvents.on('archive:restored',       onArchiveRestored);
 
   // Keep-alive heartbeat every 25 seconds (SSE comment lines — not parsed by client)
   const heartbeat = setInterval(() => {
@@ -90,14 +104,21 @@ router.get('/stream', (req, res) => {
   // Clean up all listeners when client disconnects
   req.on('close', () => {
     clearInterval(heartbeat);
-    adminEvents.off('request:created',       onRequest);
-    adminEvents.off('request:cancelled',     onRequestCancelled);
-    adminEvents.off('request:rate_updated',  onRequestRateUpdated);
-    adminEvents.off('application:created',   onApplication);
-    adminEvents.off('inquiry:created',       onInquiry);
-    adminEvents.off('status:changed',        onStatusChange);
-    adminEvents.off('client:registered',     onClientRegistered);
-    adminEvents.off('facility:created',      onFacilityCreated);
+    adminEvents.off('request:created',        onRequest);
+    adminEvents.off('request:cancelled',      onRequestCancelled);
+    adminEvents.off('request:rate_updated',   onRequestRateUpdated);
+    adminEvents.off('application:created',    onApplication);
+    adminEvents.off('inquiry:created',        onInquiry);
+    adminEvents.off('status:changed',         onStatusChange);
+    adminEvents.off('client:registered',      onClientRegistered);
+    adminEvents.off('client:status_toggled',  onClientStatusToggled);
+    adminEvents.off('client:deleted',         onClientDeleted);
+    adminEvents.off('facility:created',       onFacilityCreated);
+    adminEvents.off('facility:updated',       onFacilityUpdated);
+    adminEvents.off('facility:deleted',       onFacilityDeleted);
+    adminEvents.off('rate_card:created',      onRateCardCreated);
+    adminEvents.off('rate_card:deleted',      onRateCardDeleted);
+    adminEvents.off('archive:restored',       onArchiveRestored);
   });
 });
 
@@ -2406,7 +2427,7 @@ router.get('/facilities', async (req, res, next) => {
         GROUP_CONCAT(
           DISTINCT CASE 
             WHEN (frc.expiry_date IS NULL OR frc.expiry_date >= CURDATE()) 
-            THEN CONCAT(frc.role, ':$', ROUND(frc.bill_rate))
+            THEN CONCAT(frc.role, CASE WHEN frc.shift_type IS NOT NULL AND LOWER(TRIM(frc.shift_type)) != 'standard' THEN CONCAT(' (', frc.shift_type, ')') ELSE '' END, ':$', ROUND(frc.bill_rate))
           END 
           ORDER BY frc.role ASC
           SEPARATOR '|'
@@ -2468,26 +2489,27 @@ router.get('/registered-clients', async (req, res, next) => {
   try {
     const [clients] = await pool.query(`
       SELECT 
-        COALESCE(u.id, f.id) AS id,
-        COALESCE(u.email, f.contact_email, 'no-email@facility.local') AS email,
-        COALESCE(u.full_name, f.contact_name, 'Facility Coordinator') AS full_name,
+        u.id AS id,
+        u.email AS email,
+        u.full_name AS full_name,
         COALESCE(f.name, u.organization_name, 'Healthcare Facility') AS organization_name,
-        f.id AS facility_id,
+        COALESCE(f.id, u.facility_id) AS facility_id,
         COALESCE(u.client_role, 'Staffing Requester') AS client_role,
         COALESCE(u.phone, f.contact_phone, '—') AS phone,
         COALESCE(u.is_active, 1) AS is_active,
         COALESCE(u.email_verified, 1) AS email_verified,
         u.last_login,
-        COALESCE(u.created_at, f.created_at) AS created_at,
+        u.created_at AS created_at,
         COALESCE(f.facility_code, 'FAC') AS facility_code,
         COALESCE(f.name, u.organization_name) AS linked_facility_name,
         COALESCE(f.status, 'pending') AS facility_status,
         COUNT(DISTINCT sr.id) AS total_requests_count
-      FROM facilities f
-      LEFT JOIN users u ON (u.facility_id = f.id OR LOWER(TRIM(u.organization_name)) = LOWER(TRIM(f.name))) AND u.role = 'client'
-      LEFT JOIN staffing_requests sr ON (sr.facility_id = f.id OR LOWER(TRIM(sr.facility_name)) = LOWER(TRIM(f.name)) OR (u.email IS NOT NULL AND sr.contact_email = u.email))
-      GROUP BY f.id, u.id
-      ORDER BY created_at DESC
+      FROM users u
+      LEFT JOIN facilities f ON (f.id = u.facility_id OR LOWER(TRIM(f.name)) = LOWER(TRIM(u.organization_name)))
+      LEFT JOIN staffing_requests sr ON (sr.facility_id = f.id OR LOWER(TRIM(sr.facility_name)) = LOWER(TRIM(f.name)) OR LOWER(TRIM(sr.contact_email)) = LOWER(TRIM(u.email)))
+      WHERE u.role = 'client'
+      GROUP BY u.id
+      ORDER BY u.created_at DESC
     `);
 
     res.json({
@@ -2532,6 +2554,13 @@ router.patch('/registered-clients/:id/toggle-status', async (req, res, next) => 
         ]
       );
     } catch (_) {}
+
+    adminEvents.emit('client:status_toggled', {
+      id: userId,
+      email: user.email,
+      full_name: user.full_name,
+      is_active: newStatus
+    });
 
     res.json({
       success: true,
@@ -2772,6 +2801,15 @@ router.patch('/facilities/:id', async (req, res, next) => {
     ]);
 
     const [updated] = await pool.query('SELECT * FROM facilities WHERE id = ?', [id]);
+    
+    adminEvents.emit('facility:updated', {
+      id,
+      name: updated[0].name,
+      facility_code: updated[0].facility_code,
+      status: updated[0].status,
+      msa_expiry_date: updated[0].msa_expiry_date
+    });
+
     res.json({
       success: true,
       message: 'Facility details updated successfully.',
@@ -2927,9 +2965,16 @@ router.delete('/facilities/:facilityId/rate-cards/:rateCardId', async (req, res,
       req.admin.id,
       req.admin.full_name,
       rateCardId,
-      `Removed rate term for ${card.role} (${card.shift_type} - \$${card.bill_rate}/hr) from facility ${facilityId}`,
+      `Removed rate term for ${card.role} (${card.shift_type} - \${card.bill_rate}/hr) from facility ${facilityId}`,
       req.ip
     ]);
+
+    adminEvents.emit('rate_card:deleted', {
+      facility_id: facilityId,
+      rate_card_id: rateCardId,
+      role: card.role,
+      shift_type: card.shift_type
+    });
 
     res.json({
       success: true,
@@ -3754,5 +3799,3 @@ router.delete('/roster/:id/avatar', requirePermission('roster:manage'), async (r
 });
 
 module.exports = router;
-
-
