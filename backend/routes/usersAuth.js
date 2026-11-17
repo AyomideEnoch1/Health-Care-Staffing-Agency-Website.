@@ -19,7 +19,7 @@ const pool = require('../db');
 const { uploadAvatar, validateAvatarContent } = require('../middleware/avatarUpload');
 const { authLoginLimiter, passwordResetLimiter } = require('../middleware/rateLimiter');
 const adminEvents = require('../utils/events');
-const { enqueueMail } = require('../utils/mailOutbox');
+const { enqueueMail, notifySuperAdmins } = require('../utils/mailOutbox');
 const { generateSecureToken, maskEmail } = require('../utils/cryptoUtils');
 const { sendRawMail, buildUserVerificationOtpEmail } = require('../utils/mailer');
 
@@ -172,6 +172,19 @@ router.post('/register', async (req, res, next) => {
       phone: data.phone ? data.phone.trim() : null,
       created_at: new Date().toISOString()
     });
+
+    // Enqueue client registration notification alert to all active super-admins
+    if (data.role === 'client') {
+      notifySuperAdmins({
+        type: 'client_registration_alert',
+        vars: {
+          organization_name: orgName,
+          full_name: data.full_name.trim(),
+          email: emailClean,
+          phone: data.phone ? data.phone.trim() : null
+        }
+      }).catch(err => console.warn('[Client Registration Alert Error]:', err.message));
+    }
 
     // Record audit trail
     try {

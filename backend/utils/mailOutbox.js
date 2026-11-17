@@ -237,8 +237,51 @@ async function logEmailAudit({ outboxId = null, type, recipientHash, providerMes
   }
 }
 
+/**
+ * Resolves all active super-admin and dispatch operator email addresses from database + agency inbox.
+ * Guarantees every super-admin receives operational notifications.
+ */
+async function getSuperAdminEmails() {
+  const defaultAlert = process.env.AGENCY_ALERT_EMAIL || 'info@divinefingershealthcare.ca';
+  const recipients = new Set([defaultAlert.toLowerCase().trim()]);
+  try {
+    const [rows] = await pool.query(
+      "SELECT email FROM admins WHERE (role = 'super-admin' OR role = 'dispatch' OR role = 'care-coordinator') AND is_active = 1"
+    );
+    if (rows && rows.length > 0) {
+      for (const row of rows) {
+        if (row.email && row.email.includes('@')) {
+          recipients.add(row.email.toLowerCase().trim());
+        }
+      }
+    }
+  } catch (err) {
+    console.warn('[Admin Alert Recipient Resolver Error]:', err.message);
+  }
+  return Array.from(recipients);
+}
+
+/**
+ * Dispatches an operational alert email to every active super-admin and the agency alert inbox.
+ */
+async function notifySuperAdmins({ type, vars = {} }) {
+  const emails = await getSuperAdminEmails();
+  const results = [];
+  for (const email of emails) {
+    try {
+      const res = await enqueueMail({ type, to: email, vars });
+      results.push(res);
+    } catch (e) {
+      console.warn(`[notifySuperAdmins Error for ${email}]:`, e.message);
+    }
+  }
+  return results;
+}
+
 module.exports = {
   enqueueMail,
+  getSuperAdminEmails,
+  notifySuperAdmins,
   dispatchOutboxEntry,
   drainPendingOutbox,
   isSuppressed,

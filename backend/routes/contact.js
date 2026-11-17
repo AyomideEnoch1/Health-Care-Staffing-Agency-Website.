@@ -5,7 +5,7 @@ const { z } = require('zod');
 const pool = require('../db');
 const { publicFormLimiter } = require('../middleware/rateLimiter');
 const adminEvents = require('../utils/events');
-const { enqueueMail } = require('../utils/mailOutbox');
+const { enqueueMail, notifySuperAdmins } = require('../utils/mailOutbox');
 
 const contactSchema = z.object({
   name: z.string().trim().min(2).max(100),
@@ -107,10 +107,9 @@ router.post('/', publicFormLimiter, async (req, res, next) => {
       }
     }).catch(err => console.warn('[Contact Ack Outbox Warning]:', err.message));
 
-    // Enqueue notification alert to agency operations desk
-    enqueueMail({
+    // Fan out notification alert to all active super-admins
+    notifySuperAdmins({
       type: 'contact_alert',
-      to: process.env.AGENCY_ALERT_EMAIL || 'info@divinefingershealthcare.ca',
       vars: {
         name: validated.name,
         email: validated.email,

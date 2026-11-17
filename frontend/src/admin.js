@@ -948,30 +948,66 @@
     if (!notifList) return;
     const alerts = [];
 
-    // Check for urgent pending requests
-    LiveStore.requests.filter(r => r.urgency_level === 'emergency_surge' && r.status === 'pending').forEach(r => {
+    // 1. Check for emergency surge requests (Highest priority)
+    (LiveStore.requests || []).filter(r => r.urgency_level === 'emergency_surge' && r.status === 'pending').forEach(r => {
       alerts.push({
-        title: `🚨 Emergency Surge: ${r.facility_name}`,
-        sub: `${r.role_requested} needed immediately (${r.request_code})`,
-        action: () => { switchTab('requests-tab', 'Client Requests'); window.openRequestDrawer(r.id); }
+        title: `🚨 Emergency Surge: ${r.facility_name || 'Facility'}`,
+        sub: `${r.role_requested} needed immediately (${r.request_code || 'URGENT'})`,
+        action: () => { switchTab('requests-tab', 'Client Requests'); if (window.openRequestDrawer) window.openRequestDrawer(r.id); }
       });
     });
 
-    // Check for expiring credentials
-    LiveStore.staff.filter(s => s.credential_status === 'expired' || s.credential_status === 'expiring').forEach(s => {
+    // 2. Check for expiring or expired staff credentials
+    (LiveStore.staff || []).filter(s => s.credential_status === 'expired' || s.credential_status === 'expiring').forEach(s => {
       alerts.push({
         title: `⚠️ Credential Alert: ${s.name}`,
-        sub: `Status: ${s.credential_status.toUpperCase()} (CPR Expiry: ${s.cpr_expiry_date ? s.cpr_expiry_date.slice(0,10) : 'None'})`,
-        action: () => { switchTab('compliance-tab', 'Compliance & Credentials'); window.openStaffDrawer(s.id); }
+        sub: `Status: ${(s.credential_status || '').toUpperCase()} (CPR: ${s.cpr_expiry_date ? s.cpr_expiry_date.slice(0,10) : 'None'})`,
+        action: () => { switchTab('compliance-tab', 'Compliance & Credentials'); if (window.openStaffDrawer) window.openStaffDrawer(s.id); }
       });
     });
 
-    // Check for running late delay notices from caregivers
-    LiveStore.requests.filter(r => (r.delay_minutes > 0 || r.delay_reason) && r.status !== 'completed' && r.status !== 'cancelled').forEach(r => {
+    // 3. Check for running late delay notices from caregivers
+    (LiveStore.requests || []).filter(r => (r.delay_minutes > 0 || r.delay_reason) && r.status !== 'completed' && r.status !== 'cancelled').forEach(r => {
       alerts.push({
         title: `⏱️ Running Late: ${r.assigned_staff_name || 'Caregiver'} (+${r.delay_minutes || 15}m)`,
         sub: `${r.facility_name} • Note: "${r.delay_reason || 'Delayed on commute.'}"`,
-        action: () => { switchTab('requests-tab', 'Client Requests'); window.openRequestDrawer(r.id); }
+        action: () => { switchTab('requests-tab', 'Client Requests'); if (window.openRequestDrawer) window.openRequestDrawer(r.id); }
+      });
+    });
+
+    // 4. Check for new candidate job applications awaiting screening
+    (LiveStore.applicants || []).filter(a => a.stage === 'new').forEach(a => {
+      alerts.push({
+        title: `👤 New Applicant: ${a.full_name}`,
+        sub: `${a.role_applied} • Inbound candidate awaiting screening (${a.application_code || 'ATS'})`,
+        action: () => { switchTab('applicants-tab', 'Applicant Pipeline (ATS)'); if (window.openApplicantDrawer) window.openApplicantDrawer(a.id); }
+      });
+    });
+
+    // 5. Check for standard pending staffing requests awaiting dispatch
+    (LiveStore.requests || []).filter(r => r.status === 'pending' && r.urgency_level !== 'emergency_surge').forEach(r => {
+      alerts.push({
+        title: `📋 Shift Request: ${r.facility_name}`,
+        sub: `${r.role_requested} • ${r.shift_type || 'Shift'} awaiting dispatch (${r.request_code || 'PENDING'})`,
+        action: () => { switchTab('requests-tab', 'Client Requests'); if (window.openRequestDrawer) window.openRequestDrawer(r.id); }
+      });
+    });
+
+    // 6. Check for pending healthcare facilities awaiting onboarding or terms
+    (LiveStore.facilities || []).filter(f => f.effective_status === 'pending').forEach(f => {
+      alerts.push({
+        title: `🏥 Facility Onboarding: ${f.name}`,
+        sub: `Awaiting contracted rate activation (${f.region || 'GTA'})`,
+        action: () => { switchTab('facilities-tab', 'Facilities & Rates'); if (window.openFacilityModal) window.openFacilityModal(f.id); }
+      });
+    });
+
+    // 7. Check for unread contact/inquiry messages
+    (LiveStore.inquiries || []).filter(i => i.status === 'unread').forEach(i => {
+      alerts.push({
+        title: `✉️ Inbound Inquiry: ${i.name}`,
+        sub: `${i.inquiry_type || 'General'} • "${i.message ? (i.message.length > 40 ? i.message.slice(0, 37) + '...' : i.message) : 'New message'}"`,
+        action: () => { switchTab('inquiries-tab', 'Communications & Inquiries'); if (window.selectInquiryThread) window.selectInquiryThread(i.id); }
       });
     });
 
@@ -983,14 +1019,14 @@
     if (notifCountText) notifCountText.textContent = `${alerts.length} Alerts`;
 
     if (alerts.length === 0) {
-      notifList.innerHTML = `<div style="padding: 1.5rem; text-align: center; color: var(--text-muted); font-size: 0.8rem;">All credentials and shifts operational</div>`;
+      notifList.innerHTML = `<div style="padding: 1.5rem; text-align: center; color: var(--text-muted); font-size: 0.8rem;">All credentials, shifts, and applications operational</div>`;
       return;
     }
 
     notifList.innerHTML = alerts.map((a, idx) => `
       <div class="notif-item" onclick="window.handleNotifClick(${idx})">
-        <div class="notif-item-title">${a.title}</div>
-        <div class="notif-item-sub">${a.sub}</div>
+        <div class="notif-item-title">${escapeHTML(a.title)}</div>
+        <div class="notif-item-sub">${escapeHTML(a.sub)}</div>
       </div>
     `).join('');
 

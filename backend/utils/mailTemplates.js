@@ -345,6 +345,32 @@ const templates = {
          </div>`
       )
     };
+  },
+
+  client_registration_alert: (vars) => {
+    const org = escapeHtml(sanitizeHeader(vars.organization_name || 'Healthcare Facility'));
+    const name = escapeHtml(sanitizeHeader(vars.full_name || 'Client Administrator'));
+    const email = escapeHtml(sanitizeHeader(vars.email || ''));
+    const phone = escapeHtml(sanitizeHeader(vars.phone || 'Not provided'));
+    const loginUrl = `${APP_URL()}/admin-login.html`;
+
+    return {
+      subject: `🏥 [NEW CLIENT] ${org} — ${name}`,
+      html: wrapTemplate(
+        'Client Registration Alert',
+        `<h3 style="color: #0f172a; margin-top: 0;">New Healthcare Facility Registered</h3>
+         <div style="background: #f8fafc; border-left: 4px solid #00a896; padding: 12px 16px; margin: 16px 0; border-radius: 4px;">
+           <p style="margin: 4px 0;"><strong>Facility / Organization:</strong> ${org}</p>
+           <p style="margin: 4px 0;"><strong>Contact Person:</strong> ${name}</p>
+           <p style="margin: 4px 0;"><strong>Email:</strong> ${email}</p>
+           <p style="margin: 4px 0;"><strong>Phone:</strong> ${phone}</p>
+         </div>
+         <p style="font-size: 0.9rem; color: #475569;">This facility account is in <em>Pending Onboarding</em> status awaiting Master Services Agreement (MSA) review and customized rate card terms.</p>
+         <div style="text-align: center; margin: 20px 0;">
+           <a href="${loginUrl}" style="background: #00a896; color: #ffffff; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">Open Facilities Console</a>
+         </div>`
+      )
+    };
   }
 };
 

@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 const { z } = require('zod');
 const pool = require('../db');
 const { publicFormLimiter } = require('../middleware/rateLimiter');
-const { enqueueMail } = require('../utils/mailOutbox');
+const { enqueueMail, notifySuperAdmins } = require('../utils/mailOutbox');
 const adminEvents = require('../utils/events');
 
 const JWT_ADMIN_SECRET = process.env.JWT_ADMIN_SECRET || process.env.JWT_SECRET || 'divine_fingers_default_admin_jwt_secret_key_2026';
@@ -83,10 +83,9 @@ router.post('/', publicFormLimiter, async (req, res, next) => {
       created_at: new Date().toISOString()
     });
 
-    // Enqueue transactional outbox alert to agency dispatch desk
-    enqueueMail({
+    // Fan out operational outbox alert to all active super-admins and dispatch desk
+    notifySuperAdmins({
       type: 'staffing_request_alert',
-      to: process.env.AGENCY_ALERT_EMAIL || 'info@divinefingershealthcare.ca',
       vars: { ...validated, request_code: requestCode }
     }).catch(err => console.error('[MAIL ALERT ERROR]:', err.message));
 

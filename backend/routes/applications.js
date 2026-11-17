@@ -19,7 +19,7 @@ const { z } = require('zod');
 const pool = require('../db');
 const { uploadResume, validateMimeContent } = require('../middleware/upload');
 const { publicFormLimiter } = require('../middleware/rateLimiter');
-const { enqueueMail } = require('../utils/mailOutbox');
+const { enqueueMail, notifySuperAdmins } = require('../utils/mailOutbox');
 const adminEvents = require('../utils/events');
 
 const applicationSchema = z.object({
@@ -108,10 +108,9 @@ router.post(
         vars: { ...validated, application_code: appCode }
       }).catch(err => console.error('[MAIL CONFIRM ERROR]:', err.message));
 
-      // Enqueue agency recruitment alert
-      enqueueMail({
+      // Enqueue agency recruitment alert to all active super-admins
+      notifySuperAdmins({
         type: 'application_alert',
-        to: process.env.AGENCY_ALERT_EMAIL || 'info@divinefingershealthcare.ca',
         vars: {
           full_name: validated.full_name,
           role_applied: validated.role_applied,
