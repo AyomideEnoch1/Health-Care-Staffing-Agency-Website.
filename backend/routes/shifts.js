@@ -251,7 +251,17 @@ async function evaluateStaffCompliance(staffId, staffEmail) {
  */
 router.get('/', async (req, res, next) => {
   try {
-    const authUser = getAuthUser(req) || (req.query?.staff_id ? { id: req.query.staff_id, email: req.query.staff_email } : null);
+    let authUser = getAuthUser(req);
+    if (!authUser && (req.query?.staff_id || req.headers['x-staff-id'])) {
+      authUser = {
+        id: req.query?.staff_id || req.headers['x-staff-id'],
+        email: req.query?.staff_email || req.headers['x-staff-email'] || '',
+        role: 'healthcare_worker'
+      };
+    }
+    const authUserId = (authUser && authUser.id) ? String(authUser.id) : '';
+    const authUserEmail = (authUser && authUser.email) ? String(authUser.email).trim().toLowerCase() : '';
+
     let compliance = null;
     if (authUser && (authUser.role === 'healthcare_worker' || authUser.id)) {
       try {
@@ -259,34 +269,73 @@ router.get('/', async (req, res, next) => {
       } catch (e) {}
     }
 
+    // Resolve all possible roster and user identifiers belonging to this authenticated staff member
+    const myIdentities = new Set();
+    if (authUserId) myIdentities.add(authUserId);
+    if (authUserEmail) {
+      try {
+        const [rosterRows] = await pool.query('SELECT id FROM staff_roster WHERE LOWER(email) = ?', [authUserEmail]);
+        (rosterRows || []).forEach(row => myIdentities.add(String(row.id)));
+        const [userRows] = await pool.query('SELECT id FROM users WHERE LOWER(email) = ?', [authUserEmail]);
+        (userRows || []).forEach(row => myIdentities.add(String(row.id)));
+      } catch (_) {}
+    }
+
+    // Fetch shifts that are open, confirmed, or dispatched
     const [rows] = await pool.query(`
       SELECT r.id, r.request_code, r.facility_name, r.unit_department, r.role_requested,
              r.shift_type, r.status, r.urgency_level, r.start_date, r.created_at,
-             r.assigned_staff_id
+             r.assigned_staff_id, r.assigned_staff_email, r.assigned_staff_name
       FROM staffing_requests r
-      WHERE (r.status = 'pending' OR (r.status = 'confirmed' AND (r.assigned_staff_id IS NULL OR r.assigned_staff_id = '')))
+      WHERE r.status IN ('pending', 'confirmed', 'dispatched')
+        AND r.status NOT IN ('completed', 'cancelled')
       ORDER BY r.created_at DESC
-      LIMIT 50
+      LIMIT 100
     `);
 
-    const shifts = (rows || []).map(r => ({
-      id: r.id,
-      request_code: r.request_code,
-      facility_name: r.facility_name,
-      facility: r.facility_name,
-      unit_department: r.unit_department,
-      department: r.unit_department,
-      role_requested: r.role_requested || 'Registered Nurse',
-      role: r.role_requested || 'Registered Nurse',
-      shift_type: r.shift_type || 'Day Shift',
-      time: r.shift_type || '07:00 - 15:30 (Day Shift)',
-      start_date: r.start_date,
-      urgency_level: r.urgency_level,
-      rate: r.role_requested === 'PSW' ? '$28.50/hr' : (r.role_requested === 'RPN' ? '$38.00/hr' : '$48.50/hr'),
-      urgency: r.urgency_level === 'emergency_surge' ? 'Urgent Surge' : (r.urgency_level === 'urgent' ? 'High Priority' : 'Open'),
-      status: r.status,
-      assigned_staff_id: r.assigned_staff_id
-    }));
+    // Process shifts:
+    // 1. If claimed by the current staff -> EXCLUDE completely from open shifts list (so it leaves their list)
+    // 2. If claimed by ANOTHER staff -> INCLUDE in list, marked as is_claimed: true (so other staff cannot claim it)
+    // 3. If unclaimed -> INCLUDE in list as available for claiming
+    const shifts = [];
+    for (const r of (rows || [])) {
+      const isClaimedByMe = Boolean(
+        (r.assigned_staff_id && myIdentities.has(String(r.assigned_staff_id))) ||
+        (r.assigned_staff_email && authUserEmail && r.assigned_staff_email.trim().toLowerCase() === authUserEmail)
+      );
+
+      // If claimed by the same staff, it leaves the open shifts list completely
+      if (isClaimedByMe) {
+        continue;
+      }
+
+      const isClaimedByOther = Boolean(
+        r.status === 'dispatched' ||
+        (r.assigned_staff_id && !myIdentities.has(String(r.assigned_staff_id)))
+      );
+
+      shifts.push({
+        id: r.id,
+        request_code: r.request_code,
+        facility_name: r.facility_name,
+        facility: r.facility_name,
+        unit_department: r.unit_department,
+        department: r.unit_department,
+        role_requested: r.role_requested || 'Registered Nurse',
+        role: r.role_requested || 'Registered Nurse',
+        shift_type: r.shift_type || 'Day Shift',
+        time: r.shift_type || '07:00 - 15:30 (Day Shift)',
+        start_date: r.start_date,
+        urgency_level: r.urgency_level,
+        rate: r.role_requested === 'PSW' ? '$28.50/hr' : (r.role_requested === 'RPN' ? '$38.00/hr' : '$48.50/hr'),
+        urgency: r.urgency_level === 'emergency_surge' ? 'Urgent Surge' : (r.urgency_level === 'urgent' ? 'High Priority' : 'Open'),
+        status: isClaimedByOther ? 'dispatched' : r.status,
+        is_claimed: isClaimedByOther,
+        claimed_by_other: isClaimedByOther,
+        can_claim: !isClaimedByOther,
+        assigned_staff_id: r.assigned_staff_id
+      });
+    }
 
     if (compliance && !compliance.isCompliant) {
       return res.json({
@@ -373,20 +422,28 @@ router.get('/clock-status', async (req, res, next) => {
     // 2. Fetch shifts allocated/dispatched by Admin to this staff member
     let allocatedShifts = [];
     try {
+      const userEmail = (user.email || '').trim().toLowerCase();
+      const userId = user.id || '';
+
       const [assignedRows] = await pool.query(
         `SELECT r.id, r.request_code, r.facility_name, r.unit_department, r.role_requested,
                 r.shift_type, r.start_date, r.urgency_level, r.status, r.special_instructions,
                 r.contact_name, r.contact_phone, r.created_at
          FROM staffing_requests r
-         WHERE (r.assigned_staff_id = ? OR r.assigned_staff_id IN (SELECT id FROM staff_roster WHERE email = ?))
-           AND r.status IN ('dispatched', 'in_session', 'confirmed')
+         WHERE (
+           r.assigned_staff_id = ? 
+           OR (r.assigned_staff_email IS NOT NULL AND LOWER(r.assigned_staff_email) = ?)
+           OR (r.assigned_staff_id IN (SELECT id FROM staff_roster WHERE LOWER(email) = ? AND email IS NOT NULL AND email != ''))
+           OR (r.assigned_staff_id IN (SELECT id FROM users WHERE LOWER(email) = ? AND email IS NOT NULL AND email != ''))
+         )
+         AND r.status IN ('dispatched', 'in_session', 'confirmed')
          ORDER BY CASE 
            WHEN r.status = 'in_session' THEN 1 
            WHEN r.status = 'dispatched' THEN 2 
            ELSE 3 END,
            r.start_date ASC, r.created_at DESC
-         LIMIT 10`,
-        [user.id, user.email || '']
+         LIMIT 20`,
+        [userId, userEmail, userEmail, userEmail]
       );
       allocatedShifts = assignedRows || [];
     } catch (e) {
@@ -1302,8 +1359,14 @@ router.post('/:id/claim', async (req, res, next) => {
 
     // Assign staff and update status to dispatched
     await pool.query(
-      `UPDATE staffing_requests SET assigned_staff_id = ?, status = 'dispatched' WHERE id = ?`,
-      [rosterId, shift.id]
+      `UPDATE staffing_requests 
+       SET assigned_staff_id = ?, 
+           assigned_staff_name = ?,
+           assigned_staff_email = ?,
+           status = 'dispatched',
+           updated_at = NOW() 
+       WHERE id = ?`,
+      [rosterId, staffName, (user.email || '').trim().toLowerCase(), shift.id]
     );
 
     // Direct in-memory guarantee if pool.inMemoryStore is present

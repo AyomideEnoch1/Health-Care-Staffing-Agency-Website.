@@ -7105,134 +7105,11 @@ html, body {
               </div>
             </div>
 
-            <!-- Admin-Allocated Shift & Clock In (When Off Duty) -->
+            <!-- Admin-Allocated & Claimed Shifts List (When Off Duty) -->
             <div id="clock-in-form-container" style="margin-top: 1.25rem;">
               
-              <!-- State 1: Displayed when Admin has Allocated a Shift to this Staff -->
-              <div class="allocated-shift-card" id="allocated-shift-card" style="display: none;">
-                <div class="shift-card-header">
-                  <div style="display: flex; align-items: center; gap: 0.65rem; flex-wrap: wrap;">
-                    <span class="shift-badge-dispatched">
-                      <span class="pulse-dot" style="background:#10B981;"></span> DISPATCHED UPCOMING PLACEMENT
-                    </span>
-                    <span class="shift-code-tag" id="allocated-shift-code">—</span>
-                  </div>
-                  <div style="display: flex; align-items: center; gap: 0.45rem; font-size: 0.78rem; color: #BAE6FD;">
-                    <i data-lucide="shield-check" style="width: 15px; height: 15px; color: #38BDF8;"></i>
-                    <span>Ministry Verified Placement</span>
-                  </div>
-                </div>
-
-                <div class="shift-card-body">
-                  <div class="shift-hero-banner">
-                    <div class="facility-icon-wrap">
-                      <i data-lucide="building-2" style="width: 26px; height: 26px;"></i>
-                    </div>
-                    <div style="flex: 1; min-width: 0;">
-                      <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.4rem;">
-                        <span class="placement-confirmed-pill">
-                          <i data-lucide="check-circle-2" style="width: 13px; height: 13px;"></i> Confirmed Placement
-                        </span>
-                        <span class="geofence-verified-pill">
-                          <i data-lucide="navigation" style="width: 13px; height: 13px;"></i> Geofence Within 50m
-                        </span>
-                      </div>
-                      <h3 class="shift-facility-title" id="allocated-facility-name">—</h3>
-                      <div class="shift-unit-role" id="allocated-unit-role">—</div>
-                    </div>
-                  </div>
-
-                  <div class="shift-details-grid">
-                    <div class="shift-detail-item">
-                      <div class="shift-detail-icon-box" style="background: #EFF6FF; color: #0284C7;">
-                        <i data-lucide="calendar" style="width: 20px; height: 20px;"></i>
-                      </div>
-                      <div>
-                        <span class="shift-detail-label">SCHEDULED DATE</span>
-                        <span class="shift-detail-val" id="allocated-shift-date">—</span>
-                      </div>
-                    </div>
-
-                    <div class="shift-detail-item">
-                      <div class="shift-detail-icon-box" style="background: #F0FDF4; color: #16A34A;">
-                        <i data-lucide="clock" style="width: 20px; height: 20px;"></i>
-                      </div>
-                      <div>
-                        <span class="shift-detail-label">SHIFT WINDOW</span>
-                        <span class="shift-detail-val" id="allocated-shift-time">—</span>
-                      </div>
-                    </div>
-
-                    <div class="shift-detail-item">
-                      <div class="shift-detail-icon-box" style="background: #F5F3FF; color: #7C3AED;">
-                        <i data-lucide="user-check" style="width: 20px; height: 20px;"></i>
-                      </div>
-                      <div>
-                        <span class="shift-detail-label">PRACTICE ROLE</span>
-                        <span class="shift-detail-val" id="allocated-role-badge">—</span>
-                      </div>
-                    </div>
-
-                    <div class="shift-detail-item">
-                      <div class="shift-detail-icon-box" style="background: #FEF3C7; color: #D97706;">
-                        <i data-lucide="banknote" style="width: 20px; height: 20px;"></i>
-                      </div>
-                      <div>
-                        <span class="shift-detail-label">ESTIMATED REMUNERATION</span>
-                        <span class="shift-detail-val" id="allocated-rate-badge">—</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="instructions-callout" id="allocated-instructions-container">
-                    <div class="instructions-icon">
-                      <i data-lucide="file-text" style="width: 18px; height: 18px;"></i>
-                    </div>
-                    <div>
-                      <strong style="display: block; font-size: 0.84rem; margin-bottom: 2px; color: #0C4A6E;">Special Shift Instructions &amp; Unit Notes:</strong>
-                      <span id="allocated-instructions-text" style="font-size: 0.82rem; color: #0369A1;">Instructions will appear here once a shift is dispatched to you.</span>
-                    </div>
-                  </div>
-
-                  <div style="margin-top: 1.5rem;">
-                    <button type="button" id="btn-clock-in-allocated" class="btn-clock-in" onclick="handleStaffClockAction('clock_in')">
-                      <i data-lucide="play-circle" style="width: 22px; height: 22px;"></i>
-                      <span>Clock In to Assigned Shift (1-Tap EVV Verification)</span>
-                    </button>
-                    <div class="clock-in-footer-note">
-                      <i data-lucide="shield-check" style="width: 14px; height: 14px; color: #0284C7;"></i>
-                      <span>Ontario EVV Geofence Verification Active • Cryptographic Timestamping (MOH Compliant)</span>
-                    </div>
-                  </div>
-
-                  <!-- Running Late Delay Notification Bar -->
-                  <div class="running-late-box" id="allocated-late-container" style="margin-top: 1.25rem; padding: 0.85rem 1.15rem; background: #FFFDF5; border: 1px solid #FEF08A; border-radius: 10px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem;">
-                    <div style="display: flex; align-items: flex-start; gap: 0.55rem;">
-                      <i data-lucide="clock-alert" style="width: 17px; height: 17px; color: #D97706;"></i>
-                      <span style="font-size: 0.83rem; font-weight: 700; color: #854D0E;">Running behind schedule? Notify dispatch desk:</span>
-                    </div>
-                    <div style="display: flex; gap: 0.5rem; align-items: center;">
-                      <button type="button" class="late-quick-btn" onclick="submitStaffRunningLate(15)" style="background: #FEF3C7; border: 1px solid #F59E0B; color: #92400E; padding: 0.35rem 0.75rem; border-radius: 6px; font-size: 0.76rem; font-weight: 700; cursor: pointer; transition: all 0.2s;">
-                        +15 min delay
-                      </button>
-                      <button type="button" class="late-quick-btn" onclick="submitStaffRunningLate(30)" style="background: #FEF3C7; border: 1px solid #F59E0B; color: #92400E; padding: 0.35rem 0.75rem; border-radius: 6px; font-size: 0.76rem; font-weight: 700; cursor: pointer; transition: all 0.2s;">
-                        +30 min delay
-                      </button>
-                      <button type="button" class="late-quick-btn" onclick="toggleStaffLateBanner()" style="background: #FFFFFF; border: 1px solid #CBD5E1; color: #475569; padding: 0.35rem 0.75rem; border-radius: 6px; font-size: 0.76rem; font-weight: 700; cursor: pointer; transition: all 0.2s;">
-                        Custom Note
-                      </button>
-                    </div>
-                    <div id="staff-late-custom-box" style="display: none; width: 100%; margin-top: 0.5rem;">
-                      <div style="display: flex; gap: 0.5rem;">
-                        <input type="text" id="staff-late-custom-reason" class="form-input-styled" placeholder="Reason for delay (e.g. 401 highway traffic, TTC delay)..." style="font-size: 0.82rem; padding: 0.45rem 0.75rem; flex: 1;">
-                        <button type="button" onclick="submitStaffRunningLate(null)" style="background: #D97706; color: #FFFFFF; border: none; padding: 0.45rem 0.95rem; border-radius: 6px; font-size: 0.8rem; font-weight: 700; cursor: pointer;">
-                          Send Delay Notice
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <!-- Container for all claimed & dispatched shifts -->
+              <div id="allocated-shifts-list" style="display: none; flex-direction: column; gap: 1.25rem;"></div>
 
               <!-- State 2: Displayed when NO Shift is currently allocated by Admin -->
               <div class="no-shift-assigned-card" id="no-shift-assigned-card" style="display: none;">
@@ -10879,6 +10756,7 @@ let deviceClockInterval = null;
 let shiftDurationInterval = null;
 let currentActivePunch = null;
 let currentAssignedShift = null;
+let currentAllocatedShifts = [];
 let allStaffOpenShifts = [];
 let currentOpenShiftRoleFilter = 'all';
 let currentOpenShiftRegionOnly = false;
@@ -11261,66 +11139,162 @@ async function checkClockStatus() {
       if (statusMetricTitle) statusMetricTitle.textContent = 'Off Duty';
       if (statusMetricDesc) statusMetricDesc.textContent = 'Ready for Dispatch';
 
-      if (data.assignedShift) {
-        currentAssignedShift = data.assignedShift;
-        if (allocatedCard) allocatedCard.style.display = 'block';
+      const allocatedShifts = (data.allocatedShifts && data.allocatedShifts.length > 0)
+        ? data.allocatedShifts
+        : (data.assignedShift ? [data.assignedShift] : []);
+
+      currentAllocatedShifts = allocatedShifts;
+      currentAssignedShift = allocatedShifts.length > 0 ? allocatedShifts[0] : null;
+
+      const shiftsListContainer = document.getElementById('allocated-shifts-list');
+
+      if (allocatedShifts.length > 0) {
         if (noShiftCard) noShiftCard.style.display = 'none';
+        if (shiftsListContainer) {
+          shiftsListContainer.style.display = 'flex';
+          shiftsListContainer.innerHTML = `
+            <div style="font-weight: 800; font-size: 0.95rem; color: var(--navy); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.25rem;">
+              <span style="display: flex; align-items: center; gap: 6px;">
+                <i data-lucide="calendar-check" style="width: 18px; height: 18px; color: #0284C7;"></i>
+                <span>Your Claimed &amp; Dispatched Shifts (${allocatedShifts.length})</span>
+              </span>
+              <span style="font-size: 0.74rem; font-weight: 700; color: #16A34A; background: #DCFCE7; padding: 0.2rem 0.6rem; border-radius: 9999px;">
+                Ready for EVV Verification
+              </span>
+            </div>
+            ` + allocatedShifts.map((shift, idx) => {
+            const isPrimary = idx === 0;
+            const code = shift.request_code || 'SHIFT-DISPATCHED';
+            const fac = shift.facility_name || 'Partner Health Facility';
+            const unit = `${shift.unit_department || 'General Care'} • ${shift.role_requested || 'Health Care Professional'}`;
+            const time = `${shift.shift_type || 'Day Shift'} (${shift.duration_hours || 12} hrs)`;
+            const d = shift.start_date ? new Date(shift.start_date) : null;
+            const dateStr = d && !isNaN(d.getTime()) 
+              ? d.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })
+              : 'Immediate Placement';
+            const role = shift.role_requested || 'Registered Nurse (RN)';
+            const instructions = shift.special_instructions || 'Report to unit charge nurse on arrival. Wear standard clinical scrubs & valid facility identification badge.';
 
-        const codeEl = document.getElementById('allocated-shift-code');
-        const facEl = document.getElementById('allocated-facility-name');
-        const unitEl = document.getElementById('allocated-unit-role');
-        const timeEl = document.getElementById('allocated-shift-time');
+            const rawD = shift.start_date;
+            const sDateStr = typeof rawD === 'string' ? rawD.slice(0, 10) : (rawD ? new Date(rawD).toISOString().slice(0, 10) : '');
+            const lNowStr = new Date(Date.now() - (new Date().getTimezoneOffset() * 60000)).toISOString().slice(0, 10);
+            const isFuture = sDateStr && sDateStr > lNowStr;
 
-        const code = currentAssignedShift.request_code || 'SHIFT-DISPATCHED';
-        const fac = currentAssignedShift.facility_name || 'Partner Health Facility';
-        const unit = `${currentAssignedShift.unit_department || 'General Care'} • ${currentAssignedShift.role_requested || 'Health Care Professional'}`;
-        const time = `${currentAssignedShift.shift_type || 'Day Shift'} (${currentAssignedShift.duration_hours || 12} hrs)`;
+            const clockInBtnHtml = isFuture
+              ? `<button type="button" class="btn-clock-in" disabled style="width: 100%; background: #94A3B8; opacity: 0.7; cursor: not-allowed; display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 0.95rem 1.4rem; border-radius: 10px; font-weight: 800; border: none; color: #fff;">
+                   <i data-lucide="calendar-clock" style="width:20px;height:20px;"></i>
+                   <span>Scheduled for ${sDateStr} (Clock-in unlocks on shift day)</span>
+                 </button>`
+              : `<button type="button" id="btn-clock-in-${shift.id}" class="btn-clock-in" onclick="handleStaffClockAction('clock_in', '${shift.id}', this)" style="width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 0.95rem 1.4rem; border-radius: 10px; font-weight: 800; border: none; color: #fff; cursor: pointer; background: linear-gradient(135deg, #059669 0%, #10B981 50%, #047857 100%);">
+                   <i data-lucide="play-circle" style="width:22px;height:22px;"></i>
+                   <span>Clock In to Assigned Shift (1-Tap EVV Verification)</span>
+                 </button>`;
 
-        if (codeEl) codeEl.textContent = code;
-        if (facEl) facEl.textContent = fac;
-        if (unitEl) unitEl.textContent = unit;
-        if (timeEl) timeEl.textContent = time;
+            return `
+              <div class="allocated-shift-card" style="display: block; background: #FFFFFF; border: 1.5px solid #BAE6FD; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 14px rgba(2, 132, 199, 0.08);">
+                <div class="shift-card-header" style="background: linear-gradient(135deg, #0284C7 0%, #0369A1 100%); padding: 0.85rem 1.25rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; color: #FFFFFF;">
+                  <div style="display: flex; align-items: center; gap: 0.65rem; flex-wrap: wrap;">
+                    <span class="shift-badge-dispatched" style="background: rgba(255,255,255,0.2); color: #FFFFFF; padding: 0.25rem 0.65rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 800; display: inline-flex; align-items: center; gap: 5px;">
+                      <span class="pulse-dot" style="background:#10B981;"></span> ${isPrimary ? 'DISPATCHED UPCOMING PLACEMENT' : 'CLAIMED CONFIRMED PLACEMENT'}
+                    </span>
+                    <span class="shift-code-tag" style="background: rgba(0,0,0,0.2); padding: 0.2rem 0.5rem; border-radius: 4px; font-family: monospace; font-size: 0.76rem; font-weight: 700;">${code}</span>
+                  </div>
+                  <div style="display: flex; align-items: center; gap: 0.45rem; font-size: 0.78rem; color: #BAE6FD;">
+                    <i data-lucide="shield-check" style="width: 15px; height: 15px; color: #38BDF8;"></i>
+                    <span>Ministry Verified Placement</span>
+                  </div>
+                </div>
 
-        const dateEl = document.getElementById('allocated-shift-date');
-        const roleEl = document.getElementById('allocated-role-badge');
-        const rateEl = document.getElementById('allocated-rate-badge');
-        const instrEl = document.getElementById('allocated-instructions-text');
+                <div class="shift-card-body" style="padding: 1.25rem;">
+                  <div class="shift-hero-banner" style="display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 1.25rem;">
+                    <div class="facility-icon-wrap" style="width: 48px; height: 48px; border-radius: 10px; background: #E0F2FE; color: #0284C7; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                      <i data-lucide="building-2" style="width: 26px; height: 26px;"></i>
+                    </div>
+                    <div style="flex: 1; min-width: 0;">
+                      <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.4rem;">
+                        <span class="placement-confirmed-pill" style="background: #ECFDF5; color: #047857; font-size: 0.72rem; font-weight: 800; padding: 0.2rem 0.55rem; border-radius: 9999px; display: inline-flex; align-items: center; gap: 4px;">
+                          <i data-lucide="check-circle-2" style="width: 13px; height: 13px;"></i> Confirmed Placement
+                        </span>
+                        <span class="geofence-verified-pill" style="background: #EFF6FF; color: #1D4ED8; font-size: 0.72rem; font-weight: 800; padding: 0.2rem 0.55rem; border-radius: 9999px; display: inline-flex; align-items: center; gap: 4px;">
+                          <i data-lucide="navigation" style="width: 13px; height: 13px;"></i> Geofence Within 50m
+                        </span>
+                      </div>
+                      <h3 class="shift-facility-title" style="margin: 0; font-size: 1.15rem; font-weight: 800; color: var(--navy); font-family: var(--font-heading);">${escapeHTML(fac)}</h3>
+                      <div class="shift-unit-role" style="font-size: 0.85rem; color: #64748B; margin-top: 2px;">${escapeHTML(unit)}</div>
+                    </div>
+                  </div>
 
-        if (dateEl) {
-          const d = currentAssignedShift.start_date ? new Date(currentAssignedShift.start_date) : null;
-          dateEl.textContent = d && !isNaN(d.getTime()) 
-            ? d.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })
-            : 'Immediate Assignment';
+                  <div class="shift-details-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.85rem; margin-bottom: 1.25rem;">
+                    <div class="shift-detail-item" style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 0.75rem 1rem; border-radius: 8px; display: flex; align-items: center; gap: 0.75rem;">
+                      <div class="shift-detail-icon-box" style="width: 36px; height: 36px; border-radius: 8px; background: #EFF6FF; color: #0284C7; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                        <i data-lucide="calendar" style="width: 18px; height: 18px;"></i>
+                      </div>
+                      <div>
+                        <span class="shift-detail-label" style="font-size: 0.68rem; font-weight: 700; color: #64748B; display: block;">SCHEDULED DATE</span>
+                        <span class="shift-detail-val" style="font-size: 0.88rem; font-weight: 800; color: var(--navy);">${dateStr}</span>
+                      </div>
+                    </div>
+
+                    <div class="shift-detail-item" style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 0.75rem 1rem; border-radius: 8px; display: flex; align-items: center; gap: 0.75rem;">
+                      <div class="shift-detail-icon-box" style="width: 36px; height: 36px; border-radius: 8px; background: #F0FDF4; color: #16A34A; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                        <i data-lucide="clock" style="width: 18px; height: 18px;"></i>
+                      </div>
+                      <div>
+                        <span class="shift-detail-label" style="font-size: 0.68rem; font-weight: 700; color: #64748B; display: block;">SHIFT WINDOW</span>
+                        <span class="shift-detail-val" style="font-size: 0.88rem; font-weight: 800; color: var(--navy);">${escapeHTML(time)}</span>
+                      </div>
+                    </div>
+
+                    <div class="shift-detail-item" style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 0.75rem 1rem; border-radius: 8px; display: flex; align-items: center; gap: 0.75rem;">
+                      <div class="shift-detail-icon-box" style="width: 36px; height: 36px; border-radius: 8px; background: #F5F3FF; color: #7C3AED; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                        <i data-lucide="user-check" style="width: 18px; height: 18px;"></i>
+                      </div>
+                      <div>
+                        <span class="shift-detail-label" style="font-size: 0.68rem; font-weight: 700; color: #64748B; display: block;">PRACTICE ROLE</span>
+                        <span class="shift-detail-val" style="font-size: 0.88rem; font-weight: 800; color: var(--navy);">${escapeHTML(role)}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="instructions-callout" style="background: #F0F9FF; border: 1px solid #BAE6FD; border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 1.25rem; display: flex; align-items: flex-start; gap: 0.75rem;">
+                    <i data-lucide="file-text" style="width: 18px; height: 18px; color: #0284C7; flex-shrink: 0; margin-top: 2px;"></i>
+                    <div>
+                      <strong style="display: block; font-size: 0.82rem; margin-bottom: 2px; color: #0C4A6E;">Special Shift Instructions &amp; Unit Notes:</strong>
+                      <span style="font-size: 0.8rem; color: #0369A1; line-height: 1.4;">${escapeHTML(instructions)}</span>
+                    </div>
+                  </div>
+
+                  <div>
+                    ${clockInBtnHtml}
+                    <div class="clock-in-footer-note" style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-top: 0.65rem; font-size: 0.74rem; color: #64748B;">
+                      <i data-lucide="shield-check" style="width: 14px; height: 14px; color: #0284C7;"></i>
+                      <span>Ontario EVV Geofence Verification Active • Cryptographic Timestamping (MOH Compliant)</span>
+                    </div>
+                  </div>
+
+                  <!-- Running Late Delay Notification Bar -->
+                  <div style="margin-top: 1rem; padding: 0.75rem 1rem; background: #FFFDF5; border: 1px solid #FEF08A; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                      <i data-lucide="clock-alert" style="width: 16px; height: 16px; color: #D97706;"></i>
+                      <span style="font-size: 0.8rem; font-weight: 700; color: #854D0E;">Running behind schedule?</span>
+                    </div>
+                    <div style="display: flex; gap: 0.4rem; align-items: center;">
+                      <button type="button" onclick="submitStaffRunningLate(15, '${shift.id}')" style="background: #FEF3C7; border: 1px solid #F59E0B; color: #92400E; padding: 0.3rem 0.65rem; border-radius: 5px; font-size: 0.74rem; font-weight: 700; cursor: pointer;">+15 min</button>
+                      <button type="button" onclick="submitStaffRunningLate(30, '${shift.id}')" style="background: #FEF3C7; border: 1px solid #F59E0B; color: #92400E; padding: 0.3rem 0.65rem; border-radius: 5px; font-size: 0.74rem; font-weight: 700; cursor: pointer;">+30 min</button>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            `;
+          }).join('');
         }
-        if (roleEl) roleEl.textContent = currentAssignedShift.role_requested || 'Registered Nurse (RN)';
-        if (rateEl) {
-          const r = currentAssignedShift.role_requested;
-          rateEl.textContent = r === 'PSW' ? '$28.50 - $34.00/hr' : (r === 'RPN' ? '$38.00 - $44.00/hr' : '$48.50 - $56.00/hr');
-        }
-        if (instrEl) {
-          instrEl.textContent = currentAssignedShift.special_instructions || 'Report to unit charge nurse on arrival. Wear standard clinical scrubs & valid facility identification badge.';
-        }
 
-        const btnAlloc = document.getElementById('btn-clock-in-allocated');
-        if (btnAlloc && currentAssignedShift && currentAssignedShift.start_date) {
-          const rawD = currentAssignedShift.start_date;
-          const sDateStr = typeof rawD === 'string' ? rawD.slice(0, 10) : new Date(rawD).toISOString().slice(0, 10);
-          const lNowStr = new Date(Date.now() - (new Date().getTimezoneOffset() * 60000)).toISOString().slice(0, 10);
-          if (sDateStr > lNowStr) {
-            btnAlloc.disabled = true;
-            btnAlloc.style.opacity = '0.65';
-            btnAlloc.style.cursor = 'not-allowed';
-            btnAlloc.innerHTML = '<i data-lucide="calendar-clock" style="width:20px;height:20px;"></i> <span>Scheduled for ' + sDateStr + ' (Clock-in unlocks on shift day)</span>';
-          } else {
-            btnAlloc.disabled = false;
-            btnAlloc.style.opacity = '1';
-            btnAlloc.style.cursor = 'pointer';
-            btnAlloc.innerHTML = '<i data-lucide="play-circle" style="width:22px;height:22px;"></i> <span>Clock In to Assigned Shift (1-Tap EVV Verification)</span>';
-          }
-        }
+        const primaryFac = currentAssignedShift.facility_name || 'Partner Health Facility';
+        const primaryUnit = `${currentAssignedShift.unit_department || 'General Care'} • ${currentAssignedShift.role_requested || 'Health Care Professional'}`;
 
-        if (ovAssignedFac) ovAssignedFac.textContent = fac;
-        if (ovAssignedUnit) ovAssignedUnit.textContent = unit;
+        if (ovAssignedFac) ovAssignedFac.textContent = allocatedShifts.length > 1 ? `${allocatedShifts.length} Claimed Shifts (${primaryFac})` : primaryFac;
+        if (ovAssignedUnit) ovAssignedUnit.textContent = primaryUnit;
         if (ovBadge) {
           ovBadge.innerHTML = '<span class="pulse-dot" style="background:#10B981;"></span> Dispatched Upcoming Shift';
           ovBadge.style.background = '#ECFDF5';
@@ -11329,7 +11303,10 @@ async function checkClockStatus() {
 
       } else {
         currentAssignedShift = null;
-        if (allocatedCard) allocatedCard.style.display = 'none';
+        if (shiftsListContainer) {
+          shiftsListContainer.style.display = 'none';
+          shiftsListContainer.innerHTML = '';
+        }
         if (noShiftCard) noShiftCard.style.display = 'block';
 
         if (ovAssignedFac) ovAssignedFac.textContent = 'No Shift Dispatched Today';
@@ -11352,10 +11329,14 @@ async function checkClockStatus() {
 // ------------------------------------------------------------------------
 // Clock In / Clock Out Actions
 // ------------------------------------------------------------------------
-async function handleStaffClockAction(action) {
+async function handleStaffClockAction(action, specificShiftId = null, clickedBtn = null) {
   if (action === 'clock_in') {
-    if (currentAssignedShift && currentAssignedShift.start_date) {
-      const rawD = currentAssignedShift.start_date;
+    const targetShift = (specificShiftId && currentAllocatedShifts)
+      ? (currentAllocatedShifts.find(s => s.id === specificShiftId) || currentAssignedShift)
+      : currentAssignedShift;
+
+    if (targetShift && targetShift.start_date) {
+      const rawD = targetShift.start_date;
       const sDateStr = typeof rawD === 'string' ? rawD.slice(0, 10) : new Date(rawD).toISOString().slice(0, 10);
       const lNowStr = new Date(Date.now() - (new Date().getTimezoneOffset() * 60000)).toISOString().slice(0, 10);
       if (sDateStr > lNowStr) {
@@ -11363,13 +11344,13 @@ async function handleStaffClockAction(action) {
         return;
       }
     }
-    const shiftId = currentAssignedShift ? currentAssignedShift.id : null;
-    const reqCode = currentAssignedShift ? currentAssignedShift.request_code : '';
-    const facName = currentAssignedShift ? currentAssignedShift.facility_name : 'Partner Facility';
-    const roleReq = currentAssignedShift ? currentAssignedShift.role_requested : 'RN';
-    const unitDept = currentAssignedShift ? currentAssignedShift.unit_department : 'General';
+    const shiftId = targetShift ? targetShift.id : null;
+    const reqCode = targetShift ? targetShift.request_code : '';
+    const facName = targetShift ? targetShift.facility_name : 'Partner Facility';
+    const roleReq = targetShift ? targetShift.role_requested : 'RN';
+    const unitDept = targetShift ? targetShift.unit_department : 'General';
 
-    const btn = document.getElementById('btn-clock-in-allocated');
+    const btn = clickedBtn || (shiftId ? document.getElementById('btn-clock-in-' + shiftId) : null) || document.getElementById('btn-clock-in-allocated');
     if (btn) {
       btn.disabled = true;
       btn.innerHTML = '<i data-lucide="loader-2" class="spin-icon" style="width:18px;height:18px;"></i> Verifying Geofence & Clocking In...';
@@ -11492,7 +11473,7 @@ function toggleStaffLateBanner() {
   }
 }
 
-async function submitStaffRunningLate(mins) {
+async function submitStaffRunningLate(mins, specificShiftId = null) {
   let reason = '';
   if (mins) {
     reason = `Delayed by approximately ${mins} minutes (traffic/transit).`;
@@ -11505,8 +11486,11 @@ async function submitStaffRunningLate(mins) {
     }
   }
 
-  const shiftId = currentAssignedShift ? currentAssignedShift.id : null;
-  const facility = currentAssignedShift ? currentAssignedShift.facility_name : 'Partner Facility';
+  const targetShift = (specificShiftId && currentAllocatedShifts)
+    ? (currentAllocatedShifts.find(s => s.id === specificShiftId) || currentAssignedShift)
+    : currentAssignedShift;
+  const shiftId = targetShift ? targetShift.id : null;
+  const facility = targetShift ? targetShift.facility_name : 'Partner Facility';
 
   try {
     const res = await fetch(`${API_BASE}/shifts/running-late`, {
@@ -11681,7 +11665,23 @@ async function loadStaffOpenShifts() {
   container.innerHTML = '<div style="text-align: center; color: #64748B; padding: 2rem;">Scanning Ontario health care facilities for available shifts...</div>';
 
   try {
-    const res = await fetch(`${API_BASE}/shifts`, { credentials: 'include' });
+    const activeStaff = currentStaffUser || currentUser || (typeof window !== 'undefined' && window.currentUser) || {
+      id: 'staff-nurse-sarah',
+      email: 'sarah.jenkins@divinefingershealthcare.ca',
+      full_name: 'Sarah Jenkins, RN'
+    };
+    const staffId = activeStaff.id || '';
+    const staffEmail = activeStaff.email || '';
+    const headers = {};
+    if (staffId) headers['X-Staff-Id'] = staffId;
+    if (staffEmail) headers['X-Staff-Email'] = staffEmail;
+
+    const qParams = new URLSearchParams();
+    if (staffId) qParams.set('staff_id', staffId);
+    if (staffEmail) qParams.set('staff_email', staffEmail);
+    const url = `${API_BASE}/shifts${qParams.toString() ? '?' + qParams.toString() : ''}`;
+
+    const res = await fetch(url, { headers, credentials: 'include' });
     let shifts = [];
     if (res.ok) {
       const data = await res.json();
@@ -11838,6 +11838,7 @@ function renderFilteredOpenShifts() {
         <div style="flex: 1; min-width: 250px;">
           <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
             ${urgencyBadge}
+            ${(s.is_claimed || s.claimed_by_other || s.status === 'dispatched') ? '<span style="background: #F1F5F9; color: #475569; font-size: 0.72rem; font-weight: 800; padding: 0.2rem 0.55rem; border-radius: 9999px; display: inline-flex; align-items: center; gap: 4px;"><i data-lucide="lock" style="width: 11px; height: 11px;"></i> Claimed by Another Staff</span>' : ''}
             <span style="font-size: 0.76rem; font-weight: 700; color: #64748B;">#${(s.request_code || s.id || 'SHIFT').toString().slice(-8)}</span>
           </div>
           <h4 style="margin: 0; font-size: 1.05rem; font-weight: 800; color: var(--navy); font-family: var(--font-heading);">
@@ -11855,7 +11856,11 @@ function renderFilteredOpenShifts() {
         </div>
 
         <div style="text-align: right;">
-          ${isBlocked ? `
+          ${s.is_claimed || s.claimed_by_other || s.status === 'dispatched' ? `
+            <button type="button" class="btn-claim-shift claimed" disabled style="background: #94A3B8; color: #FFFFFF; font-weight: 700; border: none; padding: 0.55rem 1.1rem; border-radius: 6px; font-size: 0.82rem; cursor: not-allowed; display: inline-flex; align-items: center; gap: 0.4rem; opacity: 0.85;" title="Shift claimed by another healthcare worker">
+              <i data-lucide="lock" style="width: 14px; height: 14px;"></i> Claimed
+            </button>
+          ` : (isBlocked ? `
             <button type="button" class="btn-claim-shift" id="btn-claim-${s.id}" onclick="handleBlockedClaimClick('${s.id}')" style="background: #D97706; color: #FFFFFF; font-weight: 800; border: none; padding: 0.55rem 1.1rem; border-radius: 6px; font-size: 0.82rem; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; transition: all 0.2s ease;">
               <i data-lucide="shield-alert" style="width: 15px; height: 15px;"></i> Credentials Required
             </button>
@@ -11863,7 +11868,7 @@ function renderFilteredOpenShifts() {
             <button type="button" class="btn-claim-shift" id="btn-claim-${s.id}" onclick="claimShift('${s.id}', this)" style="background: #0284C7; color: #FFFFFF; font-weight: 800; border: none; padding: 0.55rem 1.1rem; border-radius: 6px; font-size: 0.82rem; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; transition: all 0.2s ease;">
               <i data-lucide="check" style="width: 15px; height: 15px;"></i> Claim Shift
             </button>
-          `}
+          `)}
         </div>
       </div>
     `;
