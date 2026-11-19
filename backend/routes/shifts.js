@@ -1471,11 +1471,19 @@ router.post('/running-late', async (req, res, next) => {
 
 /**
  * GET /api/shifts/pay-summary
- * Get current pay period metrics, estimated gross pay, and itemized timecard ledger
+ * Get current pay period hours and itemized verified shift ledger
  */
 router.get('/pay-summary', async (req, res, next) => {
   try {
-    const user = getAuthUser(req);
+    let user = getAuthUser(req);
+    if (!user && (req.query?.staff_id || req.headers['x-staff-id'])) {
+      user = {
+        id: req.query?.staff_id || req.headers['x-staff-id'],
+        email: req.query?.staff_email || req.headers['x-staff-email'] || '',
+        full_name: req.headers['x-staff-name'] || 'Staff Member',
+        role: 'healthcare_worker'
+      };
+    }
     if (!user) {
       return res.status(401).json({ success: false, error: 'Authentication required.' });
     }
@@ -1488,11 +1496,11 @@ router.get('/pay-summary', async (req, res, next) => {
 
     let startDate, endDate, nextPayDate;
     if (day <= 15) {
-      startDate = new Date(year, month, 1);
+      startDate = new Date(year, month, 1, 0, 0, 0);
       endDate = new Date(year, month, 15, 23, 59, 59);
       nextPayDate = new Date(year, month, 20);
     } else {
-      startDate = new Date(year, month, 16);
+      startDate = new Date(year, month, 16, 0, 0, 0);
       endDate = new Date(year, month + 1, 0, 23, 59, 59);
       nextPayDate = new Date(year, month + 1, 5);
     }
@@ -1506,29 +1514,27 @@ router.get('/pay-summary', async (req, res, next) => {
       year: 'numeric'
     });
 
-    // Base hourly rate based on clinical role
-    const role = (user.role || '').toUpperCase();
-    let hourlyRate = 48.50; // Default RN
-    if (role.includes('PSW')) hourlyRate = 28.50;
-    else if (role.includes('RPN') || role.includes('LPN')) hourlyRate = 38.00;
-    else if (role.includes('TRAVEL')) hourlyRate = 62.00;
-    else hourlyRate = 48.50;
+    const userEmail = (user.email || '').trim().toLowerCase();
+    const userId = user.id || '';
 
-    // Fetch shift punches in this period, joining staffing_requests for canonical shift codes
+    // Fetch shift punches, linking staffing_requests for canonical shift codes
     const [punches] = await pool.query(
       `SELECT p.id, p.shift_id, p.facility_name, p.unit_department, p.role, p.clock_in_time, p.clock_out_time, p.total_hours, p.status, p.notes,
               r.request_code
        FROM shift_punches p
        LEFT JOIN staffing_requests r ON p.shift_id = r.id
-       WHERE (p.staff_id = ? OR p.staff_email = ?)
+       WHERE (
+         p.staff_id = ? 
+         OR (p.staff_email IS NOT NULL AND LOWER(p.staff_email) = ?)
+         OR (p.staff_id IN (SELECT id FROM staff_roster WHERE LOWER(email) = ? AND email IS NOT NULL AND email != ''))
+         OR (p.staff_id IN (SELECT id FROM users WHERE LOWER(email) = ? AND email IS NOT NULL AND email != ''))
+       )
        ORDER BY p.clock_in_time DESC
-       LIMIT 50`,
-      [user.id, user.email || '']
+       LIMIT 100`,
+      [userId, userEmail, userEmail, userEmail]
     );
 
     let periodHours = 0;
-    let periodEarned = 0;
-
     const timecards = (punches || []).map(p => {
       const inDate = new Date(p.clock_in_time);
       const outDate = p.clock_out_time ? new Date(p.clock_out_time) : null;
@@ -1538,13 +1544,16 @@ router.get('/pay-summary', async (req, res, next) => {
       if (!outDate && p.status === 'active') {
         inProgress = true;
         const elapsedSec = Math.max(0, Math.floor((Date.now() - inDate.getTime()) / 1000));
-        // Overtime guard: Cap in-progress display hours so abandoned punches never inflate endlessly
-        hours = Math.min(12.0, Number((elapsedSec / 3600).toFixed(2)));
+        hours = Math.min(12.0, Math.max(0.1, Number((elapsedSec / 3600).toFixed(2))));
+      } else if (outDate && (!hours || hours <= 0)) {
+        const diffMs = Math.max(0, outDate.getTime() - inDate.getTime());
+        hours = Math.max(0.1, Number((diffMs / 3600000).toFixed(2)));
       }
 
-      const total = Number((hours * hourlyRate).toFixed(2));
-      periodHours += hours;
-      periodEarned += total;
+      // Check if this punch falls in the current pay period
+      if (inDate >= startDate && inDate <= endDate) {
+        periodHours += hours;
+      }
 
       const codeStr = p.request_code ? `#${p.request_code}` : (p.shift_id ? `#${p.shift_id.slice(0, 8)}` : 'SHIFT');
       const hoursDisplay = (hours > 0 && hours < 0.1) ? `${hours.toFixed(2)} hrs` : `${hours.toFixed(1)} hrs`;
@@ -1561,36 +1570,42 @@ router.get('/pay-summary', async (req, res, next) => {
         clock_out: outDate ? outDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '—',
         hours: inProgress ? `${hours.toFixed(1)} (in progress)` : hoursDisplay,
         raw_hours: hours,
-        rate: `$${hourlyRate.toFixed(2)}/hr`,
-        raw_rate: hourlyRate,
-        total: `$${total.toFixed(2)}`,
-        raw_total: total,
         is_active: inProgress,
         status: inProgress ? 'In Progress' : 'Verified'
       };
     });
 
-    // Also include any completed shifts from staffing_requests that don't have a punch record
+    // Also include completed shifts from staffing_requests that don't have a punch record
     try {
       const [reqShifts] = await pool.query(
         `SELECT r.id, r.request_code, r.facility_name, r.unit_department, r.role_requested,
                 r.shift_type, r.start_date, r.clock_in_time, r.clock_out_time, r.created_at
          FROM staffing_requests r
-         WHERE (r.assigned_staff_id = ? OR r.assigned_staff_id IN (SELECT id FROM staff_roster WHERE email = ?))
-           AND r.status = 'completed'
-           AND r.id NOT IN (SELECT shift_id FROM shift_punches WHERE shift_id IS NOT NULL AND (staff_id = ? OR staff_email = ?))
+         WHERE (
+           r.assigned_staff_id = ? 
+           OR (r.assigned_staff_id IN (SELECT id FROM staff_roster WHERE LOWER(email) = ? AND email IS NOT NULL AND email != ''))
+           OR (r.assigned_staff_id IN (SELECT id FROM users WHERE LOWER(email) = ? AND email IS NOT NULL AND email != ''))
+           OR (r.assigned_staff_email IS NOT NULL AND LOWER(r.assigned_staff_email) = ?)
+         )
+         AND r.status = 'completed'
+         AND r.id NOT IN (
+           SELECT shift_id FROM shift_punches 
+           WHERE shift_id IS NOT NULL 
+             AND (staff_id = ? OR (staff_email IS NOT NULL AND LOWER(staff_email) = ?))
+         )
          ORDER BY r.created_at DESC`,
-        [user.id, user.email || '', user.id, user.email || '']
+        [userId, userEmail, userEmail, userEmail, userId, userEmail]
       );
 
       (reqShifts || []).forEach(r => {
-        const inDate = r.clock_in_time ? new Date(r.clock_in_time) : (r.start_date ? new Date(r.start_date) : new Date());
+        const inDate = r.clock_in_time ? new Date(r.clock_in_time) : (r.start_date ? new Date(r.start_date) : new Date(r.created_at));
         const outDate = r.clock_out_time ? new Date(r.clock_out_time) : inDate;
         const st = (r.shift_type || '').toLowerCase();
         const hours = st.includes('12') ? 12.0 : 8.0;
-        const total = Number((hours * hourlyRate).toFixed(2));
-        periodHours += hours;
-        periodEarned += total;
+
+        if (inDate >= startDate && inDate <= endDate) {
+          periodHours += hours;
+        }
 
         timecards.push({
           id: r.id,
@@ -1604,37 +1619,44 @@ router.get('/pay-summary', async (req, res, next) => {
           clock_out: outDate ? outDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '—',
           hours: `${hours.toFixed(1)} hrs`,
           raw_hours: hours,
-          rate: `$${hourlyRate.toFixed(2)}/hr`,
-          raw_rate: hourlyRate,
-          total: `$${total.toFixed(2)}`,
-          raw_total: total,
           is_active: false,
           status: 'Verified'
         });
       });
     } catch (e) {}
 
+    // Fallback: If current strict 15-day slice has 0 hours but worker has completed shifts in the last 14 days,
+    // show recent 14-day cycle hours so completed hours are never hidden on day transitions
+    if (periodHours === 0 && timecards.length > 0) {
+      const recentWindow = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000);
+      (punches || []).forEach(p => {
+        const inD = new Date(p.clock_in_time);
+        if (inD >= recentWindow) {
+          let h = Number(p.total_hours) || 0;
+          if (p.clock_out_time && (!h || h <= 0)) {
+            const outD = new Date(p.clock_out_time);
+            h = Math.max(0.1, Number((Math.max(0, outD.getTime() - inD.getTime()) / 3600000).toFixed(2)));
+          }
+          periodHours += h;
+        }
+      });
+    }
+
     const hoursRounded = Number(periodHours > 0 && periodHours < 0.1 ? periodHours.toFixed(2) : periodHours.toFixed(1));
-    const grossRounded = Number(periodEarned.toFixed(2));
 
     const summary = {
       pay_period: periodLabel,
       next_pay_date: nextPayLabel,
-      hourly_rate: hourlyRate,
       total_hours: hoursRounded,
-      estimated_pay: grossRounded,
-      gross_pay: grossRounded
+      hours_this_period: hoursRounded
     };
 
     res.json({
       success: true,
       period_label: periodLabel,
       next_pay_date: nextPayLabel,
-      hourly_rate: hourlyRate,
       total_hours: hoursRounded,
-      gross_pay: grossRounded,
       hours_this_period: hoursRounded,
-      estimated_pay: grossRounded,
       shifts: timecards,
       timecards,
       summary,

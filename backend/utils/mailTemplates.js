@@ -365,7 +365,7 @@ const templates = {
            <p style="margin: 4px 0;"><strong>Email:</strong> ${email}</p>
            <p style="margin: 4px 0;"><strong>Phone:</strong> ${phone}</p>
          </div>
-         <p style="font-size: 0.9rem; color: #475569;">This facility account is in <em>Pending Onboarding</em> status awaiting Master Services Agreement (MSA) review and customized rate card terms.</p>
+         <p style="font-size: 0.9rem; color: #475569;">This facility account is in <em>Pending Onboarding</em> status awaiting account review and customized rate card terms.</p>
          <div style="text-align: center; margin: 20px 0;">
            <a href="${loginUrl}" style="background: #00a896; color: #ffffff; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">Open Facilities Console</a>
          </div>`

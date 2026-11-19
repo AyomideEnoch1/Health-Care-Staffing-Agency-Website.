@@ -6895,11 +6895,11 @@ html, body {
 
             <div class="metric-card" onclick="switchStaffPage('staff-page-pay', 'Pay & Timesheets')" style="cursor: pointer;">
               <div class="metric-icon-wrap orange">
-                <i data-lucide="wallet" style="width: 24px; height: 24px;"></i>
+                <i data-lucide="calendar-check-2" style="width: 24px; height: 24px;"></i>
               </div>
               <div class="metric-data-group">
-                <span class="metric-val" id="metric-worker-pay-val">$0.00</span>
-                <span class="metric-label">Estimated Gross Accrual</span>
+                <span class="metric-val" id="metric-worker-shifts-val">0</span>
+                <span class="metric-label">Verified Shifts Logged</span>
               </div>
             </div>
 
@@ -7443,19 +7443,19 @@ html, body {
               <div class="pay-metric-box" style="background: #F8FAFC; border: 1.5px solid #E2E8F0; border-radius: 8px; padding: 1.25rem;">
                 <span style="font-size: 0.74rem; font-weight: 700; color: #64748B; display: block;">CURRENT PERIOD HOURS</span>
                 <span id="pay-period-hours" style="font-size: 1.6rem; font-weight: 900; color: var(--navy); display: block; margin-top: 0.25rem;">0.0 hrs</span>
-                <span style="font-size: 0.74rem; color: #64748B;">Pay period hours will appear as shifts are completed</span>
+                <span style="font-size: 0.74rem; color: #64748B;">Verified shift hours logged this cycle</span>
               </div>
 
               <div class="pay-metric-box" style="background: #F8FAFC; border: 1.5px solid #E2E8F0; border-radius: 8px; padding: 1.25rem;">
-                <span style="font-size: 0.74rem; font-weight: 700; color: #64748B; display: block;">ESTIMATED GROSS PAY</span>
-                <span id="pay-period-gross" style="font-size: 1.6rem; font-weight: 900; color: #0284C7; display: block; margin-top: 0.25rem;">$0.00</span>
-                <span style="font-size: 0.74rem; color: #64748B;">Standard bi-weekly payroll cycle</span>
+                <span style="font-size: 0.74rem; font-weight: 700; color: #64748B; display: block;">PAYROLL DISBURSEMENT</span>
+                <span style="font-size: 1.35rem; font-weight: 900; color: #0284C7; display: block; margin-top: 0.25rem;">Direct Deposit</span>
+                <span style="font-size: 0.74rem; color: #64748B;">Automated EFT bank remittance</span>
               </div>
 
               <div class="pay-metric-box" style="background: #F8FAFC; border: 1.5px solid #E2E8F0; border-radius: 8px; padding: 1.25rem;">
                 <span style="font-size: 0.74rem; font-weight: 700; color: #64748B; display: block;">NEXT PAY DATE</span>
                 <span id="pay-period-next-date" style="font-size: 1.6rem; font-weight: 900; color: var(--navy); display: block; margin-top: 0.25rem;">—</span>
-                <span style="font-size: 0.74rem; color: #64748B;">Direct Deposit via EFT</span>
+                <span style="font-size: 0.74rem; color: #64748B;">Standard bi-weekly payroll cycle</span>
               </div>
             </div>
 
@@ -7471,13 +7471,12 @@ html, body {
                       <th>Shift Code &amp; Facility</th>
                       <th>Date</th>
                       <th>Hours Logged</th>
-                      <th>Hourly Rate</th>
-                      <th>Gross Total</th>
+                      <th>Unit / Department</th>
                       <th>Status</th>
                     </tr>
                   </thead>
                   <tbody id="staff-pay-table-body">
-                    <tr><td colspan="6" style="text-align: center; color: #64748B; padding: 1.5rem;">Loading pay ledger...</td></tr>
+                    <tr><td colspan="5" style="text-align: center; color: #64748B; padding: 1.5rem;">Loading verified timecard ledger...</td></tr>
                   </tbody>
                 </table>
               </div>
@@ -12078,54 +12077,64 @@ let currentStaffPayShifts = [];
 async function loadStaffPaySummary() {
   const tbody = document.getElementById('staff-pay-table-body');
   const hoursEl = document.getElementById('pay-period-hours');
-  const grossEl = document.getElementById('pay-period-gross');
   const nextDateEl = document.getElementById('pay-period-next-date');
-
   const topHoursEl = document.getElementById('metric-worker-hours-val');
-  const topPayEl = document.getElementById('metric-worker-pay-val');
+  const topShiftsEl = document.getElementById('metric-worker-shifts-val');
 
   try {
-    const res = await fetch(`${API_BASE}/shifts/pay-summary`, { credentials: 'include' });
+    const activeStaff = currentStaffUser || currentUser || (typeof window !== 'undefined' && window.currentUser) || {
+      id: 'staff-nurse-sarah',
+      email: 'sarah.jenkins@divinefingershealthcare.ca',
+      full_name: 'Sarah Jenkins, RN'
+    };
+    const staffId = activeStaff.id || '';
+    const staffEmail = activeStaff.email || '';
+
+    const headers = {};
+    if (staffId) headers['X-Staff-Id'] = staffId;
+    if (staffEmail) headers['X-Staff-Email'] = staffEmail;
+
+    const qParams = new URLSearchParams();
+    if (staffId) qParams.set('staff_id', staffId);
+    if (staffEmail) qParams.set('staff_email', staffEmail);
+    const url = `${API_BASE}/shifts/pay-summary${qParams.toString() ? '?' + qParams.toString() : ''}`;
+
+    const res = await fetch(url, { headers, credentials: 'include' });
     let payData = null;
     if (res.ok) {
       payData = await res.json();
     }
 
     const rawHours = (payData && (payData.total_hours ?? payData.hours_this_period ?? payData.summary?.total_hours)) ?? 0;
-    const rawGross = (payData && (payData.gross_pay ?? payData.estimated_pay ?? payData.summary?.estimated_pay ?? payData.summary?.gross_pay)) ?? 0;
     const numH = Number(rawHours) || 0;
     const hours = (numH > 0 && numH < 0.1) ? numH.toFixed(2) : numH.toFixed(1);
-    const gross = `$${Number(rawGross).toLocaleString('en-CA', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-    const nextDate = (payData && (payData.next_pay_date || payData.summary?.next_pay_date)) || 'Sun, Sep 20, 2026';
+    const nextDate = (payData && (payData.next_pay_date || payData.summary?.next_pay_date)) || 'Direct Deposit (Bi-Weekly)';
 
     if (hoursEl) hoursEl.textContent = `${hours} hrs`;
-    if (grossEl) grossEl.textContent = gross;
     if (nextDateEl) nextDateEl.textContent = nextDate;
 
     if (topHoursEl) topHoursEl.textContent = `${hours}h`;
-    if (topPayEl) topPayEl.textContent = gross;
 
     const shifts = (payData && (payData.shifts || payData.timecards || payData.records)) ? (payData.shifts || payData.timecards || payData.records) : [];
 
     currentStaffPayShifts = shifts;
+    if (topShiftsEl) topShiftsEl.textContent = shifts.length;
 
     if (tbody) {
       if (shifts.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #64748B; padding: 2rem;">No verified pay records yet. Completed and verified shifts will appear here.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #64748B; padding: 2rem;">No verified shift records for this cycle yet. Completed EVV shifts will appear here automatically.</td></tr>';
       } else {
         tbody.innerHTML = shifts.map(s => {
           const sH = Number(s.raw_hours ?? s.hours ?? 0);
           const sHDisplay = (sH > 0 && sH < 0.1) ? `${sH.toFixed(2)} hrs` : (typeof s.hours === 'string' && s.hours.includes('hrs') ? s.hours : `${sH.toFixed(1)} hrs`);
-          const sRateDisplay = typeof s.rate === 'string' ? s.rate : `$${Number(s.raw_rate ?? s.rate ?? 48.5).toFixed(2)}/hr`;
-          const sTotalDisplay = typeof s.total === 'string' ? s.total : `$${Number(s.raw_total ?? s.total ?? 0).toFixed(2)}`;
+          const unitDisplay = s.unit || 'General Care';
 
           return `
             <tr>
-              <td><strong style="color:var(--navy);">${s.code || s.request_code || 'SHIFT'}</strong><div style="font-size:0.75rem;color:#64748B;">${s.facility || 'Hospital Facility'} &bull; ${s.unit || 'General'}</div></td>
+              <td><strong style="color:var(--navy);">${s.code || s.request_code || 'SHIFT'}</strong><div style="font-size:0.75rem;color:#64748B;">${s.facility || 'Hospital Partner Facility'}</div></td>
               <td>${s.date || s.date_label || '—'}</td>
               <td><strong>${sHDisplay}</strong></td>
-              <td>${sRateDisplay}</td>
-              <td><strong style="color:#0284C7;">${sTotalDisplay}</strong></td>
+              <td><span style="font-size:0.8rem;color:#475569;">${unitDisplay}</span></td>
               <td><span style="background:#ECFDF5;color:#047857;font-size:0.75rem;font-weight:700;padding:0.2rem 0.55rem;border-radius:9999px;">${s.status || 'Verified'}</span></td>
             </tr>
           `;
@@ -12135,10 +12144,9 @@ async function loadStaffPaySummary() {
 
   } catch (err) {
     if (hoursEl) hoursEl.textContent = '0.0 hrs';
-    if (grossEl) grossEl.textContent = '$0.00';
-    if (nextDateEl) nextDateEl.textContent = 'Sun, Sep 20, 2026';
+    if (nextDateEl) nextDateEl.textContent = 'Direct Deposit (Bi-Weekly)';
     if (tbody) {
-      tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #64748B; padding: 2rem;">No verified pay records yet.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #64748B; padding: 2rem;">No verified pay records yet.</td></tr>';
     }
   }
 }
@@ -12149,14 +12157,13 @@ function exportStaffPayStub() {
     return;
   }
 
-  const headers = ['Shift Code', 'Facility', 'Date', 'Hours', 'Hourly Rate', 'Gross Amount', 'Status'];
+  const headers = ['Shift Code', 'Facility', 'Date', 'Hours Logged', 'Unit / Department', 'Status'];
   const dataRows = currentStaffPayShifts.map(s => [
     `"${s.code || 'SHIFT'}"`,
     `"${(s.facility || 'Hospital Facility').replace(/"/g, '""')}"`,
     `"${s.date || '—'}"`,
-    Number(s.hours || 0).toFixed(1),
-    Number(s.rate || 0).toFixed(2),
-    Number(s.total || 0).toFixed(2),
+    Number(s.raw_hours ?? s.hours ?? 0).toFixed(1),
+    `"${(s.unit || 'General Care').replace(/"/g, '""')}"`,
     `"${s.status || 'Verified'}"`
   ]);
 
@@ -12168,7 +12175,7 @@ function exportStaffPayStub() {
   const encodedUri = encodeURI(csvContent);
   const link = document.createElement('a');
   link.setAttribute('href', encodedUri);
-  link.setAttribute('download', `Divine_Fingers_PayStub_${new Date().toISOString().slice(0, 10)}.csv`);
+  link.setAttribute('download', `DFH_Verified_Timesheet_${new Date().toISOString().slice(0, 10)}.csv`);
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);

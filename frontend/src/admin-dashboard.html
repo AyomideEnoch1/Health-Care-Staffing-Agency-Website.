@@ -134,7 +134,7 @@
           <span class="nav-badge danger" id="badge-requests-count" style="display:none;">0</span>
         </button>
 
-        <button type="button" class="nav-item-btn" data-tab="facilities-tab" data-title="Facilities &amp; MSA Contracts" onclick="window.switchAdminTab('facilities-tab', 'Facilities &amp; MSA Contracts')">
+        <button type="button" class="nav-item-btn" data-tab="facilities-tab" data-title="Facilities &amp; Rates" onclick="window.switchAdminTab('facilities-tab', 'Facilities &amp; Rates')">
           <span class="nav-icon"><i data-lucide="file-badge"></i></span>
           <span class="nav-label">Facilities &amp; Rates</span>
           <span class="nav-badge" id="badge-facilities-count" style="display:none;">0</span>
@@ -633,7 +633,7 @@
           </div>
         </div>
 
-        <!-- TAB: HEALTHCARE FACILITIES & MSA CONTRACT RATE CARDS -->
+        <!-- TAB: HEALTHCARE FACILITIES & RATE CARDS -->
         <div class="admin-view-tab" id="facilities-tab" style="display: none;">
           <!-- Top KPI Metrics -->
           <div class="kpi-grid">
@@ -649,7 +649,7 @@
             </div>
             <div class="kpi-card">
               <div class="kpi-top">
-                <span class="kpi-title">Active MSA Terms</span>
+                <span class="kpi-title">Active Rate Terms</span>
                 <div class="kpi-icon-box" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;"><i data-lucide="file-check" style="width: 18px; height: 18px;"></i></div>
               </div>
               <div class="kpi-value-row">
@@ -693,7 +693,7 @@
           <div style="background: rgba(0, 168, 150, 0.08); border: 1px solid rgba(0, 168, 150, 0.25); border-radius: 8px; padding: 0.9rem 1.1rem; margin-bottom: 1.25rem; display: flex; align-items: flex-start; gap: 0.85rem;">
             <i data-lucide="shield-check" style="width: 22px; height: 22px; color: var(--brand-turquoise, #00a896); flex-shrink: 0; margin-top: 2px;"></i>
             <div style="font-size: 0.82rem; line-height: 1.45; color: var(--text-secondary, #94a3b8);">
-              <strong style="color: var(--text-primary, #f8fafc);">Internal Rate Card Governance &amp; Portal Accounts:</strong> Healthcare facilities registering online via the client portal are automatically synced here in <span style="color: #f59e0b; font-weight: 700;">Pending Onboarding</span> status until their MSA contracts and rate cards are finalized. Agency admins can review accounts, set customized shift rates, or toggle portal access.
+              <strong style="color: var(--text-primary, #f8fafc);">Internal Rate Card Governance &amp; Portal Accounts:</strong> Healthcare facilities registering online via the client portal are automatically synced here in <span style="color: #f59e0b; font-weight: 700;">Pending Onboarding</span> status until their rate cards and customized terms are finalized. Agency admins can review accounts, set customized shift rates, or toggle portal access.
             </div>
           </div>
 
@@ -717,9 +717,9 @@
                 <input type="text" class="search-input filter-search-box" id="facilities-search-input" placeholder="Search facility name, code, contact or email...">
                 <select class="filter-select" id="facilities-status-filter">
                   <option value="">All Statuses</option>
-                  <option value="active">Active MSA Contract</option>
+                  <option value="active">Active Facility</option>
                   <option value="pending">Pending Onboarding</option>
-                  <option value="expired">Expired MSA</option>
+                  <option value="expired">Inactive / Expired</option>
                   <option value="portal_active">Has Portal Account</option>
                   <option value="no_portal">No Portal Account</option>
                 </select>
@@ -737,15 +737,14 @@
                     <th>Facility Name &amp; Code</th>
                     <th>Location / Region</th>
                     <th>Primary Contact &amp; Portal Account</th>
-                    <th>Contract Status</th>
-                    <th>MSA Expiry Date</th>
+                    <th>Status</th>
                     <th>Contracted Terms</th>
                     <th style="text-align: right;">Actions</th>
                   </tr>
                 </thead>
                 <tbody id="facilities-table-body">
                   <tr>
-                    <td colspan="7" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">
+                    <td colspan="6" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">'
                       <i data-lucide="loader-2" class="spin" style="width: 24px; height: 24px; margin-bottom: 0.5rem;"></i>
                       <div>Loading healthcare facilities &amp; contracted rate cards...</div>
                     </td>
@@ -1925,67 +1924,12 @@
             <input type="tel" class="modal-input" id="facility-contact-phone" placeholder="e.g. +1 (416) 438-2911">
           </div>
           <div class="modal-form-group">
-            <label for="facility-status">MSA Contract Status *</label>
+            <label for="facility-status">Facility Status *</label>
             <select class="modal-input" id="facility-status" required>
-              <option value="active">Active MSA Contract</option>
+              <option value="active">Active</option>
               <option value="pending" selected>Pending Onboarding (Global Fallback)</option>
-              <option value="expired">Expired MSA</option>
+              <option value="expired">Inactive</option>
             </select>
-          </div>
-        </div>
-
-        <div class="modal-form-grid">
-          <div class="modal-form-group">
-            <label for="facility-msa-signed">MSA Execution / Signed Date</label>
-            <input type="date" class="modal-input" id="facility-msa-signed">
-          </div>
-          <div class="modal-form-group">
-            <label for="facility-msa-expiry">MSA Expiration Date</label>
-            <input type="date" class="modal-input" id="facility-msa-expiry">
-          </div>
-        </div>
-
-        <div class="modal-form-group" style="margin-bottom: 1.25rem;">
-          <label style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
-            <span>Executed Master Services Agreement (MSA Document)</span>
-            <span style="font-size: 0.72rem; color: var(--text-muted); font-weight: normal;">PDF, DOC, DOCX up to 25MB</span>
-          </label>
-
-          <!-- Direct File Upload Dropzone -->
-          <div class="admin-file-upload-box" id="facility-msa-dropzone">
-            <input type="file" id="facility-msa-file" class="admin-hidden-file-input" accept=".pdf,.doc,.docx" onchange="window.handleFacilityMsaFileChange(this)">
-            <label for="facility-msa-file" class="admin-file-upload-label" id="facility-msa-file-label">
-              <div class="admin-file-upload-icon-circle">
-                <i data-lucide="file-up" id="facility-msa-file-icon" style="width: 18px; height: 18px;"></i>
-              </div>
-              <div class="admin-file-upload-text-group">
-                <span class="admin-file-upload-title" id="facility-msa-title">Upload Signed Contract Document</span>
-                <span class="admin-file-upload-subtitle" id="facility-msa-subtitle">Drag &amp; drop or click to choose MSA contract (.pdf, .docx)</span>
-              </div>
-              <span class="admin-file-upload-btn-chip" id="facility-msa-browse-btn">Browse File</span>
-            </label>
-            <div id="facility-msa-preview-bar" style="display: none; align-items: center; justify-content: space-between; margin-top: 0.5rem; padding: 0.5rem 0.75rem; background: rgba(2, 132, 199, 0.1); border: 1px solid rgba(2, 132, 199, 0.3); border-radius: 6px; font-size: 0.75rem;">
-              <div style="display: flex; align-items: center; gap: 0.5rem; overflow: hidden; min-width: 0;">
-                <i data-lucide="file-check-2" style="width: 16px; height: 16px; color: #10B981; flex-shrink: 0;"></i>
-                <a id="facility-msa-active-link" href="#" target="_blank" rel="noopener noreferrer" style="color: var(--brand-turquoise); font-weight: 600; text-decoration: underline; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"></a>
-              </div>
-              <button type="button" onclick="window.clearFacilityMsaFile()" style="background: none; border: none; color: #EF4444; font-size: 0.72rem; cursor: pointer; display: flex; align-items: center; gap: 2px; flex-shrink: 0; padding: 2px 6px; border-radius: 4px;">
-                <i data-lucide="x" style="width: 13px; height: 13px;"></i> Remove
-              </button>
-            </div>
-          </div>
-
-          <!-- Stored file path / URL hidden input -->
-          <input type="hidden" id="facility-msa-url">
-
-          <!-- Optional manual URL fallback -->
-          <div style="margin-top: 0.45rem;">
-            <a href="javascript:void(0)" onclick="window.toggleMsaUrlInput()" id="facility-msa-url-toggle" style="font-size: 0.72rem; color: var(--text-muted); text-decoration: underline;">
-              Or link to an external document URL instead
-            </a>
-            <div id="facility-msa-url-wrapper" style="display: none; margin-top: 0.45rem;">
-              <input type="text" class="modal-input" id="facility-msa-url-manual" placeholder="https://external-storage.ca/contracts/msa-shn-2026.pdf" oninput="document.getElementById('facility-msa-url').value = this.value.trim();">
-            </div>
           </div>
         </div>
 
@@ -2006,7 +1950,7 @@
     <div class="admin-modal-card" style="max-width: 540px;">
       <div class="modal-header">
         <h3 class="modal-title">
-          <i data-lucide="badge-dollar-sign" style="width: 20px; height: 20px; color: var(--brand-turquoise);"></i> Add Contracted MSA Rate Term
+          <i data-lucide="badge-dollar-sign" style="width: 20px; height: 20px; color: var(--brand-turquoise);"></i> Add Contracted Rate Term
         </h3>
         <button type="button" class="modal-close-btn" onclick="window.closeRateCardModal()" aria-label="Close modal"><i data-lucide="x" style="width: 20px; height: 20px;"></i></button>
       </div>
@@ -2116,14 +2060,14 @@
   </div>
 
   <!-- ==========================================================================
-       FACILITY RATE CARDS & MSA CONTRACT TERMS MANAGEMENT MODAL
+       FACILITY RATE CARDS & CONTRACT TERMS MANAGEMENT MODAL
        ========================================================================== -->
   <div class="admin-modal-overlay" id="modal-manage-rate-cards">
     <div class="admin-modal-card" style="max-width: 900px; width: 95%;">
       <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem;">
         <div>
           <h3 class="modal-title" id="manage-rate-cards-title" style="display: flex; align-items: center; gap: 0.5rem; margin: 0; font-size: 1.15rem;">
-            <i data-lucide="badge-dollar-sign" style="width: 22px; height: 22px; color: var(--brand-cyan);"></i> Contracted MSA Rate Cards
+            <i data-lucide="badge-dollar-sign" style="width: 22px; height: 22px; color: var(--brand-cyan);"></i> Contracted Facility Rate Cards
           </h3>
           <div id="manage-rate-cards-subtitle" style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 3px;">
             Facility: Scarborough Health Network
@@ -2328,7 +2272,7 @@
   </div>
 
 <!-- Core Dashboard Application Script -->
-  <script src="admin.js?v=6.9.0"></script>
+  <script src="admin.js?v=7.0.0"></script>
 
 </body>
 </html>

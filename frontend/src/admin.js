@@ -5506,9 +5506,9 @@
     facilitiesTableBody.innerHTML = filtered.map(f => {
       let statusBadge = '';
       if (f.effective_status === 'active') {
-        statusBadge = '<span class="status-pill verified" style="font-size: 0.72rem; padding: 2px 8px;"><i data-lucide="shield-check" style="width: 12px; height: 12px;"></i> Active MSA</span>';
+        statusBadge = '<span class="status-pill verified" style="font-size: 0.72rem; padding: 2px 8px;"><i data-lucide="shield-check" style="width: 12px; height: 12px;"></i> Active</span>';
       } else if (f.effective_status === 'expired') {
-        statusBadge = '<span class="status-pill danger" style="font-size: 0.72rem; padding: 2px 8px;"><i data-lucide="alert-triangle" style="width: 12px; height: 12px;"></i> Expired MSA</span>';
+        statusBadge = '<span class="status-pill danger" style="font-size: 0.72rem; padding: 2px 8px;"><i data-lucide="alert-triangle" style="width: 12px; height: 12px;"></i> Inactive</span>';
       } else {
         statusBadge = '<span class="status-pill pending" style="font-size: 0.72rem; padding: 2px 8px;"><i data-lucide="clock" style="width: 12px; height: 12px;"></i> Pending Onboarding</span>';
       }
@@ -5594,15 +5594,6 @@
             <div class="meta-value">
               ${statusBadge}
               ${expiryWarning}
-            </div>
-          </td>
-
-          <!-- MSA Expiry Date -->
-          <td class="cell-grid-item" data-label="MSA Expiry">
-            <div class="meta-label">MSA Expiry Date</div>
-            <div class="meta-value">
-              <strong>${expiryStr}</strong>
-              ${docLink}
             </div>
           </td>
 
@@ -5875,9 +5866,9 @@
     if (summaryEl) {
       let statusPill = '';
       if (facility.effective_status === 'active') {
-        statusPill = '<span class="status-pill verified" style="font-size: 0.72rem; padding: 1px 7px;">Active MSA Contract</span>';
+        statusPill = '<span class="status-pill verified" style="font-size: 0.72rem; padding: 1px 7px;">Active Facility</span>';
       } else if (facility.effective_status === 'expired') {
-        statusPill = '<span class="status-pill danger" style="font-size: 0.72rem; padding: 1px 7px;">Expired MSA</span>';
+        statusPill = '<span class="status-pill danger" style="font-size: 0.72rem; padding: 1px 7px;">Inactive</span>';
       } else {
         statusPill = '<span class="status-pill pending" style="font-size: 0.72rem; padding: 1px 7px;">Pending Onboarding</span>';
       }
@@ -6014,66 +6005,10 @@
     }
   };
 
-  // Facility Modal & MSA Document Upload Handlers
-  window.handleFacilityMsaFileChange = function(input) {
-    if (!input || !input.files || !input.files[0]) return;
-    const file = input.files[0];
-    const maxBytes = 25 * 1024 * 1024; // 25MB
-    if (file.size > maxBytes) {
-      showToast('Document exceeds maximum allowed size of 25MB.', 'error');
-      input.value = '';
-      return;
-    }
-
-    const titleEl = document.getElementById('facility-msa-title');
-    const subEl = document.getElementById('facility-msa-subtitle');
-    const btnEl = document.getElementById('facility-msa-browse-btn');
-    const previewBar = document.getElementById('facility-msa-preview-bar');
-    const previewLink = document.getElementById('facility-msa-active-link');
-
-    const formattedSize = file.size > 1048576 
-      ? (file.size / 1048576).toFixed(1) + ' MB'
-      : Math.round(file.size / 1024) + ' KB';
-
-    if (titleEl) titleEl.textContent = file.name;
-    if (subEl) subEl.textContent = `Ready to upload (${formattedSize})`;
-    if (btnEl) btnEl.textContent = 'Change';
-
-    if (previewBar && previewLink) {
-      previewBar.style.display = 'flex';
-      previewLink.textContent = `Staged: ${file.name} (${formattedSize})`;
-      previewLink.removeAttribute('href');
-      previewLink.style.textDecoration = 'none';
-      previewLink.style.color = '#38BDF8';
-    }
-    if (window.lucide) lucide.createIcons();
-  };
-
-  window.clearFacilityMsaFile = function() {
-    const fileInput = document.getElementById('facility-msa-file');
-    const urlHidden = document.getElementById('facility-msa-url');
-    const urlManual = document.getElementById('facility-msa-url-manual');
-    const titleEl = document.getElementById('facility-msa-title');
-    const subEl = document.getElementById('facility-msa-subtitle');
-    const btnEl = document.getElementById('facility-msa-browse-btn');
-    const previewBar = document.getElementById('facility-msa-preview-bar');
-
-    if (fileInput) fileInput.value = '';
-    if (urlHidden) urlHidden.value = '';
-    if (urlManual) urlManual.value = '';
-    if (titleEl) titleEl.textContent = 'Upload Signed Contract Document';
-    if (subEl) subEl.textContent = 'Drag & drop or click to choose MSA contract (.pdf, .docx)';
-    if (btnEl) btnEl.textContent = 'Browse File';
-    if (previewBar) previewBar.style.display = 'none';
-    if (window.lucide) lucide.createIcons();
-  };
-
-  window.toggleMsaUrlInput = function() {
-    const wrapper = document.getElementById('facility-msa-url-wrapper');
-    if (!wrapper) return;
-    const isHidden = wrapper.style.display === 'none' || !wrapper.style.display;
-    wrapper.style.display = isHidden ? 'block' : 'none';
-  };
+  // Facility Modal Handlers
+  window.handleFacilityMsaFileChange = function() {};
+  window.clearFacilityMsaFile = function() {};
+  window.toggleMsaUrlInput = function() {};
 
   // Facility Modal Handlers
   window.openFacilityModal = function(facilityId = null) {
@@ -6081,11 +6016,6 @@
     const form = document.getElementById('form-facility');
     if (!form) return;
     form.reset();
-
-    // Reset MSA Document Upload State
-    window.clearFacilityMsaFile();
-    const urlWrapper = document.getElementById('facility-msa-url-wrapper');
-    if (urlWrapper) urlWrapper.style.display = 'none';
 
     document.getElementById('facility-id').value = facilityId || '';
 
@@ -6101,65 +6031,9 @@
         document.getElementById('facility-contact-email').value = f.contact_email || '';
         document.getElementById('facility-contact-phone').value = f.contact_phone || '';
         document.getElementById('facility-status').value = f.status || 'pending';
-        document.getElementById('facility-msa-signed').value = f.msa_signed_date ? f.msa_signed_date.slice(0, 10) : '';
-        document.getElementById('facility-msa-expiry').value = f.msa_expiry_date ? f.msa_expiry_date.slice(0, 10) : '';
-        
-        // Attached MSA Document representation
-        if (f.msa_document_url) {
-          const msaUrl = f.msa_document_url;
-          document.getElementById('facility-msa-url').value = msaUrl;
-          const manualInput = document.getElementById('facility-msa-url-manual');
-          if (manualInput) manualInput.value = msaUrl;
-
-          const titleEl = document.getElementById('facility-msa-title');
-          const subEl = document.getElementById('facility-msa-subtitle');
-          const btnEl = document.getElementById('facility-msa-browse-btn');
-          const previewBar = document.getElementById('facility-msa-preview-bar');
-          const previewLink = document.getElementById('facility-msa-active-link');
-
-          const filename = msaUrl.split('/').pop() || 'Executed Contract';
-          if (titleEl) titleEl.textContent = 'Active MSA Contract Attached';
-          if (subEl) subEl.textContent = filename;
-          if (btnEl) btnEl.textContent = 'Replace File';
-
-          if (previewBar && previewLink) {
-            previewBar.style.display = 'flex';
-            previewLink.textContent = `View Document: ${filename}`;
-            previewLink.href = msaUrl;
-            previewLink.style.textDecoration = 'underline';
-            previewLink.style.color = 'var(--brand-turquoise)';
-          }
-        }
       }
     } else {
       if (titleEl) titleEl.innerHTML = `<i data-lucide="building-2" style="width: 20px; height: 20px; color: var(--brand-cyan);"></i> Register Healthcare Facility`;
-    }
-
-    // Bind drag & drop onto the MSA dropzone if not already bound
-    const dropzone = document.getElementById('facility-msa-dropzone');
-    if (dropzone && !dropzone.dataset.dragBound) {
-      dropzone.dataset.dragBound = 'true';
-      dropzone.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        dropzone.style.borderColor = 'var(--brand-cyan)';
-        dropzone.style.background = 'rgba(0, 245, 212, 0.12)';
-      });
-      dropzone.addEventListener('dragleave', () => {
-        dropzone.style.borderColor = '';
-        dropzone.style.background = '';
-      });
-      dropzone.addEventListener('drop', (e) => {
-        e.preventDefault();
-        dropzone.style.borderColor = '';
-        dropzone.style.background = '';
-        if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-          const fileInput = document.getElementById('facility-msa-file');
-          if (fileInput) {
-            fileInput.files = e.dataTransfer.files;
-            window.handleFacilityMsaFileChange(fileInput);
-          }
-        }
-      });
     }
 
     if (modalFacility) modalFacility.classList.add('open');
@@ -6175,40 +6049,14 @@
     const facilityId = document.getElementById('facility-id').value;
     const submitBtn  = document.getElementById('facility-submit-btn');
 
-    const msaFileInput = document.getElementById('facility-msa-file');
-    let msaDocUrl = document.getElementById('facility-msa-url').value.trim() || null;
-
     if (!document.getElementById('facility-name').value.trim()) {
       showToast('Facility legal name is required.', 'error');
       return;
     }
 
     try {
-      if (submitBtn) { submitBtn.disabled = true; }
-
-      // 1. If a new MSA file is chosen, upload it first to /api/admin/facilities/upload-msa
-      if (msaFileInput && msaFileInput.files && msaFileInput.files.length > 0) {
-        if (submitBtn) submitBtn.innerHTML = '<i data-lucide="loader-2" class="spin"></i> Uploading Contract Document...';
-        if (window.lucide) lucide.createIcons();
-
-        const formData = new FormData();
-        formData.append('msa_document', msaFileInput.files[0]);
-
-        const uploadRes = await apiRequest('/admin/facilities/upload-msa', {
-          method: 'POST',
-          body: formData
-        });
-
-        if (uploadRes && uploadRes.success && uploadRes.file_url) {
-          msaDocUrl = uploadRes.file_url;
-          document.getElementById('facility-msa-url').value = msaDocUrl;
-        } else {
-          throw new Error(uploadRes?.error || 'Failed to upload contract document.');
-        }
-      }
-
-      // 2. Submit facility profile metadata
-      if (submitBtn) {
+      if (submitBtn) { 
+        submitBtn.disabled = true;
         submitBtn.innerHTML = '<i data-lucide="loader-2" class="spin"></i> Saving Facility Profile...';
         if (window.lucide) lucide.createIcons();
       }
@@ -6221,10 +6069,7 @@
         contact_name: document.getElementById('facility-contact-name').value.trim() || null,
         contact_email: document.getElementById('facility-contact-email').value.trim() || null,
         contact_phone: document.getElementById('facility-contact-phone').value.trim() || null,
-        status: document.getElementById('facility-status').value,
-        msa_signed_date: document.getElementById('facility-msa-signed').value || null,
-        msa_expiry_date: document.getElementById('facility-msa-expiry').value || null,
-        msa_document_url: msaDocUrl
+        status: document.getElementById('facility-status').value
       };
 
       let res;
