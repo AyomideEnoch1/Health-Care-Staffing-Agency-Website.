@@ -7,6 +7,7 @@ const path = require('path');
 const pool = require('../db');
 const adminEvents = require('../utils/events');
 const { uploadCredential } = require('../middleware/uploadCredentials');
+const { generateNextStaffCode } = require('../utils/rosterHelper');
 
 const JWT_ADMIN_SECRET = process.env.JWT_ADMIN_SECRET || process.env.JWT_SECRET || 'divine_fingers_default_admin_jwt_secret_key_2026';
 const JWT_USER_SECRET = process.env.JWT_USER_SECRET || process.env.USER_JWT_SECRET || process.env.JWT_SECRET || 'divine_fingers_default_user_jwt_secret_key_2026';
@@ -1053,14 +1054,15 @@ router.post('/my-documents/upload', (req, res, next) => {
     // Auto-create or ensure staff_roster record exists for this clinician
     if (!rosterStaff) {
       try {
-        const [countRows] = await pool.query('SELECT COUNT(*) AS total FROM staff_roster');
-        const nextCode = `STF-${String(((countRows && countRows[0] && countRows[0].total) || 0) + 1).padStart(3, '0')}`;
-        const newStaffId = user.id || crypto.randomUUID();
+        const nextCode = await generateNextStaffCode(pool);
+        let newStaffId = user.id || crypto.randomUUID();
+        const [idConflict] = await pool.query('SELECT id FROM staff_roster WHERE id = ? LIMIT 1', [newStaffId]);
+        if (idConflict && idConflict.length > 0) newStaffId = crypto.randomUUID();
+
         await pool.query(
           `INSERT INTO staff_roster 
             (id, staff_code, name, role, specialty, region, phone, email, status, credential_status, hourly_rate, cpr_expiry_date)
-           VALUES (?, ?, ?, 'RN', 'General Care', 'Greater Toronto Area', ?, ?, 'available', 'pending', 35.00, DATE_ADD(CURDATE(), INTERVAL 1 YEAR))
-           ON DUPLICATE KEY UPDATE name = VALUES(name), email = VALUES(email)`,
+           VALUES (?, ?, ?, 'RN', 'General Care', 'Greater Toronto Area', ?, ?, 'available', 'pending', 35.00, DATE_ADD(CURDATE(), INTERVAL 1 YEAR))`,
           [newStaffId, nextCode, user.full_name || 'Staff Member', user.phone || null, user.email || null]
         );
         const [created] = await pool.query('SELECT id, name, staff_code, role, email FROM staff_roster WHERE id = ? OR email = ? LIMIT 1', [newStaffId, user.email || '']);

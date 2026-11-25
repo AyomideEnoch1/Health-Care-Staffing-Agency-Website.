@@ -40,6 +40,7 @@ const adminEvents = require('../utils/events');
 const { enqueueMail } = require('../utils/mailOutbox');
 const mailService = require('../services/mail/MailService');
 const { generateSecureToken } = require('../utils/cryptoUtils');
+const { generateNextStaffCode, healDuplicateStaffCodes, healMissingHealthcareWorkers } = require('../utils/rosterHelper');
 
 // All admin routes require authentication
 router.use(requireAdminAuth());
@@ -540,11 +541,9 @@ router.patch('/applications/:id/stage', requirePermission('applications:manage')
             }
 
             // Check staff_roster table
-            const [rosterRows] = await pool.query('SELECT id FROM staff_roster WHERE id = ? OR LOWER(email) = ? LIMIT 1', [id, emailClean]);
+            const [rosterRows] = await pool.query('SELECT id, staff_code FROM staff_roster WHERE id = ? OR LOWER(email) = ? LIMIT 1', [id, emailClean]);
             if (!rosterRows || rosterRows.length === 0) {
-              const [countRows] = await pool.query('SELECT COUNT(*) AS total FROM staff_roster');
-              const nextNum = String((countRows?.[0]?.total || 0) + 1).padStart(3, '0');
-              const staffCode = `STF-${nextNum}`;
+              const staffCode = await generateNextStaffCode(pool);
               let mappedRole = 'RN';
               const rawRole = app.role_applied || '';
               if (rawRole.includes('RPN')) mappedRole = 'RPN';
@@ -552,12 +551,15 @@ router.patch('/applications/:id/stage', requirePermission('applications:manage')
               else if (rawRole.includes('Companion')) mappedRole = 'Companion';
               else if (rawRole.includes('Travel')) mappedRole = 'Travel Nurse';
 
+              let rosterId = id;
+              const [idConflict] = await pool.query('SELECT id FROM staff_roster WHERE id = ? LIMIT 1', [rosterId]);
+              if (idConflict && idConflict.length > 0) rosterId = crypto.randomUUID();
+
               await pool.query(
                 `INSERT INTO staff_roster
                   (id, name, role, specialty, status, credential_status, rating, region, phone, email, staff_code, hourly_rate, cpr_expiry_date)
-                 VALUES (?, ?, ?, 'General Care', 'available', 'verified', 5.0, 'Greater Toronto Area', ?, ?, ?, 45.00, DATE_ADD(CURDATE(), INTERVAL 1 YEAR))
-                 ON DUPLICATE KEY UPDATE name = VALUES(name), role = VALUES(role), phone = VALUES(phone)`,
-                [id, app.full_name, mappedRole, app.phone || null, emailClean, staffCode]
+                 VALUES (?, ?, ?, 'General Care', 'available', 'verified', 5.0, 'Greater Toronto Area', ?, ?, ?, 45.00, DATE_ADD(CURDATE(), INTERVAL 1 YEAR))`,
+                [rosterId, app.full_name, mappedRole, app.phone || null, emailClean, staffCode]
               );
             }
           }
@@ -882,15 +884,15 @@ async function ensureRosterStaff(identifier) {
     );
     if (userRows && userRows.length > 0) {
       const u = userRows[0];
-      const [countRows] = await pool.query('SELECT COUNT(*) AS total FROM staff_roster');
-      const nextCode = `STF-${String(((countRows && countRows[0] && countRows[0].total) || 0) + 1).padStart(3, '0')}`;
-      const newId = u.id || crypto.randomUUID();
+      const nextCode = await generateNextStaffCode(pool);
+      let newId = u.id || crypto.randomUUID();
+      const [idConflict] = await pool.query('SELECT id FROM staff_roster WHERE id = ? LIMIT 1', [newId]);
+      if (idConflict && idConflict.length > 0) newId = crypto.randomUUID();
 
       await pool.query(
         `INSERT INTO staff_roster 
           (id, staff_code, name, role, specialty, region, phone, email, status, credential_status, hourly_rate, cpr_expiry_date)
-         VALUES (?, ?, ?, 'RN', 'General Care', 'Greater Toronto Area', ?, ?, 'available', 'pending', 35.00, DATE_ADD(CURDATE(), INTERVAL 1 YEAR))
-         ON DUPLICATE KEY UPDATE name = VALUES(name), email = VALUES(email)`,
+         VALUES (?, ?, ?, 'RN', 'General Care', 'Greater Toronto Area', ?, ?, 'available', 'pending', 35.00, DATE_ADD(CURDATE(), INTERVAL 1 YEAR))`,
         [newId, nextCode, u.full_name || 'Staff Member', u.phone || null, u.email]
       );
 
@@ -913,15 +915,15 @@ async function ensureRosterStaff(identifier) {
       const a = appRows[0];
       const validRoles = ['RN', 'RPN', 'PSW', 'Companion', 'Travel Nurse'];
       const standardRole = validRoles.find(r => (a.role_applied || '').toUpperCase().includes(r)) || 'RN';
-      const [countRows] = await pool.query('SELECT COUNT(*) AS total FROM staff_roster');
-      const nextCode = `STF-${String(((countRows && countRows[0] && countRows[0].total) || 0) + 1).padStart(3, '0')}`;
-      const newId = a.id || crypto.randomUUID();
+      const nextCode = await generateNextStaffCode(pool);
+      let newId = a.id || crypto.randomUUID();
+      const [idConflict] = await pool.query('SELECT id FROM staff_roster WHERE id = ? LIMIT 1', [newId]);
+      if (idConflict && idConflict.length > 0) newId = crypto.randomUUID();
 
       await pool.query(
         `INSERT INTO staff_roster 
           (id, staff_code, name, role, specialty, region, phone, email, status, credential_status, hourly_rate, cpr_expiry_date)
-         VALUES (?, ?, ?, ?, 'General Care', 'Greater Toronto Area', ?, ?, 'available', 'pending', 35.00, DATE_ADD(CURDATE(), INTERVAL 1 YEAR))
-         ON DUPLICATE KEY UPDATE name = VALUES(name), email = VALUES(email)`,
+         VALUES (?, ?, ?, ?, 'General Care', 'Greater Toronto Area', ?, ?, 'available', 'pending', 35.00, DATE_ADD(CURDATE(), INTERVAL 1 YEAR))`,
         [newId, nextCode, a.full_name || 'Staff Member', standardRole, a.phone || null, a.email]
       );
 
@@ -938,31 +940,11 @@ async function ensureRosterStaff(identifier) {
 // GET /api/admin/roster
 router.get('/roster', requirePermission('roster:view'), async (req, res, next) => {
   try {
-    // Auto-heal / sync any registered healthcare_worker accounts into staff_roster
-    try {
-      const [missingUsers] = await pool.query(`
-        SELECT u.id, u.full_name, u.email, u.phone 
-        FROM users u 
-        WHERE (u.role = 'healthcare_worker' OR (u.organization_name IS NULL AND u.role != 'client'))
-          AND LOWER(TRIM(u.email)) NOT IN (SELECT LOWER(TRIM(email)) FROM staff_roster WHERE email IS NOT NULL AND email != '')
-      `);
-      if (missingUsers && missingUsers.length > 0) {
-        const [countRows] = await pool.query('SELECT COUNT(*) AS total FROM staff_roster');
-        let curTotal = (countRows?.[0]?.total || 0);
-        for (const mu of missingUsers) {
-          curTotal++;
-          const nextCode = `STF-${String(curTotal).padStart(3, '0')}`;
-          await pool.query(
-            `INSERT INTO staff_roster 
-              (id, staff_code, name, role, specialty, region, phone, email, status, credential_status, hourly_rate, cpr_expiry_date)
-             VALUES (?, ?, ?, 'RN', 'General Care', 'Greater Toronto Area', ?, ?, 'available', 'pending', 35.00, DATE_ADD(CURDATE(), INTERVAL 1 YEAR))`,
-            [mu.id, nextCode, mu.full_name || 'Staff Member', mu.phone || null, mu.email]
-          );
-        }
-      }
-    } catch (syncErr) {
-      console.warn('[Roster Auto-Sync Warning]:', syncErr.message);
-    }
+    // 1. Repair any duplicate or empty staff_codes
+    await healDuplicateStaffCodes(pool);
+
+    // 2. Auto-heal / sync any registered healthcare_worker accounts into staff_roster
+    await healMissingHealthcareWorkers(pool);
 
     const [rows] = await pool.query(
       `SELECT id, staff_code, name, role, specialty, cno_registration_num, status,
@@ -989,24 +971,22 @@ router.post('/roster', requirePermission('roster:manage'), async (req, res, next
     }
 
     const emailClean = email.toLowerCase().trim();
-    // Keep user id and staff roster id aligned if user already exists
-    let id = crypto.randomUUID();
-    const [existingUser] = await pool.query('SELECT id, full_name, email, role FROM users WHERE LOWER(email) = ?', [emailClean]);
-    if (existingUser && existingUser.length > 0) {
-      id = existingUser[0].id;
-    }
-
     const effectiveStatus = (status && status !== 'pending_verification') ? status : 'available';
 
-    // Pre-check: If staff member already exists in staff_roster (by id or email), perform an in-place update
+    const [existingUser] = await pool.query(
+      'SELECT id, full_name, email, role FROM users WHERE LOWER(TRIM(email)) = ? LIMIT 1',
+      [emailClean]
+    );
+
+    // Pre-check: If staff member already exists in staff_roster (by email or user id), perform an in-place update
     const [existingStaff] = await pool.query(
-      'SELECT id, staff_code, name, email FROM staff_roster WHERE id = ? OR LOWER(email) = ? LIMIT 1',
-      [id, emailClean]
+      'SELECT id, staff_code, name, email FROM staff_roster WHERE LOWER(TRIM(email)) = ? OR id = ? LIMIT 1',
+      [emailClean, (existingUser && existingUser[0]?.id) || '']
     );
 
     if (existingStaff && existingStaff.length > 0) {
       const targetId = existingStaff[0].id;
-      const targetCode = existingStaff[0].staff_code || 'STF-001';
+      const targetCode = existingStaff[0].staff_code || (await generateNextStaffCode(pool));
 
       await pool.query(
         `UPDATE staff_roster SET
@@ -1015,7 +995,7 @@ router.post('/roster', requirePermission('roster:manage'), async (req, res, next
           credential_status = ?, vss_status = ?, n95_fit_test = ?
          WHERE id = ?`,
         [
-          name, role, specialty || 'General Care', region || 'Greater Toronto Area', phone, emailClean,
+          name.trim(), role, specialty || 'General Care', region || 'Greater Toronto Area', phone.trim(), emailClean,
           parseFloat(hourly_rate) || 35.00,
           cpr_expiry_date || new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
           cno_registration_num || null,
@@ -1052,25 +1032,28 @@ router.post('/roster', requirePermission('roster:manage'), async (req, res, next
       });
     }
 
-    const countRes = await pool.query('SELECT COUNT(*) AS total FROM staff_roster');
-    const nextNum = (countRes[0][0].total || 0) + 1;
-    const staffCode = `STF-${String(nextNum).padStart(3, '0')}`;
+    // Generate guaranteed-unique staff_code for new clinician
+    const staffCode = await generateNextStaffCode(pool);
 
+    // Ensure ID doesn't collide with any existing roster record
+    let id = crypto.randomUUID();
+    if (existingUser && existingUser.length > 0) {
+      const [idConflict] = await pool.query('SELECT id FROM staff_roster WHERE id = ? LIMIT 1', [existingUser[0].id]);
+      if (!idConflict || idConflict.length === 0) {
+        id = existingUser[0].id;
+      }
+    }
+
+    // Clean INSERT — never overwrites any existing staff record
     await pool.query(
       `INSERT INTO staff_roster
         (id, staff_code, name, role, specialty, region, phone, email,
          hourly_rate, cpr_expiry_date, cno_registration_num, status,
          credential_status, vss_status, n95_fit_test)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-       ON DUPLICATE KEY UPDATE
-         name = VALUES(name), role = VALUES(role), specialty = VALUES(specialty),
-         region = VALUES(region), phone = VALUES(phone), hourly_rate = VALUES(hourly_rate),
-         cpr_expiry_date = VALUES(cpr_expiry_date), cno_registration_num = VALUES(cno_registration_num),
-         status = VALUES(status), credential_status = VALUES(credential_status),
-         vss_status = VALUES(vss_status), n95_fit_test = VALUES(n95_fit_test)`,
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
-        id, staffCode, name, role, specialty || 'General Care',
-        region || 'Greater Toronto Area', phone, emailClean,
+        id, staffCode, name.trim(), role, specialty || 'General Care',
+        region || 'Greater Toronto Area', phone.trim(), emailClean,
         parseFloat(hourly_rate) || 35.00,
         cpr_expiry_date || new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
         cno_registration_num || null,

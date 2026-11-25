@@ -1218,13 +1218,16 @@
     const region = document.getElementById('roster-region-filter')?.value || '';
 
     const filtered = LiveStore.staff.filter(s => {
+      const name = (s.name || '').toLowerCase();
+      const code = (s.staff_code || '').toLowerCase();
+      const cno  = (s.cno_registration_num || '').toLowerCase();
       const matchesQuery = !query || 
-        s.name.toLowerCase().includes(query) || 
-        s.staff_code.toLowerCase().includes(query) ||
-        (s.cno_registration_num && s.cno_registration_num.toLowerCase().includes(query));
+        name.includes(query) || 
+        code.includes(query) || 
+        cno.includes(query);
       const matchesRole   = isFilterAll(role) || s.role === role;
       const matchesStatus = isFilterAll(status) || s.status === status;
-      const matchesRegion = isFilterAll(region) || (s.region && s.region.toLowerCase().includes(region.toLowerCase()));
+      const matchesRegion = isFilterAll(region) || ((s.region || '').toLowerCase().includes(region.toLowerCase()));
       return matchesQuery && matchesRole && matchesStatus && matchesRegion;
     });
 

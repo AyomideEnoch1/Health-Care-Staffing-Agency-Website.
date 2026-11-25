@@ -22,6 +22,7 @@ const adminEvents = require('../utils/events');
 const { enqueueMail, notifySuperAdmins } = require('../utils/mailOutbox');
 const { generateSecureToken, maskEmail } = require('../utils/cryptoUtils');
 const { sendRawMail, buildUserVerificationOtpEmail } = require('../utils/mailer');
+const { generateNextStaffCode } = require('../utils/rosterHelper');
 
 const USER_JWT_SECRET = process.env.JWT_USER_SECRET || process.env.USER_JWT_SECRET || process.env.JWT_SECRET || 'divine_fingers_default_user_jwt_secret_key_2026';
 const JWT_SECRET = USER_JWT_SECRET;
@@ -203,26 +204,30 @@ router.post('/register', async (req, res, next) => {
     // If registering as a healthcare professional, also populate staff_roster so the admin dispatch team sees them
     if (data.role === 'healthcare_worker') {
       try {
-        const countRes = await pool.query('SELECT COUNT(*) AS total FROM staff_roster');
-        const nextNum = ((countRes[0] && countRes[0][0] && countRes[0][0].total) || 0) + 1;
-        const staffCode = `STF-${String(nextNum).padStart(3, '0')}`;
-        const validRoles = ['RN', 'RPN', 'PSW', 'Companion', 'Travel Nurse'];
-        const clinicalRole = (data.clinical_role && validRoles.includes(data.clinical_role)) ? data.clinical_role : 'RN';
-        await pool.query(
-          `INSERT INTO staff_roster (id, staff_code, name, role, specialty, region, phone, email, status, credential_status, hourly_rate, cpr_expiry_date)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'available', 'pending', 0.00, '2027-12-31')
-           ON DUPLICATE KEY UPDATE name = VALUES(name), role = VALUES(role), phone = VALUES(phone), email = VALUES(email)`,
-          [
-            userId,
-            staffCode,
-            data.full_name.trim(),
-            clinicalRole,
-            'General Care',
-            'Greater Toronto Area',
-            data.phone ? data.phone.trim() : null,
-            emailClean
-          ]
-        );
+        const [existing] = await pool.query('SELECT id FROM staff_roster WHERE LOWER(TRIM(email)) = ? LIMIT 1', [emailClean]);
+        if (!existing || existing.length === 0) {
+          const staffCode = await generateNextStaffCode(pool);
+          const validRoles = ['RN', 'RPN', 'PSW', 'Companion', 'Travel Nurse'];
+          const clinicalRole = (data.clinical_role && validRoles.includes(data.clinical_role)) ? data.clinical_role : 'RN';
+          let rosterId = userId;
+          const [idConflict] = await pool.query('SELECT id FROM staff_roster WHERE id = ? LIMIT 1', [rosterId]);
+          if (idConflict && idConflict.length > 0) rosterId = crypto.randomUUID();
+
+          await pool.query(
+            `INSERT INTO staff_roster (id, staff_code, name, role, specialty, region, phone, email, status, credential_status, hourly_rate, cpr_expiry_date)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'available', 'pending', 0.00, '2027-12-31')`,
+            [
+              rosterId,
+              staffCode,
+              data.full_name.trim(),
+              clinicalRole,
+              'General Care',
+              'Greater Toronto Area',
+              data.phone ? data.phone.trim() : null,
+              emailClean
+            ]
+          );
+        }
       } catch (rosterErr) {
         console.warn('[Staff Roster Mirror Warning]:', rosterErr.message);
       }
@@ -577,13 +582,15 @@ router.get('/me', async (req, res) => {
           rosterRegion = rosterRows[0].region || null;
         } else {
           // Auto-sync into staff_roster if missing
-          const [countRes] = await pool.query('SELECT COUNT(*) AS total FROM staff_roster');
-          const nextNum = ((countRes[0] && countRes[0][0] && countRes[0][0].total) || 0) + 1;
-          staffCode = `STF-${String(nextNum).padStart(3, '0')}`;
+          staffCode = await generateNextStaffCode(pool);
+          let rosterId = user.id;
+          const [idConflict] = await pool.query('SELECT id FROM staff_roster WHERE id = ? LIMIT 1', [rosterId]);
+          if (idConflict && idConflict.length > 0) rosterId = crypto.randomUUID();
+
           await pool.query(
             `INSERT INTO staff_roster (id, staff_code, name, role, specialty, region, phone, email, status, credential_status, hourly_rate, cpr_expiry_date)
              VALUES (?, ?, ?, 'RN', 'General Care', 'Greater Toronto Area', ?, ?, 'available', 'pending', 35.00, DATE_ADD(CURDATE(), INTERVAL 1 YEAR))`,
-            [user.id, staffCode, user.full_name || 'Staff Member', user.phone || null, user.email]
+            [rosterId, staffCode, user.full_name || 'Staff Member', user.phone || null, user.email]
           );
         }
       } catch (e) {}
